@@ -81,8 +81,9 @@ async function refreshAuthUI() {
       const age = row.profiles?.age ? `${row.profiles.age}세` : "";
       const gender = row.profiles?.gender ?? "";
       const langs = Array.isArray(row.profiles?.languages) ? row.profiles.languages : [];
-      const img = row.profiles?.avatar_url || (Array.isArray(row.photos) && row.photos[0]) || "https://picsum.photos/seed/puzzmi/400/300";
-// JPY 고정가
+      const keys = Array.isArray(row.photos) ? row.photos : [];
+      const firstKey = keys[0] || null;
+      const img = firstKey ? supabase.storage.from('mates').getPublicUrl(firstKey).data.publicUrl : (row.profiles?.avatar_url || "https://picsum.photos/seed/puzzmi/400/300");// JPY 고정가
 const priceJpy = 4000;
 const price = new Intl.NumberFormat('ja-JP', {
   style: 'currency',
