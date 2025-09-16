@@ -115,16 +115,6 @@ async function load(){
         ? `메이트가 예약을 확정했습니다.\n일정: ${when}`
         : `사유: ${reason || '사유 미기재'}\n일정: ${when}`;
 
-      const link = `booking.html?booking_id=${bk.id}`;
-      await createNotification({
-        user_id: bk.customer_id,     // 고객에게
-        title, body,
-        type: act === 'confirm' ? 'booking_confirmed'
-            : act === 'decline'  ? 'booking_declined'
-            : 'booking_canceled',
-        link
-      });
-
       // 4) 화면 갱신
       await load();
     };
