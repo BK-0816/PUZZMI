@@ -38,7 +38,7 @@
   }
 
   // ===== 2) 메이트 목록 (페이지네이션 + 공개 URL 변환 + 로그인 가드 + 찜) =====
-  const ONLY_VERIFIED = true;   // 비로그인 사용자에게 공개하려면 true 권장
+  const ONLY_VERIFIED = false;   // 비로그인 사용자에게 공개하려면 true 권장
   const PAGE_SIZE     = 8;
 
   let page = 0, isLoading = false, hasMore = true;
@@ -187,9 +187,6 @@
     await loadMates({ reset: true });
   })();
 </script>
-
-
-
 
 <body>
     <header class="header">
