@@ -49,9 +49,9 @@
       <div id="meta" class="grid" style="margin-top:12px"></div>
 
       <div class="row" style="margin-top:8px">
-        <a class="btn btn-secondary" id="backBtn">목록으로</a>
+        <a class="cta-btn" id="backBtn">목록으로</a>
         <a class="cta-btn" id="bookBtn" data-requires-auth="true">예약하기</a>
-        <button class="btn btn-outline" id="favBtn" data-requires-auth="true">찜하기</button>
+        <button class="cta-btn" id="favBtn" data-requires-auth="true">찜하기</button>
         <div id="favMsg" class="muted" style="display:none">찜 완료</div>
       </div>
     </section>
@@ -240,7 +240,7 @@
             <div class="reply" style="margin-top:8px">
               <div class="label" style="margin-bottom:4px">코멘트 작성/수정</div>
               <textarea class="input" id="reply_${r.id}" placeholder="코멘트를 입력하세요...">${r.mate_reply ?? ''}</textarea>
-              <button class="btn btn-secondary" data-reply-save="${r.id}" style="margin-top:6px">코멘트 저장</button>
+              <button class="cta-btn" data-reply-save="${r.id}" style="margin-top:6px">코멘트 저장</button>
             </div>
           `: ''}
         </div>
