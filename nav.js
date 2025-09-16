@@ -20,12 +20,14 @@ function el(tag, attrs={}, children=[]) {
 
 async function getRoles() {
   const { data: { user } } = await supabase.auth.getUser();
-  let isAdmin = false;
+  let isAdmin = false, isMate = false;
   if (user) {
     const a = await supabase.from('admin_users').select('user_id').eq('user_id', user.id).maybeSingle();
     isAdmin = !!a.data;
+    const m = await supabase.from('mate_profiles').select('user_id').eq('user_id', user.id).maybeSingle();
+    isMate = !!m.data;
   }
-  return { user, isAdmin };
+  return { user, isAdmin, isMate };
 }
 
 export async function renderNavbar(rootId='app-nav') {
@@ -44,7 +46,7 @@ export async function renderNavbar(rootId='app-nav') {
   const menu = el('div', { class: 'menu' });
   wrap.appendChild(menu);
 
-  const { user, isAdmin } = await getRoles();
+  const { user, isAdmin, isMate } = await getRoles();
 
   // ✅ 비로그인: "로그인"만
   if (!user) {
@@ -53,11 +55,24 @@ export async function renderNavbar(rootId='app-nav') {
     return;
   }
 
+    if (user && !isAdmin && !isMate) {
+    // 일반 유저
+    menu.appendChild(el('a', { href: 'my_favorites.html' }, '내 찜'));
+    menu.appendChild(el('a', { href: 'my_bookings.html' }, '내 예약'));
+  }
+
   // ✅ 로그인: 이용고객 → "1:1문의", 관리자 → "Q&A관리"
   if (isAdmin) {
+    
+    menu.appendChild(el('a', { href: 'admin_plus.html' }, '관리자'));
+    menu.appendChild(el('a', { href: 'admin_mates.html' }, '메이트 관리'));
     menu.appendChild(el('a', { href: 'qna.html' }, 'Q&A관리'));
   } else {
     menu.appendChild(el('a', { href: 'qna.html' }, '1:1문의'));
+  }
+  if (isMate) {
+    menu.appendChild(el('a', { href: 'mate_dashboard.html' }, '메이트 대시보드'));
+    menu.appendChild(el('a', { href: 'mate_edit.html' }, '프로필 편집'));
   }
 
   // 우측 로그인 정보/로그아웃
