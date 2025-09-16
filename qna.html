@@ -74,7 +74,6 @@
     // 관리자 여부 확인
     const { data: adminRow } = await supabase.from('admin_users').select('user_id').eq('user_id', user.id).maybeSingle();
     const isAdmin = !!adminRow;
-    bindAdminHandlers(isAdmin, user, supabase, loadList);
 
     // UI 라벨
     if (isAdmin) {
@@ -219,17 +218,10 @@ function bindAdminHandlers(isAdmin, user, supabase, loadList) {
     }
   });
 }
-
-// 간단 토스트
-function toast(msg) {
-  const t = document.createElement('div');
-  t.textContent = msg;
-  t.style.cssText = 'position:fixed;left:50%;top:16px;transform:translateX(-50%);background:#222;color:#fff;padding:8px 12px;border-radius:8px;z-index:9999;opacity:.95';
-  document.body.appendChild(t);
-  setTimeout(()=>t.remove(), 1600);
-}
       }
     }
+
+        bindAdminHandlers(isAdmin, user, supabase, loadList);
 
     await loadList();
   </script>
