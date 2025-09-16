@@ -84,6 +84,9 @@
     card.innerHTML = `
       <div class="friend-image">
         <img src="${img}" alt="${name}">
+        <div class="heart-badge" data-heart="${row.user_id}">
+          <i class="fas fa-heart"></i><span class="count">${favCount}</span>
+        </div>
       </div>
       <div class="friend-info">
         <h3 class="friend-name">${name}</h3>
@@ -99,7 +102,9 @@
         <div style="margin-top:10px; display:flex; gap:8px;">
           <button class="cta-btn" data-requires-auth="true" href="mate_like.html?mate_id=${row.user_id}">프로필 보기</button>
           <button class="cta-btn" data-requires-auth="true" href="booking.html?mate_id=${row.user_id}">예약하기</button>
-          <button class="cta-btn" data-fav-mate="${row.user_id}">찜하기</button>
+          <button class="cta-btn" data-fav-mate="${row.user_id}" ${alreadyFav ? "disabled" : ""}>
+            ${alreadyFav ? "찜 완료" : "찜하기"}
+          </button>
         </div>
       </div>
     `;
