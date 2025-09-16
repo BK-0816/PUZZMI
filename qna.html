@@ -94,13 +94,14 @@
       if (!title || !content) return;
 
       const { error } = await supabase.from('qna').insert({
-        user_id: user.id,
-        user_email: user.email ?? null,
-        title,
-        subject: title,        // ★ subject 채워서 NOT NULL 만족
-        content,
-        status: 'open'
-      });
+  user_id: user.id,
+  user_email: user.email ?? null,
+  title,
+  subject: title,     // subject NOT NULL 대비
+  content,            // textarea 값
+  message: content,   // ← DB의 message 컬럼도 동일 값으로 채움
+  status: 'open'
+});
       if (error) {
         newResult.innerHTML = `<div class="error">등록 실패: ${error.message}</div>`;
       } else {
@@ -115,7 +116,7 @@
     async function loadList() {
       list.innerHTML = '';
       const sel = supabase.from('qna')
-        .select('id, user_email, subject, title, content, status, answer, created_at, answered_at, answered_by')
+        .select('id, user_email, subject, title, content, message, status, answer, created_at, answered_at, answered_by')
         .order('created_at', { ascending: false });
 
       const { data, error } = isAdmin ? await sel : await sel.eq('user_id', user.id);
@@ -142,7 +143,7 @@
               ${answered ? `<span>답변: ${answered}</span>` : ''}
               <span class="right">상태: ${status}</span>
             </div>
-            <div style="margin-top:8px; white-space:pre-wrap">${row.content}</div>
+            <div style="margin-top:8px; white-space:pre-wrap">${row.content ?? row.message ?? ''}</div>
             ${row.answer ? `
               <div class="card" style="margin-top:10px; background:#fff;">
                 <div class="label" style="margin-bottom:4px">관리자 답변</div>
