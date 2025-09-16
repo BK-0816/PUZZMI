@@ -21,4 +21,9 @@ document.getElementById('bookingForm').onsubmit=async(e)=>{e.preventDefault(); c
 const date=document.getElementById('date').value; const start_time=document.getElementById('start_time').value; const duration_hours=parseInt(document.getElementById('duration_hours').value,10); const language=document.getElementById('language').value; const customer_name=document.getElementById('customer_name').value.trim(); const customer_contact=document.getElementById('customer_contact').value.trim(); const notes=document.getElementById('notes').value.trim();
 const {data:{user}}=await supabase.auth.getUser(); const payload={mate_id:mateId, customer_id:user?.id||null, customer_name, customer_contact, date, start_time, duration_hours, language, notes, status:'pending'};
 const {data,error}=await supabase.from('bookings').insert(payload).select().single(); document.getElementById('result').innerHTML= error?('<div class=error>오류: '+error.message+'</div>'):(`<div class=success>예약 신청 완료! (ID: ${data.id})</div>`); btn.disabled=false;};
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    const redir = encodeURIComponent(location.pathname + location.search);
+    location.replace(`auth_combo.html?redirect=${redir}`);
+  }
 </script></body></html>
