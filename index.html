@@ -65,7 +65,6 @@ async function refreshAuthUI() {
         rating,
         photos,
         profiles ( id, full_name, age, gender, languages, avatar_url )
-        )
       `)
       .eq("is_verified", true)
       .order("rating", { ascending: false })
@@ -89,7 +88,9 @@ const price = new Intl.NumberFormat('ja-JP', {
   style: 'currency',
   currency: 'JPY',
   maximumFractionDigits: 0
-}).format(priceJpy); // → "￥4,000"      const rating = row.rating ?? 4.8;
+}).format(priceJpy); // → "￥4,000"      
+const rating = row.rating ?? 4.8;
+
       const cats = [
         ...(row.tags ?? []),
         ...(row.areas ?? [])
@@ -113,7 +114,7 @@ const price = new Intl.NumberFormat('ja-JP', {
             ${langs.map(l => `<span class="language">${l}</span>`).join("")}
           </div>
           <div class="friend-price">
-            <span class="price">₩${price}</span><span class="duration">/시간</span>
+            <span class="price">${price}</span><span class="duration">/시간</span>
           </div>
           <div style="margin-top:10px">
             <a class="cta-btn" href="mate_like.html?mate_id=${row.user_id}">프로필 보기</a>
@@ -318,17 +319,20 @@ const price = new Intl.NumberFormat('ja-JP', {
 
 
     <section id="friends" class="friends">
-        < class="container">
-            <div class="section-header">
-                <h2 class="section-title" data-key="friends-title">우리 친구들을 만나보세요</h2>
-                <p class="section-subtitle" data-key="friends-subtitle">좋아하는 것도, 맛집도, 최신 트렌드도 다 얘기할 수 있는 친구와 함께.</p>
-            </div>
-            
-            <div class="friend-filters">
-                <button class="filter-btn active" data-filter="all" data-key="filter-all">전체</button>
-            </div>
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title" data-key="friends-title">우리 친구들을 만나보세요</h2>
+      <p class="section-subtitle" data-key="friends-subtitle">좋아하는 것도, 맛집도, 최신 트렌드도 다 얘기할 수 있는 친구와 함께!</p>
+    </div>
 
-    </section>
+    <div class="friend-filters">
+      <button class="filter-btn active" data-filter="all" data-key="filter-all">전체</button>
+    </div>
+
+    <!-- ★ JS가 카드를 채워 넣을 컨테이너 -->
+    <div class="friends-grid"></div>
+  </div>
+</section>
 
     <section id="how-it-works" class="how-it-works">
         <div class="container">
