@@ -40,7 +40,7 @@
 
     function rowHtml(r){
       const dt = `${r.date} ${r.start_time} (${r.duration_hours}h)`;
-      const canAct = r.status === 'pending'; // 확정 후에는 버튼 숨김
+      //const canAct = r.status === 'pending'; // 확정 후에는 버튼 숨김
       return `
         <div class="card">
           <div class="flex justify-between align-center">
@@ -50,8 +50,8 @@
               <div class="muted">요청: ${(r.notes||'').replace(/</g,'&lt;')}</div>
             </div>
             <div class="flex gap-8">
-              ${canAct ? `<button class="btn btn-secondary" data-act="confirm" data-id="${r.id}">확정</button>` : ''}
-              ${canAct ? `<button class="btn btn-secondary" data-act="decline" data-id="${r.id}">거절</button>` : ''}
+              ${canAct ? `<button class="cta-btn" data-act="confirm" data-id="${r.id}">확정</button>` : ''}
+              ${canAct ? `<button class="cta-btn" data-act="decline" data-id="${r.id}">거절</button>` : ''}
             </div>
           </div>
         </div>`;
