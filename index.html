@@ -18,7 +18,7 @@
 
 <!-- Supabase JS v2 (ESM) -->
 <script type="module">
-  // nav.js에서 만든 싱글톤 supabase 재사용 (중복 생성 방지)
+  // nav.js에서 만든 싱글톤 supabase 재사용 (중복 인스턴스 방지)
   import { supabase } from "./nav.js";
 
   // ===== 1) 로그인 버튼 UI =====
@@ -38,15 +38,14 @@
   }
 
   // ===== 2) 메이트 목록 (페이지네이션) =====
-  const ONLY_VERIFIED = false;   // 공개만 노출 권장
+  const ONLY_VERIFIED = false;          // 공개만 노출하려면 true
   const PAGE_SIZE     = 8;
-
   let page = 0, isLoading = false, hasMore = true;
 
   const grid = document.querySelector(".friends-grid");
   const loadMoreBtn = document.getElementById("loadMore");
 
-  // storage key → public URL (mates/ 접두어 보정)
+  // storage key → public URL
   function keyToUrl(key) {
     if (!key) return "";
     if (/^https?:\/\//i.test(key)) return key;
@@ -62,29 +61,31 @@
     return "⚧";
   }
 
+  // 카드 렌더
   function renderCard(row) {
     const name   = row.profiles?.full_name ?? "이름 비공개";
     const age    = row.profiles?.age ? `${row.profiles.age}세` : "";
     const gender = row.profiles?.gender ?? "";
-    const gIcon  = genderIcon(gender);
     const langs  = Array.isArray(row.profiles?.languages) ? row.profiles.languages : [];
+    const gIcon  = genderIcon(gender);
 
     const keys   = Array.isArray(row.photos) ? row.photos : [];
     const cover  = row.primary_photo || keys[0] || row.profiles?.avatar_url || "https://picsum.photos/seed/puzzmi/400/300";
     const img    = cover.startsWith("http") ? cover : keyToUrl(cover);
 
-    // 고정 JPY 4,000/시간
     const priceJpy = new Intl.NumberFormat("ja-JP", { style: "currency", currency: "JPY", maximumFractionDigits: 0 }).format(4000);
     const tagsTxt  = (row.tags ?? []).slice(0,3).join(", ") || "서울 투어";
+    const subline  = [gIcon, age].filter(Boolean).join(" • ");
 
-    const subline = [gIcon, age].filter(Boolean).join(" • "); // "♂ • 26세" 형태
+    // 안전한 기본값(이전 코드의 ReferenceError 방지)
+    const favCount = Number(row.favorites_count ?? 0);
 
     const card = document.createElement("div");
     card.className = "friend-card";
     card.innerHTML = `
       <div class="friend-image">
         <img src="${img}" alt="${name}">
-        <div class="heart-badge" data-heart="${row.user_id}">
+        <div class="heart-badge" data-heart="${row.user_id}" style="position:absolute;right:8px;top:8px;background:#e0245e;color:#fff;border-radius:16px;padding:4px 8px;font-size:12px;display:flex;gap:6px;align-items:center;">
           <i class="fas fa-heart"></i><span class="count">${favCount}</span>
         </div>
       </div>
@@ -100,11 +101,9 @@
           <span class="price">${priceJpy}</span><span class="duration">/시간</span>
         </div>
         <div style="margin-top:10px; display:flex; gap:8px;">
-          <button class="cta-btn" data-requires-auth="true" href="mate_like.html?mate_id=${row.user_id}">프로필 보기</button>
-          <button class="cta-btn" data-requires-auth="true" href="booking.html?mate_id=${row.user_id}">예약하기</button>
-          <button class="cta-btn" data-fav-mate="${row.user_id}" ${alreadyFav ? "disabled" : ""}>
-            ${alreadyFav ? "찜 완료" : "찜하기"}
-          </button>
+          <a class="btn btn-secondary" data-requires-auth="true" href="mate_like.html?mate_id=${row.user_id}">프로필 보기</a>
+          <a class="cta-btn"          data-requires-auth="true" href="booking.html?mate_id=${row.user_id}">예약하기</a>
+          <button class="btn btn-secondary" data-fav-mate="${row.user_id}">찜하기</button>
         </div>
       </div>
     `;
@@ -156,9 +155,9 @@
 
   loadMoreBtn?.addEventListener("click", () => loadMates());
 
-  // 인증 가드 & 찜하기
+  // ===== 3) 인증 가드 & 찜하기 처리 =====
   document.addEventListener("click", async (e) => {
-    // 로그인 필요한 링크
+    // 로그인 필요한 링크(<a>)
     const link = e.target.closest('a[data-requires-auth="true"]');
     if (link) {
       const { data: { user } } = await supabase.auth.getUser();
@@ -185,8 +184,11 @@
       if (error) {
         alert("찜하기 실패: " + error.message);
       } else {
+        // UI 반영: 버튼 비활성 + 하트 1 증가
         favBtn.disabled = true;
         favBtn.textContent = "찜 완료";
+        const badge = document.querySelector(`.heart-badge[data-heart="${mateId}"] .count`);
+        if (badge) badge.textContent = String(Number(badge.textContent || "0") + 1);
       }
     }
   });
@@ -197,6 +199,7 @@
     await loadMates({ reset: true });
   })();
 </script>
+
 
 
 
