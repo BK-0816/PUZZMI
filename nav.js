@@ -38,7 +38,6 @@ export async function renderNavbar(rootId='app-nav') {
   root.appendChild(wrap);
 
   const brand = el('a', { class: 'brand', href: 'index.html' }, [
-    el('span', { class: 'dot' }),
     el('span', {}, 'PUZZMI')
   ]);
   wrap.appendChild(brand);
