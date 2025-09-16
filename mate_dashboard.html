@@ -1,15 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>메이트 대시보드 - PUZZMI</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="pages.css"/>
+  <link rel="stylesheet" href="nav.css"/>
+  <link rel="stylesheet" href="pages-theme.css"/>
+  <script type="module" src="nav.js"></script>
+  <style>
+    .status-badge{padding:2px 8px;border-radius:999px;background:#eee;font-size:.85rem}
+    .status-pending{background:#fff3cd}
+    .status-confirmed{background:#d1e7dd}
+    .status-declined{background:#f8d7da}
+  </style>
+</head>
+<body class="bg-cream">
+  <div id="app-nav"></div>
+  <main class="page stack-16">
+    <section class="card">
+      <h2>예약 신청 알림</h2>
+      <div id="list" class="stack-16"></div>
+    </section>
+  </main>
 
-<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>메이트 대시보드 - PUZZMI</title>
-<link rel="stylesheet" href="styles.css"/><link rel="stylesheet" href="pages.css"/><link rel="stylesheet" href="nav.css"/><link rel="stylesheet" href="pages-theme.css"/>
-<script type="module" src="nav.js"></script></head>
-<body class="bg-cream"><div id="app-nav"></div><main class="page stack-16"><section class="card"><h2>예약 신청 알림</h2><div id="list" class="stack-16"></div></section></main>
-<script type="module">
-import { supabase } from './nav.js';
-function rowHtml(r){const dt=`${r.date} ${r.start_time} (${r.duration_hours}h)`; const can=['pending','confirmed'].includes(r.status); return `<div class="card"><div class="flex justify-between align-center"><div><div style="font-weight:800">${dt}</div><div class="muted">${r.customer_name} • ${r.customer_contact} • 상태: ${r.status}</div><div class="muted">요청: ${(r.notes||'').replace(/</g,'&lt;')}</div></div><div class="flex gap-8">${can?`<button class="btn btn-secondary" data-act="confirm" data-id="${r.id}">확정</button>`:''}${can?`<button class="btn btn-secondary" data-act="decline" data-id="${r.id}">거절</button>`:''}</div></div></div>`;}
-async function load(){const {data:{user}}=await supabase.auth.getUser(); const list=document.getElementById('list'); if(!user){list.innerHTML='<div class="note">로그인 필요</div>'; return;}
-const {data,error}=await supabase.from('bookings').select('*').eq('mate_id', user.id).order('created_at',{ascending:false}); if(error){console.error(error); return;} if(!data||!data.length){list.innerHTML='<div class="muted">예약 신청이 없습니다.</div>'; return;} list.innerHTML=data.map(rowHtml).join('');
-list.querySelectorAll('button[data-act]').forEach(btn=>btn.onclick=async()=>{const id=btn.dataset.id; const act=btn.dataset.act; const status=act==='confirm'?'confirmed':'declined'; const {error}=await supabase.from('bookings').update({status}).eq('id', id); if(error) alert(error.message); else load();});}
-const ch=supabase.channel('bookings:mate').on('postgres_changes',{event:'*',schema:'public',table:'bookings'},p=>load()).subscribe();
-load();
-</script></body></html>
+  <script type="module">
+    import { supabase } from './nav.js';
+
+    const list = document.getElementById('list');
+    let currentUser = null;
+    let sub = null;
+
+    const badge = (s) => {
+      const cls = s === 'pending' ? 'status-pending' :
+                  s === 'confirmed' ? 'status-confirmed' : 'status-declined';
+      return `<span class="status-badge ${cls}">${s}</span>`;
+    };
+
+    function rowHtml(r){
+      const dt = `${r.date} ${r.start_time} (${r.duration_hours}h)`;
+      const canAct = r.status === 'pending'; // 확정 후에는 버튼 숨김
+      return `
+        <div class="card">
+          <div class="flex justify-between align-center">
+            <div>
+              <div style="font-weight:800">${dt}</div>
+              <div class="muted">${r.customer_name} • ${r.customer_contact} • 상태: ${badge(r.status)}</div>
+              <div class="muted">요청: ${(r.notes||'').replace(/</g,'&lt;')}</div>
+            </div>
+            <div class="flex gap-8">
+              ${canAct ? `<button class="btn btn-secondary" data-act="confirm" data-id="${r.id}">확정</button>` : ''}
+              ${canAct ? `<button class="btn btn-secondary" data-act="decline" data-id="${r.id}">거절</button>` : ''}
+            </div>
+          </div>
+        </div>`;
+    }
+
+    async function load(){
+      const { data: { user }, error: authErr } = await supabase.auth.getUser();
+      if (authErr) { console.error(authErr); list.innerHTML='<div class="error">인증 오류</div>'; return; }
+      if (!user) { list.innerHTML='<div class="note">로그인이 필요합니다.</div>'; return; }
+      currentUser = user;
+
+      // 목록
+      const { data, error } = await supabase
+        .from('bookings')
+        .select('*')
+        .eq('mate_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) { console.error(error); list.innerHTML='<div class="error">불러오기 실패: '+error.message+'</div>'; return; }
+      if (!data || !data.length) { list.innerHTML = '<div class="muted">예약 신청이 없습니다.</div>'; return; }
+      list.innerHTML = data.map(rowHtml).join('');
+
+      // 버튼 핸들러 (위임)
+      list.querySelectorAll('button[data-act]').forEach(btn => {
+        btn.onclick = async () => {
+          const id = btn.dataset.id;
+          const act = btn.dataset.act;
+          const status = act === 'confirm' ? 'confirmed' : 'declined';
+
+          // 내 예약만, 허용 상태만 갱신
+          const { data: updated, error: upErr } = await supabase
+            .from('bookings')
+            .update({ status })
+            .eq('id', id)
+            .eq('mate_id', currentUser.id)
+            .select('id,status')
+            .single();
+
+          if (upErr) {
+            alert('업데이트 실패: ' + upErr.message);
+            console.error(upErr);
+            return;
+          }
+          // 즉시 새로고침
+          await load();
+        };
+      });
+
+      // Realtime 구독 (한 번만)
+      if (!sub) {
+        sub = supabase
+          .channel('bookings:mate:' + user.id)
+          .on('postgres_changes',
+              { event: '*', schema: 'public', table: 'bookings', filter: `mate_id=eq.${user.id}` },
+              payload => load()
+          )
+          .subscribe();
+      }
+    }
+
+    load();
+  </script>
+</body>
+</html>
