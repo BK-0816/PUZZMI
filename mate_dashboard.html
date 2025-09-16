@@ -121,23 +121,6 @@ async function load(){
   });
 }
 
-async function createNotification({ user_id, title, body, type, link }) {
-  const { data:{ user } } = await supabase.auth.getUser();
-  if (!user) return;
-
-  const payload = {
-    user_id,
-    sender_id: user.id,
-    title: s(title, '알림'),
-    body:  s(body,  s(title, '내용 없음')),
-    type:  s(type,  'info'),
-    link:  link ?? null, // link는 NULL 허용
-  };
-
-  const { error } = await supabase.from('notifications').insert(payload);
-  if (error) console.error('notify error:', error, payload);
-}
-
 // 실시간 반영
 const ch = supabase.channel('bookings:mate')
   .on('postgres_changes',{event:'*',schema:'public',table:'bookings'}, ()=>load())
