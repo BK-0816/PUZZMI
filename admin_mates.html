@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PUZZMI - 메이트 관리 (관리자)</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="pages.css"/>
+  <link rel="stylesheet" href="pages-theme.css"/>
+  <link rel="stylesheet" href="nav.css"/>
+  <style>
+    body.bg-cream { background: var(--bg-cream); background-repeat:no-repeat; background-size:cover; }
+    .wrap-page { max-width: 1200px; margin: 32px auto; padding: 0 12px; }
+    .toolbar { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin: 0 0 12px; }
+    .toolbar .input, .toolbar select { min-width: 180px; }
+    .mates-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:12px; }
+    .mate-card .top { display:flex; gap:10px; align-items:center; }
+    .mate-card img { width:64px; height:64px; object-fit:cover; border-radius:12px; }
+    .stats { display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
+    .stat-pill { background:#fff; border:1px solid rgba(0,0,0,.08); padding:6px 10px; border-radius:999px; font-weight:700; font-size:.92rem; }
+    .actions { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+    .pill-verify { font-size:.8rem; padding:2px 8px; border-radius:999px; border:1px solid rgba(0,0,0,.12); }
+    .pill-verify.ok { background: #eafff5; color:#0a7a4b; border-color:#b6f1d6;}
+    .pill-verify.no { background: #fff7f7; color:#b14a3c; border-color:#f4c7c2;}
+
+    .panel { margin-top:18px; }
+    .table { width:100%; border-collapse: collapse; background:#fff; border-radius:14px; overflow:hidden; }
+    .table th, .table td { padding:10px 12px; border-bottom:1px solid rgba(0,0,0,.06); text-align:left; vertical-align:top; }
+    .table th { background: #faf7f2; font-weight:800; }
+    .right { text-align:right; }
+    .muted { color: var(--text-secondary); }
+    .error { color:#b00020; }
+    .success { color:#0a7a4b; }
+  </style>
+  <script type="module" src="nav.js"></script>
+</head>
+<body class="bg-cream">
+<div id="app-nav"></div>
+<main class="wrap-page">
+  <section class="card">
+    <h2 style="margin:0 0 6px">메이트 관리</h2>
+    <div class="muted">메이트의 프로필/검증 상태를 관리하고, 실적·예약 현황을 확인하세요.</div>
+    <div id="adminGuard" class="error" style="display:none;margin-top:6px"></div>
+
+    <div class="toolbar" id="toolbar" style="margin-top:12px">
+      <input id="q" class="input" placeholder="이름/태그 검색"/>
+      <select id="filterVerified" class="input">
+        <option value="">검증 상태: 전체</option>
+        <option value="true">검증됨만</option>
+        <option value="false">미검증만</option>
+      </select>
+      <input id="dateFrom" class="input" type="date" />
+      <span>~</span>
+      <input id="dateTo" class="input" type="date" />
+      <button id="btnReload" class="btn btn-secondary">새로고침</button>
+    </div>
+
+    <div id="mates" class="mates-grid"></div>
+
+    <div class="panel">
+      <div style="display:flex;gap:8px;align-items:center; margin-bottom:6px">
+        <h3 style="margin:0">선택한 메이트의 예약 목록</h3>
+        <button id="btnExport" class="btn btn-secondary">CSV 내보내기</button>
+        <span id="selMateLabel" class="muted"></span>
+      </div>
+      <div id="bookingsError" class="error"></div>
+      <table class="table" id="bookingsTable" aria-label="예약 목록">
+        <thead>
+          <tr>
+            <th>예약ID</th>
+            <th>시작</th>
+            <th>종료</th>
+            <th>상태</th>
+            <th>고객</th>
+            <th class="right">금액</th>
+          </tr>
+        </thead>
+        <tbody id="bookingsBody">
+          <tr><td colspan="6" class="muted">메이트 카드를 선택하면 예약이 표시됩니다.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<script type="module">
+  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+  const SUPABASE_URL = "https://eevvgbbokenpjnvtmztk.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4";
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const adminGuard = document.getElementById('adminGuard');
+  const matesEl = document.getElementById('mates');
+  const bookingsBody = document.getElementById('bookingsBody');
+  const bookingsError = document.getElementById('bookingsError');
+  const selMateLabel = document.getElementById('selMateLabel');
+
+  const q = document.getElementById('q');
+  const filterVerified = document.getElementById('filterVerified');
+  const dateFrom = document.getElementById('dateFrom');
+  const dateTo = document.getElementById('dateTo');
+  const btnReload = document.getElementById('btnReload');
+  const btnExport = document.getElementById('btnExport');
+
+  // 1) 접근 제어: 관리자만
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    adminGuard.textContent = "로그인이 필요합니다. 로그인 페이지로 이동합니다…";
+    const redir = encodeURIComponent(location.pathname.replace(/^\//,'') + location.search);
+    setTimeout(()=>location.replace('auth_combo.html?redirect=' + redir), 800);
+    throw new Error('login required');
+  }
+  const { data: isAdminRow } = await supabase.from('admin_users').select('user_id').eq('user_id', user.id).maybeSingle();
+  if (!isAdminRow) {
+    adminGuard.textContent = "관리자만 접근할 수 있습니다.";
+    throw new Error('admin required');
+  }
+
+  // 2) 상태
+  let mates = [];
+  let allBookings = [];   // 현재 조회 기간 내 전체 예약(여러 메이트)
+  let selectedMateId = null;
+
+  // 3) 도우미들
+  const yenFmt = new Intl.NumberFormat('ja-JP', { style:'currency', currency:'JPY', maximumFractionDigits:0 });
+  function asDateTime(b){
+    // 유연한 스키마 대응: starts_at/ends_at 또는 date+start_time/end_time
+    const s = b.starts_at || b.start_at || b.start || (b.date && b.start_time && (b.date + 'T' + b.start_time));
+    const e = b.ends_at || b.end_at || b.end || (b.date && b.end_time && (b.date + 'T' + b.end_time));
+    return {
+      start: s ? new Date(s) : null,
+      end: e ? new Date(e) : null
+    };
+  }
+  function isUpcoming(b){
+    const { start } = asDateTime(b);
+    if (!start) return false;
+    return start.getTime() >= Date.now();
+  }
+  function amountText(b){
+    // price_total / total_price / amount 등 자동 감지 (없으면 빈칸)
+    const val = b.price_total ?? b.total_price ?? b.amount ?? null;
+    const cur = (b.currency || 'JPY').toUpperCase();
+    if (val == null) return '';
+    try {
+      if (cur === 'JPY') return yenFmt.format(val);
+      return new Intl.NumberFormat(undefined, { style:'currency', currency:cur }).format(val);
+    } catch {
+      return String(val);
+    }
+  }
+  function dateText(d){
+    return d ? new Intl.DateTimeFormat('ko-KR', { dateStyle:'medium', timeStyle:'short' }).format(d) : '';
+  }
+
+  // 4) 데이터 불러오기
+  async function loadMatesAndBookings(){
+    matesEl.innerHTML = '<div class="muted" style="padding:8px">불러오는 중…</div>';
+
+    // mates
+    const selVerified = filterVerified.value;
+    let mpQuery = supabase
+      .from('mate_profiles')
+      .select(`
+        user_id, is_verified, rating, tags, areas, bio, hourly_rate, photos,
+        profiles ( id, full_name, age, languages, avatar_url )
+      `)
+      .order('rating', { ascending: false })
+      .limit(200);
+
+    if (selVerified === 'true') mpQuery = mpQuery.eq('is_verified', true);
+    if (selVerified === 'false') mpQuery = mpQuery.eq('is_verified', false);
+
+    const { data: matesData, error: matesErr } = await mpQuery;
+    if (matesErr) {
+      matesEl.innerHTML = `<div class="error">메이트 로드 실패: ${matesErr.message}</div>`;
+      return;
+    }
+
+    // 검색어 필터(이름/태그/지역)
+    const term = (q.value || '').trim().toLowerCase();
+    mates = (matesData||[]).filter(r=>{
+      if (!term) return true;
+      const name = (r.profiles?.full_name||'').toLowerCase();
+      const t = (Array.isArray(r.tags)?r.tags.join(' '):'').toLowerCase();
+      const a = (Array.isArray(r.areas)?r.areas.join(' '):'').toLowerCase();
+      return name.includes(term) || t.includes(term) || a.includes(term);
+    });
+
+    // bookings (조회기간)
+    let bQuery = supabase.from('bookings').select('*').in('mate_id', mates.map(m=>m.user_id)).limit(2000);
+    const { data: bookingsData, error: bookingsErr } = await bQuery;
+    if (bookingsErr) {
+      allBookings = [];
+      console.warn('bookings read error:', bookingsErr);
+    } else {
+      allBookings = (bookingsData||[]);
+    }
+
+    // 클라 기간 필터
+    const fromVal = dateFrom.value ? new Date(dateFrom.value) : null;
+    const toVal   = dateTo.value ? new Date(dateTo.value) : null;
+    allBookings = allBookings.filter(b=>{
+      const { start } = asDateTime(b);
+      if (!start) return true; // 시간 미지정 예약은 유지
+      if (fromVal && start < new Date(fromVal.getFullYear(), fromVal.getMonth(), fromVal.getDate())) return false;
+      if (toVal   && start > new Date(toVal.getFullYear(), toVal.getMonth(), toVal.getDate(), 23,59,59)) return false;
+      return true;
+    });
+
+    renderMates();
+    if (selectedMateId) showBookings(selectedMateId);
+  }
+
+  function renderMates(){
+    if (!mates.length) { matesEl.innerHTML = '<div class="muted" style="padding:8px">표시할 메이트가 없습니다.</div>'; return; }
+
+    matesEl.innerHTML = mates.map(m=>{
+      const p = m.profiles || {};
+      const img = p.avatar_url || (Array.isArray(m.photos) && m.photos[0]) || 'https://picsum.photos/seed/puzzmi/200/200';
+      const name = p.full_name || '(이름없음)';
+      const age = p.age ? `${p.age}세` : '';
+      const langs = Array.isArray(p.languages) ? p.languages.join(', ') : '';
+      const rating = m.rating ?? '—';
+
+      const mine = allBookings.filter(b=>b.mate_id === m.user_id);
+      const total = mine.length;
+      const upcoming = mine.filter(isUpcoming).length;
+      const byStatus = mine.reduce((acc,b)=>{ acc[b.status||'unknown']=(acc[b.status||'unknown']||0)+1; return acc; },{});
+
+      return `
+        <div class="card mate-card" data-mate="${m.user_id}">
+          <div class="top">
+            <img src="${img}" alt="avatar"/>
+            <div>
+              <div style="font-weight:800">${name}</div>
+              <div class="muted">${[age, langs].filter(Boolean).join(' • ')}</div>
+              <div style="margin-top:4px">
+                <span class="pill-verify ${m.is_verified ? 'ok':'no'}">${m.is_verified ? '검증됨':'미검증'}</span>
+                <span class="stat-pill">⭐ ${rating}</span>
+              </div>
+            </div>
+          </div>
+          <div class="stats">
+            <span class="stat-pill">총예약 ${total}</span>
+            <span class="stat-pill">다가오는 ${upcoming}</span>
+            ${Object.entries(byStatus).map(([s,c])=>`<span class="stat-pill">${s} ${c}</span>`).join('')}
+          </div>
+          <div class="actions">
+            <a class="btn btn-secondary" href="mate_like.html?mate_id=${m.user_id}" target="_blank">프로필 보기</a>
+            <button class="btn btn-primary" data-action="show-bookings" data-id="${m.user_id}">예약 보기</button>
+            <button class="btn" data-action="toggle-verify" data-id="${m.user_id}">${m.is_verified ? '검증 해제':'검증 처리'}</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    matesEl.querySelectorAll('[data-action="show-bookings"]').forEach(btn=>{
+      btn.addEventListener('click', ()=> showBookings(btn.getAttribute('data-id')));
+    });
+    matesEl.querySelectorAll('[data-action="toggle-verify"]').forEach(btn=>{
+      btn.addEventListener('click', ()=> toggleVerify(btn.getAttribute('data-id')));
+    });
+  }
+
+  async function toggleVerify(mateId){
+    const m = mates.find(x=>x.user_id === mateId);
+    if (!m) return;
+    const next = !m.is_verified;
+    const { error } = await supabase.from('mate_profiles').update({ is_verified: next }).eq('user_id', mateId);
+    if (error) {
+      alert('검증 상태 변경 실패: ' + error.message);
+      return;
+    }
+    m.is_verified = next;
+    renderMates();
+  }
+
+  async function showBookings(mateId){
+    selectedMateId = mateId;
+    selMateLabel.textContent = ` (mate_id=${mateId})`;
+
+    bookingsError.textContent = '';
+    const rows = allBookings.filter(b=>b.mate_id === mateId);
+
+    if (!rows.length) {
+      bookingsBody.innerHTML = `<tr><td colspan="6" class="muted">예약이 없습니다.</td></tr>`;
+      return;
+    }
+
+    const customerIds = [...new Set(rows.map(b=>b.customer_id).filter(Boolean))];
+    let profileMap = {};
+    if (customerIds.length){
+      const { data: profs, error: perr } = await supabase.from('profiles').select('id, full_name, email');
+      if (!perr && profs) {
+        profileMap = Object.fromEntries(profs.map(p=>[p.id, (p.full_name || p.email || p.id)]));
+      }
+    }
+
+    bookingsBody.innerHTML = rows
+      .sort((a,b)=>{
+        const { start:as } = asDateTime(a);
+        const { start:bs } = asDateTime(b);
+        return (bs?.getTime()||0) - (as?.getTime()||0);
+      })
+      .map(b=>{
+        const { start, end } = asDateTime(b);
+        const cust = profileMap[b.customer_id] || (b.customer_email || '');
+        return `
+          <tr>
+            <td>${b.id || ''}</td>
+            <td>${dateText(start)}</td>
+            <td>${dateText(end)}</td>
+            <td>${b.status || ''}</td>
+            <td>${cust}</td>
+            <td class="right">${amountText(b)}</td>
+          </tr>
+        `;
+      }).join('');
+  }
+
+  // CSV 내보내기
+  btnExport.addEventListener('click', ()=>{
+    if (!selectedMateId) { alert('먼저 메이트를 선택해주세요.'); return; }
+    const rows = [...bookingsBody.querySelectorAll('tr')].map(tr=>[...tr.children].map(td=>td.textContent));
+    if (!rows.length || rows[0].length < 6) { alert('내보낼 데이터가 없습니다.'); return; }
+
+    const header = ['예약ID','시작','종료','상태','고객','금액'];
+    let csv = header.join(',') + '\n';
+    rows.forEach(r=>{
+      if (r[0] === '예약ID') return; // 헤더 중복 방지
+      csv += r.map(v => \"" + "{(v||'').replace(/\"/g,'\"\"')}" + "\").join(',') + '\n';
+    });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `bookings_${selectedMateId}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  [q, filterVerified, btnReload, dateFrom, dateTo].forEach(el=>{
+    el?.addEventListener('input', ()=> loadMatesAndBookings());
+    el?.addEventListener('change', ()=> loadMatesAndBookings());
+    el?.addEventListener('click', (e)=> { if (e.target===btnReload) loadMatesAndBookings(); });
+  });
+
+  const today = new Date();
+  const to60 = new Date(Date.now() + 60*24*3600*1000);
+  dateFrom.valueAsDate = today;
+  dateTo.valueAsDate = to60;
+
+  await loadMatesAndBookings();
+</script>
+</body>
+</html>
