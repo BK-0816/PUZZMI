@@ -45,14 +45,32 @@
   const grid = document.querySelector(".friends-grid");
   const loadMoreBtn = document.getElementById("loadMore");
 
-  async function refreshHeartCount(mateId) {
-  const { count } = await supabase
-    .from('favorites')
-    .select('id', { head: true, count: 'exact' })
-    .eq('mate_id', mateId);
+async function refreshHeartBadgesForRendered() {
+  const badges = Array.from(document.querySelectorAll('.heart-badge[data-heart]'));
+  if (!badges.length) return;
 
-  const countEl = document.querySelector(`.heart-badge[data-heart="${mateId}"] .count`);
-  if (countEl && typeof count === 'number') countEl.textContent = count;
+  const ids = [...new Set(badges.map(b => b.getAttribute('data-heart')).filter(Boolean))];
+
+  // 이 페이지에 보이는 mate_id들의 favorites를 전부 가져와서 JS에서 그룹핑
+  const { data, error } = await supabase
+    .from('favorites')
+    .select('mate_id')
+    .in('mate_id', ids);
+
+  if (error) {
+    console.warn('heart refresh error:', error);
+    return;
+  }
+  const counts = {};
+  for (const row of (data || [])) {
+    counts[row.mate_id] = (counts[row.mate_id] || 0) + 1;
+  }
+
+  for (const id of ids) {
+    const n = counts[id] || 0;
+    const el = document.querySelector(`.heart-badge[data-heart="${id}"] .count`);
+    if (el) el.textContent = n;
+  }
 }
   // storage key → public URL
   function keyToUrl(key) {
@@ -196,15 +214,17 @@ document.addEventListener('click', async (e) => {
 
   // 하트 배지 숫자 다시 읽기
   const { count } = await supabase
-    .from('favorites')
-    .select('id', { count: 'exact', head: true })
-    .eq('mate_id', mateId);
+  .from('favorites')
+  .select('id', { count: 'exact', head: true })
+  .eq('mate_id', mateId);
 
-  const badge = document.querySelector(`[data-heart-badge="${mateId}"]`);
-  if (badge && typeof count === 'number') badge.textContent = count;
+const countEl = document.querySelector(`.heart-badge[data-heart="${mateId}"] .count`);
+if (typeof count === 'number' && countEl) countEl.textContent = count;
 
   btn.disabled = true;
   await refreshHeartCount(mateId);
+  btn.setAttribute('aria-disabled', 'true');
+btn.classList.add('is-faved');
   btn.textContent = '찜 완료';
 });
 
