@@ -48,182 +48,189 @@
     </section>
   </main>
 
-  <script type="module">
-    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+<script type="module">
+  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-    const SUPABASE_URL = "https://eevvgbbokenpjnvtmztk.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4";
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  // ===== 전역: 관리자 이벤트 위임 & 토스트 =====
+  let adminHandlersBound = false;
+  function bindAdminHandlers(isAdmin, user, supabase, loadList) {
+    if (adminHandlersBound || !isAdmin) return;
+    adminHandlersBound = true;
 
-    const requireLogin = document.getElementById('requireLogin');
-    const formNew = document.getElementById('formNew');
-    const newResult = document.getElementById('newResult');
-    const list = document.getElementById('list');
-    const qnaTitle = document.getElementById('qnaTitle');
-    const listTitle = document.getElementById('listTitle');
+    document.addEventListener('click', async (e) => {
+      const saveBtn  = e.target.closest('button[data-ans-save]');
+      const closeBtn = e.target.closest('button[data-ans-close]');
+      if (!saveBtn && !closeBtn) return;
 
-    // 로그인 체크 → 미로그인 시 리디렉션
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      requireLogin.style.display = 'block';
-      const redir = encodeURIComponent('qna.html');
-      setTimeout(() => location.replace(`auth_combo.html?redirect=${redir}`), 800);
-      throw new Error('login required');
-    }
+      if (saveBtn) {
+        const id = saveBtn.getAttribute('data-ans-save');
+        const textarea = document.getElementById(`ans_${id}`);
+        const txt = (textarea?.value ?? '').trim();
+        try {
+          const { error } = await supabase
+            .from('qna')
+            .update({
+              answer: txt,
+              answered_by: user.id,
+              answered_at: new Date().toISOString(),
+              status: 'answered'   // DB 허용값이어야 함
+            })
+            .eq('id', id);
+          if (error) throw error;
+          toast('답변이 저장되었습니다.');
+          await loadList();
+        } catch (err) {
+          console.error(err);
+          alert('저장 실패: ' + (err?.message || err));
+        }
+        return;
+      }
 
-    // 관리자 여부 확인
-    const { data: adminRow } = await supabase.from('admin_users').select('user_id').eq('user_id', user.id).maybeSingle();
-    const isAdmin = !!adminRow;
-
-    // UI 라벨
-    if (isAdmin) {
-      qnaTitle.textContent = 'Q&A 관리';
-      listTitle.textContent = '전체 문의';
-      formNew.style.display = 'none'; // 관리자는 새 문의 작성 숨김
-    } else {
-      qnaTitle.textContent = '1:1 문의';
-      listTitle.textContent = '내 문의 목록';
-      formNew.style.display = 'grid';
-    }
-
-    // 새 문의 등록(일반 사용자)
-    formNew?.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const title = document.getElementById('title').value.trim();
-      const content = document.getElementById('content').value.trim();
-      if (!title || !content) return;
-
-      const { error } = await supabase.from('qna').insert({
-  user_id: user.id,
-  user_email: user.email ?? null,
-  title,
-  subject: title,     // subject NOT NULL 대비
-  content,            // textarea 값
-  message: content,   // ← DB의 message 컬럼도 동일 값으로 채움
-  status: 'open'
-});
-      if (error) {
-        newResult.innerHTML = `<div class="error">등록 실패: ${error.message}</div>`;
-      } else {
-        newResult.innerHTML = `<div class="success">등록되었습니다.</div>`;
-        (document.getElementById('title').value = '');
-        (document.getElementById('content').value = '');
-        await loadList();
+      if (closeBtn) {
+        const id = closeBtn.getAttribute('data-ans-close');
+        try {
+          const { error } = await supabase
+            .from('qna')
+            .update({ status: 'closed' })
+            .eq('id', id);
+          if (error) throw error;
+          toast('완료 처리했습니다.');
+          await loadList();
+        } catch (err) {
+          console.error(err);
+          alert('완료 처리 실패: ' + (err?.message || err));
+        }
       }
     });
+  }
 
-    // 목록 로드
-    async function loadList() {
-      list.innerHTML = '';
-      const sel = supabase.from('qna')
-        .select('id, user_email, subject, title, content, message, status, answer, created_at, answered_at, answered_by')
-        .order('created_at', { ascending: false });
+  function toast(msg) {
+    const t = document.createElement('div');
+    t.textContent = msg;
+    t.style.cssText = 'position:fixed;left:50%;top:16px;transform:translateX(-50%);background:#222;color:#fff;padding:8px 12px;border-radius:8px;z-index:9999;opacity:.95';
+    document.body.appendChild(t);
+    setTimeout(()=>t.remove(), 1600);
+  }
 
-      const { data, error } = isAdmin ? await sel : await sel.eq('user_id', user.id);
-      if (error) {
-        list.innerHTML = `<div class="error">불러오기 실패: ${error.message}</div>`;
-        return;
-      }
-      if (!data || data.length === 0) {
-        list.innerHTML = `<div class="muted">문의 내역이 없습니다.</div>`;
-        return;
-      }
+  // ===== Supabase =====
+  const SUPABASE_URL = "https://eevvgbbokenpjnvtmztk.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4";
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-      list.innerHTML = data.map(row => {
-        const created = new Date(row.created_at).toLocaleString('ko-KR');
-        const answered = row.answered_at ? new Date(row.answered_at).toLocaleString('ko-KR') : '';
-        const status = row.status ?? (row.answer ? 'answered' : 'open');
+  const requireLogin = document.getElementById('requireLogin');
+  const formNew = document.getElementById('formNew');
+  const newResult = document.getElementById('newResult');
+  const list = document.getElementById('list');
+  const qnaTitle = document.getElementById('qnaTitle');
+  const listTitle = document.getElementById('listTitle');
 
-        return `
-          <div class="qna-item card">
-            <h4 style="margin:0 0 6px">${row.title ?? row.subject ?? '(제목 없음)'}</h4>
-            <div class="meta">
-              ${isAdmin ? `<span>From: ${row.user_email ?? '익명'}</span>` : ''}
-              <span>작성: ${created}</span>
-              ${answered ? `<span>답변: ${answered}</span>` : ''}
-              <span class="right">상태: ${status}</span>
-            </div>
-            <div style="margin-top:8px; white-space:pre-wrap">${row.content ?? row.message ?? ''}</div>
-            ${row.answer ? `
-              <div class="card" style="margin-top:10px; background:#fff;">
-                <div class="label" style="margin-bottom:4px">관리자 답변</div>
-                <div style="white-space:pre-wrap">${row.answer}</div>
-              </div>
-            ` : ''}
-            ${isAdmin ? `
-              <div style="margin-top:10px">
-                <textarea id="ans_${row.id}" class="input" placeholder="답변을 입력하세요...">${row.answer ?? ''}</textarea>
-                <div style="display:flex; gap:8px; margin-top:8px">
-                <button type="button" class="btn btn-primary" data-ans-save="${row.id}">답변 저장</button>
-                <button type="button" class="btn btn-secondary" data-ans-close="${row.id}">상태: 완료 처리</button>
-                </div>
-              </div>
-            ` : ''}
-          </div>
-        `;
-      }).join('');
+  // 로그인 체크 → 미로그인 시 리디렉션
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    requireLogin.style.display = 'block';
+    const redir = encodeURIComponent('qna.html');
+    setTimeout(() => location.replace(`auth_combo.html?redirect=${redir}`), 800);
+    throw new Error('login required');
+  }
 
-      if (isAdmin) {
-        // 답변 저장/닫기 이벤트 위임
-        let adminHandlersBound = false;
-function bindAdminHandlers(isAdmin, user, supabase, loadList) {
-  if (adminHandlersBound || !isAdmin) return;
-  adminHandlersBound = true;
+  // 관리자 여부 확인
+  const { data: adminRow } = await supabase.from('admin_users')
+    .select('user_id').eq('user_id', user.id).maybeSingle();
+  const isAdmin = !!adminRow;
 
-  document.addEventListener('click', async (e) => {
-    const saveBtn  = e.target.closest('button[data-ans-save]');
-    const closeBtn = e.target.closest('button[data-ans-close]');
-    if (!saveBtn && !closeBtn) return;
+  // UI 라벨
+  if (isAdmin) {
+    qnaTitle.textContent = 'Q&A 관리';
+    listTitle.textContent = '전체 문의';
+    formNew.style.display = 'none';
+  } else {
+    qnaTitle.textContent = '1:1 문의';
+    listTitle.textContent = '내 문의 목록';
+    formNew.style.display = 'grid';
+  }
 
-    // 저장
-    if (saveBtn) {
-      const id = saveBtn.getAttribute('data-ans-save');
-      const textarea = document.getElementById(`ans_${id}`);
-      const txt = (textarea?.value ?? '').trim();
-      try {
-        const { error } = await supabase
-          .from('qna')
-          .update({
-            answer: txt,
-            answered_by: user.id,
-            answered_at: new Date().toISOString(),
-            status: 'answered' // DB 허용값('answered')인지 확인!
-          })
-          .eq('id', id);
-        if (error) throw error;
-        toast('답변이 저장되었습니다.');
-        await loadList();
-      } catch (err) {
-        console.error(err);
-        alert('저장 실패: ' + (err?.message || err));
-      }
+  // ===== 목록을 즉시 로드 (문의 등록 안 해도 바로 보임) =====
+  async function loadList() {
+    list.innerHTML = '';
+    const sel = supabase.from('qna')
+      .select('id, user_email, subject, title, content, message, status, answer, created_at, answered_at, answered_by')
+      .order('created_at', { ascending: false });
+
+    const { data, error } = isAdmin ? await sel : await sel.eq('user_id', user.id);
+    if (error) {
+      list.innerHTML = `<div class="error">불러오기 실패: ${error.message}</div>`;
+      return;
+    }
+    if (!data || data.length === 0) {
+      list.innerHTML = `<div class="muted">문의 내역이 없습니다.</div>`;
       return;
     }
 
-    // 완료(닫기)
-    if (closeBtn) {
-      const id = closeBtn.getAttribute('data-ans-close');
-      try {
-        const { error } = await supabase
-          .from('qna')
-          .update({ status: 'closed' })
-          .eq('id', id);
-        if (error) throw error;
-        toast('완료 처리했습니다.');
-        await loadList();
-      } catch (err) {
-        console.error(err);
-        alert('완료 처리 실패: ' + (err?.message || err));
-      }
+    list.innerHTML = data.map(row => {
+      const created = new Date(row.created_at).toLocaleString('ko-KR');
+      const answered = row.answered_at ? new Date(row.answered_at).toLocaleString('ko-KR') : '';
+      const status = row.status ?? (row.answer ? 'answered' : 'open');
+
+      return `
+        <div class="qna-item card">
+          <h4 style="margin:0 0 6px">${row.title ?? row.subject ?? '(제목 없음)'}</h4>
+          <div class="meta">
+            ${isAdmin ? `<span>From: ${row.user_email ?? '익명'}</span>` : ''}
+            <span>작성: ${created}</span>
+            ${answered ? `<span>답변: ${answered}</span>` : ''}
+            <span class="right">상태: ${status}</span>
+          </div>
+          <div style="margin-top:8px; white-space:pre-wrap">${row.content ?? row.message ?? ''}</div>
+          ${row.answer ? `
+            <div class="card" style="margin-top:10px; background:#fff;">
+              <div class="label" style="margin-bottom:4px">관리자 답변</div>
+              <div style="white-space:pre-wrap">${row.answer}</div>
+            </div>
+          ` : ''}
+          ${isAdmin ? `
+            <div style="margin-top:10px">
+              <textarea id="ans_${row.id}" class="input" placeholder="답변을 입력하세요...">${row.answer ?? ''}</textarea>
+              <div style="display:flex; gap:8px; margin-top:8px">
+                <button type="button" class="btn btn-primary" data-ans-save="${row.id}">답변 저장</button>
+                <button type="button" class="btn btn-secondary" data-ans-close="${row.id}">상태: 완료 처리</button>
+              </div>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }).join('');
+  }
+
+  // 관리자 이벤트 위임 바인딩 → 그 다음 목록 로드
+  bindAdminHandlers(isAdmin, user, supabase, loadList);
+  await loadList();
+
+  // ===== 새 문의 등록(일반 사용자) =====
+  formNew?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const title = document.getElementById('title').value.trim();
+    const content = document.getElementById('content').value.trim();
+    if (!title || !content) return;
+
+    const { error } = await supabase.from('qna').insert({
+      user_id: user.id,
+      user_email: user.email ?? null,
+      title,
+      subject: title,    // 서버의 NOT NULL 대비
+      content,
+      message: content,  // 서버의 NOT NULL 대비
+      status: 'open'     // DB 체크 제약 허용값과 맞춤
+    });
+    if (error) {
+      newResult.innerHTML = `<div class="error">등록 실패: ${error.message}</div>`;
+    } else {
+      newResult.innerHTML = `<div class="success">등록되었습니다.</div>`;
+      document.getElementById('title').value = '';
+      document.getElementById('content').value = '';
+      await loadList();  // 등록 후 즉시 갱신
     }
   });
-}
-      }
-    }
+</script>
 
-        bindAdminHandlers(isAdmin, user, supabase, loadList);
-
-    await loadList();
-  </script>
 </body>
 </html>
