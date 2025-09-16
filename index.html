@@ -83,8 +83,13 @@ async function refreshAuthUI() {
       const gender = row.profiles?.gender ?? "";
       const langs = Array.isArray(row.profiles?.languages) ? row.profiles.languages : [];
       const img = row.profiles?.avatar_url || (Array.isArray(row.photos) && row.photos[0]) || "https://picsum.photos/seed/puzzmi/400/300";
-      const price = (row.hourly_rate ?? 30000).toLocaleString("ko-KR");
-      const rating = row.rating ?? 4.8;
+// JPY 고정가
+const priceJpy = 4000;
+const price = new Intl.NumberFormat('ja-JP', {
+  style: 'currency',
+  currency: 'JPY',
+  maximumFractionDigits: 0
+}).format(priceJpy); // → "￥4,000"      const rating = row.rating ?? 4.8;
       const cats = [
         ...(row.tags ?? []),
         ...(row.areas ?? [])
@@ -313,7 +318,7 @@ async function refreshAuthUI() {
 
 
     <section id="friends" class="friends">
-        <div class="container">
+        < class="container">
             <div class="section-header">
                 <h2 class="section-title" data-key="friends-title">우리 친구들을 만나보세요</h2>
                 <p class="section-subtitle" data-key="friends-subtitle">좋아하는 것도, 맛집도, 최신 트렌드도 다 얘기할 수 있는 친구와 함께.</p>
@@ -321,86 +326,7 @@ async function refreshAuthUI() {
             
             <div class="friend-filters">
                 <button class="filter-btn active" data-filter="all" data-key="filter-all">전체</button>
-                <button class="filter-btn" data-filter="food" data-key="filter-food">맛집 투어</button>
-                <button class="filter-btn" data-filter="culture" data-key="filter-culture">문화 체험</button>
-                <button class="filter-btn" data-filter="shopping" data-key="filter-shopping">쇼핑</button>
-                <button class="filter-btn" data-filter="nightlife" data-key="filter-nightlife">나이트라이프</button>
             </div>
-            
-            <div class="friends-grid">
-                <div class="friend-card" data-category="food culture">
-                    <div class="friend-image">
-                        <img src="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400" alt="지은">
-                        <div class="friend-badge">
-                            <i class="fas fa-star"></i>
-                            <span>4.9</span>
-                        </div>
-                    </div>
-                    <div class="friend-info">
-                        <h3 class="friend-name">지은</h3>
-                        <p class="friend-age">25세 • 여성</p>
-                        <p class="friend-specialties" data-key="jieun-specialties">맛집 탐방, 한국 문화</p>
-                        <p class="friend-description" data-key="jieun-desc">안녕하세요! 서울 토박이 지은입니다. 숨겨진 맛집과 전통문화를 소개해드려요.</p>
-                        <div class="friend-languages">
-                            <span class="language">한국어</span>
-                            <span class="language">English</span>
-                            <span class="language">中文</span>
-                        </div>
-                        <div class="friend-price">
-                            <span class="price">₩35,000</span>
-                            <span class="duration" data-key="per-day">/일</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="friend-card" data-category="shopping culture">
-                    <div class="friend-image">
-                        <img src="https://images.pexels.com/photos/1516680/pexels-photo-1516680.jpeg?auto=compress&cs=tinysrgb&w=400" alt="민준">
-                        <div class="friend-badge">
-                            <i class="fas fa-star"></i>
-                            <span>4.8</span>
-                        </div>
-                    </div>
-                    <div class="friend-info">
-                        <h3 class="friend-name">민준</h3>
-                        <p class="friend-age">28세 • 남성</p>
-                        <p class="friend-specialties" data-key="minjun-specialties">쇼핑, K-팝 문화</p>
-                        <p class="friend-description" data-key="minjun-desc">K-팝과 패션을 사랑하는 민준이에요. 홍대, 강남의 핫플레이스를 안내해드려요!</p>
-                        <div class="friend-languages">
-                            <span class="language">한국어</span>
-                            <span class="language">English</span>
-                            <span class="language">日本語</span>
-                        </div>
-                        <div class="friend-price">
-                            <span class="price">₩40,000</span>
-                            <span class="duration" data-key="per-day">/일</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="friend-card" data-category="nightlife food">
-                    <div class="friend-image">
-                        <img src="https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=400" alt="소영">
-                        <div class="friend-badge">
-                            <i class="fas fa-star"></i>
-                            <span>4.9</span>
-                        </div>
-                    </div>
-                    <div class="friend-info">
-                        <h3 class="friend-name">소영</h3>
-                        <p class="friend-age">26세 • 여성</p>
-                        <p class="friend-specialties" data-key="soyoung-specialties">나이트라이프, 바 투어</p>
-                        <p class="friend-description" data-key="soyoung-desc">서울의 밤을 즐기고 싶다면 저와 함께해요! 루프탑바부터 숨겨진 펫집까지.</p>
-                        <div class="friend-languages">
-                            <span class="language">한국어</span>
-                            <span class="language">English</span>
-                        </div>
-                        <div class="friend-price">
-                            <span class="price">₩45,000</span>
-                            <span class="duration" data-key="per-day">/일</span>
-                        </div>
-                    </div>
-                </div>
                 
                 <div class="friend-card" data-category="culture">
                     <div class="friend-image">
