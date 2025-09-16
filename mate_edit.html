@@ -24,12 +24,13 @@
     .carousel .nav{ position:absolute; top:50%; transform:translateY(-50%); background:rgba(0,0,0,.5); color:#fff; border:none; width:36px; height:36px; border-radius:50%; cursor:pointer; }
     .carousel .prev{ left:6px; }
     .carousel .next{ right:6px; }
-    figure.thumb{ width:120px; }
-    figure.thumb img{ width:100%; height:100px; object-fit:cover; border-radius:8px; }
-    figure.thumb figcaption{ font-size:.8rem; display:flex; justify-content:space-between; align-items:center; gap:6px; margin-top:4px; }
+    figure.thumb{ width:140px; }
+    figure.thumb img{ width:100%; height:110px; object-fit:cover; border-radius:8px; }
+    figure.thumb figcaption{ font-size:.8rem; display:flex; flex-direction:column; gap:6px; margin-top:6px; }
     .btn-danger{ background:#e53935; color:#fff; }
     .btn-light{ background:#fff; border:1px solid #ddd; }
     .w-100{ width:100%; }
+    .badge{ display:inline-block; padding:2px 8px; border-radius:999px; background:#f5f5f5; border:1px solid #eee; font-size:.75rem; }
   </style>
 </head>
 <body class="bg-cream">
@@ -37,7 +38,7 @@
   <main class="wrap">
     <section class="card">
       <h2>메이트 프로필 편집</h2>
-      <p class="help">여러 장의 사진을 업로드하고, 아래 캐러셀에서 미리 볼 수 있어요.</p>
+      <p class="help">여러 장의 사진을 업로드하고, <b>대표사진</b>을 지정할 수 있습니다. 대표사진은 목록/프로필 썸네일의 첫 번째로 노출돼요.</p>
 
       <!-- 업로더 -->
       <div class="grid">
@@ -47,7 +48,7 @@
           <div id="uploadMsg" class="muted" style="margin-top:6px"></div>
         </div>
 
-        <!-- 썸네일 & 삭제 -->
+        <!-- 썸네일 & 삭제/대표설정 -->
         <div class="row" id="thumbs"></div>
 
         <!-- 캐러셀 미리보기 -->
@@ -122,7 +123,7 @@
     async function ensureProfileRow() {
       const { data, error } = await supabase
         .from('mate_profiles')
-        .select('user_id, bio, hourly_rate, tags, areas, photos')
+        .select('user_id, bio, hourly_rate, tags, areas, photos, primary_photo')
         .eq('user_id', user.id)
         .maybeSingle();
       if (error) console.warn(error);
@@ -130,7 +131,7 @@
 
       const { data: inserted, error: insErr } = await supabase
         .from('mate_profiles')
-        .insert({ user_id: user.id, bio: null, hourly_rate: null, tags: [], areas: [], photos: [] })
+        .insert({ user_id: user.id, bio: null, hourly_rate: null, tags: [], areas: [], photos: [], primary_photo: null })
         .select()
         .single();
       if (insErr) throw insErr;
@@ -139,8 +140,7 @@
 
     let profile = await ensureProfileRow();
     fillForm(profile);
-    renderThumbs(profile.photos || []);
-    renderCarousel(profile.photos || []);
+    renderAll(profile);
 
     function fillForm(p) {
       bioEl.value    = p.bio ?? '';
@@ -150,39 +150,80 @@
     }
 
     function keyToUrl(key) {
-      return supabase.storage.from('mates').getPublicUrl(key).data.publicUrl;
+      const pure = key.startsWith('mates/') ? key.replace(/^mates\//,'') : key;
+      return supabase.storage.from('mates').getPublicUrl(pure).data.publicUrl;
     }
 
-    function renderThumbs(keys) {
-      thumbs.innerHTML = (keys||[]).map(k => `
+    // 대표 우선 정렬
+    function orderedKeys(photos, primary) {
+      const arr = Array.isArray(photos) ? [...photos] : [];
+      const out = [];
+      if (primary) out.push(primary);
+      for (const k of arr) if (!out.includes(k)) out.push(k);
+      return out;
+    }
+
+    function renderAll(p) {
+      renderThumbs(p.photos || [], p.primary_photo);
+      renderCarousel(p.photos || [], p.primary_photo);
+    }
+
+    function renderThumbs(keys, primary) {
+      if (!Array.isArray(keys)) keys = [];
+      thumbs.innerHTML = orderedKeys(keys, primary).map(k => `
         <figure class="thumb">
           <img src="${keyToUrl(k)}" alt="사진"/>
           <figcaption>
-            <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70px;">${k.split('/').pop()}</span>
-            <button type="button" class="btn btn-light" data-remove="${k}">삭제</button>
+            <span class="badge" style="${k===primary?'background:#ffe4e6;border-color:#ff9aa2;':''}">
+              ${k===primary ? '대표 사진' : '일반 사진'}
+            </span>
+            <button type="button" class="btn btn-light" data-set-primary="${k}">대표로</button>
+            <button type="button" class="btn btn-danger" data-remove="${k}">삭제</button>
           </figcaption>
         </figure>
       `).join('');
 
+      // 대표 설정
+      thumbs.querySelectorAll('[data-set-primary]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const key = btn.getAttribute('data-set-primary');
+          const { error } = await supabase.from('mate_profiles')
+            .update({ primary_photo: key })
+            .eq('user_id', user.id);
+          if (error) return alert('대표 지정 실패: ' + error.message);
+          profile.primary_photo = key;
+          renderAll(profile);
+        });
+      });
+
+      // 삭제
       thumbs.querySelectorAll('[data-remove]').forEach(btn => {
         btn.addEventListener('click', async () => {
           const key = btn.getAttribute('data-remove');
           // 스토리지 삭제
           await supabase.storage.from('mates').remove([key]);
           // DB 배열 갱신
-          const next = (profile.photos || []).filter(x => x !== key);
-          const { error: upErr } = await supabase.from('mate_profiles').update({ photos: next }).eq('user_id', user.id);
+          let nextPhotos = (profile.photos || []).filter(x => x !== key);
+          let nextPrimary = profile.primary_photo;
+          // 대표를 지웠다면 새 대표 지정(있으면 첫번째)
+          if (key === profile.primary_photo) {
+            nextPrimary = nextPhotos[0] || null;
+          }
+          const { error: upErr } = await supabase.from('mate_profiles')
+            .update({ photos: nextPhotos, primary_photo: nextPrimary })
+            .eq('user_id', user.id);
           if (upErr) return alert('DB 반영 실패: ' + upErr.message);
-          profile.photos = next;
-          renderThumbs(next);
-          renderCarousel(next);
+          profile.photos = nextPhotos;
+          profile.primary_photo = nextPrimary;
+          renderAll(profile);
         });
       });
     }
 
-    function renderCarousel(keys) {
-      if (!keys || !keys.length) { track.innerHTML = '<div class="muted" style="padding:8px">등록된 사진이 없습니다.</div>'; return; }
-      track.innerHTML = keys.map(k => `<img src="${keyToUrl(k)}" alt="메이트 사진">`).join('');
+    function renderCarousel(keys, primary) {
+      const list = orderedKeys(keys, primary);
+      if (!list.length) { track.innerHTML = '<div class="muted" style="padding:8px">등록된 사진이 없습니다.</div>'; return; }
+      track.innerHTML = list.map(k => `<img src="${keyToUrl(k)}" alt="메이트 사진">`).join('');
     }
 
     prevBtn.addEventListener('click', () => track.scrollBy({ left: -300, behavior: 'smooth' }));
@@ -209,17 +250,20 @@
       }
 
       if (uploaded.length) {
-        const next = [...(profile.photos || []), ...uploaded];
-        const { error: dbErr } = await supabase.from('mate_profiles').update({ photos: next }).eq('user_id', user.id);
+        const nextPhotos = [...(profile.photos || []), ...uploaded];
+        // 대표사진이 없었다면 첫 업로드를 대표로
+        const nextPrimary = profile.primary_photo || uploaded[0];
+        const { error: dbErr } = await supabase.from('mate_profiles')
+          .update({ photos: nextPhotos, primary_photo: nextPrimary })
+          .eq('user_id', user.id);
         if (dbErr) { uploadMsg.textContent = 'DB 반영 실패: ' + dbErr.message; }
         else {
-          profile.photos = next;
+          profile.photos = nextPhotos;
+          profile.primary_photo = nextPrimary;
           uploadMsg.textContent = '업로드 완료!';
-          renderThumbs(next);
-          renderCarousel(next);
+          renderAll(profile);
         }
       }
-      // 파일 입력 초기화
       photosInput.value = '';
     });
 

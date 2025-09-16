@@ -144,12 +144,12 @@
       favMsg.style.display = 'inline';
     });
 
-    // 프로필 & 사진 로드
+    // 프로필 & 사진 로드 (photos + primary_photo 모두 사용)
     async function loadProfile() {
       const { data: row, error } = await supabase
         .from('mate_profiles')
         .select(`
-          user_id, bio, hourly_rate, tags, areas, primary_photo,
+          user_id, bio, hourly_rate, tags, areas, photos, primary_photo,
           profiles ( full_name, age, gender, languages )
         `)
         .eq('user_id', mateId)
@@ -165,18 +165,16 @@
       // 이름
       mateNameEl.textContent = (row.profiles?.full_name ?? '메이트') + ' 님';
 
-      // 사진 캐러셀 (primary_photo가 있으면 우선)
+      // 사진 캐러셀: primary가 맨 앞, 나머지는 중복 제거 후 뒤에
       const keys = Array.isArray(row.photos) ? [...row.photos] : [];
-      if (row.primary_photo) {
-        // 이미 목록에 있으면 앞으로 이동, 없으면 앞에 추가
-        const i = keys.indexOf(row.primary_photo);
-        if (i > 0) { keys.splice(i,1); keys.unshift(row.primary_photo); }
-        if (i < 0) { keys.unshift(row.primary_photo); }
-      }
-      if (!keys.length) {
+      const list = [];
+      if (row.primary_photo) list.push(row.primary_photo);
+      for (const k of keys) if (!list.includes(k)) list.push(k);
+
+      if (!list.length) {
         track.innerHTML = '<div class="muted" style="padding:8px">등록된 사진이 없습니다.</div>';
       } else {
-        const urls = keys.map(keyToUrl).filter(Boolean);
+        const urls = list.map(keyToUrl).filter(Boolean);
         track.innerHTML = urls.map(u => `<img src="${u}" alt="메이트 사진">`).join('');
       }
 
@@ -184,7 +182,6 @@
       const age    = row.profiles?.age ? `${row.profiles.age}세` : '';
       const gender = row.profiles?.gender || '';
       const langs  = Array.isArray(row.profiles?.languages) ? row.profiles.languages.join(', ') : '';
-      // 카드/목록과 동일하게 JPY 고정가 4,000/시간
       const priceJpy = new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY', maximumFractionDigits: 0 }).format(4000);
       const tags  = (row.tags || []).map(s=>`<span class="pill">${s}</span>`).join(' ');
       const areas = (row.areas || []).map(s=>`<span class="pill">${s}</span>`).join(' ');
@@ -201,6 +198,7 @@
 
     // 리뷰 목록
     async function loadReviews() {
+      const reviewsList = document.getElementById('reviewsList');
       reviewsList.innerHTML = '<div class="muted">불러오는 중…</div>';
       const { data: rows, error } = await supabase
         .from('reviews')
@@ -249,14 +247,14 @@
 
     // 리뷰 작성 가능 여부 체크 & 폼 표시
     async function prepareReviewForm() {
+      const reviewForm = document.getElementById('reviewForm');
       reviewForm.style.display = 'none';
       reviewForm.dataset.bookingId = '';
 
       const { data:{ user } } = await supabase.auth.getUser();
-      if (!user) return; // 비로그인 시 폼 미표시
+      if (!user) return;
 
-      // 본인 완료 예약(최근 5건) 중, 리뷰 미작성인 예약 1건 찾기
-      const { data: bks, error: be } = await supabase
+      const { data: bks } = await supabase
         .from('bookings')
         .select('id')
         .eq('mate_id', mateId)
@@ -265,7 +263,7 @@
         .order('id', { ascending: false })
         .limit(5);
 
-      if (be || !bks || bks.length === 0) return;
+      if (!bks || bks.length === 0) return;
 
       for (const b of bks) {
         const { data: rv } = await supabase
@@ -282,8 +280,10 @@
     }
 
     // 리뷰 저장
-    reviewForm.addEventListener('submit', async (e) => {
+    document.getElementById('reviewForm').addEventListener('submit', async (e) => {
       e.preventDefault();
+      const reviewResult = document.getElementById('reviewResult');
+      const reviewText   = document.getElementById('reviewText');
       reviewResult.textContent = '';
       const txt = reviewText.value.trim();
       if (!txt) return;
@@ -294,7 +294,6 @@
         return (location.href = `auth_combo.html?redirect=${redir}`);
       }
 
-      // 표기용 작성자 이름
       let authorName = user.email?.split('@')[0] || '고객';
       const { data: prof } = await supabase.from('profiles')
         .select('full_name')
@@ -302,7 +301,7 @@
         .maybeSingle();
       if (prof?.full_name) authorName = prof.full_name;
 
-      const bookingId = Number(reviewForm.dataset.bookingId || '0');
+      const bookingId = Number(document.getElementById('reviewForm').dataset.bookingId || '0');
       if (!bookingId) {
         reviewResult.innerHTML = `<div class="error">리뷰 가능한 예약이 없습니다.</div>`;
         return;
@@ -321,7 +320,7 @@
         reviewResult.innerHTML = `<div class="success">등록되었습니다.</div>`;
         reviewText.value = '';
         await loadReviews();
-        reviewForm.style.display = 'none'; // 1건만 작성 허용
+        document.getElementById('reviewForm').style.display = 'none';
       }
     });
 
@@ -343,7 +342,6 @@
 
       if (error) alert('저장 실패: ' + error.message);
       else {
-        // 미니 토스트
         const t = document.createElement('div');
         t.textContent = '저장되었습니다.';
         t.style.cssText='position:fixed;left:50%;top:16px;transform:translateX(-50%);background:#222;color:#fff;padding:8px 12px;border-radius:8px;z-index:9999;opacity:.95';
