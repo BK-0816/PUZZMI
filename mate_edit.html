@@ -31,6 +31,8 @@
     .btn-light{ background:#fff; border:1px solid #ddd; }
     .w-100{ width:100%; }
     .badge{ display:inline-block; padding:2px 8px; border-radius:999px; background:#f5f5f5; border:1px solid #eee; font-size:.75rem; }
+    .two-col{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    @media (max-width: 640px){ .two-col{ grid-template-columns:1fr; } }
   </style>
 </head>
 <body class="bg-cream">
@@ -63,8 +65,40 @@
       </div>
     </section>
 
+    <!-- 계정 기본정보(profiles) -->
     <section class="card">
-      <h3>기본 정보</h3>
+      <h3>계정 기본정보</h3>
+      <form id="formAccount" class="grid">
+        <div class="two-col">
+          <div class="field">
+            <div class="label">이름</div>
+            <input id="fullName" class="input" placeholder="예: 김지은" />
+          </div>
+          <div class="field">
+            <div class="label">나이</div>
+            <input id="age" type="number" min="16" max="100" class="input" placeholder="예: 26"/>
+          </div>
+        </div>
+        <div class="field" style="max-width:320px">
+          <div class="label">성별</div>
+          <select id="gender" class="input">
+            <option value="">선택 안함</option>
+            <option value="female">여성 (♀)</option>
+            <option value="male">남성 (♂)</option>
+            <option value="other">기타/비공개 (⚧)</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <button class="btn btn-primary" type="submit">기본정보 저장</button>
+          <div id="saveAccountMsg" class="muted"></div>
+        </div>
+      </form>
+    </section>
+
+    <!-- 활동 정보(mate_profiles) -->
+    <section class="card">
+      <h3>활동 정보</h3>
       <form id="formProfile" class="grid">
         <div class="field">
           <div class="label">소개 (bio)</div>
@@ -85,7 +119,7 @@
         </div>
 
         <div class="row">
-          <button class="btn btn-primary" type="submit">저장</button>
+          <button class="btn btn-primary" type="submit">활동정보 저장</button>
           <div id="saveMsg" class="muted"></div>
         </div>
       </form>
@@ -94,12 +128,22 @@
 
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-    const supabase = createClient("https://eevvgbbokenpjnvtmztk.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4");
+    const supabase = createClient(
+      "https://eevvgbbokenpjnvtmztk.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4"
+    );
 
+    // 엘리먼트
     const photosInput = document.getElementById('photosInput');
     const uploadMsg   = document.getElementById('uploadMsg');
     const thumbs      = document.getElementById('thumbs');
     const track       = document.getElementById('photoTrack');
+
+    const formAccount = document.getElementById('formAccount');
+    const fullNameEl  = document.getElementById('fullName');
+    const ageEl       = document.getElementById('age');
+    const genderEl    = document.getElementById('gender');
+    const saveAccountMsg = document.getElementById('saveAccountMsg');
 
     const formProfile = document.getElementById('formProfile');
     const bioEl   = document.getElementById('bio');
@@ -119,58 +163,69 @@
       throw new Error('login required');
     }
 
-    // 프로필 행 확보 (없으면 생성)
-    async function ensureProfileRow() {
-      const { data, error } = await supabase
-        .from('mate_profiles')
-        .select('user_id, bio, hourly_rate, tags, areas, photos, primary_photo')
-        .eq('user_id', user.id)
-        .maybeSingle();
-      if (error) console.warn(error);
-      if (data) return data;
-
-      const { data: inserted, error: insErr } = await supabase
-        .from('mate_profiles')
-        .insert({ user_id: user.id, bio: null, hourly_rate: null, tags: [], areas: [], photos: [], primary_photo: null })
-        .select()
-        .single();
-      if (insErr) throw insErr;
-      return inserted;
-    }
-
-    let profile = await ensureProfileRow();
-    fillForm(profile);
-    renderAll(profile);
-
-    function fillForm(p) {
-      bioEl.value    = p.bio ?? '';
-      hourlyEl.value = p.hourly_rate ?? '';
-      tagsEl.value   = Array.isArray(p.tags) ? p.tags.join(', ') : '';
-      areasEl.value  = Array.isArray(p.areas) ? p.areas.join(', ') : '';
-    }
-
-    function keyToUrl(key) {
+    // helpers
+    const keyToUrl = (key) => {
       const pure = key.startsWith('mates/') ? key.replace(/^mates\//,'') : key;
       return supabase.storage.from('mates').getPublicUrl(pure).data.publicUrl;
-    }
-
-    // 대표 우선 정렬
-    function orderedKeys(photos, primary) {
+    };
+    const orderKeys = (photos, primary) => {
       const arr = Array.isArray(photos) ? [...photos] : [];
       const out = [];
       if (primary) out.push(primary);
       for (const k of arr) if (!out.includes(k)) out.push(k);
       return out;
+    };
+
+    // 현재 데이터 로드
+    async function loadAll() {
+      // profiles
+      const { data: prof } = await supabase
+        .from('profiles')
+        .select('id, full_name, age, gender')
+        .eq('id', user.id)
+        .maybeSingle();
+      if (prof) {
+        fullNameEl.value = prof.full_name ?? '';
+        ageEl.value      = prof.age ?? '';
+        genderEl.value   = (prof.gender ?? '').toLowerCase();
+      }
+
+      // mate_profiles
+      const { data: mp } = await supabase
+        .from('mate_profiles')
+        .select('user_id, bio, hourly_rate, tags, areas, photos, primary_photo')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (!mp) {
+        // 없으면 생성
+        const { data: created } = await supabase
+          .from('mate_profiles')
+          .insert({ user_id: user.id, tags: [], areas: [], photos: [] })
+          .select()
+          .single();
+        renderProfile(created);
+      } else {
+        renderProfile(mp);
+      }
     }
 
-    function renderAll(p) {
+    let profileRow = null;
+    function renderProfile(p) {
+      profileRow = p;
+      bioEl.value    = p.bio ?? '';
+      hourlyEl.value = p.hourly_rate ?? '';
+      tagsEl.value   = Array.isArray(p.tags) ? p.tags.join(', ') : '';
+      areasEl.value  = Array.isArray(p.areas) ? p.areas.join(', ') : '';
       renderThumbs(p.photos || [], p.primary_photo);
       renderCarousel(p.photos || [], p.primary_photo);
     }
 
     function renderThumbs(keys, primary) {
-      if (!Array.isArray(keys)) keys = [];
-      thumbs.innerHTML = orderedKeys(keys, primary).map(k => `
+      const list = orderKeys(keys, primary);
+      if (!list.length) { thumbs.innerHTML = ''; return; }
+
+      thumbs.innerHTML = list.map(k => `
         <figure class="thumb">
           <img src="${keyToUrl(k)}" alt="사진"/>
           <figcaption>
@@ -191,8 +246,8 @@
             .update({ primary_photo: key })
             .eq('user_id', user.id);
           if (error) return alert('대표 지정 실패: ' + error.message);
-          profile.primary_photo = key;
-          renderAll(profile);
+          profileRow.primary_photo = key;
+          renderProfile(profileRow);
         });
       });
 
@@ -201,27 +256,26 @@
         btn.addEventListener('click', async () => {
           const key = btn.getAttribute('data-remove');
           // 스토리지 삭제
-          await supabase.storage.from('mates').remove([key]);
+          await supabase.storage.from('mates').remove([key]).catch(()=>{});
           // DB 배열 갱신
-          let nextPhotos = (profile.photos || []).filter(x => x !== key);
-          let nextPrimary = profile.primary_photo;
-          // 대표를 지웠다면 새 대표 지정(있으면 첫번째)
-          if (key === profile.primary_photo) {
-            nextPrimary = nextPhotos[0] || null;
-          }
-          const { error: upErr } = await supabase.from('mate_profiles')
+          let nextPhotos  = (profileRow.photos || []).filter(x => x !== key);
+          let nextPrimary = profileRow.primary_photo;
+          if (key === nextPrimary) nextPrimary = nextPhotos[0] || null;
+
+          const { error } = await supabase.from('mate_profiles')
             .update({ photos: nextPhotos, primary_photo: nextPrimary })
             .eq('user_id', user.id);
-          if (upErr) return alert('DB 반영 실패: ' + upErr.message);
-          profile.photos = nextPhotos;
-          profile.primary_photo = nextPrimary;
-          renderAll(profile);
+          if (error) return alert('DB 반영 실패: ' + error.message);
+
+          profileRow.photos = nextPhotos;
+          profileRow.primary_photo = nextPrimary;
+          renderProfile(profileRow);
         });
       });
     }
 
     function renderCarousel(keys, primary) {
-      const list = orderedKeys(keys, primary);
+      const list = orderKeys(keys, primary);
       if (!list.length) { track.innerHTML = '<div class="muted" style="padding:8px">등록된 사진이 없습니다.</div>'; return; }
       track.innerHTML = list.map(k => `<img src="${keyToUrl(k)}" alt="메이트 사진">`).join('');
     }
@@ -230,7 +284,7 @@
     nextBtn.addEventListener('click', () => track.scrollBy({ left:  300, behavior: 'smooth' }));
 
     // 업로드
-    photosInput.addEventListener('change', async (e) => {
+    document.getElementById('photosInput').addEventListener('change', async (e) => {
       const files = Array.from(e.target.files || []);
       if (!files.length) return;
       uploadMsg.textContent = '업로드 중…';
@@ -238,10 +292,7 @@
       const uploaded = [];
       for (const f of files) {
         if (!f.type.startsWith('image/')) continue;
-        if (f.size > 8 * 1024 * 1024) { // 8MB 제한 예시
-          uploadMsg.textContent = '8MB 이하 이미지만 업로드 가능합니다.';
-          continue;
-        }
+        if (f.size > 8 * 1024 * 1024) { uploadMsg.textContent = '8MB 이하 이미지만 업로드 가능합니다.'; continue; }
         const ext = (f.name.split('.').pop() || 'jpg').toLowerCase();
         const key = `${user.id}/${crypto.randomUUID()}.${ext}`;
         const { error: upErr } = await supabase.storage.from('mates').upload(key, f, { upsert: false, contentType: f.type || 'image/jpeg' });
@@ -250,43 +301,64 @@
       }
 
       if (uploaded.length) {
-        const nextPhotos = [...(profile.photos || []), ...uploaded];
-        // 대표사진이 없었다면 첫 업로드를 대표로
-        const nextPrimary = profile.primary_photo || uploaded[0];
+        const nextPhotos = [...(profileRow.photos || []), ...uploaded];
+        const nextPrimary = profileRow.primary_photo || uploaded[0];
         const { error: dbErr } = await supabase.from('mate_profiles')
           .update({ photos: nextPhotos, primary_photo: nextPrimary })
           .eq('user_id', user.id);
         if (dbErr) { uploadMsg.textContent = 'DB 반영 실패: ' + dbErr.message; }
         else {
-          profile.photos = nextPhotos;
-          profile.primary_photo = nextPrimary;
+          profileRow.photos = nextPhotos;
+          profileRow.primary_photo = nextPrimary;
           uploadMsg.textContent = '업로드 완료!';
-          renderAll(profile);
+          renderProfile(profileRow);
         }
       }
-      photosInput.value = '';
+      e.target.value = '';
     });
 
-    // 저장(프로필 정보)
-    formProfile.addEventListener('submit', async (e) => {
+    // 계정 기본정보 저장 (profiles)
+    formAccount.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const tags = tagsEl.value.split(',').map(s => s.trim()).filter(Boolean);
-      const areas= areasEl.value.split(',').map(s => s.trim()).filter(Boolean);
-      const hourly = hourlyEl.value ? parseInt(hourlyEl.value, 10) : null;
+      saveAccountMsg.textContent = '';
 
       const payload = {
-        bio: bioEl.value || null,
-        hourly_rate: isNaN(hourly) ? null : hourly,
-        tags,
-        areas
+        id: user.id, // upsert 키
+        full_name: fullNameEl.value || null,
+        age: ageEl.value ? parseInt(ageEl.value, 10) : null,
+        gender: (genderEl.value || '').toLowerCase() || null
       };
 
-      const { error } = await supabase.from('mate_profiles')
-        .update(payload)
-        .eq('user_id', user.id);
-      if (error) { saveMsg.textContent = '저장 실패: ' + error.message; }
-      else { saveMsg.textContent = '저장되었습니다.'; }
+      const { error } = await supabase
+        .from('profiles')
+        .upsert(payload, { onConflict: 'id' });
+
+      if (error) saveAccountMsg.textContent = '저장 실패: ' + error.message;
+      else       saveAccountMsg.textContent = '저장되었습니다.';
     });
+
+    // 활동정보 저장 (mate_profiles)
+    formProfile.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const tags  = tagsEl.value.split(',').map(s => s.trim()).filter(Boolean);
+      const areas = areasEl.value.split(',').map(s => s.trim()).filter(Boolean);
+      const hourly= hourlyEl.value ? parseInt(hourlyEl.value, 10) : null;
+
+      const { error } = await supabase.from('mate_profiles')
+        .update({
+          bio: bioEl.value || null,
+          hourly_rate: isNaN(hourly) ? null : hourly,
+          tags,
+          areas
+        })
+        .eq('user_id', user.id);
+
+      if (error) saveMsg.textContent = '저장 실패: ' + error.message;
+      else       saveMsg.textContent = '저장되었습니다.';
+    });
+
+    // 초기 로드
+    await loadAll();
   </script>
 </body>
 </html>

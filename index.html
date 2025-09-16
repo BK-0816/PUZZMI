@@ -37,8 +37,8 @@
     }
   }
 
-  // ===== 2) 메이트 목록 (페이지네이션 + 공개 URL 변환 + 찜카운트) =====
-  const ONLY_VERIFIED = false;   // 운영시 true 권장
+  // ===== 2) 메이트 목록 (페이지네이션) =====
+  const ONLY_VERIFIED = true;   // 공개만 노출 권장
   const PAGE_SIZE     = 8;
 
   let page = 0, isLoading = false, hasMore = true;
@@ -46,47 +46,48 @@
   const grid = document.querySelector(".friends-grid");
   const loadMoreBtn = document.getElementById("loadMore");
 
-  // storage key → public URL (mates/ 접두어가 있든 없든 안전하게 처리)
+  // storage key → public URL (mates/ 접두어 보정)
   function keyToUrl(key) {
     if (!key) return "";
-    const candidates = [
-      key.replace(/^\/+/, ""),
-      key.replace(/^mates\//, ""),
-      key
-    ];
-    for (const k of candidates) {
-      const { data } = supabase.storage.from("mates").getPublicUrl(k);
-      if (data?.publicUrl) return data.publicUrl;
-    }
-    return "";
+    if (/^https?:\/\//i.test(key)) return key;
+    const pure = key.startsWith("mates/") ? key.replace(/^mates\//,"") : key;
+    return supabase.storage.from("mates").getPublicUrl(pure).data.publicUrl;
   }
 
-  // 카드 렌더
-  function renderCard(row, favCount = 0, alreadyFav = false) {
+  // 성별 → 기호
+  function genderIcon(gender) {
+    const g = (gender || "").toString().trim().toLowerCase();
+    if (["female","f","여","여자","woman","여성"].includes(g)) return "♀";
+    if (["male","m","남","남자","man","남성"].includes(g))   return "♂";
+    return "⚧";
+  }
+
+  function renderCard(row) {
     const name   = row.profiles?.full_name ?? "이름 비공개";
     const age    = row.profiles?.age ? `${row.profiles.age}세` : "";
     const gender = row.profiles?.gender ?? "";
+    const gIcon  = genderIcon(gender);
     const langs  = Array.isArray(row.profiles?.languages) ? row.profiles.languages : [];
 
     const keys   = Array.isArray(row.photos) ? row.photos : [];
     const cover  = row.primary_photo || keys[0] || row.profiles?.avatar_url || "https://picsum.photos/seed/puzzmi/400/300";
-    const img    = cover?.startsWith("http") ? cover : keyToUrl(cover);
+    const img    = cover.startsWith("http") ? cover : keyToUrl(cover);
 
+    // 고정 JPY 4,000/시간
     const priceJpy = new Intl.NumberFormat("ja-JP", { style: "currency", currency: "JPY", maximumFractionDigits: 0 }).format(4000);
     const tagsTxt  = (row.tags ?? []).slice(0,3).join(", ") || "서울 투어";
+
+    const subline = [gIcon, age].filter(Boolean).join(" • "); // "♂ • 26세" 형태
 
     const card = document.createElement("div");
     card.className = "friend-card";
     card.innerHTML = `
       <div class="friend-image">
         <img src="${img}" alt="${name}">
-        <div class="heart-badge" data-heart="${row.user_id}">
-          <i class="fas fa-heart"></i><span class="count">${favCount}</span>
-        </div>
       </div>
       <div class="friend-info">
         <h3 class="friend-name">${name}</h3>
-        <p class="friend-age">${[age, gender].filter(Boolean).join(" • ")}</p>
+        <p class="friend-age">${subline || "정보 미기재"}</p>
         <p class="friend-specialties">${tagsTxt}</p>
         <p class="friend-description">${row.bio ?? "함께 서울의 숨은 명소를 즐겨봐요!"}</p>
         <div class="friend-languages">
@@ -98,9 +99,7 @@
         <div style="margin-top:10px; display:flex; gap:8px;">
           <a class="cta-btn" data-requires-auth="true" href="mate_like.html?mate_id=${row.user_id}">프로필 보기</a>
           <a class="cta-btn"          data-requires-auth="true" href="booking.html?mate_id=${row.user_id}">예약하기</a>
-          <button class="cta-btn" data-fav-mate="${row.user_id}" ${alreadyFav ? "disabled" : ""}>
-            ${alreadyFav ? "찜 완료" : "찜하기"}
-          </button>
+          <button class="cta-btn" data-fav-mate="${row.user_id}">찜하기</button>
         </div>
       </div>
     `;
@@ -127,46 +126,20 @@
     if (ONLY_VERIFIED) query = query.eq("is_verified", true);
 
     const { data, error, count } = await query;
+
     if (error) {
       console.error("loadMates error:", error);
-      if (!grid.innerHTML) grid.innerHTML = `<p style="padding:16px">메이트를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.</p>`;
+      if (!grid.innerHTML) {
+        grid.innerHTML = `<p style="padding:16px">메이트를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.</p>`;
+      }
       loadMoreBtn && (loadMoreBtn.style.display = "none");
       isLoading = false;
       return;
     }
 
-    const mates = data || [];
-    const mateIds = mates.map(m => m.user_id);
+    (data || []).forEach(renderCard);
 
-    // --- 즐겨찾기 카운트/내가 찜했는지 조회 (현재 페이지에 한해 한번에 조회)
-    let favCounts = new Map();
-    let myFavSet  = new Set();
-    const { data: { user } } = await supabase.auth.getUser();
-
-    // 전체 카운트 (현재 페이지 mate_id에 해당하는 모든 rows 조회 후 reduce)
-    if (mateIds.length) {
-      const { data: favRows, error: favErr } = await supabase
-        .from("favorites")
-        .select("mate_id, user_id")
-        .in("mate_id", mateIds);
-
-      if (!favErr && Array.isArray(favRows)) {
-        for (const r of favRows) {
-          favCounts.set(r.mate_id, (favCounts.get(r.mate_id) || 0) + 1);
-          if (user && r.user_id === user.id) myFavSet.add(r.mate_id);
-        }
-      }
-    }
-
-    // 렌더
-    mates.forEach(row => {
-      const c = favCounts.get(row.user_id) || 0;
-      const a = myFavSet.has(row.user_id);
-      renderCard(row, c, a);
-    });
-
-    // 페이지네이션
-    const fetched = mates.length;
+    const fetched = (data || []).length;
     const total   = typeof count === "number" ? count : (from + fetched);
     hasMore = (from + fetched) < total;
 
@@ -178,7 +151,7 @@
 
   loadMoreBtn?.addEventListener("click", () => loadMates());
 
-  // ===== 3) 인증 가드 & 찜하기(위임) =====
+  // 인증 가드 & 찜하기
   document.addEventListener("click", async (e) => {
     // 로그인 필요한 링크
     const link = e.target.closest('a[data-requires-auth="true"]');
@@ -195,33 +168,20 @@
     // 찜하기 버튼
     const favBtn = e.target.closest("[data-fav-mate]");
     if (favBtn) {
-      const mateId = favBtn.getAttribute("data-fav-mate");
-
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         const redir = encodeURIComponent(location.pathname + location.search);
         return (location.href = `auth_combo.html?redirect=${redir}`);
       }
-
-      // 1인 1회: (user_id, mate_id) unique 제약/UPSERT 사용
+      const mateId = favBtn.getAttribute("data-fav-mate");
       const { error } = await supabase
         .from("favorites")
-        .upsert(
-          { user_id: user.id, mate_id: mateId },
-          { onConflict: "user_id,mate_id", ignoreDuplicates: true }
-        );
-
+        .upsert({ user_id: user.id, mate_id: mateId }, { onConflict: "user_id,mate_id" });
       if (error) {
-        return alert("찜하기 실패: " + error.message);
-      }
-
-      // UI 업데이트: 버튼 비활성화 + 텍스트 변경, 하트 카운트 +1
-      favBtn.disabled = true;
-      favBtn.textContent = "찜 완료";
-      const heart = document.querySelector(`.heart-badge[data-heart="${mateId}"] .count`);
-      if (heart) {
-        const n = parseInt(heart.textContent || "0", 10) + 1;
-        heart.textContent = String(n);
+        alert("찜하기 실패: " + error.message);
+      } else {
+        favBtn.disabled = true;
+        favBtn.textContent = "찜 완료";
       }
     }
   });
@@ -232,6 +192,7 @@
     await loadMates({ reset: true });
   })();
 </script>
+
 
 
 <body>
