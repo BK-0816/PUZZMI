@@ -97,8 +97,8 @@
           <span class="price">${priceJpy}</span><span class="duration">/시간</span>
         </div>
         <div style="margin-top:10px; display:flex; gap:8px;">
-          <a class="cta-btn" data-requires-auth="true" href="mate_like.html?mate_id=${row.user_id}">프로필 보기</a>
-          <a class="cta-btn"          data-requires-auth="true" href="booking.html?mate_id=${row.user_id}">예약하기</a>
+          <button class="cta-btn" data-requires-auth="true" href="mate_like.html?mate_id=${row.user_id}">프로필 보기</button>
+          <button class="cta-btn" data-requires-auth="true" href="booking.html?mate_id=${row.user_id}">예약하기</button>
           <button class="cta-btn" data-fav-mate="${row.user_id}">찜하기</button>
         </div>
       </div>
