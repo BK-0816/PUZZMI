@@ -58,6 +58,7 @@ export async function renderNavbar(rootId='app-nav') {
     // 일반 유저
     menu.appendChild(el('a', { href: 'my_favorites.html' }, '내 찜'));
     menu.appendChild(el('a', { href: 'my_bookings.html' }, '내 예약'));
+    menu.appendChild(el('a', { href: 'notification.html' }, '알림함'));
   }
 
   // ✅ 로그인: 이용고객 → "1:1문의", 관리자 → "Q&A관리"
@@ -72,6 +73,7 @@ export async function renderNavbar(rootId='app-nav') {
   if (isMate) {
     menu.appendChild(el('a', { href: 'mate_dashboard.html' }, '메이트 대시보드'));
     menu.appendChild(el('a', { href: 'mate_edit.html' }, '프로필 편집'));
+
   }
 
   // 우측 로그인 정보/로그아웃

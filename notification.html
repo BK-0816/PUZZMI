@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>알림함 - PUZZMI</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="pages.css"/>
+  <link rel="stylesheet" href="pages-theme.css"/>
+  <link rel="stylesheet" href="nav.css"/>
+  <script type="module" src="nav.js"></script>
+  <style>
+    body.bg-cream { background: var(--bg-cream); }
+    .wrap { max-width: 860px; margin: 32px auto; }
+    .toolbar { display:flex; gap:8px; align-items:center; margin-bottom:12px; }
+    .toolbar .spacer { flex:1; }
+    .pill { border:1px solid rgba(0,0,0,.08); background:#fff; padding:8px 12px; border-radius:999px; cursor:pointer; }
+    .pill.active { background: var(--primary-color); color:#fff; border-color:transparent; }
+    .list { display:grid; gap:10px; }
+    .nitem { display:flex; gap:12px; align-items:flex-start; padding:12px; background:#fff; border:1px solid rgba(0,0,0,.08); border-radius:12px; }
+    .dot { width:10px; height:10px; border-radius:50%; background:#ff4757; margin-top:6px; flex:0 0 auto; visibility:hidden; }
+    .nitem.unread .dot { visibility:visible; }
+    .meta { color: var(--text-secondary); font-size:.9rem; }
+    .title { font-weight:800; margin:0 0 4px; }
+    .body { white-space:pre-wrap; }
+    .actions { display:flex; gap:6px; }
+    .empty { color: var(--text-secondary); padding:16px; text-align:center; }
+    .pager { display:flex; justify-content:center; gap:8px; margin-top:10px; }
+    .link { color: var(--primary-color); text-decoration: underline; cursor:pointer; }
+  </style>
+</head>
+<body class="bg-cream">
+  <div id="app-nav"></div>
+
+  <main class="wrap">
+    <section class="card">
+      <h2 style="margin:0 0 6px;">알림함</h2>
+      <div class="meta" id="counter">읽지 않은 알림 0개</div>
+
+      <div class="toolbar">
+        <button class="pill active" data-filter="all">전체</button>
+        <button class="pill" data-filter="unread">안 읽음</button>
+        <div class="spacer"></div>
+        <button class="btn btn-secondary" id="markAllRead">모두 읽음 처리</button>
+      </div>
+
+      <div id="list" class="list"></div>
+      <div class="pager">
+        <button class="pill" id="prev">이전</button>
+        <button class="pill" id="next">다음</button>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { supabase } from './nav.js';
+
+    const PAGE_SIZE = 15;
+    let me = null;
+    let page = 0;
+    let filter = 'all'; // all | unread
+    let sub = null;
+
+    const listEl   = document.getElementById('list');
+    const counter  = document.getElementById('counter');
+    const prevBtn  = document.getElementById('prev');
+    const nextBtn  = document.getElementById('next');
+    const markAll  = document.getElementById('markAllRead');
+
+    // 로그인 체크 (미로그인 → 로그인 페이지로)
+    (async () => {
+      const { data:{ user } } = await supabase.auth.getUser();
+      if (!user) {
+        const redir = encodeURIComponent('notifications.html');
+        location.replace(`auth_combo.html?redirect=${redir}`);
+        return;
+      }
+      me = user;
+
+      bindEvents();
+      await refreshCounter();
+      await load();
+      subscribeRealtime();
+    })();
+
+    function bindEvents(){
+      // 필터 탭
+      document.querySelectorAll('.pill[data-filter]').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          document.querySelectorAll('.pill[data-filter]').forEach(b=>b.classList.remove('active'));
+          btn.classList.add('active');
+          filter = btn.getAttribute('data-filter');
+          page = 0;
+          await load();
+        });
+      });
+
+      // 페이지네이션
+      prevBtn.addEventListener('click', async ()=>{
+        if (page > 0) { page--; await load(); }
+      });
+      nextBtn.addEventListener('click', async ()=>{
+        page++; await load();
+      });
+
+      // 모두 읽음
+      markAll.addEventListener('click', async ()=>{
+        const { error } = await supabase
+          .from('notifications')
+          .update({ read_at: new Date().toISOString() })
+          .eq('user_id', me.id)
+          .is('read_at', null);
+        if (error) return alert('실패: ' + error.message);
+        await refreshCounter();
+        await load();
+      });
+    }
+
+    function nItemHtml(row){
+      const cls = row.read_at ? '' : 'unread';
+      const when = new Date(row.created_at).toLocaleString('ko-KR');
+      const typeKo = row.type === 'booking_declined' ? '예약 거절'
+                    : row.type === 'booking_canceled' ? '예약 취소'
+                    : row.type;
+      const linkHtml = row.link ? `<span class="link" data-open="${encodeURIComponent(row.link)}">자세히 보기</span>` : '';
+
+      return `
+        <div class="nitem ${cls}" data-id="${row.id}">
+          <div class="dot"></div>
+          <div style="flex:1">
+            <div class="title">${row.title}</div>
+            <div class="meta">${typeKo} • ${when}</div>
+            <div class="body">${(row.body||'').replace(/</g,'&lt;')}</div>
+            <div class="actions" style="margin-top:8px">
+              ${linkHtml}
+              ${row.read_at ? '' : '<button class="btn btn-secondary" data-mark-read>읽음</button>'}
+              ${row.read_at ? '<span class="muted">읽음 처리됨</span>' : ''}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function refreshCounter(){
+      const { count } = await supabase
+        .from('notifications')
+        .select('id', { count:'exact', head:true })
+        .eq('user_id', me.id)
+        .is('read_at', null);
+      counter.textContent = `읽지 않은 알림 ${count ?? 0}개`;
+    }
+
+    async function load(){
+      listEl.innerHTML = '<div class="muted" style="padding:8px">로딩 중…</div>';
+
+      let q = supabase
+        .from('notifications')
+        .select('*')
+        .eq('user_id', me.id)
+        .order('created_at', { ascending:false })
+        .range(page * PAGE_SIZE, page*PAGE_SIZE + PAGE_SIZE - 1);
+
+      if (filter === 'unread') q = q.is('read_at', null);
+
+      const { data, error } = await q;
+      if (error) {
+        console.error(error);
+        listEl.innerHTML = '<div class="error">불러오기 실패: '+error.message+'</div>';
+        return;
+      }
+
+      if (!data?.length){
+        listEl.innerHTML = '<div class="empty">표시할 알림이 없습니다.</div>';
+      } else {
+        listEl.innerHTML = data.map(nItemHtml).join('');
+      }
+
+      // 카드 내 액션들 (읽음/링크)
+      listEl.querySelectorAll('[data-mark-read]').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          const card = btn.closest('.nitem');
+          const id = card.getAttribute('data-id');
+          const { error } = await supabase.from('notifications').update({ read_at: new Date().toISOString() }).eq('id', id).eq('user_id', me.id);
+          if (error) return alert('실패: ' + error.message);
+          await refreshCounter();
+          await load();
+        });
+      });
+
+      listEl.querySelectorAll('[data-open]').forEach(a=>{
+        a.addEventListener('click', async ()=>{
+          const url = decodeURIComponent(a.getAttribute('data-open'));
+          // 클릭 시 해당 알림을 읽음처리도 함께
+          const card = a.closest('.nitem');
+          const id = card.getAttribute('data-id');
+          await supabase.from('notifications').update({ read_at: new Date().toISOString() }).eq('id', id).eq('user_id', me.id).catch(()=>{});
+          window.location.href = url;
+        });
+      });
+    }
+
+    function subscribeRealtime(){
+      if (sub) return;
+      sub = supabase
+        .channel('realtime:notifications:'+me.id)
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${me.id}`
+        }, async (_payload) => {
+          await refreshCounter();
+          // 첫 페이지를 보고 있을 때는 즉시 최신 반영
+          if (page === 0) await load();
+        })
+        .subscribe();
+    }
+  </script>
+</body>
+</html>
