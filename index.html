@@ -156,42 +156,40 @@
   loadMoreBtn?.addEventListener("click", () => loadMates());
 
   // ===== 3) 인증 가드 & 찜하기 처리 =====
-  document.addEventListener("click", async (e) => {
-    // 로그인 필요한 링크(<a>)
-    const link = e.target.closest('a[data-requires-auth="true"]');
-    if (link) {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        e.preventDefault();
-        const redir = encodeURIComponent(link.getAttribute("href"));
-        location.href = `auth_combo.html?redirect=${redir}`;
-        return;
-      }
-    }
 
-    // 찜하기 버튼
-    const favBtn = e.target.closest("[data-fav-mate]");
-    if (favBtn) {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        const redir = encodeURIComponent(location.pathname + location.search);
-        return (location.href = `auth_combo.html?redirect=${redir}`);
-      }
-      const mateId = favBtn.getAttribute("data-fav-mate");
-      const { error } = await supabase
-        .from("favorites")
-        .upsert({ user_id: user.id, mate_id: mateId }, { onConflict: "user_id,mate_id" });
-      if (error) {
-        alert("찜하기 실패: " + error.message);
-      } else {
-        // UI 반영: 버튼 비활성 + 하트 1 증가
-        favBtn.disabled = true;
-        favBtn.textContent = "찜 완료";
-        const badge = document.querySelector(`.heart-badge[data-heart="${mateId}"] .count`);
-        if (badge) badge.textContent = String(Number(badge.textContent || "0") + 1);
-      }
-    }
-  });
+document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('[data-fav-mate]');
+  if (!btn) return;
+
+  const { data: { user }, error: authErr } = await supabase.auth.getUser();
+  if (authErr || !user) {
+    const redir = encodeURIComponent(location.pathname + location.search);
+    location.href = `auth_combo.html?redirect=${redir}`;
+    return;
+  }
+
+  const mateId = btn.getAttribute('data-fav-mate');
+
+  // 중복 방지용 unique(user_id, mate_id) 를 DB에 만들어둔다고 가정
+  const { error } = await supabase
+    .from('favorites')
+    .upsert({ user_id: user.id, mate_id: mateId }, { onConflict: 'user_id,mate_id' });
+
+  if (error) return alert('찜하기 실패: ' + error.message);
+
+  // 하트 배지 숫자 다시 읽기
+  const { count } = await supabase
+    .from('favorites')
+    .select('id', { count: 'exact', head: true })
+    .eq('mate_id', mateId);
+
+  const badge = document.querySelector(`[data-heart-badge="${mateId}"]`);
+  if (badge && typeof count === 'number') badge.textContent = count;
+
+  btn.disabled = true;
+  btn.textContent = '찜 완료';
+});
+
 
   // 초기 실행
   (async () => {
