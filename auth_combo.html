@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -24,6 +23,7 @@
     .sep::before, .sep::after { content:''; flex:1; height:1px; background: rgba(0,0,0,.08); }
     .full { width:100%; }
     .muted { color: var(--text-secondary); }
+    .row.gap8 { display:flex; gap:8px; }
   </style>
 </head>
 <body class="bg-cream">
@@ -50,7 +50,7 @@
             <input class="input" id="login_password" type="password" required/>
           </div>
         </div>
-        <button class="btn btn-primary" type="submit">로그인</button>
+        <button class="btn btn-primary" type="submit" id="login_btn">로그인</button>
         <div id="login_result"></div>
 
         <div class="sep">또는</div>
@@ -83,8 +83,13 @@
             <input class="input" id="signup_password" type="password" minlength="6" required/>
           </div>
         </div>
-        <button class="btn btn-primary" type="submit">회원가입</button>
-        <div class="note">회원가입 후 이메일 인증이 필요할 수 있어요.</div>
+
+        <div class="row gap8">
+          <button class="btn btn-primary" type="submit" id="signup_btn">회원가입</button>
+          <button type="button" class="btn btn-secondary" id="resend_signup" disabled>인증 메일 재전송</button>
+        </div>
+
+        <div class="note">회원가입 후 이메일 인증이 필요할 수 있어요. 메일이 오지 않으면 60초 후 재전송을 눌러주세요.</div>
         <div id="signup_result"></div>
 
         <div class="sep">또는</div>
@@ -100,7 +105,7 @@
           <div class="label">이메일</div>
           <input class="input" id="magic_email" type="email" required/>
         </div>
-        <button class="btn btn-primary" type="submit">로그인 링크 보내기</button>
+        <button class="btn btn-primary" type="submit" id="magic_btn">로그인 링크 보내기</button>
         <div class="muted">메일의 링크를 클릭하면 자동 로그인됩니다.</div>
         <div id="magic_result"></div>
       </form>
@@ -119,86 +124,201 @@
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4";
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // === Config: 원하면 false로 바꿔서 버튼 숨김 가능 ===
     const ENABLE_GOOGLE_OAUTH = true;
     const ENABLE_TWITTER_OAUTH = true;
 
-    // Tabs
+    // ===== Tabs =====
     const tabs = document.querySelectorAll('.tab');
     const panels = document.querySelectorAll('form[data-panel]');
-    tabs.forEach(t => t.addEventListener('click', () => {
-      tabs.forEach(x => x.classList.remove('active'));
-      t.classList.add('active');
-      const name = t.getAttribute('data-tab');
+    function switchTab(name){
+      tabs.forEach(x => x.classList.toggle('active', x.getAttribute('data-tab')===name));
       panels.forEach(p => p.classList.toggle('hidden', p.getAttribute('data-panel') !== name));
-    }));
+    }
+    tabs.forEach(t => t.addEventListener('click', () => switchTab(t.getAttribute('data-tab'))));
 
     function getRedirect() {
       const url = new URL(window.location.href);
       return url.searchParams.get('redirect') || 'index.html';
     }
 
-    const whoami = document.getElementById('whoami');
-    const logoutBtn = document.getElementById('logout');
+    const whoami   = document.getElementById('whoami');
+    const logoutBtn= document.getElementById('logout');
 
-    // LOGIN
+    // ===== 공통: 쿨다운 도우미 =====
+    function setupCooldown(key, btn, baseText){
+      let timer = null;
+      const tick = () => {
+        const until = Number(localStorage.getItem(key) || 0);
+        const left = Math.ceil((until - Date.now())/1000);
+        if (left > 0) {
+          btn.disabled = true;
+          btn.textContent = `${baseText} (${left}s)`;
+          timer = setTimeout(tick, 500);
+        } else {
+          btn.disabled = false;
+          btn.textContent = baseText;
+          localStorage.removeItem(key);
+          timer && clearTimeout(timer);
+        }
+      };
+      const start = (sec=60) => {
+        localStorage.setItem(key, Date.now() + sec*1000);
+        tick();
+      };
+      // 초기 상태 복원
+      tick();
+      return { start };
+    }
+
+    const cdSignup = setupCooldown("cd_signup", document.getElementById("signup_btn"), "회원가입");
+    const cdResend = setupCooldown("cd_resend", document.getElementById("resend_signup"), "인증 메일 재전송");
+    const cdMagic  = setupCooldown("cd_magic",  document.getElementById("magic_btn"),  "로그인 링크 보내기");
+
+    // ===== LOGIN =====
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
+      const btn = document.getElementById('login_btn');
+      btn.disabled = true;
+
       const email = document.getElementById('login_email').value.trim();
       const password = document.getElementById('login_password').value;
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       const box = document.getElementById('login_result');
-      if (error) { box.innerHTML = '<div class="error">로그인 실패: ' + error.message + '</div>'; }
-      else {
+
+      if (error) {
+        box.innerHTML = '<div class="error">로그인 실패: ' + error.message + '</div>';
+        btn.disabled = false;
+      } else {
         box.innerHTML = '<div class="success">로그인 성공! 잠시 후 이동합니다…</div>';
         setTimeout(() => location.href = getRedirect(), 600);
       }
       renderUser();
     });
 
-    // SIGNUP
+    // ===== SIGNUP =====
     document.getElementById('signupForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const full_name = document.getElementById('signup_name').value.trim();
-      const ageRaw = document.getElementById('signup_age').value;
-      const age = ageRaw ? parseInt(ageRaw, 10) : null;
-      const email = document.getElementById('signup_email').value.trim();
-      const password = document.getElementById('signup_password').value;
+      const ageRaw    = document.getElementById('signup_age').value;
+      const age       = ageRaw ? parseInt(ageRaw, 10) : null;
+      const email     = document.getElementById('signup_email').value.trim();
+      const password  = document.getElementById('signup_password').value;
+
+      const btn = document.getElementById('signup_btn');
+      btn.disabled = true;
 
       const { data, error } = await supabase.auth.signUp({
-        email, password,
-        options: { data: { full_name } }
+        email,
+        password,
+        options: { data: { full_name }, emailRedirectTo: window.location.origin + '/' + getRedirect() }
       });
+
       const box = document.getElementById('signup_result');
+
       if (error) {
+        const msg = (error.message || "").toLowerCase();
+
+        // 레이트 리밋
+        if (msg.includes('rate limit') || msg.includes('too many requests')) {
+          box.innerHTML = '<div class="error">요청이 너무 많습니다. 잠시 후 다시 시도해주세요.</div>';
+          cdSignup.start(60);
+          cdResend.start(60);
+          return;
+        }
+
+        // 이미 가입된 이메일 → 매직링크로 유도
+        if (msg.includes('already') && msg.includes('registered')) {
+          box.innerHTML = '<div class="error">이미 가입된 이메일입니다. 이메일로 로그인 링크를 보내드립니다.</div>';
+          // 자동으로 매직링크 탭으로 전환 + 전송
+          switchTab('magic');
+          document.getElementById('magic_email').value = email;
+          await sendMagic(email);
+          return;
+        }
+
         box.innerHTML = '<div class="error">회원가입 실패: ' + error.message + '</div>';
+        btn.disabled = false;
         return;
       }
+
+      // 가입 정상 → 프로필 upsert (RLS로 실패해도 가입은 성공 처리)
       if (data?.user?.id) {
-        await supabase.from('profiles').upsert({
-          id: data.user.id,
-          full_name,
-          age
-        }, { onConflict: 'id' });
+        const { error: profErr } = await supabase
+          .from('profiles')
+          .upsert({ id: data.user.id, full_name, age }, { onConflict: 'id' });
+        if (profErr) {
+          console.warn('profiles upsert blocked by RLS:', profErr.message);
+          box.innerHTML = '<div class="success">회원가입 완료! 이메일을 확인해주세요. (프로필은 로그인 후 마이페이지에서 수정 가능)</div>';
+        } else {
+          box.innerHTML = '<div class="success">회원가입 완료! 이메일을 확인해주세요.</div>';
+        }
+      } else {
+        box.innerHTML = '<div class="success">회원가입 요청이 접수되었습니다. 이메일을 확인해주세요.</div>';
       }
-      box.innerHTML = '<div class="success">회원가입 완료! 이메일 인증이 필요한 경우 메일을 확인해주세요.</div>';
+
+      // 쿨다운 시작
+      cdSignup.start(60);
+      cdResend.start(60);
       renderUser();
     });
 
-    // MAGIC LINK
+    // ===== RESEND SIGNUP EMAIL =====
+    document.getElementById('resend_signup').addEventListener('click', async () => {
+      const email = document.getElementById('signup_email').value.trim();
+      if (!email) {
+        alert('회원가입 섹션의 이메일을 먼저 입력해주세요.');
+        return;
+      }
+      const btn = document.getElementById('resend_signup');
+      btn.disabled = true;
+      const { error } = await supabase.auth.resend({ type: 'signup', email });
+      if (error) {
+        const msg = (error.message || '').toLowerCase();
+        if (msg.includes('rate limit') || msg.includes('too many requests')) {
+          alert('요청이 너무 많습니다. 잠시 후 다시 시도해주세요.');
+        } else {
+          alert('재전송 실패: ' + error.message);
+        }
+      } else {
+        alert('인증 메일을 다시 보냈습니다. 메일함을 확인해주세요.');
+      }
+      cdResend.start(60);
+    });
+
+    // ===== MAGIC LINK =====
+    async function sendMagic(email){
+      const btn = document.getElementById('magic_btn');
+      btn.disabled = true;
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: window.location.origin + '/' + getRedirect(),
+          shouldCreateUser: false   // 이미 가입된 계정에만 전송
+        }
+      });
+      const box = document.getElementById('magic_result');
+      if (error) {
+        const msg = (error.message || '').toLowerCase();
+        if (msg.includes('rate limit') || msg.includes('too many requests')) {
+          box.innerHTML = '<div class="error">요청이 너무 많습니다. 잠시 후 다시 시도해주세요.</div>';
+          cdMagic.start(60);
+        } else {
+          box.innerHTML = '<div class="error">전송 실패: ' + error.message + '</div>';
+          btn.disabled = false;
+        }
+      } else {
+        box.innerHTML = '<div class="success">로그인 링크를 전송했습니다. 메일을 확인해주세요.</div>';
+        cdMagic.start(60);
+      }
+    }
+
     document.getElementById('magicForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('magic_email').value.trim();
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: { emailRedirectTo: window.location.origin + '/' + getRedirect() }
-      });
-      const box = document.getElementById('magic_result');
-      if (error) box.innerHTML = '<div class="error">전송 실패: ' + error.message + '</div>';
-      else box.innerHTML = '<div class="success">로그인 링크를 전송했습니다. 메일을 확인해주세요.</div>';
+      await sendMagic(email);
     });
 
-    // OAUTH HANDLERS (graceful errors)
+    // ===== OAUTH =====
     function handleOAuthError(err) {
       const hint = document.getElementById('oauth_hint');
       if (!err) return;
@@ -220,11 +340,10 @@
 
     const gBtns = ['btn_google','btn_google2'].map(id => document.getElementById(id));
     const tBtns = ['btn_twitter','btn_twitter2'].map(id => document.getElementById(id));
-
     gBtns.forEach(b => { if (!ENABLE_GOOGLE_OAUTH) b.classList.add('hidden'); else b.addEventListener('click', () => oauthSignIn('google')); });
     tBtns.forEach(b => { if (!ENABLE_TWITTER_OAUTH) b.classList.add('hidden'); else b.addEventListener('click', () => oauthSignIn('twitter')); });
 
-    // LOGOUT
+    // ===== LOGOUT / WHOAMI =====
     logoutBtn.addEventListener('click', async () => {
       await supabase.auth.signOut();
       renderUser();
@@ -241,34 +360,6 @@
       }
     }
     renderUser();
-
-    // 예: 가입 버튼 클릭 핸들러
-const COOLDOWN_SEC = 60;
-const key = "signupCooldownUntil";
-const now = Date.now();
-const until = Number(localStorage.getItem(key) || 0);
-if (until > now) {
-  const left = Math.ceil((until - now)/1000);
-  alert(`잠시 후 다시 시도하세요. (${left}s)`);
-  return;
-}
-
-const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo } });
-if (error?.message?.toLowerCase().includes("rate limit")) {
-  localStorage.setItem(key, Date.now() + COOLDOWN_SEC*1000);
-  alert("인증 메일 요청이 너무 많습니다. 잠시 후 다시 시도해주세요.");
-  return;
-}
-// 정상: 쿨다운 시작
-localStorage.setItem(key, Date.now() + COOLDOWN_SEC*1000);
-
-await supabase.auth.signInWithOtp({
-  email,
-  options: { shouldCreateUser: false } // 이미 있는 계정에만 링크 발송
-});
-
-await supabase.auth.resend({ type: 'signup', email });
-
   </script>
 </body>
 </html>
