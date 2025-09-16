@@ -45,6 +45,15 @@
   const grid = document.querySelector(".friends-grid");
   const loadMoreBtn = document.getElementById("loadMore");
 
+  async function refreshHeartCount(mateId) {
+  const { count } = await supabase
+    .from('favorites')
+    .select('id', { head: true, count: 'exact' })
+    .eq('mate_id', mateId);
+
+  const countEl = document.querySelector(`.heart-badge[data-heart="${mateId}"] .count`);
+  if (countEl && typeof count === 'number') countEl.textContent = count;
+}
   // storage key → public URL
   function keyToUrl(key) {
     if (!key) return "";
@@ -108,6 +117,9 @@
       </div>
     `;
     grid.appendChild(card);
+    
+    refreshHeartCount(row.user_id);
+
   }
 
   async function loadMates({ reset=false } = {}) {
@@ -160,6 +172,8 @@
 document.addEventListener('click', async (e) => {
   const btn = e.target.closest('[data-fav-mate]');
   if (!btn) return;
+  e.preventDefault();                 // a/button 혼선 방지
+  btn.disabled = true; 
 
   const { data: { user }, error: authErr } = await supabase.auth.getUser();
   if (authErr || !user) {
@@ -175,7 +189,10 @@ document.addEventListener('click', async (e) => {
     .from('favorites')
     .upsert({ user_id: user.id, mate_id: mateId }, { onConflict: 'user_id,mate_id' });
 
-  if (error) return alert('찜하기 실패: ' + error.message);
+  if (error) {
+    btn.disabled = false;
+    return alert('찜하기 실패: ' + error.message);
+  }
 
   // 하트 배지 숫자 다시 읽기
   const { count } = await supabase
@@ -187,6 +204,7 @@ document.addEventListener('click', async (e) => {
   if (badge && typeof count === 'number') badge.textContent = count;
 
   btn.disabled = true;
+  await refreshHeartCount(mateId);
   btn.textContent = '찜 완료';
 });
 
