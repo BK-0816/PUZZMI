@@ -1,103 +1,198 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>이용문의(Q&A) - PUZZMI</title>
+  <title>PUZZMI - Q&A</title>
   <link rel="stylesheet" href="styles.css"/>
   <link rel="stylesheet" href="pages.css"/>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="pages-theme.css"/>
+  <style>
+    body.bg-cream { background: var(--bg-cream); background-repeat:no-repeat; background-size:cover; }
+    .qna-wrap{ max-width:980px; margin:40px auto; }
+    .card h2{ margin:0 0 8px; }
+    .grid{ display:grid; gap:12px; }
+    .qna-item .meta{ font-size:.9rem; color:var(--text-secondary); display:flex; gap:8px; flex-wrap:wrap; }
+    .qna-item textarea{ width:100%; min-height:120px; }
+    .right{ margin-left:auto; }
+  </style>
 </head>
-<body>
-  <link rel="stylesheet" href="styles.css" />
-<style>
-  /* 메인 styles.css에 --bg-cream 변수가 이미 있으니 그대로 사용 가능 */
-  body { background: var(--bg-cream); background-repeat:no-repeat; background-size:cover; }
-</style>
-  <main class="page">
-    <section class="row">
-      <div class="card">
-        <h2>최근 문의</h2>
-        <div id="list" class="stack-16"></div>
-      </div>
-      <div class="card">
-        <h2>문의 남기기</h2>
-        <form id="qnaForm" class="stack-16">
-          <div class="field">
-            <div class="label">이름/닉네임</div>
-            <input class="input" id="author_name" required/>
-          </div>
-          <div class="field">
-            <div class="label">연락처(이메일 또는 LINE)</div>
-            <input class="input" id="contact" required/>
-          </div>
-          <div class="field">
-            <div class="label">제목</div>
-            <input class="input" id="subject" required/>
-          </div>
-          <div class="field">
-            <div class="label">문의 내용</div>
-            <textarea class="textarea" id="message" required></textarea>
-          </div>
-          <button class="btn btn-primary" type="submit">등록</button>
-          <div id="result"></div>
-        </form>
-      </div>
+<body class="bg-cream">
+  <div id="app-nav"></div>
+  <main class="qna-wrap">
+    <section class="card">
+      <h2 id="qnaTitle">1:1 문의</h2>
+      <div id="requireLogin" class="error" style="display:none">로그인이 필요합니다. 로그인 페이지로 이동합니다…</div>
+
+      <!-- 이용고객(일반 사용자) 전용: 새 문의 작성 -->
+      <form id="formNew" class="grid" style="display:none">
+        <div class="field">
+          <div class="label">제목</div>
+          <input class="input" id="title" required placeholder="예: 예약 변경 문의"/>
+        </div>
+        <div class="field">
+          <div class="label">내용</div>
+          <textarea class="input" id="content" required placeholder="문의 내용을 자세히 적어주세요."></textarea>
+        </div>
+        <button class="btn btn-primary" type="submit">문의 등록</button>
+        <div id="newResult"></div>
+      </form>
+    </section>
+
+    <!-- 목록 -->
+    <section class="card">
+      <h3 id="listTitle">내 문의 목록</h3>
+      <div id="list" class="grid"></div>
     </section>
   </main>
 
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+    import { renderNavbar, supabase as navSb } from "./nav.js"; // 네비 재사용(선택)
+
     const SUPABASE_URL = "https://eevvgbbokenpjnvtmztk.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4";
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const list = document.getElementById('list');
+    renderNavbar(); // 상단바
 
-    async function loadQna() {
-      const { data, error } = await supabase
-        .from('qna')
-        .select('id, author_name, subject, created_at, status')
-        .order('created_at', { ascending: false })
-        .limit(50);
-      if (error) { console.error(error); return; }
-      list.innerHTML = (data || []).map(q => `
-        <div class="card">
-          <div class="flex justify-between align-center">
-            <div>
-              <div style="font-weight:700">${q.subject}</div>
-              <div class="muted">${q.author_name || '익명'} • ${new Date(q.created_at).toLocaleString()} • 상태: ${q.status}</div>
-            </div>
-          </div>
-        </div>
-      `).join('');
+    const requireLogin = document.getElementById('requireLogin');
+    const formNew = document.getElementById('formNew');
+    const newResult = document.getElementById('newResult');
+    const list = document.getElementById('list');
+    const qnaTitle = document.getElementById('qnaTitle');
+    const listTitle = document.getElementById('listTitle');
+
+    // 로그인 체크 → 미로그인 시 리디렉션
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      requireLogin.style.display = 'block';
+      const redir = encodeURIComponent('qna.html');
+      setTimeout(() => location.replace(`auth_combo.html?redirect=${redir}`), 800);
+      throw new Error('login required');
     }
 
-    loadQna();
+    // 관리자 여부 확인
+    const { data: adminRow } = await supabase.from('admin_users').select('user_id').eq('user_id', user.id).maybeSingle();
+    const isAdmin = !!adminRow;
 
-    const form = document.getElementById('qnaForm');
-    const result = document.getElementById('result');
-    form.addEventListener('submit', async (e) => {
+    // UI 라벨
+    if (isAdmin) {
+      qnaTitle.textContent = 'Q&A 관리';
+      listTitle.textContent = '전체 문의';
+      formNew.style.display = 'none'; // 관리자는 새 문의 작성 숨김
+    } else {
+      qnaTitle.textContent = '1:1 문의';
+      listTitle.textContent = '내 문의 목록';
+      formNew.style.display = 'grid';
+    }
+
+    // 새 문의 등록(일반 사용자)
+    formNew?.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const payload = {
-        author_name: document.getElementById('author_name').value.trim(),
-        contact: document.getElementById('contact').value.trim(),
-        subject: document.getElementById('subject').value.trim(),
-        message: document.getElementById('message').value.trim(),
-        status: 'new'
-      };
-      const { error } = await supabase.from('qna').insert(payload);
+      const title = document.getElementById('title').value.trim();
+      const content = document.getElementById('content').value.trim();
+      if (!title || !content) return;
+
+      const { error } = await supabase.from('qna').insert({
+        user_id: user.id,
+        user_email: user.email ?? null,
+        title, content, status: 'open'
+      });
       if (error) {
-        console.error(error);
-        result.innerHTML = '<div class="error">등록 실패. 다시 시도해주세요.</div>';
+        newResult.innerHTML = `<div class="error">등록 실패: ${error.message}</div>`;
       } else {
-        result.innerHTML = '<div class="success">등록 완료! 빠르게 답변드릴게요.</div>';
-        form.reset();
-        loadQna();
+        newResult.innerHTML = `<div class="success">등록되었습니다.</div>`;
+        (document.getElementById('title').value = '');
+        (document.getElementById('content').value = '');
+        await loadList();
       }
     });
+
+    // 목록 로드
+    async function loadList() {
+      list.innerHTML = '';
+      const sel = supabase.from('qna')
+        .select('id, user_email, title, content, status, answer, created_at, answered_at, answered_by')
+        .order('created_at', { ascending: false });
+
+      const { data, error } = isAdmin ? await sel : await sel.eq('user_id', user.id);
+      if (error) {
+        list.innerHTML = `<div class="error">불러오기 실패: ${error.message}</div>`;
+        return;
+      }
+      if (!data || data.length === 0) {
+        list.innerHTML = `<div class="muted">문의 내역이 없습니다.</div>`;
+        return;
+      }
+
+      list.innerHTML = data.map(row => {
+        const created = new Date(row.created_at).toLocaleString('ko-KR');
+        const answered = row.answered_at ? new Date(row.answered_at).toLocaleString('ko-KR') : '';
+        const status = row.status ?? (row.answer ? 'answered' : 'open');
+
+        return `
+          <div class="qna-item card">
+            <h4 style="margin:0 0 6px">${row.title}</h4>
+            <div class="meta">
+              ${isAdmin ? `<span>From: ${row.user_email ?? '익명'}</span>` : ''}
+              <span>작성: ${created}</span>
+              ${answered ? `<span>답변: ${answered}</span>` : ''}
+              <span class="right">상태: ${status}</span>
+            </div>
+            <div style="margin-top:8px; white-space:pre-wrap">${row.content}</div>
+            ${row.answer ? `
+              <div class="card" style="margin-top:10px; background:#fff;">
+                <div class="label" style="margin-bottom:4px">관리자 답변</div>
+                <div style="white-space:pre-wrap">${row.answer}</div>
+              </div>
+            ` : ''}
+            ${isAdmin ? `
+              <div style="margin-top:10px">
+                <textarea id="ans_${row.id}" class="input" placeholder="답변을 입력하세요...">${row.answer ?? ''}</textarea>
+                <div style="display:flex; gap:8px; margin-top:8px">
+                  <button class="btn btn-primary" data-ans-save="${row.id}">답변 저장</button>
+                  <button class="btn btn-secondary" data-ans-close="${row.id}">상태: 완료 처리</button>
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+
+      if (isAdmin) {
+        // 답변 저장/닫기 이벤트 위임
+        list.addEventListener('click', async (e) => {
+          const saveId = e.target.closest('[data-ans-save]')?.getAttribute('data-ans-save');
+          const closeId = e.target.closest('[data-ans-close]')?.getAttribute('data-ans-close');
+          if (!saveId && !closeId) return;
+
+          if (saveId) {
+            const txt = (document.getElementById(`ans_${saveId}`)?.value ?? '').trim();
+            const { error } = await supabase.from('qna')
+              .update({
+                answer: txt,
+                answered_by: user.id,
+                answered_at: new Date().toISOString(),
+                status: 'answered'
+              })
+              .eq('id', saveId);
+            if (error) alert('저장 실패: ' + error.message);
+            else await loadList();
+          }
+
+          if (closeId) {
+            const { error } = await supabase.from('qna')
+              .update({ status: 'closed' })
+              .eq('id', closeId);
+            if (error) alert('완료 처리 실패: ' + error.message);
+            else await loadList();
+          }
+        }, { once: true }); // 새로 로드할 때마다 다시 바인딩
+      }
+    }
+
+    await loadList();
   </script>
 </body>
 </html>

@@ -1,5 +1,4 @@
-
-/* PUZZMI role-aware navbar (login -> auth_combo.html) */
+/* PUZZMI navbar – auth-aware & minimal menu */
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const SUPABASE_URL = "https://eevvgbbokenpjnvtmztk.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4";
@@ -21,14 +20,12 @@ function el(tag, attrs={}, children=[]) {
 
 async function getRoles() {
   const { data: { user } } = await supabase.auth.getUser();
-  let isAdmin = false, isMate = false;
+  let isAdmin = false;
   if (user) {
     const a = await supabase.from('admin_users').select('user_id').eq('user_id', user.id).maybeSingle();
     isAdmin = !!a.data;
-    const m = await supabase.from('mate_profiles').select('user_id').eq('user_id', user.id).maybeSingle();
-    isMate = !!m.data;
   }
-  return { user, isAdmin, isMate };
+  return { user, isAdmin };
 }
 
 export async function renderNavbar(rootId='app-nav') {
@@ -47,36 +44,26 @@ export async function renderNavbar(rootId='app-nav') {
   const menu = el('div', { class: 'menu' });
   wrap.appendChild(menu);
 
-  const { user, isAdmin, isMate } = await getRoles();
+  const { user, isAdmin } = await getRoles();
 
-  // Common
-  menu.appendChild(el('a', { href: 'index.html#friends' }, '메이트 찾기'));
-  menu.appendChild(el('a', { href: 'qna.html' }, 'Q&A'));
-
-  if (user && !isAdmin && !isMate) {
-    // 일반 유저
-    menu.appendChild(el('a', { href: 'my_favorites.html' }, '내 찜'));
-    menu.appendChild(el('a', { href: 'my_bookings.html' }, '내 예약'));
-  }
-
-  if (isMate) {
-    menu.appendChild(el('a', { href: 'mate_dashboard.html' }, '메이트 대시보드'));
-    menu.appendChild(el('a', { href: 'mate_edit.html' }, '프로필 편집'));
-  }
-
-  if (isAdmin) {
-    menu.appendChild(el('a', { href: 'admin_plus.html' }, '관리자'));
-    menu.appendChild(el('a', { href: 'admin_mates.html' }, '메이트 관리'));
-  }
-
-  if (user) {
-    const me = el('span', { class: 'pill' }, user.email || user.id);
-    menu.appendChild(me);
-    menu.appendChild(el('button', { onclick: async () => { await supabase.auth.signOut(); location.reload(); } }, '로그아웃'));
-  } else {
+  // ✅ 비로그인: "로그인"만
+  if (!user) {
     const _redir = encodeURIComponent(location.pathname + location.search);
     menu.appendChild(el('a', { href: 'auth_combo.html?redirect=' + _redir }, '로그인'));
+    return;
   }
+
+  // ✅ 로그인: 이용고객 → "1:1문의", 관리자 → "Q&A관리"
+  if (isAdmin) {
+    menu.appendChild(el('a', { href: 'qna.html' }, 'Q&A관리'));
+  } else {
+    menu.appendChild(el('a', { href: 'qna.html' }, '1:1문의'));
+  }
+
+  // 우측 로그인 정보/로그아웃
+  const me = el('span', { class: 'pill' }, user.email || user.id);
+  menu.appendChild(me);
+  menu.appendChild(el('button', { onclick: async () => { await supabase.auth.signOut(); location.reload(); } }, '로그아웃'));
 }
 
 document.addEventListener('DOMContentLoaded', () => renderNavbar());
