@@ -51,7 +51,7 @@ export async function renderNavbar(rootId='app-nav') {
 
   // Common
   menu.appendChild(el('a', { href: 'index.html#friends' }, '메이트 찾기'));
-  menu.appendChild(el('a', { href: 'qna_v2.html' }, 'Q&A'));
+  menu.appendChild(el('a', { href: 'qna.html' }, 'Q&A'));
 
   if (user && !isAdmin && !isMate) {
     // 일반 유저
