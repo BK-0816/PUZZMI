@@ -42,7 +42,8 @@
   }
 
   // ===== 2) 메이트 목록(페이지네이션 + 이미지 URL 변환 + 로그인 가드) =====
-  const ONLY_VERIFIED = false;      // 공개만 노출하려면 true
+  // 공개 조회 RLS를 is_verified=true에만 허용하셨다면 true로 두세요.
+  const ONLY_VERIFIED = true;
   const PAGE_SIZE     = 8;
 
   let page = 0;
@@ -51,7 +52,7 @@
 
   const grid = document.querySelector(".friends-grid");
 
-  // "더 보기" 버튼이 없으면 만들어서 붙임
+  // "더 보기" 버튼(페이지 하단에 이미 있다면 이 블록은 그대로 둬도 무해)
   let loadMoreBtn = document.getElementById("loadMore");
   if (!loadMoreBtn && grid) {
     const actionsWrap = document.createElement("div");
@@ -69,11 +70,11 @@
   // 스토리지 키 → 공개 URL
   const keyToUrl = (key) => {
     if (!key) return null;
-    const pureKey = key.startsWith('mates/') ? key.replace(/^mates\//,'') : key; // 실수 보정
+    const pureKey = key.startsWith('mates/') ? key.replace(/^mates\//,'') : key;
     return supabase.storage.from('mates').getPublicUrl(pureKey).data.publicUrl;
   };
 
-  // 카드 렌더
+  // 카드 렌더 (별점 배지는 제거)
   function renderCard(row) {
     const name   = row.profiles?.full_name ?? "이름 비공개";
     const age    = row.profiles?.age ? `${row.profiles.age}세` : "";
@@ -83,11 +84,12 @@
     const keys = Array.isArray(row.photos) ? row.photos : [];
     const coverRaw = row.primary_photo || keys[0] || null;
     const coverKey = coverRaw?.startsWith('mates/') ? coverRaw.replace(/^mates\//,'') : coverRaw;
-    const img = coverKey ? supabase.storage.from('mates').getPublicUrl(coverKey).data.publicUrl : (row.profiles?.avatar_url || "https://picsum.photos/seed/puzzmi/400/300");
+    const img = coverKey
+      ? supabase.storage.from('mates').getPublicUrl(coverKey).data.publicUrl
+      : (row.profiles?.avatar_url || "https://picsum.photos/seed/puzzmi/400/300");
 
     // 고정 JPY 4,000/시간
     const priceJpy = new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY', maximumFractionDigits: 0 }).format(4000);
-    const rating   = row.rating ?? 4.8;
     const tagsTxt  = (row.tags ?? []).slice(0,3).join(", ") || "서울 투어";
     const cats     = [...(row.tags ?? []), ...(row.areas ?? [])].join(" ").toLowerCase() || "culture";
 
@@ -98,7 +100,6 @@
     card.innerHTML = `
       <div class="friend-image">
         <img src="${img}" alt="${name}">
-        <div class="friend-badge"><i class="fas fa-star"></i><span>${rating}</span></div>
       </div>
       <div class="friend-info">
         <h3 class="friend-name">${name}</h3>
@@ -112,9 +113,9 @@
           <span class="price">${priceJpy}</span><span class="duration">/시간</span>
         </div>
         <div style="margin-top:10px; display:flex; gap:8px;">
-          <a class="cta-btn" data-requires-auth="true" href="mate_like.html?mate_id=${row.user_id}">프로필 보기</a>
+          <a class="btn btn-secondary" data-requires-auth="true" href="mate_like.html?mate_id=${row.user_id}">프로필 보기</a>
           <a class="cta-btn"          data-requires-auth="true" href="booking.html?mate_id=${row.user_id}">예약하기</a>
-          <a class="cta-btn" data-fav-mate="${row.user_id}">찜하기</a>
+          <a class="cta-btn"          data-fav-mate="${row.user_id}" href="#">찜하기</a>
         </div>
       </div>
     `;
@@ -130,11 +131,14 @@
     const from = page * PAGE_SIZE;
     const to   = from + PAGE_SIZE - 1;
 
+    // ★ select 문자열에 불필요한 '+' 제거하고, 백틱 템플릿 정확히 닫기
     let query = supabase
       .from("mate_profiles")
-      .select(`user_id, bio, hourly_rate, tags, areas, is_verified, photos, primary_photo,
-+         profiles ( id, full_name, age, gender, languages, avatar_url )`, { count: 'exact' })
-      .order("rating", { ascending: false })
+      .select(`
+        user_id, bio, hourly_rate, tags, areas, is_verified, photos, primary_photo,
+        profiles ( id, full_name, age, gender, languages, avatar_url )
+      `, { count: 'exact' })
+      .order("created_at", { ascending: false })
       .range(from, to);
 
     if (ONLY_VERIFIED) query = query.eq("is_verified", true);
@@ -165,32 +169,38 @@
 
   loadMoreBtn?.addEventListener("click", () => loadMatesPage());
 
-  // ===== 3) 링크 클릭 시 로그인 가드 =====
+  // ===== 3) 링크 클릭 시 로그인 가드(프로필/예약) + 찜하기 처리 =====
   document.addEventListener('click', async (e) => {
+    // 로그인 가드(프로필, 예약)
     const link = e.target.closest('a[data-requires-auth="true"]');
-    if (!link) return;
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) return;   // 로그인 상태면 통과
-    e.preventDefault(); // 미로그인 → 로그인 페이지로
-    const redir = encodeURIComponent(link.getAttribute('href'));
-    location.href = `auth_combo.html?redirect=${redir}`;
-  });
-
-  // 찜하기
-  const favBtn = e.target.closest('button[data-fav-mate]');
-  if (favBtn) {
-    const { data:{ user } } = await supabase.auth.getUser();
-    if (!user) {
-      const redir = encodeURIComponent(location.pathname + location.search);
-      return (location.href = `auth_combo.html?redirect=${redir}`);
+    if (link) {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        e.preventDefault();
+        const redir = encodeURIComponent(link.getAttribute('href'));
+        return (location.href = `auth_combo.html?redirect=${redir}`);
+      }
+      return;
     }
-    const mateId = favBtn.getAttribute('data-fav-mate');
-    const { error } = await supabase.from('favorites')
-      .upsert({ user_id: user.id, mate_id: mateId }, { onConflict: 'user_id,mate_id', ignoreDuplicates: true });
-    if (error) return alert('찜하기 실패: ' + error.message);
-    favBtn.disabled = true;
-    favBtn.textContent = '찜 완료';
-  }
+
+    // 찜하기
+    const favLink = e.target.closest('a[data-fav-mate]');
+    if (favLink) {
+      e.preventDefault();
+      const { data:{ user } } = await supabase.auth.getUser();
+      if (!user) {
+        const redir = encodeURIComponent(location.pathname + location.search);
+        return (location.href = `auth_combo.html?redirect=${redir}`);
+      }
+      const mateId = favLink.getAttribute('data-fav-mate');
+      const { error } = await supabase
+        .from('favorites')
+        .upsert({ user_id: user.id, mate_id: mateId }, { onConflict: 'user_id,mate_id', ignoreDuplicates: true });
+      if (error) return alert('찜하기 실패: ' + error.message);
+      favLink.classList.add('disabled');
+      favLink.textContent = '찜 완료';
+    }
+  });
 
   // 초기 실행
   (async () => {
