@@ -187,7 +187,7 @@ document.addEventListener('click', async (e) => {
   // 중복 방지용 unique(user_id, mate_id) 를 DB에 만들어둔다고 가정
   const { error } = await supabase
     .from('favorites')
-    .upsert({ user_id: user.id, mate_id: mateId }, { onConflict: 'user_id,mate_id' });
+    .upsert({ user_id: user.id, mate_id: mateId }, { onConflict: 'user_id,mate_id',ignoreDuplicates: true });
 
   if (error) {
     btn.disabled = false;
