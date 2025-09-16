@@ -1,31 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PUZZMI - 메이트 프로필</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="pages.css"/>
+  <link rel="stylesheet" href="pages-theme.css"/>
+  <link rel="stylesheet" href="nav.css"/>
+  <script type="module" src="nav.js"></script>
+  <style>
+    body.bg-cream { background: var(--bg-cream); background-repeat:no-repeat; background-size:cover; }
+    .wrap{ max-width:980px; margin:40px auto; }
+    .grid{ display:grid; gap:16px; }
+    .card h2{ margin:0 0 8px; }
+    .muted{ color:var(--text-secondary); }
+    .carousel{ position:relative; }
+    .carousel .track{ display:flex; gap:8px; overflow-x:auto; scroll-snap-type:x mandatory; padding:6px; }
+    .carousel .track::-webkit-scrollbar{ height:8px; }
+    .carousel .track > img{ flex:0 0 auto; width:320px; height:220px; object-fit:cover; border-radius:12px; scroll-snap-align:start; background:#f5f5f5; }
+    .carousel .nav{ position:absolute; top:50%; transform:translateY(-50%); background:rgba(0,0,0,.5); color:#fff; border:none; width:36px; height:36px; border-radius:50%; cursor:pointer; }
+    .carousel .prev{ left:6px; }
+    .carousel .next{ right:6px; }
+    .row{ display:flex; gap:12px; flex-wrap:wrap; align-items:flex-start; }
+  </style>
+</head>
+<body class="bg-cream">
+  <div id="app-nav"></div>
+  <main class="wrap">
+    <section class="card">
+      <h2 id="mateName">메이트 프로필</h2>
+      <div class="carousel">
+        <button class="nav prev" aria-label="이전">‹</button>
+        <div class="track" id="photoTrack"></div>
+        <button class="nav next" aria-label="다음">›</button>
+      </div>
+      <div id="meta" class="grid" style="margin-top:12px"></div>
+      <div class="row" style="margin-top:8px">
+        <a class="btn btn-secondary" id="backBtn">목록으로</a>
+        <a class="cta-btn" id="bookBtn">예약하기</a>
+      </div>
+    </section>
+  </main>
 
-<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>메이트 프로필 - PUZZMI</title>
-<link rel="stylesheet" href="styles.css"/><link rel="stylesheet" href="pages.css"/><link rel="stylesheet" href="nav.css"/><link rel="stylesheet" href="pages-theme.css"/>
-<script type="module" src="nav.js"></script></head>
-<body class="bg-cream"><div id="app-nav"></div><main class="page"><section class="row">
-<aside class="card"><img id="avatar" style="width:100%;height:320px;object-fit:cover;border-radius:12px"/><div class="spacer"></div><a id="bookBtn" class="btn btn-primary" href="#">이 메이트로 예약하기</a><button id="favBtn" class="btn btn-secondary">♡ 찜하기</button></aside>
-<article class="card"><h2 id="name">메이트 이름</h2><div class="muted" id="meta"></div><div id="bio" class="spacer"></div><h3 class="label">MBTI & 취미</h3><div class="chips" id="chips"></div><div class="spacer"></div><h3 class="label">언어</h3><div class="chips" id="langs"></div></article>
-</section></main>
-<script type="module">
-import { supabase } from './nav.js';
-const params=new URLSearchParams(location.search); const mateId=params.get('mate_id'); const favBtn=document.getElementById('favBtn');
-async function loadMate(){const {data}=await supabase.from('mate_profiles').select(`user_id,bio,hourly_rate,mbti,hobbies,rating,profiles!inner(id,full_name,age,gender,languages,avatar_url)`).eq('user_id', mateId).single();
-const p=data?.profiles||{}; document.getElementById('avatar').src=p.avatar_url||"https://picsum.photos/seed/puzzmi/600/400"; document.getElementById('name').textContent=p.full_name||'이름 비공개';
-const age=p.age?`${p.age}세`:''; const gender=p.gender||''; const mbti=data.mbti?` • MBTI ${data.mbti}`:''; document.getElementById('meta').textContent=[age,gender].filter(Boolean).join(' • ')+mbti;
-document.getElementById('bio').textContent=data.bio||''; document.getElementById('chips').innerHTML=(data.hobbies||[]).map(t=>`<span class="chip">${t}</span>`).join(''); document.getElementById('langs').innerHTML=(p.languages||[]).map(l=>`<span class="chip">${l}</span>`).join(''); document.getElementById('bookBtn').href=`booking.html?mate_id=${data.user_id}`;}
-async function syncFav(){const {data:{user}}=await supabase.auth.getUser(); if(!user){favBtn.textContent='♡ 찜하기 (로그인 필요)'; return;} const {data}=await supabase.from('favorites').select('*').eq('user_id', user.id).eq('mate_id', mateId).maybeSingle(); favBtn.textContent=data?'♥ 찜해제':'♡ 찜하기';}
-favBtn.onclick=async()=>{const {data:{user}}=await supabase.auth.getUser(); if(!user) return location.href='auth.html?redirect='+encodeURIComponent(location.pathname+location.search);
-const {data}=await supabase.from('favorites').select('*').eq('user_id', user.id).eq('mate_id', mateId).maybeSingle(); if(data){await supabase.from('favorites').delete().eq('user_id', user.id).eq('mate_id', mateId);} else {await supabase.from('favorites').insert({user_id:user.id, mate_id:mateId});} syncFav();};
-loadMate(); syncFav();
-  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-  const SUPABASE_URL = "https://eevvgbbokenpjnvtmztk.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4";
-  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+    const supabase = createClient("https://eevvgbbokenpjnvtmztk.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4");
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    const redir = encodeURIComponent(location.pathname + location.search);
-    location.replace(`auth_combo.html?redirect=${redir}`);
-  }
-</script></body></html>
+    const params = new URLSearchParams(location.search);
+    const mateId = params.get('mate_id');
+    if (!mateId) {
+      alert('mate_id가 없습니다.');
+      history.back();
+    }
+
+    function keyToUrl(key) {
+      return supabase.storage.from('mates').getPublicUrl(key).data.publicUrl;
+    }
+
+    const track = document.getElementById('photoTrack');
+    const mateName = document.getElementById('mateName');
+    const meta = document.getElementById('meta');
+    const backBtn = document.getElementById('backBtn');
+    const bookBtn = document.getElementById('bookBtn');
+
+    backBtn.href = './index.html#friends';
+    bookBtn.href = `booking.html?mate_id=${encodeURIComponent(mateId)}`;
+
+    // 데이터 로드
+    const { data, error } = await supabase
+      .from('mate_profiles')
+      .select(`user_id, bio, hourly_rate, tags, areas, rating, photos,
+               profiles ( full_name, age, gender, languages )`)
+      .eq('user_id', mateId)
+      .maybeSingle();
+
+    if (error || !data) {
+      track.innerHTML = '<div class="muted" style="padding:8px">프로필을 불러오지 못했습니다.</div>';
+    } else {
+      mateName.textContent = (data.profiles?.full_name ?? '메이트') + ' 님';
+      const keys = Array.isArray(data.photos) ? data.photos : [];
+      if (!keys.length) {
+        track.innerHTML = '<div class="muted" style="padding:8px">등록된 사진이 없습니다.</div>';
+      } else {
+        const urls = keys.map(keyToUrl);
+        track.innerHTML = urls.map(u => `<img src="${u}" alt="메이트 사진">`).join('');
+      }
+
+      const age = data.profiles?.age ? `${data.profiles.age}세` : '';
+      const gender = data.profiles?.gender || '';
+      const langs = Array.isArray(data.profiles?.languages) ? data.profiles.languages.join(', ') : '';
+      const price = data.hourly_rate ? new Intl.NumberFormat('ko-KR').format(data.hourly_rate) : '협의';
+      const tags = (data.tags || []).join(', ');
+      const areas = (data.areas || []).join(', ');
+      const rating = data.rating ?? 'N/A';
+
+      meta.innerHTML = `
+        <div><strong>소개</strong><br>${data.bio ?? '소개가 아직 없습니다.'}</div>
+        <div><strong>기본 정보</strong><br>${[age, gender].filter(Boolean).join(' • ') || '미기재'}</div>
+        <div><strong>언어</strong><br>${langs || '미기재'}</div>
+        <div><strong>시급</strong><br>₩ ${price} / 시간</div>
+        <div><strong>태그</strong><br>${tags || '없음'}</div>
+        <div><strong>활동 지역</strong><br>${areas || '미기재'} </div>
+        <div><strong>평점</strong><br>${rating}</div>
+      `;
+    }
+
+    // 좌우 버튼
+    const prevBtn = document.querySelector('.carousel .prev');
+    const nextBtn = document.querySelector('.carousel .next');
+    prevBtn.addEventListener('click', ()=> track.scrollBy({ left: -320, behavior:'smooth' }));
+    nextBtn.addEventListener('click', ()=> track.scrollBy({ left:  320, behavior:'smooth' }));
+  </script>
+</body>
+</html>
