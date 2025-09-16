@@ -1,31 +1,248 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PUZZMI - 메이트 프로필 편집</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="pages.css"/>
+  <link rel="stylesheet" href="pages-theme.css"/>
+  <link rel="stylesheet" href="nav.css"/>
+  <script type="module" src="nav.js"></script>
+  <style>
+    body.bg-cream { background: var(--bg-cream); background-repeat:no-repeat; background-size:cover; }
+    .wrap{ max-width:980px; margin:40px auto; }
+    .grid{ display:grid; gap:16px; }
+    .row{ display:flex; gap:12px; flex-wrap:wrap; align-items:flex-start; }
+    .card h2{ margin:0 0 8px; }
+    .muted{ color:var(--text-secondary); }
+    .help{ font-size:.9rem; color:var(--text-secondary); }
+    .carousel{ position:relative; }
+    .carousel .track{ display:flex; gap:8px; overflow-x:auto; scroll-snap-type:x mandatory; padding:6px; }
+    .carousel .track::-webkit-scrollbar{ height:8px; }
+    .carousel .track > img{ flex:0 0 auto; width:280px; height:200px; object-fit:cover; border-radius:12px; scroll-snap-align:start; background:#f5f5f5; }
+    .carousel .nav{ position:absolute; top:50%; transform:translateY(-50%); background:rgba(0,0,0,.5); color:#fff; border:none; width:36px; height:36px; border-radius:50%; cursor:pointer; }
+    .carousel .prev{ left:6px; }
+    .carousel .next{ right:6px; }
+    figure.thumb{ width:120px; }
+    figure.thumb img{ width:100%; height:100px; object-fit:cover; border-radius:8px; }
+    figure.thumb figcaption{ font-size:.8rem; display:flex; justify-content:space-between; align-items:center; gap:6px; margin-top:4px; }
+    .btn-danger{ background:#e53935; color:#fff; }
+    .btn-light{ background:#fff; border:1px solid #ddd; }
+    .w-100{ width:100%; }
+  </style>
+</head>
+<body class="bg-cream">
+  <div id="app-nav"></div>
+  <main class="wrap">
+    <section class="card">
+      <h2>메이트 프로필 편집</h2>
+      <p class="help">여러 장의 사진을 업로드하고, 아래 캐러셀에서 미리 볼 수 있어요.</p>
 
-<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>메이트 프로필 편집 - PUZZMI</title>
-<link rel="stylesheet" href="styles.css"/><link rel="stylesheet" href="pages.css"/><link rel="stylesheet" href="nav.css"/><link rel="stylesheet" href="pages-theme.css"/>
-<script type="module" src="nav.js"></script></head>
-<body class="bg-cream"><div id="app-nav"></div><main class="page"><section class="card"><h2>내 메이트 프로필 편집</h2>
-<form id="form" class="stack-16">
-<div class="row"><div class="field"><div class="label">이름</div><input class="input" id="full_name"/></div><div class="field"><div class="label">나이</div><input class="input" id="age" type="number" min="1" step="1"/></div></div>
-<div class="row"><div class="field"><div class="label">아바타 URL</div><input class="input" id="avatar_url" placeholder="https://..."/></div><div class="field"><div class="label">사용 언어(쉼표)</div><input class="input" id="languages" placeholder="ko,ja,en"/></div></div>
-<div class="row single"><div class="field"><div class="label">소개(Bio)</div><textarea class="textarea" id="bio"></textarea></div></div>
-<div class="row"><div class="field"><div class="label">시급</div><input class="input" id="hourly_rate" type="number" min="0" step="1000"/></div><div class="field"><div class="label">태그(쉼표)</div><input class="input" id="tags" placeholder="카페투어,사진,한옥"/></div></div>
-<div class="row"><div class="field"><div class="label">활동 지역(쉼표)</div><input class="input" id="areas" placeholder="홍대,익선동,을지로"/></div><div class="field"><div class="label">취미(쉼표)</div><input class="input" id="hobbies" placeholder="카페,사진,디저트"/></div></div>
-<div class="row single"><div class="field"><div class="label">사진 URL들(쉼표)</div><input class="input" id="photos" placeholder="https://img1,..."/></div></div>
-<button class="btn btn-primary" type="submit">저장</button><div id="result"></div></form></section></main>
-<script type="module">
-import { supabase } from './nav.js';
-const form=document.getElementById('form'), result=document.getElementById('result');
-function toArr(v){return v.split(',').map(s=>s.trim()).filter(Boolean);}
-async function load(){const {data:{user}}=await supabase.auth.getUser(); if(!user){result.innerHTML='<div class="note">로그인 필요</div>'; return;}
-const p=await supabase.from('profiles').select('*').eq('id', user.id).maybeSingle();
-const m=await supabase.from('mate_profiles').select('*').eq('user_id', user.id).maybeSingle();
-document.getElementById('full_name').value=p.data?.full_name||''; document.getElementById('age').value=p.data?.age||''; document.getElementById('avatar_url').value=p.data?.avatar_url||''; document.getElementById('languages').value=(p.data?.languages||[]).join(',');
-document.getElementById('bio').value=m.data?.bio||''; document.getElementById('hourly_rate').value=m.data?.hourly_rate||''; document.getElementById('tags').value=(m.data?.tags||[]).join(','); document.getElementById('areas').value=(m.data?.areas||[]).join(','); document.getElementById('hobbies').value=(m.data?.hobbies||[]).join(','); document.getElementById('photos').value=(m.data?.photos||[]).join(',');}
-form.addEventListener('submit', async e=>{e.preventDefault(); const {data:{user}}=await supabase.auth.getUser(); if(!user) return alert('로그인 필요');
-const profiles={id:user.id, full_name:document.getElementById('full_name').value.trim(), age:document.getElementById('age').value?parseInt(document.getElementById('age').value,10):null, avatar_url:document.getElementById('avatar_url').value.trim(), languages:toArr(document.getElementById('languages').value)};
-const mate={user_id:user.id, bio:document.getElementById('bio').value.trim(), hourly_rate:document.getElementById('hourly_rate').value?parseInt(document.getElementById('hourly_rate').value,10):null, tags:toArr(document.getElementById('tags').value), areas:toArr(document.getElementById('areas').value), hobbies:toArr(document.getElementById('hobbies').value), photos:toArr(document.getElementById('photos').value)};
-const up1=await supabase.from('profiles').upsert(profiles,{onConflict:'id'}); if(up1.error){result.innerHTML='<div class="error">프로필 저장 실패: '+up1.error.message+'</div>'; return;}
-const up2=await supabase.from('mate_profiles').upsert(mate,{onConflict:'user_id'}); if(up2.error){result.innerHTML='<div class="error">메이트 저장 실패: '+up2.error.message+'</div>'; return;}
-result.innerHTML='<div class="success">저장되었습니다!</div>';});
-load();
-</script></body></html>
+      <!-- 업로더 -->
+      <div class="grid">
+        <div class="field">
+          <div class="label">프로필 사진 (여러 장 선택 가능)</div>
+          <input id="photosInput" type="file" accept="image/*" multiple />
+          <div id="uploadMsg" class="muted" style="margin-top:6px"></div>
+        </div>
+
+        <!-- 썸네일 & 삭제 -->
+        <div class="row" id="thumbs"></div>
+
+        <!-- 캐러셀 미리보기 -->
+        <div class="card" style="background:#fff;">
+          <h3 style="margin-top:0">미리보기</h3>
+          <div class="carousel">
+            <button class="nav prev" aria-label="이전">‹</button>
+            <div class="track" id="photoTrack"></div>
+            <button class="nav next" aria-label="다음">›</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h3>기본 정보</h3>
+      <form id="formProfile" class="grid">
+        <div class="field">
+          <div class="label">소개 (bio)</div>
+          <textarea id="bio" class="input" placeholder="함께 서울의 숨은 명소를 즐겨봐요!"></textarea>
+        </div>
+        <div class="field">
+          <div class="label">시급</div>
+          <input id="hourly" type="number" class="input" min="0" step="1000" placeholder="예: 40000"/>
+          <div class="help">원화(₩) 기준. 프론트에서 통화표시는 자유롭게 변환해 표시할 수 있습니다.</div>
+        </div>
+        <div class="field">
+          <div class="label">태그 (콤마로 구분)</div>
+          <input id="tags" class="input" placeholder="맛집, 카페, 쇼핑"/>
+        </div>
+        <div class="field">
+          <div class="label">활동 지역 (콤마로 구분)</div>
+          <input id="areas" class="input" placeholder="홍대, 강남, 익선동"/>
+        </div>
+
+        <div class="row">
+          <button class="btn btn-primary" type="submit">저장</button>
+          <div id="saveMsg" class="muted"></div>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+    const supabase = createClient("https://eevvgbbokenpjnvtmztk.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4");
+
+    const photosInput = document.getElementById('photosInput');
+    const uploadMsg   = document.getElementById('uploadMsg');
+    const thumbs      = document.getElementById('thumbs');
+    const track       = document.getElementById('photoTrack');
+
+    const formProfile = document.getElementById('formProfile');
+    const bioEl   = document.getElementById('bio');
+    const hourlyEl= document.getElementById('hourly');
+    const tagsEl  = document.getElementById('tags');
+    const areasEl = document.getElementById('areas');
+    const saveMsg = document.getElementById('saveMsg');
+
+    const prevBtn = document.querySelector('.carousel .prev');
+    const nextBtn = document.querySelector('.carousel .next');
+
+    // 로그인 확인
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      const redir = encodeURIComponent('mate_edit.html');
+      location.replace(`auth_combo.html?redirect=${redir}`);
+      throw new Error('login required');
+    }
+
+    // 프로필 행 확보 (없으면 생성)
+    async function ensureProfileRow() {
+      const { data, error } = await supabase
+        .from('mate_profiles')
+        .select('user_id, bio, hourly_rate, tags, areas, photos')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (error) console.warn(error);
+      if (data) return data;
+
+      const { data: inserted, error: insErr } = await supabase
+        .from('mate_profiles')
+        .insert({ user_id: user.id, bio: null, hourly_rate: null, tags: [], areas: [], photos: [] })
+        .select()
+        .single();
+      if (insErr) throw insErr;
+      return inserted;
+    }
+
+    let profile = await ensureProfileRow();
+    fillForm(profile);
+    renderThumbs(profile.photos || []);
+    renderCarousel(profile.photos || []);
+
+    function fillForm(p) {
+      bioEl.value    = p.bio ?? '';
+      hourlyEl.value = p.hourly_rate ?? '';
+      tagsEl.value   = Array.isArray(p.tags) ? p.tags.join(', ') : '';
+      areasEl.value  = Array.isArray(p.areas) ? p.areas.join(', ') : '';
+    }
+
+    function keyToUrl(key) {
+      return supabase.storage.from('mates').getPublicUrl(key).data.publicUrl;
+    }
+
+    function renderThumbs(keys) {
+      thumbs.innerHTML = (keys||[]).map(k => `
+        <figure class="thumb">
+          <img src="${keyToUrl(k)}" alt="사진"/>
+          <figcaption>
+            <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70px;">${k.split('/').pop()}</span>
+            <button type="button" class="btn btn-light" data-remove="${k}">삭제</button>
+          </figcaption>
+        </figure>
+      `).join('');
+
+      thumbs.querySelectorAll('[data-remove]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const key = btn.getAttribute('data-remove');
+          // 스토리지 삭제
+          await supabase.storage.from('mates').remove([key]);
+          // DB 배열 갱신
+          const next = (profile.photos || []).filter(x => x !== key);
+          const { error: upErr } = await supabase.from('mate_profiles').update({ photos: next }).eq('user_id', user.id);
+          if (upErr) return alert('DB 반영 실패: ' + upErr.message);
+          profile.photos = next;
+          renderThumbs(next);
+          renderCarousel(next);
+        });
+      });
+    }
+
+    function renderCarousel(keys) {
+      if (!keys || !keys.length) { track.innerHTML = '<div class="muted" style="padding:8px">등록된 사진이 없습니다.</div>'; return; }
+      track.innerHTML = keys.map(k => `<img src="${keyToUrl(k)}" alt="메이트 사진">`).join('');
+    }
+
+    prevBtn.addEventListener('click', () => track.scrollBy({ left: -300, behavior: 'smooth' }));
+    nextBtn.addEventListener('click', () => track.scrollBy({ left:  300, behavior: 'smooth' }));
+
+    // 업로드
+    photosInput.addEventListener('change', async (e) => {
+      const files = Array.from(e.target.files || []);
+      if (!files.length) return;
+      uploadMsg.textContent = '업로드 중…';
+
+      const uploaded = [];
+      for (const f of files) {
+        if (!f.type.startsWith('image/')) continue;
+        if (f.size > 8 * 1024 * 1024) { // 8MB 제한 예시
+          uploadMsg.textContent = '8MB 이하 이미지만 업로드 가능합니다.';
+          continue;
+        }
+        const ext = (f.name.split('.').pop() || 'jpg').toLowerCase();
+        const key = `${user.id}/${crypto.randomUUID()}.${ext}`;
+        const { error: upErr } = await supabase.storage.from('mates').upload(key, f, { upsert: false, contentType: f.type || 'image/jpeg' });
+        if (upErr) { console.error(upErr); uploadMsg.textContent = '일부 파일 업로드 실패: ' + upErr.message; continue; }
+        uploaded.push(key);
+      }
+
+      if (uploaded.length) {
+        const next = [...(profile.photos || []), ...uploaded];
+        const { error: dbErr } = await supabase.from('mate_profiles').update({ photos: next }).eq('user_id', user.id);
+        if (dbErr) { uploadMsg.textContent = 'DB 반영 실패: ' + dbErr.message; }
+        else {
+          profile.photos = next;
+          uploadMsg.textContent = '업로드 완료!';
+          renderThumbs(next);
+          renderCarousel(next);
+        }
+      }
+      // 파일 입력 초기화
+      photosInput.value = '';
+    });
+
+    // 저장(프로필 정보)
+    formProfile.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const tags = tagsEl.value.split(',').map(s => s.trim()).filter(Boolean);
+      const areas= areasEl.value.split(',').map(s => s.trim()).filter(Boolean);
+      const hourly = hourlyEl.value ? parseInt(hourlyEl.value, 10) : null;
+
+      const payload = {
+        bio: bioEl.value || null,
+        hourly_rate: isNaN(hourly) ? null : hourly,
+        tags,
+        areas
+      };
+
+      const { error } = await supabase.from('mate_profiles')
+        .update(payload)
+        .eq('user_id', user.id);
+      if (error) { saveMsg.textContent = '저장 실패: ' + error.message; }
+      else { saveMsg.textContent = '저장되었습니다.'; }
+    });
+  </script>
+</body>
+</html>
