@@ -241,6 +241,34 @@
       }
     }
     renderUser();
+
+    // 예: 가입 버튼 클릭 핸들러
+const COOLDOWN_SEC = 60;
+const key = "signupCooldownUntil";
+const now = Date.now();
+const until = Number(localStorage.getItem(key) || 0);
+if (until > now) {
+  const left = Math.ceil((until - now)/1000);
+  alert(`잠시 후 다시 시도하세요. (${left}s)`);
+  return;
+}
+
+const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo } });
+if (error?.message?.toLowerCase().includes("rate limit")) {
+  localStorage.setItem(key, Date.now() + COOLDOWN_SEC*1000);
+  alert("인증 메일 요청이 너무 많습니다. 잠시 후 다시 시도해주세요.");
+  return;
+}
+// 정상: 쿨다운 시작
+localStorage.setItem(key, Date.now() + COOLDOWN_SEC*1000);
+
+await supabase.auth.signInWithOtp({
+  email,
+  options: { shouldCreateUser: false } // 이미 있는 계정에만 링크 발송
+});
+
+await supabase.auth.resend({ type: 'signup', email });
+
   </script>
 </body>
 </html>
