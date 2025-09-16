@@ -25,94 +25,157 @@
     </section>
   </main>
 
-  <script type="module">
-    import { supabase } from './nav.js';
+<script type="module">
+  import { supabase } from './nav.js';
 
-    const list = document.getElementById('list');
-    let currentUser = null;
-    let sub = null;
+  const list = document.getElementById('list');
+  let me = null;
+  let sub = null;
 
-    const badge = (s) => {
-      const cls = s === 'pending' ? 'status-pending' :
-                  s === 'confirmed' ? 'status-confirmed' : 'status-declined';
-      return `<span class="status-badge ${cls}">${s}</span>`;
-    };
+  const badge = (s) => {
+    const cls = s === 'pending' ? 'status-pending'
+              : s === 'confirmed' ? 'status-confirmed'
+              : 'status-declined';
+    return `<span class="status-badge ${cls}">${s}</span>`;
+  };
 
-    function rowHtml(r){
-      const dt = `${r.date} ${r.start_time} (${r.duration_hours}h)`;
-      const canAct = r.status === 'pending'; // 확정 후에는 버튼 숨김
-      return `
-        <div class="card">
-          <div class="flex justify-between align-center">
-            <div>
-              <div style="font-weight:800">${dt}</div>
-              <div class="muted">${r.customer_name} • ${r.customer_contact} • 상태: ${badge(r.status)}</div>
-              <div class="muted">요청: ${(r.notes||'').replace(/</g,'&lt;')}</div>
-            </div>
-            <div class="flex gap-8">
-              ${canAct ? `<button class="cta-btn" data-act="confirm" data-id="${r.id}">확정</button>` : ''}
-              ${canAct ? `<button class="cta-btn" data-act="decline" data-id="${r.id}">거절</button>` : ''}
-            </div>
+  function rowHtml(r){
+    const dt = `${r.date} ${r.start_time} (${r.duration_hours}h)`;
+    const btns =
+      r.status === 'pending'
+        ? `
+          <button class="btn btn-secondary" data-act="confirm" data-id="${r.id}">확정</button>
+          <button class="btn btn-secondary" data-act="decline" data-id="${r.id}">거절</button>
+        `
+        : r.status === 'confirmed'
+        ? `<button class="btn btn-secondary" data-act="cancel" data-id="${r.id}">취소</button>`
+        : '';
+
+    // 사유가 있다면 보여주기
+    const reason =
+      r.status === 'declined' && r.declined_reason ? `<div class="muted">거절 사유: ${(r.declined_reason||'').replace(/</g,'&lt;')}</div>` :
+      r.status === 'canceled' && r.canceled_reason ? `<div class="muted">취소 사유: ${(r.canceled_reason||'').replace(/</g,'&lt;')}</div>` : '';
+
+    return `
+      <div class="card">
+        <div class="flex justify-between align-center">
+          <div>
+            <div style="font-weight:800">${dt}</div>
+            <div class="muted">${r.customer_name} • ${r.customer_contact} • 상태: ${badge(r.status)}</div>
+            <div class="muted">요청: ${(r.notes||'').replace(/</g,'&lt;')}</div>
+            ${reason}
           </div>
-        </div>`;
-    }
+          <div class="flex gap-8">${btns}</div>
+        </div>
+      </div>
+    `;
+  }
 
-    async function load(){
-      const { data: { user }, error: authErr } = await supabase.auth.getUser();
-      if (authErr) { console.error(authErr); list.innerHTML='<div class="error">인증 오류</div>'; return; }
-      if (!user) { list.innerHTML='<div class="note">로그인이 필요합니다.</div>'; return; }
-      currentUser = user;
+  async function load(){
+    const { data: { user }, error: authErr } = await supabase.auth.getUser();
+    if (authErr) { console.error(authErr); list.innerHTML = '<div class="error">인증 오류</div>'; return; }
+    if (!user) { list.innerHTML = '<div class="note">로그인이 필요합니다.</div>'; return; }
+    me = user;
 
-      // 목록
-      const { data, error } = await supabase
-        .from('bookings')
-        .select('*')
-        .eq('mate_id', user.id)
-        .order('created_at', { ascending: false });
+    const { data, error } = await supabase
+      .from('bookings')
+      .select('*')
+      .eq('mate_id', me.id)
+      .order('created_at', { ascending: false });
 
-      if (error) { console.error(error); list.innerHTML='<div class="error">불러오기 실패: '+error.message+'</div>'; return; }
-      if (!data || !data.length) { list.innerHTML = '<div class="muted">예약 신청이 없습니다.</div>'; return; }
-      list.innerHTML = data.map(rowHtml).join('');
+    if (error) { console.error(error); list.innerHTML = '<div class="error">불러오기 실패: '+error.message+'</div>'; return; }
+    if (!data?.length) { list.innerHTML = '<div class="muted">예약 신청이 없습니다.</div>'; return; }
 
-      // 버튼 핸들러 (위임)
-      list.querySelectorAll('button[data-act]').forEach(btn => {
-        btn.onclick = async () => {
-          const id = btn.dataset.id;
-          const act = btn.dataset.act;
-          const status = act === 'confirm' ? 'confirmed' : 'declined';
+    list.innerHTML = data.map(rowHtml).join('');
 
-          // 내 예약만, 허용 상태만 갱신
-          const { data: updated, error: upErr } = await supabase
+    // 클릭 위임 (확정/거절/취소)
+    list.querySelectorAll('button[data-act]').forEach(btn => {
+      btn.onclick = async () => {
+        const id  = btn.dataset.id;
+        const act = btn.dataset.act;
+
+        // 현재 예약 한 번 더 조회 (수신자 정보 확보)
+        const { data: row, error: rowErr } = await supabase
+          .from('bookings')
+          .select('id, mate_id, customer_id, customer_name, customer_contact, date, start_time, duration_hours, status')
+          .eq('id', id)
+          .maybeSingle();
+        if (rowErr || !row) { alert('예약 조회 실패'); return; }
+        if (row.mate_id !== me.id) { alert('내 예약이 아닙니다.'); return; }
+
+        if (act === 'confirm') {
+          const { error: upErr } = await supabase
             .from('bookings')
-            .update({ status })
-            .eq('id', id)
-            .eq('mate_id', currentUser.id)
-            .select('id,status')
-            .single();
-
-          if (upErr) {
-            alert('업데이트 실패: ' + upErr.message);
-            console.error(upErr);
-            return;
-          }
-          // 즉시 새로고침
+            .update({ status: 'confirmed', declined_reason: null, declined_at: null })
+            .eq('id', id).eq('mate_id', me.id);
+          if (upErr) return alert('확정 실패: ' + upErr.message);
           await load();
-        };
-      });
+          return;
+        }
 
-      // Realtime 구독 (한 번만)
-      if (!sub) {
-        sub = supabase
-          .channel('bookings:mate:' + user.id)
-          .on('postgres_changes',
-              { event: '*', schema: 'public', table: 'bookings', filter: `mate_id=eq.${user.id}` },
-              payload => load()
-          )
-          .subscribe();
-      }
+        if (act === 'decline') {
+          const reason = prompt('거절 사유를 입력해주세요 (고객에게 전달됩니다)');
+          if (reason === null) return; // 취소
+          const { error: upErr } = await supabase
+            .from('bookings')
+            .update({ status: 'declined', declined_reason: reason, declined_at: new Date().toISOString() })
+            .eq('id', id).eq('mate_id', me.id)
+            .select('customer_id')
+            .single();
+          if (upErr) return alert('거절 실패: ' + upErr.message);
+
+          // 인앱 알림 보내기 (선택)
+          await supabase.from('notifications').insert({
+            user_id: row.customer_id,
+            sender_id: me.id,
+            type: 'booking_declined',
+            title: '예약이 거절되었습니다',
+            body: `요청하신 ${row.date} ${row.start_time} 예약이 거절되었습니다.\n사유: ${reason}`,
+            link: null
+          }).catch(()=>{ /* 알림 실패는 무시 */ });
+
+          await load();
+          return;
+        }
+
+        if (act === 'cancel') {
+          const reason = prompt('취소 사유를 입력해주세요 (고객에게 전달됩니다)');
+          if (reason === null) return; // 취소
+          const { error: upErr } = await supabase
+            .from('bookings')
+            .update({ status: 'canceled', canceled_reason: reason, canceled_at: new Date().toISOString() })
+            .eq('id', id).eq('mate_id', me.id);
+          if (upErr) return alert('취소 실패: ' + upErr.message);
+
+          // 인앱 알림
+          await supabase.from('notifications').insert({
+            user_id: row.customer_id,
+            sender_id: me.id,
+            type: 'booking_canceled',
+            title: '예약이 취소되었습니다',
+            body: `확정되었던 ${row.date} ${row.start_time} 예약이 메이트 사정으로 취소되었습니다.\n사유: ${reason}`,
+            link: null
+          }).catch(()=>{});
+
+          await load();
+          return;
+        }
+      };
+    });
+
+    // Realtime (내 예약만 필터)
+    if (!sub) {
+      sub = supabase
+        .channel('bookings:mate:' + me.id)
+        .on('postgres_changes',
+            { event: '*', schema: 'public', table: 'bookings', filter: `mate_id=eq.${me.id}` },
+            () => load())
+        .subscribe();
     }
+  }
 
-    load();
-  </script>
+  load();
+</script>
+
 </body>
 </html>
