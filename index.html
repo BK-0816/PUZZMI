@@ -45,7 +45,7 @@
   const grid = document.querySelector(".friends-grid");
   const loadMoreBtn = document.getElementById("loadMore");
 
-async function refreshHeartBadgesForRendered() {
+async function refreshHeartCount() {
   const badges = Array.from(document.querySelectorAll('.heart-badge[data-heart]'));
   if (!badges.length) return;
 
