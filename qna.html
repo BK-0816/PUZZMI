@@ -7,6 +7,8 @@
   <link rel="stylesheet" href="styles.css"/>
   <link rel="stylesheet" href="pages.css"/>
   <link rel="stylesheet" href="pages-theme.css"/>
+  <link rel="stylesheet" href="nav.css"/>
+<script type="module" src="nav.js"></script>
   <style>
     body.bg-cream { background: var(--bg-cream); background-repeat:no-repeat; background-size:cover; }
     .qna-wrap{ max-width:980px; margin:40px auto; }
@@ -48,13 +50,10 @@
 
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-    import { renderNavbar, supabase as navSb } from "./nav.js"; // 네비 재사용(선택)
 
     const SUPABASE_URL = "https://eevvgbbokenpjnvtmztk.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4";
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    renderNavbar(); // 상단바
 
     const requireLogin = document.getElementById('requireLogin');
     const formNew = document.getElementById('formNew');
