@@ -17,8 +17,6 @@
 </head>
 
 <!-- Supabase JS v2 (ESM) -->
-ut();
-      location.reload();
 <script type="module">
   import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -44,7 +42,7 @@ ut();
   }
 
   // ===== 2) 메이트 목록(페이지네이션 + 이미지 URL 변환 + 로그인 가드) =====
-  const ONLY_VERIFIED = true;      // 공개만 노출하려면 true
+  const ONLY_VERIFIED = false;      // 공개만 노출하려면 true
   const PAGE_SIZE     = 8;
 
   let page = 0;
