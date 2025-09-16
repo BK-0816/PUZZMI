@@ -1,0 +1,202 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PUZZMI 관리자 - 예약 관리</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="pages.css"/>
+  <link rel="stylesheet" href="pages-theme.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    body.bg-cream { background: var(--bg-cream); background-repeat:no-repeat; background-size:cover; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid rgba(0,0,0,.06); text-align:left; vertical-align: top; }
+    th { font-size: 12px; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: .02em; }
+    tr:hover { background: #fff; }
+    .pill { padding: 4px 8px; border-radius: 999px; font-size: 12px; border:1px solid rgba(0,0,0,.08); background:#fff; }
+    .actions .btn { padding: 8px 10px; font-size: 13px; border-radius: 10px; }
+    .toolbar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .toolbar .select, .toolbar .input { height: 40px; }
+    .muted-sm { color: var(--text-secondary); font-size: 12px; }
+  </style>
+</head>
+<body class="bg-cream">
+  <main class="page stack-16">
+    <header class="card">
+      <h2 style="margin:0 0 6px;">예약 관리</h2>
+      <div class="muted">새 예약은 실시간으로 들어옵니다. 상태를 확인/변경하세요.</div>
+      <div id="authBox" class="stack-16" style="margin-top:12px;">
+        <div class="label">관리자 로그인 (이메일 OTP)</div>
+        <div class="toolbar">
+          <input id="email" class="input" type="email" placeholder="admin@example.com" style="max-width:320px"/>
+          <button id="sendOtp" class="btn btn-primary" type="button">로그인 메일 보내기</button>
+          <span class="muted-sm">메일의 링크를 클릭해 돌아오면 목록이 보입니다.</span>
+        </div>
+      </div>
+    </header>
+
+    <section class="card">
+      <div class="toolbar" style="justify-content: space-between;">
+        <div class="toolbar">
+          <select id="statusFilter" class="select">
+            <option value="pending">대기중(pending)</option>
+            <option value="confirmed">확정(confirmed)</option>
+            <option value="completed">완료(completed)</option>
+            <option value="declined">거절(declined)</option>
+            <option value="cancelled">취소(cancelled)</option>
+            <option value="all">전체</option>
+          </select>
+          <input id="search" class="input" placeholder="이름/연락처/메이트 이름 검색"/>
+        </div>
+        <div class="toolbar">
+          <button id="refresh" class="btn btn-secondary" type="button">새로고침</button>
+        </div>
+      </div>
+
+      <div class="spacer"></div>
+      <div class="muted-sm">* 상태 변경은 관리자 권한이 있어야 합니다. 권한이 없다면 Supabase에서 admin_users에 본인 ID를 추가하세요.</div>
+
+      <div class="spacer"></div>
+      <div style="overflow:auto;">
+        <table id="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>상태</th>
+              <th>일시</th>
+              <th>고객</th>
+              <th>연락처</th>
+              <th>언어</th>
+              <th>메이트</th>
+              <th>요청사항</th>
+              <th>조치</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+    const SUPABASE_URL = "https://eevvgbbokenpjnvtmztk.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4";
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const email = document.getElementById('email');
+    const sendOtp = document.getElementById('sendOtp');
+
+    sendOtp.addEventListener('click', async () => {
+      const v = email.value.trim();
+      if (!v) return alert('이메일을 입력해주세요');
+      const { error } = await supabase.auth.signInWithOtp({ email: v, options: { emailRedirectTo: window.location.href } });
+      if (error) alert('전송 실패: ' + error.message); else alert('로그인 메일을 보냈습니다.');
+    });
+
+    const tbody = document.getElementById('tbody');
+    const statusFilter = document.getElementById('statusFilter');
+    const refresh = document.getElementById('refresh');
+    const search = document.getElementById('search');
+
+    let rows = [];
+    let matesMap = new Map();
+
+    async function ensureAdmin() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return false;
+      // must exist in admin_users
+      const { data, error } = await supabase.from('admin_users').select('user_id').eq('user_id', user.id).maybeSingle();
+      if (error) { console.error(error); return false; }
+      return !!data;
+    }
+
+    async function loadMatesMap() {
+      const { data, error } = await supabase
+        .from('mate_profiles')
+        .select('user_id, profiles(full_name)');
+      if (!error && data) {
+        matesMap = new Map(data.map(r => [r.user_id, (r.profiles && r.profiles.full_name) || r.user_id]));
+      }
+    }
+
+    function render() {
+      const q = (search.value || '').toLowerCase();
+      const st = statusFilter.value;
+      const filtered = rows.filter(r => 
+        (st === 'all' || r.status === st) &&
+        (
+          (r.customer_name || '').toLowerCase().includes(q) ||
+          (r.customer_contact || '').toLowerCase().includes(q) ||
+          (matesMap.get(r.mate_id) || '').toLowerCase().includes(q)
+        )
+      );
+
+      tbody.innerHTML = filtered.map(r => {
+        const mateName = matesMap.get(r.mate_id) || r.mate_id;
+        const dt = `${r.date} ${r.start_time}`;
+        return `
+          <tr>
+            <td>${r.id}</td>
+            <td><span class="pill">${r.status}</span></td>
+            <td>${dt}</td>
+            <td>${r.customer_name}</td>
+            <td>${r.customer_contact}</td>
+            <td>${r.language || '-'}</td>
+            <td>${mateName}</td>
+            <td style="max-width:320px">${(r.notes||'').replace(/</g,'&lt;')}</td>
+            <td class="actions">
+              ${['confirmed','completed','declined','cancelled'].map(s => `
+                <button class="btn btn-secondary" data-id="${r.id}" data-status="${s}">${s}</button>
+              `).join('')}
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      // wire buttons
+      tbody.querySelectorAll('button[data-id]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = btn.getAttribute('data-id');
+          const status = btn.getAttribute('data-status');
+          const ok = await ensureAdmin();
+          if (!ok) return alert('관리자 권한이 없습니다.');
+          const { error } = await supabase.from('bookings').update({ status }).eq('id', id);
+          if (error) alert('상태 변경 실패: ' + error.message);
+        });
+      });
+    }
+
+    async function load() {
+      const { data, error } = await supabase
+        .from('bookings')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(200);
+      if (error) { console.error(error); return; }
+      rows = data || [];
+      render();
+    }
+
+    // Realtime: listen for new bookings
+    const channel = supabase.channel('bookings:changes')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'bookings' }, payload => {
+        rows.unshift(payload.new);
+        render();
+      })
+      .subscribe();
+
+    // filters
+    statusFilter.addEventListener('change', render);
+    refresh.addEventListener('click', () => load());
+    search.addEventListener('input', render);
+
+    // initial
+    await loadMatesMap();
+    await load();
+  </script>
+</body>
+</html>

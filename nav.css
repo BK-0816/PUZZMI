@@ -1,0 +1,11 @@
+
+/* PUZZMI nav.css */
+.app-nav { position: sticky; top:0; z-index:50; background:rgba(255,255,255,.75); backdrop-filter:saturate(120%) blur(10px); border-bottom:1px solid rgba(0,0,0,.06); }
+.app-nav .wrap { max-width:1040px; margin:0 auto; padding:10px 20px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.app-nav a { text-decoration:none; color:var(--text-primary); font-weight:700; }
+.app-nav .brand { display:flex; gap:10px; align-items:center; }
+.app-nav .brand .dot { width:10px; height:10px; border-radius:50%; background: var(--primary-color); }
+.app-nav .menu { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+.app-nav .menu a, .app-nav .menu button { font-size:14px; padding:8px 10px; border-radius:10px; border:1px solid transparent; background:transparent; cursor:pointer; }
+.app-nav .menu a:hover, .app-nav .menu button:hover { background:#fff; border-color:rgba(0,0,0,.06); }
+.app-nav .pill { background:#fff; border:1px solid rgba(0,0,0,.08); padding:6px 10px; border-radius:999px; font-size:12px; }

@@ -1,0 +1,15 @@
+
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>메이트 대시보드 - PUZZMI</title>
+<link rel="stylesheet" href="styles.css"/><link rel="stylesheet" href="pages.css"/><link rel="stylesheet" href="nav.css"/><link rel="stylesheet" href="pages-theme.css"/>
+<script type="module" src="nav.js"></script></head>
+<body class="bg-cream"><div id="app-nav"></div><main class="page stack-16"><section class="card"><h2>예약 신청 알림</h2><div id="list" class="stack-16"></div></section></main>
+<script type="module">
+import { supabase } from './nav.js';
+function rowHtml(r){const dt=`${r.date} ${r.start_time} (${r.duration_hours}h)`; const can=['pending','confirmed'].includes(r.status); return `<div class="card"><div class="flex justify-between align-center"><div><div style="font-weight:800">${dt}</div><div class="muted">${r.customer_name} • ${r.customer_contact} • 상태: ${r.status}</div><div class="muted">요청: ${(r.notes||'').replace(/</g,'&lt;')}</div></div><div class="flex gap-8">${can?`<button class="btn btn-secondary" data-act="confirm" data-id="${r.id}">확정</button>`:''}${can?`<button class="btn btn-secondary" data-act="decline" data-id="${r.id}">거절</button>`:''}</div></div></div>`;}
+async function load(){const {data:{user}}=await supabase.auth.getUser(); const list=document.getElementById('list'); if(!user){list.innerHTML='<div class="note">로그인 필요</div>'; return;}
+const {data,error}=await supabase.from('bookings').select('*').eq('mate_id', user.id).order('created_at',{ascending:false}); if(error){console.error(error); return;} if(!data||!data.length){list.innerHTML='<div class="muted">예약 신청이 없습니다.</div>'; return;} list.innerHTML=data.map(rowHtml).join('');
+list.querySelectorAll('button[data-act]').forEach(btn=>btn.onclick=async()=>{const id=btn.dataset.id; const act=btn.dataset.act; const status=act==='confirm'?'confirmed':'declined'; const {error}=await supabase.from('bookings').update({status}).eq('id', id); if(error) alert(error.message); else load();});}
+const ch=supabase.channel('bookings:mate').on('postgres_changes',{event:'*',schema:'public',table:'bookings'},p=>load()).subscribe();
+load();
+</script></body></html>

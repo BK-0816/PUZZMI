@@ -1,0 +1,174 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>메이트 프로필 - PUZZMI</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="pages.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <link rel="stylesheet" href="styles.css" />
+<style>
+  /* 메인 styles.css에 --bg-cream 변수가 이미 있으니 그대로 사용 가능 */
+  body { background: var(--bg-cream); background-repeat:no-repeat; background-size:cover; }
+</style>
+  <main class="page">
+    <section class="row">
+      <aside class="card">
+        <img id="avatar" style="width:100%;height:320px;object-fit:cover;border-radius:12px" src="" alt="avatar"/>
+        <div class="spacer"></div>
+        <a id="bookBtn" class="btn btn-primary" href="#">이 메이트로 예약하기</a>
+      </aside>
+
+      <article class="card">
+        <h2 id="name">메이트 이름</h2>
+        <div class="muted" id="meta"></div>
+        <div id="bio" class="spacer"></div>
+
+        <h3 class="label">MBTI & 취미</h3>
+        <div class="chips" id="chips"></div>
+
+        <div class="spacer"></div>
+
+        <h3 class="label">언어</h3>
+        <div class="chips" id="langs"></div>
+
+        <div class="spacer"></div>
+        <h3 class="label">후기</h3>
+        <div id="reviews"></div>
+
+        <div class="spacer"></div>
+        <h3 class="label">후기 작성하기</h3>
+        <form id="reviewForm" class="stack-16">
+          <div class="row">
+            <div class="field">
+              <div class="label">이름(닉네임)</div>
+              <input class="input" type="text" id="author_name" required/>
+            </div>
+            <div class="field">
+              <div class="label">평점</div>
+              <select class="select" id="rating" required>
+                <option value="5">★★★★★ (5)</option>
+                <option value="4">★★★★ (4)</option>
+                <option value="3">★★★ (3)</option>
+                <option value="2">★★ (2)</option>
+                <option value="1">★ (1)</option>
+              </select>
+            </div>
+          </div>
+          <div class="row single">
+            <div class="field">
+              <div class="label">후기 내용</div>
+              <textarea class="textarea" id="content" required placeholder="여행이 어땠는지 솔직한 후기를 남겨주세요"></textarea>
+            </div>
+          </div>
+          <button class="btn btn-primary" type="submit">후기 등록</button>
+          <div id="reviewResult"></div>
+        </form>
+      </article>
+    </section>
+  </main>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+    const SUPABASE_URL = "https://eevvgbbokenpjnvtmztk.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4";
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const params = new URLSearchParams(location.search);
+    const mateId = params.get('mate_id');
+
+    const avatar = document.getElementById('avatar');
+    const nameEl = document.getElementById('name');
+    const metaEl = document.getElementById('meta');
+    const bioEl = document.getElementById('bio');
+    const chips = document.getElementById('chips');
+    const langs = document.getElementById('langs');
+    const bookBtn = document.getElementById('bookBtn');
+    const reviewsBox = document.getElementById('reviews');
+
+    async function loadMate() {
+      const { data, error } = await supabase
+        .from('mate_profiles')
+        .select(`
+          user_id, bio, hourly_rate, mbti, hobbies, rating,
+          profiles!inner ( id, full_name, age, gender, languages, avatar_url )
+        `)
+        .eq('user_id', mateId)
+        .single();
+
+      if (error) {
+        console.error(error);
+        nameEl.textContent = '메이트 정보를 불러올 수 없습니다.';
+        return;
+      }
+      const p = data.profiles || {};
+      avatar.src = p.avatar_url || "https://picsum.photos/seed/puzzmi/600/400";
+      nameEl.textContent = p.full_name || '이름 비공개';
+      const age = p.age ? `${p.age}세` : '';
+      const gender = p.gender || '';
+      const mbti = data.mbti ? ` • MBTI ${data.mbti}` : '';
+      metaEl.textContent = [age, gender].filter(Boolean).join(' • ') + mbti;
+      bioEl.textContent = data.bio || '함께 서울의 숨은 명소를 즐겨봐요!';
+      chips.innerHTML = (Array.isArray(data.hobbies) ? data.hobbies : (data.hobbies ? [data.hobbies] : []))
+        .map(t => `<span class="chip">${t}</span>`).join('');
+      langs.innerHTML = (Array.isArray(p.languages) ? p.languages : [])
+        .map(l => `<span class="chip">${l}</span>`).join('');
+      bookBtn.href = `booking.html?mate_id=${data.user_id}`;
+    }
+
+    async function loadReviews() {
+      const { data, error } = await supabase
+        .from('reviews')
+        .select('*')
+        .eq('mate_id', mateId)
+        .order('created_at', { ascending: false })
+        .limit(30);
+      if (error) { console.error(error); return; }
+      if (!data || !data.length) {
+        reviewsBox.innerHTML = '<div class="muted">아직 후기가 없습니다.</div>';
+        return;
+      }
+      reviewsBox.innerHTML = data.map(r => `
+        <div class="card" style="padding:16px; margin-bottom:10px;">
+          <div class="flex justify-between align-center">
+            <strong>${r.author_name || '익명'}</strong>
+            <span>★ ${r.rating}/5</span>
+          </div>
+          <div class="muted" style="margin:4px 0 8px;">${new Date(r.created_at).toLocaleDateString()}</div>
+          <div>${(r.content || '').replace(/</g,'&lt;')}</div>
+        </div>
+      `).join('');
+    }
+
+    loadMate();
+    loadReviews();
+
+    // review submit
+    const form = document.getElementById('reviewForm');
+    const reviewResult = document.getElementById('reviewResult');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        mate_id: mateId,
+        author_name: document.getElementById('author_name').value.trim(),
+        rating: parseInt(document.getElementById('rating').value, 10),
+        content: document.getElementById('content').value.trim()
+      };
+      const { error } = await supabase.from('reviews').insert(payload);
+      if (error) {
+        console.error(error);
+        reviewResult.innerHTML = '<div class="error">후기 등록 실패. 다시 시도해주세요.</div>';
+      } else {
+        reviewResult.innerHTML = '<div class="success">후기가 등록되었습니다. 감사합니다!</div>';
+        form.reset();
+        loadReviews();
+      }
+    });
+  </script>
+</body>
+</html>

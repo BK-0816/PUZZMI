@@ -1,0 +1,11 @@
+
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PUZZMI - 로그인(Twitter)</title>
+<link rel="stylesheet" href="styles.css"/><link rel="stylesheet" href="pages.css"/><link rel="stylesheet" href="pages-theme.css"/></head>
+<body class="bg-cream"><main class="page"><section class="card"><h2>로그인</h2>
+<button id="oauth_twitter" class="btn btn-secondary">Twitter(X)로 계속하기</button><div id="result" class="muted"></div></section></main>
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+const supabase = createClient("https://eevvgbbokenpjnvtmztk.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4");
+document.getElementById('oauth_twitter').onclick=async()=>{const {error}=await supabase.auth.signInWithOAuth({provider:'twitter', options:{redirectTo:location.href}}); document.getElementById('result').textContent= error?error.message:'리디렉션 중…';};
+</script></body></html>

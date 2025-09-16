@@ -1,0 +1,15 @@
+
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>내 찜 - PUZZMI</title>
+<link rel="stylesheet" href="styles.css"/><link rel="stylesheet" href="pages.css"/><link rel="stylesheet" href="nav.css"/><link rel="stylesheet" href="pages-theme.css"/>
+<script type="module" src="nav.js"></script></head>
+<body class="bg-cream"><div id="app-nav"></div><main class="page"><section class="card"><h2>내가 찜한 메이트</h2><div id="list" class="stack-16"></div></section></main>
+<script type="module">
+import { supabase } from './nav.js';
+async function load(){const {data:{user}}=await supabase.auth.getUser(); const list=document.getElementById('list'); if(!user){list.innerHTML='<div class="note">로그인 필요</div>'; return;}
+const {data,error}=await supabase.from('favorites').select('mate_id, created_at, mate_profiles!inner(user_id, profiles!inner(full_name,avatar_url,age,gender,languages))').order('created_at',{ascending:false}); if(error){console.error(error); return;}
+if(!data||!data.length){list.innerHTML='<div class="muted">찜한 메이트가 없습니다.</div>'; return;}
+list.innerHTML=data.map(r=>{const p=r.mate_profiles?.profiles||{}; return `<div class="card"><div class="media"><img src="${p.avatar_url||'https://picsum.photos/80'}" class="round"/><div><div style="font-weight:800">${p.full_name||r.mate_id}</div><div class="muted">${[p.age? p.age+'세':'', p.gender||''].filter(Boolean).join(' • ')}</div><div class="chips">${(p.languages||[]).map(l=>'<span class="chip">'+l+'</span>').join('')}</div><div class="spacer"></div><a class="btn btn-primary" href="mate_v3_like.html?mate_id=${r.mate_id}">프로필 보기</a><button class="btn btn-secondary" data-unlike="${r.mate_id}">찜 해제</button></div></div></div>`}).join('');
+list.querySelectorAll('button[data-unlike]').forEach(btn=>btn.onclick=async()=>{const mate_id=btn.getAttribute('data-unlike'); const {data:{user}}=await supabase.auth.getUser(); await supabase.from('favorites').delete().eq('user_id', user.id).eq('mate_id', mate_id); load();});}
+load();
+</script></body></html>

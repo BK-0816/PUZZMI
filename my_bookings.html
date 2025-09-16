@@ -1,0 +1,16 @@
+
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>내 예약 - PUZZMI</title>
+<link rel="stylesheet" href="styles.css"/><link rel="stylesheet" href="pages.css"/><link rel="stylesheet" href="nav.css"/><link rel="stylesheet" href="pages-theme.css"/>
+<script type="module" src="nav.js"></script></head>
+<body class="bg-cream"><div id="app-nav"></div><main class="page"><section class="card"><h2>내 예약 내역</h2><div id="list" class="stack-16"></div></section></main>
+<script type="module">
+import { supabase } from './nav.js';
+function rowHtml(r, name){const dt=`${r.date} ${r.start_time} (${r.duration_hours}h)`; return `<div class="card"><div class="flex justify-between align-center"><div><div style="font-weight:800">${name}</div><div class="muted">${dt} • 상태: ${r.status}</div><div class="muted">요청: ${(r.notes||'').replace(/</g,'&lt;')}</div></div>${r.status==='pending'?`<button class="btn btn-secondary" data-cancel="${r.id}">예약 취소</button>`:''}</div></div>`;}
+async function load(){const {data:{user}}=await supabase.auth.getUser(); const list=document.getElementById('list'); if(!user){list.innerHTML='<div class="note">로그인 필요</div>'; return;}
+const {data,error}=await supabase.from('bookings').select('*, mate_profiles(user_id, profiles(full_name))').eq('customer_id', user.id).order('created_at',{ascending:false}); if(error){console.error(error); return;} if(!data||!data.length){list.innerHTML='<div class="muted">예약 내역이 없습니다.</div>'; return;}
+list.innerHTML=data.map(r=>rowHtml(r, r.mate_profiles?.profiles?.full_name||r.mate_id)).join('');
+list.querySelectorAll('button[data-cancel]').forEach(btn=>btn.onclick=async()=>{const id=btn.dataset.cancel; if(!confirm('취소하시겠어요?')) return; const {error}=await supabase.from('bookings').update({status:'cancelled'}).eq('id', id); if(error) alert(error.message); else load();});}
+const ch=supabase.channel('bookings:my').on('postgres_changes',{event:'*',schema:'public',table:'bookings'},p=>load()).subscribe();
+load();
+</script></body></html>

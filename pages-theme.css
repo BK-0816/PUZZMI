@@ -1,0 +1,6 @@
+
+/* pages-theme.css */
+.bg-cream { background: var(--bg-cream); background-repeat:no-repeat; background-size:cover; }
+.bg-sky { background: var(--bg-sky); background-repeat:no-repeat; background-size:cover; }
+.bg-dusk { background: var(--bg-dusk); background-repeat:no-repeat; background-size:cover; }
+.page { position: relative; z-index: 1; }

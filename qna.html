@@ -1,0 +1,103 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>이용문의(Q&A) - PUZZMI</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="pages.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <link rel="stylesheet" href="styles.css" />
+<style>
+  /* 메인 styles.css에 --bg-cream 변수가 이미 있으니 그대로 사용 가능 */
+  body { background: var(--bg-cream); background-repeat:no-repeat; background-size:cover; }
+</style>
+  <main class="page">
+    <section class="row">
+      <div class="card">
+        <h2>최근 문의</h2>
+        <div id="list" class="stack-16"></div>
+      </div>
+      <div class="card">
+        <h2>문의 남기기</h2>
+        <form id="qnaForm" class="stack-16">
+          <div class="field">
+            <div class="label">이름/닉네임</div>
+            <input class="input" id="author_name" required/>
+          </div>
+          <div class="field">
+            <div class="label">연락처(이메일 또는 LINE)</div>
+            <input class="input" id="contact" required/>
+          </div>
+          <div class="field">
+            <div class="label">제목</div>
+            <input class="input" id="subject" required/>
+          </div>
+          <div class="field">
+            <div class="label">문의 내용</div>
+            <textarea class="textarea" id="message" required></textarea>
+          </div>
+          <button class="btn btn-primary" type="submit">등록</button>
+          <div id="result"></div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+    const SUPABASE_URL = "https://eevvgbbokenpjnvtmztk.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4";
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const list = document.getElementById('list');
+
+    async function loadQna() {
+      const { data, error } = await supabase
+        .from('qna')
+        .select('id, author_name, subject, created_at, status')
+        .order('created_at', { ascending: false })
+        .limit(50);
+      if (error) { console.error(error); return; }
+      list.innerHTML = (data || []).map(q => `
+        <div class="card">
+          <div class="flex justify-between align-center">
+            <div>
+              <div style="font-weight:700">${q.subject}</div>
+              <div class="muted">${q.author_name || '익명'} • ${new Date(q.created_at).toLocaleString()} • 상태: ${q.status}</div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    loadQna();
+
+    const form = document.getElementById('qnaForm');
+    const result = document.getElementById('result');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        author_name: document.getElementById('author_name').value.trim(),
+        contact: document.getElementById('contact').value.trim(),
+        subject: document.getElementById('subject').value.trim(),
+        message: document.getElementById('message').value.trim(),
+        status: 'new'
+      };
+      const { error } = await supabase.from('qna').insert(payload);
+      if (error) {
+        console.error(error);
+        result.innerHTML = '<div class="error">등록 실패. 다시 시도해주세요.</div>';
+      } else {
+        result.innerHTML = '<div class="success">등록 완료! 빠르게 답변드릴게요.</div>';
+        form.reset();
+        loadQna();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PUZZMI 예약하기</title>
+<link rel="stylesheet" href="styles.css"/><link rel="stylesheet" href="pages.css"/><link rel="stylesheet" href="pages-theme.css"/></head>
+<body class="bg-cream"><main class="page stack-16">
+<section class="card"><header class="media"><img id="mateAvatar" class="round" src=""/><div><h2 id="mateName" style="margin:0 0 4px">메이트</h2><div class="muted" id="mateMeta"></div></div></header><div class="note" id="whoami"></div>
+<form id="bookingForm" class="stack-16">
+<div class="row"><div class="field"><div class="label">예약 날짜</div><input class="input" type="date" id="date" required/></div><div class="field"><div class="label">시작 시간</div><input class="input" type="time" id="start_time" required/></div></div>
+<div class="row"><div class="field"><div class="label">이용 시간</div><select class="select" id="duration_hours" required><option value="2">2시간</option><option value="3">3시간</option><option value="4">4시간</option></select></div><div class="field"><div class="label">언어</div><select class="select" id="language" required><option value="ko">한국어</option><option value="ja">日本語</option><option value="en">English</option></select></div></div>
+<div class="row"><div class="field"><div class="label">예약자 성함</div><input class="input" id="customer_name" required/></div><div class="field"><div class="label">연락처</div><input class="input" id="customer_contact" required/></div></div>
+<div class="row single"><div class="field"><div class="label">요청사항</div><textarea class="textarea" id="notes"></textarea></div></div>
+<button class="btn btn-primary" id="submitBtn" type="submit">예약 신청하기</button><div id="result"></div></form></section></main>
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+const supabase = createClient("https://eevvgbbokenpjnvtmztk.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4");
+const params=new URLSearchParams(location.search); const mateId=params.get('mate_id');
+async function loadMate(){if(!mateId) return; const {data}=await supabase.from('mate_profiles').select(`user_id,bio,mbti,hobbies,profiles!inner(id,full_name,age,gender,languages,avatar_url)`).eq('user_id', mateId).single(); const p=data?.profiles||{}; document.getElementById('mateAvatar').src=p.avatar_url||"https://picsum.photos/seed/puzzmi/140/140"; document.getElementById('mateName').textContent=p.full_name||'이름 비공개'; const age=p.age?`${p.age}세`:''; const gender=p.gender||''; const mbti=data.mbti?` • MBTI ${data.mbti}`:''; document.getElementById('mateMeta').textContent=[age,gender].filter(Boolean).join(' • ')+mbti;}
+async function renderUser(){const {data:{user}}=await supabase.auth.getUser(); document.getElementById('whoami').innerHTML=user?('로그인 됨: '+(user.email||user.id)):'로그인되지 않음';}
+loadMate(); renderUser();
+document.getElementById('bookingForm').onsubmit=async(e)=>{e.preventDefault(); const btn=document.getElementById('submitBtn'); btn.disabled=true;
+const date=document.getElementById('date').value; const start_time=document.getElementById('start_time').value; const duration_hours=parseInt(document.getElementById('duration_hours').value,10); const language=document.getElementById('language').value; const customer_name=document.getElementById('customer_name').value.trim(); const customer_contact=document.getElementById('customer_contact').value.trim(); const notes=document.getElementById('notes').value.trim();
+const {data:{user}}=await supabase.auth.getUser(); const payload={mate_id:mateId, customer_id:user?.id||null, customer_name, customer_contact, date, start_time, duration_hours, language, notes, status:'pending'};
+const {data,error}=await supabase.from('bookings').insert(payload).select().single(); document.getElementById('result').innerHTML= error?('<div class=error>오류: '+error.message+'</div>'):(`<div class=success>예약 신청 완료! (ID: ${data.id})</div>`); btn.disabled=false;};
+</script></body></html>

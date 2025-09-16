@@ -1,0 +1,132 @@
+
+/* PUZZMI pages.css — harmonized with main styles.css */
+/* Uses design tokens already declared in styles.css :root */
+
+html, body {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-family: 'Noto Sans KR', system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, 'Apple SD Gothic Neo', 'Noto Sans CJK KR', 'Noto Sans JP', sans-serif;
+}
+
+.page {
+  max-width: 1040px;
+  margin: 48px auto;
+  padding: 0 20px;
+}
+
+.page h1, .page h2 {
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.page h1 { font-size: 28px; margin: 0 0 18px; }
+.page h2 { font-size: 22px; margin: 0 0 16px; }
+
+/* Layout */
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+.row.single { grid-template-columns: 1fr; }
+@media (max-width: 820px) {
+  .row { grid-template-columns: 1fr; }
+}
+
+/* Card */
+.card {
+  background: #fff;
+  border: 1px solid rgba(0,0,0,.06);
+  border-radius: var(--border-radius-lg, 16px);
+  box-shadow: var(--shadow-sm, 0 6px 18px rgba(0,0,0,.06));
+  padding: 22px;
+}
+
+.card + .card { margin-top: 16px; }
+
+/* Form */
+.field { margin-bottom: 14px; }
+.label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+.input, .select, .textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--bg-tertiary);
+  border-radius: 12px;
+  font-size: 15px;
+  background: #fff;
+  outline: none;
+  transition: box-shadow .15s ease, border-color .15s ease;
+}
+.input:focus, .select:focus, .textarea:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(0,64,133,.12);
+}
+.textarea { min-height: 120px; resize: vertical; }
+
+/* Buttons */
+.btn { 
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 8px; text-decoration: none; cursor: pointer;
+  font-weight: 700; border-radius: 12px; padding: 12px 16px;
+  border: 1px solid transparent; transition: transform .05s ease, box-shadow .2s ease, background .2s ease;
+}
+.btn:active { transform: translateY(1px); }
+.btn-primary {
+  background: var(--primary-color); color: #fff;
+  box-shadow: var(--shadow-xs, 0 4px 14px rgba(0,64,133,.18));
+}
+.btn-primary:hover { filter: brightness(1.02); }
+.btn-secondary {
+  background: #fff; color: var(--primary-color);
+  border-color: rgba(0,0,0,.08);
+}
+
+/* Chips & badges */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  background: var(--bg-tertiary); color: var(--text-secondary);
+  padding: 6px 10px; border-radius: 999px; font-size: 12px;
+}
+.badge {
+  display:inline-flex; align-items:center; gap:6px;
+  background: #fff7e6; color:#8a5b00; border:1px solid #f5d48b;
+  padding:6px 10px; border-radius: 999px; font-weight:700; font-size:13px;
+}
+
+/* Muted text & notes */
+.muted { color: var(--text-secondary); font-size: 13px; }
+.note {
+  background: #f8fafc;
+  border: 1px dashed var(--bg-tertiary);
+  padding: 10px 12px;
+  border-radius: 12px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+/* Alerts */
+.success { border-left: 4px solid var(--success-color); background:#ecfdf5; padding:12px 16px; border-radius:8px; }
+.error { border-left: 4px solid var(--error-color); background:#fef2f2; padding:12px 16px; border-radius:8px; }
+
+/* Media blocks */
+.media {
+  display: flex; gap: 16px; align-items: center;
+}
+.media img.round {
+  width: 72px; height: 72px; border-radius: 50%; object-fit: cover;
+}
+
+/* Utility */
+.spacer { height: 10px; }
+.stack-16 > * + * { margin-top: 16px; }
+.stack-20 > * + * { margin-top: 20px; }
+.flex { display: flex; }
+.gap-8 { gap: 8px; }
+.justify-between { justify-content: space-between; }
+.align-center { align-items: center; }
+.hidden { display: none; }

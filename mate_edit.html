@@ -1,0 +1,31 @@
+
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>메이트 프로필 편집 - PUZZMI</title>
+<link rel="stylesheet" href="styles.css"/><link rel="stylesheet" href="pages.css"/><link rel="stylesheet" href="nav.css"/><link rel="stylesheet" href="pages-theme.css"/>
+<script type="module" src="nav.js"></script></head>
+<body class="bg-cream"><div id="app-nav"></div><main class="page"><section class="card"><h2>내 메이트 프로필 편집</h2>
+<form id="form" class="stack-16">
+<div class="row"><div class="field"><div class="label">이름</div><input class="input" id="full_name"/></div><div class="field"><div class="label">나이</div><input class="input" id="age" type="number" min="1" step="1"/></div></div>
+<div class="row"><div class="field"><div class="label">아바타 URL</div><input class="input" id="avatar_url" placeholder="https://..."/></div><div class="field"><div class="label">사용 언어(쉼표)</div><input class="input" id="languages" placeholder="ko,ja,en"/></div></div>
+<div class="row single"><div class="field"><div class="label">소개(Bio)</div><textarea class="textarea" id="bio"></textarea></div></div>
+<div class="row"><div class="field"><div class="label">시급</div><input class="input" id="hourly_rate" type="number" min="0" step="1000"/></div><div class="field"><div class="label">태그(쉼표)</div><input class="input" id="tags" placeholder="카페투어,사진,한옥"/></div></div>
+<div class="row"><div class="field"><div class="label">활동 지역(쉼표)</div><input class="input" id="areas" placeholder="홍대,익선동,을지로"/></div><div class="field"><div class="label">취미(쉼표)</div><input class="input" id="hobbies" placeholder="카페,사진,디저트"/></div></div>
+<div class="row single"><div class="field"><div class="label">사진 URL들(쉼표)</div><input class="input" id="photos" placeholder="https://img1,..."/></div></div>
+<button class="btn btn-primary" type="submit">저장</button><div id="result"></div></form></section></main>
+<script type="module">
+import { supabase } from './nav.js';
+const form=document.getElementById('form'), result=document.getElementById('result');
+function toArr(v){return v.split(',').map(s=>s.trim()).filter(Boolean);}
+async function load(){const {data:{user}}=await supabase.auth.getUser(); if(!user){result.innerHTML='<div class="note">로그인 필요</div>'; return;}
+const p=await supabase.from('profiles').select('*').eq('id', user.id).maybeSingle();
+const m=await supabase.from('mate_profiles').select('*').eq('user_id', user.id).maybeSingle();
+document.getElementById('full_name').value=p.data?.full_name||''; document.getElementById('age').value=p.data?.age||''; document.getElementById('avatar_url').value=p.data?.avatar_url||''; document.getElementById('languages').value=(p.data?.languages||[]).join(',');
+document.getElementById('bio').value=m.data?.bio||''; document.getElementById('hourly_rate').value=m.data?.hourly_rate||''; document.getElementById('tags').value=(m.data?.tags||[]).join(','); document.getElementById('areas').value=(m.data?.areas||[]).join(','); document.getElementById('hobbies').value=(m.data?.hobbies||[]).join(','); document.getElementById('photos').value=(m.data?.photos||[]).join(',');}
+form.addEventListener('submit', async e=>{e.preventDefault(); const {data:{user}}=await supabase.auth.getUser(); if(!user) return alert('로그인 필요');
+const profiles={id:user.id, full_name:document.getElementById('full_name').value.trim(), age:document.getElementById('age').value?parseInt(document.getElementById('age').value,10):null, avatar_url:document.getElementById('avatar_url').value.trim(), languages:toArr(document.getElementById('languages').value)};
+const mate={user_id:user.id, bio:document.getElementById('bio').value.trim(), hourly_rate:document.getElementById('hourly_rate').value?parseInt(document.getElementById('hourly_rate').value,10):null, tags:toArr(document.getElementById('tags').value), areas:toArr(document.getElementById('areas').value), hobbies:toArr(document.getElementById('hobbies').value), photos:toArr(document.getElementById('photos').value)};
+const up1=await supabase.from('profiles').upsert(profiles,{onConflict:'id'}); if(up1.error){result.innerHTML='<div class="error">프로필 저장 실패: '+up1.error.message+'</div>'; return;}
+const up2=await supabase.from('mate_profiles').upsert(mate,{onConflict:'user_id'}); if(up2.error){result.innerHTML='<div class="error">메이트 저장 실패: '+up2.error.message+'</div>'; return;}
+result.innerHTML='<div class="success">저장되었습니다!</div>';});
+load();
+</script></body></html>
