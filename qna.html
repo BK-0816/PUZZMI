@@ -74,6 +74,7 @@
     // 관리자 여부 확인
     const { data: adminRow } = await supabase.from('admin_users').select('user_id').eq('user_id', user.id).maybeSingle();
     const isAdmin = !!adminRow;
+    bindAdminHandlers(isAdmin, user, supabase, loadList);
 
     // UI 라벨
     if (isAdmin) {
@@ -154,8 +155,8 @@
               <div style="margin-top:10px">
                 <textarea id="ans_${row.id}" class="input" placeholder="답변을 입력하세요...">${row.answer ?? ''}</textarea>
                 <div style="display:flex; gap:8px; margin-top:8px">
-                  <button class="btn btn-primary" data-ans-save="${row.id}">답변 저장</button>
-                  <button class="btn btn-secondary" data-ans-close="${row.id}">상태: 완료 처리</button>
+                <button type="button" class="btn btn-primary" data-ans-save="${row.id}">답변 저장</button>
+                <button type="button" class="btn btn-secondary" data-ans-close="${row.id}">상태: 완료 처리</button>
                 </div>
               </div>
             ` : ''}
@@ -165,33 +166,68 @@
 
       if (isAdmin) {
         // 답변 저장/닫기 이벤트 위임
-        list.addEventListener('click', async (e) => {
-          const saveId = e.target.closest('[data-ans-save]')?.getAttribute('data-ans-save');
-          const closeId = e.target.closest('[data-ans-close]')?.getAttribute('data-ans-close');
-          if (!saveId && !closeId) return;
+        let adminHandlersBound = false;
+function bindAdminHandlers(isAdmin, user, supabase, loadList) {
+  if (adminHandlersBound || !isAdmin) return;
+  adminHandlersBound = true;
 
-          if (saveId) {
-            const txt = (document.getElementById(`ans_${saveId}`)?.value ?? '').trim();
-            const { error } = await supabase.from('qna')
-              .update({
-                answer: txt,
-                answered_by: user.id,
-                answered_at: new Date().toISOString(),
-                status: 'answered'
-              })
-              .eq('id', saveId);
-            if (error) alert('저장 실패: ' + error.message);
-            else await loadList();
-          }
+  document.addEventListener('click', async (e) => {
+    const saveBtn  = e.target.closest('button[data-ans-save]');
+    const closeBtn = e.target.closest('button[data-ans-close]');
+    if (!saveBtn && !closeBtn) return;
 
-          if (closeId) {
-            const { error } = await supabase.from('qna')
-              .update({ status: 'closed' })
-              .eq('id', closeId);
-            if (error) alert('완료 처리 실패: ' + error.message);
-            else await loadList();
-          }
-        }, { once: true }); // 새로 로드할 때마다 다시 바인딩
+    // 저장
+    if (saveBtn) {
+      const id = saveBtn.getAttribute('data-ans-save');
+      const textarea = document.getElementById(`ans_${id}`);
+      const txt = (textarea?.value ?? '').trim();
+      try {
+        const { error } = await supabase
+          .from('qna')
+          .update({
+            answer: txt,
+            answered_by: user.id,
+            answered_at: new Date().toISOString(),
+            status: 'answered' // DB 허용값('answered')인지 확인!
+          })
+          .eq('id', id);
+        if (error) throw error;
+        toast('답변이 저장되었습니다.');
+        await loadList();
+      } catch (err) {
+        console.error(err);
+        alert('저장 실패: ' + (err?.message || err));
+      }
+      return;
+    }
+
+    // 완료(닫기)
+    if (closeBtn) {
+      const id = closeBtn.getAttribute('data-ans-close');
+      try {
+        const { error } = await supabase
+          .from('qna')
+          .update({ status: 'closed' })
+          .eq('id', id);
+        if (error) throw error;
+        toast('완료 처리했습니다.');
+        await loadList();
+      } catch (err) {
+        console.error(err);
+        alert('완료 처리 실패: ' + (err?.message || err));
+      }
+    }
+  });
+}
+
+// 간단 토스트
+function toast(msg) {
+  const t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;left:50%;top:16px;transform:translateX(-50%);background:#222;color:#fff;padding:8px 12px;border-radius:8px;z-index:9999;opacity:.95';
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 1600);
+}
       }
     }
 
