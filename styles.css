@@ -459,9 +459,9 @@ body {
     }
 
     .friends-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 30px;
+      display:grid;
+      gap:20px;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     }
 
     .friend-card {
@@ -470,6 +470,7 @@ body {
         overflow: hidden;
         box-shadow: var(--shadow-sm);
         transition: var(--transition);
+        max-width:360px;
     }
 
     .friend-card:hover {
