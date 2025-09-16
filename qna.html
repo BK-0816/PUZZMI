@@ -96,7 +96,10 @@
       const { error } = await supabase.from('qna').insert({
         user_id: user.id,
         user_email: user.email ?? null,
-        title, content, status: 'open'
+        title,
+        subject: title,        // ★ subject 채워서 NOT NULL 만족
+        content,
+        status: 'open'
       });
       if (error) {
         newResult.innerHTML = `<div class="error">등록 실패: ${error.message}</div>`;
@@ -112,7 +115,7 @@
     async function loadList() {
       list.innerHTML = '';
       const sel = supabase.from('qna')
-        .select('id, user_email, title, content, status, answer, created_at, answered_at, answered_by')
+        .select('id, user_email, subject, title, content, status, answer, created_at, answered_at, answered_by')
         .order('created_at', { ascending: false });
 
       const { data, error } = isAdmin ? await sel : await sel.eq('user_id', user.id);
@@ -132,7 +135,7 @@
 
         return `
           <div class="qna-item card">
-            <h4 style="margin:0 0 6px">${row.title}</h4>
+            <h4 style="margin:0 0 6px">${row.title ?? row.subject ?? '(제목 없음)'}</h4>
             <div class="meta">
               ${isAdmin ? `<span>From: ${row.user_email ?? '익명'}</span>` : ''}
               <span>작성: ${created}</span>
