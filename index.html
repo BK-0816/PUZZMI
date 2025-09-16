@@ -17,136 +17,173 @@
 </head>
 
 <!-- Supabase JS v2 (ESM) -->
+ut();
+      location.reload();
 <script type="module">
   import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-  // TODO: 본인 프로젝트 값으로 바꾸기
+  // 프로젝트 설정
   const SUPABASE_URL = "https://eevvgbbokenpjnvtmztk.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4";
-
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// ===== 1) 로그인/로그아웃 버튼 =====
-const loginBtn = document.querySelector(".login-btn");
-async function refreshAuthUI() {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (user) {
-    loginBtn.textContent = "로그아웃";
-    loginBtn.onclick = async () => {
-      await supabase.auth.signOut();
-      location.reload();
-    };
-  } else {
-    loginBtn.textContent = "로그인";
-    loginBtn.onclick = () => {
-      const redir = encodeURIComponent(location.pathname + location.search);
-      // ✅ 이메일/비번 + 구글/트위터 버튼이 있는 합본 페이지로 이동
-      location.href = `auth_combo.html?redirect=${redir}`;
-    };
+  // ===== 1) 로그인/로그아웃 버튼 =====
+  const loginBtn = document.querySelector(".login-btn");
+  async function refreshAuthUI() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      loginBtn.textContent = "로그아웃";
+      loginBtn.onclick = async () => { await supabase.auth.signOut(); location.reload(); };
+    } else {
+      loginBtn.textContent = "로그인";
+      loginBtn.onclick = () => {
+        const redir = encodeURIComponent(location.pathname + location.search);
+        location.href = `auth_combo.html?redirect=${redir}`;
+      };
+    }
   }
-}
-  // ===== 2) 메이트 목록 불러오기 & 렌더링 =====
-  async function loadMates() {
-    const grid = document.querySelector(".friends-grid");
-    if (!grid) return;
 
-    // 초기 정적 카드 제거 후 DB 데이터로 교체
-    grid.innerHTML = "";
+  // ===== 2) 메이트 목록(페이지네이션 + 이미지 URL 변환 + 로그인 가드) =====
+  const ONLY_VERIFIED = true;      // 공개만 노출하려면 true
+  const PAGE_SIZE     = 8;
 
-    const { data, error } = await supabase
+  let page = 0;
+  let isLoading = false;
+  let hasMore   = true;
+
+  const grid = document.querySelector(".friends-grid");
+
+  // "더 보기" 버튼이 없으면 만들어서 붙임
+  let loadMoreBtn = document.getElementById("loadMore");
+  if (!loadMoreBtn && grid) {
+    const actionsWrap = document.createElement("div");
+    actionsWrap.className = "friends-actions";
+    actionsWrap.style.cssText = "text-align:center; margin-top:12px;";
+    loadMoreBtn = document.createElement("button");
+    loadMoreBtn.id = "loadMore";
+    loadMoreBtn.className = "btn btn-secondary";
+    loadMoreBtn.style.display = "none";
+    loadMoreBtn.textContent = "더 보기";
+    actionsWrap.appendChild(loadMoreBtn);
+    grid.parentElement.appendChild(actionsWrap);
+  }
+
+  // 스토리지 키 → 공개 URL
+  const keyToUrl = (key) => {
+    if (!key) return null;
+    const pureKey = key.startsWith('mates/') ? key.replace(/^mates\//,'') : key; // 실수 보정
+    return supabase.storage.from('mates').getPublicUrl(pureKey).data.publicUrl;
+  };
+
+  // 카드 렌더
+  function renderCard(row) {
+    const name   = row.profiles?.full_name ?? "이름 비공개";
+    const age    = row.profiles?.age ? `${row.profiles.age}세` : "";
+    const gender = row.profiles?.gender ?? "";
+    const langs  = Array.isArray(row.profiles?.languages) ? row.profiles.languages : [];
+
+    const keys = Array.isArray(row.photos) ? row.photos : [];
+    const img  = keys[0] ? keyToUrl(keys[0]): (row.profiles?.avatar_url || "https://picsum.photos/seed/puzzmi/400/300");
+
+    // 고정 JPY 4,000/시간
+    const priceJpy = new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY', maximumFractionDigits: 0 }).format(4000);
+    const rating   = row.rating ?? 4.8;
+    const tagsTxt  = (row.tags ?? []).slice(0,3).join(", ") || "서울 투어";
+    const cats     = [...(row.tags ?? []), ...(row.areas ?? [])].join(" ").toLowerCase() || "culture";
+
+    const card = document.createElement("div");
+    card.className = "friend-card";
+    card.dataset.category = cats;
+
+    card.innerHTML = `
+      <div class="friend-image">
+        <img src="${img}" alt="${name}">
+        <div class="friend-badge"><i class="fas fa-star"></i><span>${rating}</span></div>
+      </div>
+      <div class="friend-info">
+        <h3 class="friend-name">${name}</h3>
+        <p class="friend-age">${[age, gender].filter(Boolean).join(" • ")}</p>
+        <p class="friend-specialties">${tagsTxt}</p>
+        <p class="friend-description">${row.bio ?? "함께 서울의 숨은 명소를 즐겨봐요!"}</p>
+        <div class="friend-languages">
+          ${langs.map(l => `<span class="language">${l}</span>`).join("")}
+        </div>
+        <div class="friend-price">
+          <span class="price">${priceJpy}</span><span class="duration">/시간</span>
+        </div>
+        <div style="margin-top:10px; display:flex; gap:8px;">
+          <a class="btn btn-secondary" data-requires-auth="true" href="mate_like.html?mate_id=${row.user_id}">프로필 보기</a>
+          <a class="cta-btn"          data-requires-auth="true" href="booking.html?mate_id=${row.user_id}">예약하기</a>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  }
+
+  async function loadMatesPage({ reset=false } = {}) {
+    if (!grid || isLoading || (!hasMore && !reset)) return;
+
+    if (reset) { page = 0; hasMore = true; grid.innerHTML = ""; }
+
+    isLoading = true;
+    const from = page * PAGE_SIZE;
+    const to   = from + PAGE_SIZE - 1;
+
+    let query = supabase
       .from("mate_profiles")
       .select(`
-        user_id,
-        bio,
-        hourly_rate,
-        tags,
-        areas,
-        is_verified,
-        rating,
-        photos,
+        user_id, bio, hourly_rate, tags, areas, is_verified, rating, photos,
         profiles ( id, full_name, age, gender, languages, avatar_url )
-      `)
-      //.eq("is_verified", true)
+      `, { count: "exact" })
       .order("rating", { ascending: false })
-      .limit(12);
+      .range(from, to);
+
+    if (ONLY_VERIFIED) query = query.eq("is_verified", true);
+
+    const { data, error, count } = await query;
 
     if (error) {
       console.error(error);
-      grid.innerHTML = `<p style="padding:16px">메이트를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.</p>`;
+      if (!grid.innerHTML) {
+        grid.innerHTML = `<p style="padding:16px">메이트를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.</p>`;
+      }
+      loadMoreBtn && (loadMoreBtn.style.display = "none");
+      isLoading = false;
       return;
     }
 
-    for (const row of (data ?? [])) {
-      const name = row.profiles?.full_name ?? "이름 비공개";
-      const age = row.profiles?.age ? `${row.profiles.age}세` : "";
-      const gender = row.profiles?.gender ?? "";
-      const langs = Array.isArray(row.profiles?.languages) ? row.profiles.languages : [];
-      const keys = Array.isArray(row.photos) ? row.photos : [];
-      const firstKey = keys[0] || null;
-      const img = firstKey ? supabase.storage.from('mates').getPublicUrl(firstKey).data.publicUrl : (row.profiles?.avatar_url || "https://picsum.photos/seed/puzzmi/400/300");// JPY 고정가
-const priceJpy = 4000;
-const price = new Intl.NumberFormat('ja-JP', {
-  style: 'currency',
-  currency: 'JPY',
-  maximumFractionDigits: 0
-}).format(priceJpy); // → "￥4,000"      
-const rating = row.rating ?? 4.8;
+    (data || []).forEach(renderCard);
 
-      const cats = [
-        ...(row.tags ?? []),
-        ...(row.areas ?? [])
-      ].join(" ").toLowerCase() || "culture";
+    const fetched = (data || []).length;
+    const total   = typeof count === "number" ? count : (from + fetched);
+    hasMore = (from + fetched) < total;
 
-      const card = document.createElement("div");
-      card.className = "friend-card";
-      card.dataset.category = cats;
+    if (loadMoreBtn) loadMoreBtn.style.display = hasMore ? "inline-block" : "none";
+    if (hasMore) page += 1;
 
-      card.innerHTML = `
-        <div class="friend-image">
-          <img src="${img}" alt="${name}">
-          <div class="friend-badge"><i class="fas fa-star"></i><span>${rating}</span></div>
-        </div>
-        <div class="friend-info">
-          <h3 class="friend-name">${name}</h3>
-          <p class="friend-age">${[age, gender].filter(Boolean).join(" • ")}</p>
-          <p class="friend-specialties">${(row.tags ?? []).slice(0,3).join(", ") || "서울 투어"}</p>
-          <p class="friend-description">${row.bio ?? "함께 서울의 숨은 명소를 즐겨봐요!"}</p>
-          <div class="friend-languages">
-            ${langs.map(l => `<span class="language">${l}</span>`).join("")}
-          </div>
-          <div class="friend-price">
-            <span class="price">${price}</span><span class="duration">/시간</span>
-        </div>
-        <div style="margin-top:10px">
-        <a class="cta-btn" data-requires-auth="true" href="mate_like.html?mate_id=${row.user_id}">프로필 보기</a>
-        <a class="cta-btn" data-requires-auth="true" href="booking.html?mate_id=${row.user_id}">예약하기</a>
-        </div>
-    </div>
-    `;
-    grid.appendChild(card);
-    }
-}
+    isLoading = false;
+  }
+
+  loadMoreBtn?.addEventListener("click", () => loadMatesPage());
+
+  // ===== 3) 링크 클릭 시 로그인 가드 =====
+  document.addEventListener('click', async (e) => {
+    const link = e.target.closest('a[data-requires-auth="true"]');
+    if (!link) return;
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) return;   // 로그인 상태면 통과
+    e.preventDefault(); // 미로그인 → 로그인 페이지로
+    const redir = encodeURIComponent(link.getAttribute('href'));
+    location.href = `auth_combo.html?redirect=${redir}`;
+  });
 
   // 초기 실행
   (async () => {
     await refreshAuthUI();
-    await loadMates();
+    await loadMatesPage({ reset:true });
   })();
-
-  document.addEventListener('click', async (e) => {
-  const link = e.target.closest('a[data-requires-auth="true"]');
-  if (!link) return;
-
-  const { data: { user } } = await supabase.auth.getUser();
-  if (user) return; // 이미 로그인됨 → 정상 이동
-
-  // 로그인 안 됨 → auth_combo로 리디렉션
-  e.preventDefault();
-  const target = link.getAttribute('href'); // 상대경로 그대로 사용
-  const redir = encodeURIComponent(target);
-  location.href = `auth_combo.html?redirect=${redir}`;
-});
 </script>
+
 
 
 <body>
@@ -331,6 +368,10 @@ const rating = row.rating ?? 4.8;
 
     <!-- ★ JS가 카드를 채워 넣을 컨테이너 -->
     <div class="friends-grid"></div>
+    <!-- ✅ 더 보기 버튼 -->
+<div class="friends-actions" style="text-align:center; margin-top:12px;">
+  <button id="loadMore" class="btn btn-secondary" style="display:none">더 보기</button>
+</div>
   </div>
 </section>
 
