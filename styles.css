@@ -490,6 +490,16 @@ body {
         object-fit: cover;
     }
 
+    .heart-badge{
+  position:absolute; top:8px; right:8px;
+  display:flex; align-items:center; gap:6px;
+  background:#ff4d4f; color:#fff; border-radius:999px;
+  padding:4px 8px; font-weight:700; font-size:.9rem;
+  box-shadow:0 2px 8px rgba(0,0,0,.15);
+}
+.heart-badge i{ font-size:.95rem; }
+.heart-badge .count{ min-width:1ch; text-align:right; }
+
     .friend-badge {
         position: absolute;
         top: 15px;
