@@ -7,6 +7,7 @@
   backdrop-filter: saturate(120%) blur(15px); 
   border-bottom: 1px solid rgba(0,0,0,.08); 
   box-shadow: 0 2px 20px rgba(0,0,0,.06);
+  width: 100%;
 }
 
 .app-nav .wrap { 
