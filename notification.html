@@ -356,6 +356,89 @@
       flex: 1;
     }
     
+    /* 알림 메시지 스타일링 */
+    .notification-message {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(240, 147, 251, 0.03) 100%);
+      border: 1px solid rgba(102, 126, 234, 0.1);
+      border-radius: 16px;
+      padding: 20px;
+      margin: 16px 0;
+      position: relative;
+    }
+    
+    .notification-message::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 2px 0 0 2px;
+    }
+    
+    .message-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--text-primary);
+    }
+    
+    .message-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    
+    .message-details {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px 16px;
+      align-items: center;
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+    
+    .detail-label {
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .detail-value {
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+    
+    .detail-highlight {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 700;
+    }
+    
+    .detail-date {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.05) 100%);
+      padding: 8px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(102, 126, 234, 0.2);
+      font-weight: 600;
+      color: #667eea;
+    }
+    
     .title { 
       font-weight: 800; 
       font-size: 1.3rem;
@@ -395,15 +478,11 @@
     }
     
     .body { 
-      white-space: pre-wrap;
+      white-space: normal;
       line-height: 1.6;
       font-size: 1.05rem;
       color: var(--text-primary);
       margin-bottom: 20px;
-      padding: 20px;
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.03) 0%, rgba(240, 147, 251, 0.02) 100%);
-      border-radius: 16px;
-      border: 1px solid rgba(102, 126, 234, 0.1);
     }
     
     /* 액션 버튼들 */
@@ -553,6 +632,122 @@
       }
     }
     
+
+    // 알림 메시지 파싱 및 포맷팅 함수
+    function formatNotificationBody(body, type) {
+      if (!body) return '';
+      
+      // 기존 메시지에서 일정 정보 추출
+      const scheduleMatch = body.match(/일정:\s*(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2})\s*\((\d+)h?\)/);
+      const reasonMatch = body.match(/사유:\s*(.+?)(?:\n|$)/);
+      
+      if (scheduleMatch) {
+        const [, date, time, duration] = scheduleMatch;
+        const formattedDateTime = formatDateTime(date, time);
+        const durationText = `${duration}시간`;
+        
+        let messageHtml = '';
+        
+        if (type === 'booking_confirmed') {
+          messageHtml = `
+            <div class="notification-message">
+              <div class="message-header">
+                <div class="message-icon">🎉</div>
+                <span>예약이 확정되었습니다!</span>
+              </div>
+              <div class="message-details">
+                <span class="detail-label">📅 일정</span>
+                <span class="detail-value detail-date">${formattedDateTime}</span>
+                <span class="detail-label">⏰ 시간</span>
+                <span class="detail-value detail-highlight">${durationText}</span>
+              </div>
+            </div>
+          `;
+        } else if (type === 'booking_declined') {
+          const reason = reasonMatch ? reasonMatch[1].trim() : '사유 미기재';
+          messageHtml = `
+            <div class="notification-message">
+              <div class="message-header">
+                <div class="message-icon">😔</div>
+                <span>예약이 거절되었습니다</span>
+              </div>
+              <div class="message-details">
+                <span class="detail-label">📅 일정</span>
+                <span class="detail-value detail-date">${formattedDateTime}</span>
+                <span class="detail-label">⏰ 시간</span>
+                <span class="detail-value">${durationText}</span>
+                <span class="detail-label">💬 사유</span>
+                <span class="detail-value">${reason}</span>
+              </div>
+            </div>
+          `;
+        } else if (type === 'booking_canceled') {
+          const reason = reasonMatch ? reasonMatch[1].trim() : '사유 미기재';
+          messageHtml = `
+            <div class="notification-message">
+              <div class="message-header">
+                <div class="message-icon">🚫</div>
+                <span>예약이 취소되었습니다</span>
+              </div>
+              <div class="message-details">
+                <span class="detail-label">📅 일정</span>
+                <span class="detail-value detail-date">${formattedDateTime}</span>
+                <span class="detail-label">⏰ 시간</span>
+                <span class="detail-value">${durationText}</span>
+                <span class="detail-label">💬 사유</span>
+                <span class="detail-value">${reason}</span>
+              </div>
+            </div>
+          `;
+        } else {
+          // 기본 포맷
+          messageHtml = `
+            <div class="notification-message">
+              <div class="message-header">
+                <div class="message-icon">📋</div>
+                <span>예약 관련 알림</span>
+              </div>
+              <div class="message-details">
+                <span class="detail-label">📅 일정</span>
+                <span class="detail-value detail-date">${formattedDateTime}</span>
+                <span class="detail-label">⏰ 시간</span>
+                <span class="detail-value">${durationText}</span>
+              </div>
+            </div>
+          `;
+        }
+        
+        return messageHtml;
+      }
+      
+      // 일정 정보가 없는 경우 기본 메시지
+      return `<div class="body">${body.replace(/</g,'&lt;')}</div>`;
+    }
+
+    // 날짜/시간 포맷팅 함수
+    function formatDateTime(dateStr, timeStr) {
+      try {
+        if (!dateStr || !timeStr) return '날짜 미정';
+        
+        const dateObj = new Date(dateStr);
+        const dateFormatted = dateObj.toLocaleDateString('ko-KR', { 
+          month: 'long', 
+          day: 'numeric',
+          weekday: 'long'
+        });
+        
+        // 시간 포맷팅 (24시간 → 12시간)
+        const [hour, minute] = timeStr.split(':');
+        const hourNum = parseInt(hour, 10);
+        const period = hourNum >= 12 ? '오후' : '오전';
+        const displayHour = hourNum === 0 ? 12 : hourNum > 12 ? hourNum - 12 : hourNum;
+        const timeFormatted = `${period} ${displayHour}:${minute}`;
+        
+        return `${dateFormatted} ${timeFormatted}`;
+      } catch (e) {
+        return `${dateStr} ${timeStr}`;
+      }
+    }
     /* 로딩 상태 */
     .loading {
       display: flex;
@@ -694,6 +889,9 @@
                     : row.type === 'review_received' ? '리뷰 등록'
                     : row.type || '일반';
       const linkHtml = row.link ? `<a class="link" data-open="${encodeURIComponent(row.link)}">📋 자세히 보기</a>` : '';
+      
+      // 알림 본문을 타입에 따라 포맷팅
+      const formattedBody = formatNotificationBody(row.body || '', row.type);
 
       return `
         <div class="nitem ${cls}" data-id="${row.id}">
@@ -705,7 +903,7 @@
               <span>•</span>
               <span>📅 ${when}</span>
             </div>
-            <div class="body">${(row.body||'').replace(/</g,'&lt;')}</div>
+            ${formattedBody}
             <div class="actions">
               ${linkHtml}
               ${row.read_at ? '<span class="read-status">✅ 읽음 처리됨</span>' : '<button class="btn-read" data-mark-read>👁️ 읽음 처리</button>'}
