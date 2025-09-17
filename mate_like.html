@@ -231,12 +231,18 @@
     
     .meta-card strong {
       display: block;
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       font-weight: 700;
       color: var(--text-secondary);
-      margin-bottom: 8px;
+      margin-bottom: 12px;
       text-transform: uppercase;
       letter-spacing: 1.2px;
+      text-align: center;
+      position: absolute;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
     }
     
     .meta-card .value {
@@ -398,7 +404,7 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       text-transform: uppercase;
       letter-spacing: 0.8px;
     }
@@ -451,6 +457,19 @@
       line-height: 1.5;
       transition: all 0.3s ease;
       resize: vertical;
+      margin-top: 32px;
+      text-align: center;
+    }
+    
+    /* 소개 카드는 더 큰 높이 */
+    .meta-card.intro-card {
+      min-height: 140px;
+      grid-column: 1 / -1;
+    }
+    
+    .meta-card.intro-card .value {
+      text-align: left;
+      line-height: 1.6;
       backdrop-filter: blur(8px);
       box-shadow: inset 0 2px 8px rgba(0,0,0,0.05);
     }
@@ -601,10 +620,6 @@
 
       meta.innerHTML = `
         <div class="meta-card">
-          <strong>소개</strong>
-          <div class="value">${mp.bio ?? '소개가 아직 없습니다.'}</div>
-        </div>
-        <div class="meta-card">
           <strong>기본 정보</strong>
           <div class="value">${[age, gender].filter(Boolean).join(' • ') || '미기재'}</div>
         </div>
@@ -627,6 +642,10 @@
         <div class="meta-card">
           <strong>평점</strong>
           <div class="value">⭐ ${rating}</div>
+        </div>
+        <div class="meta-card intro-card">
+          <strong>소개</strong>
+          <div class="value">${mp.bio ?? '소개가 아직 없습니다.'}</div>
         </div>
       `;
     }
