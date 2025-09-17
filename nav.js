@@ -1,4 +1,4 @@
-/* PUZZMI navbar – redesigned with centered logo and responsive dropdowns */
+/* PUZZMI navbar – redesigned with responsive dropdowns */
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const SUPABASE_URL = "https://eevvgbbokenpjnvtmztk.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4";
@@ -102,12 +102,6 @@ export async function renderNavbar(rootId='app-nav') {
   commonMenus.forEach(menu => {
     navLeft.appendChild(el('a', { class: 'nav-link', href: menu.href }, menu.text));
   });
-
-  // 중앙 로고
-  const navCenter = el('div', { class: 'nav-center' });
-  wrap.appendChild(navCenter);
-
-  // 중앙 로고 제거 - 빈 공간으로 유지
 
   // 오른쪽 메뉴
   const navRight = el('div', { class: 'nav-right' });
