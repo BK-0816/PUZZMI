@@ -508,6 +508,10 @@ function relocateSafetyBlock() {
 
 // 모바일 메뉴
 function initializeMobileMenu() {
+    if (!mobileMenuBtn || !navMenu) {
+        return; // 요소가 없으면 함수 종료
+    }
+    
     mobileMenuBtn.addEventListener('click', () => {
         navMenu.classList.toggle('active');
     });
