@@ -176,7 +176,7 @@
     async function loadReviews(){
       const { data: rows, error } = await supabase
         .from('reviews')
-        .select('id, content, rating, created_at, author_name, mate_reply, replied_at')
+        .select('id, content, rating, created_at, author_id: user.id, author_name, mate_reply, replied_at')
         .eq('mate_id', mateId)
         .order('created_at', { ascending: false });
 
