@@ -358,7 +358,7 @@
   <main class="page">
     <section class="card">
       <h2 style="margin:0 0 10px;">로그인 / 회원가입</h2>
-      <div class="muted">이메일/비밀번호 또는 Google/Twitter(X)로 시작할 수 있어요.</div>
+      <div class="muted">안전하고 간편한 회원가입으로 PUZZMI와 함께 특별한 여행을 시작하세요! ✨</div>
 
       <div class="tabs" role="tablist">
         <button class="tab active" data-tab="login">로그인</button>
@@ -391,33 +391,126 @@
 
       <!-- 회원가입 -->
       <form id="signupForm" class="stack-16 hidden" data-panel="signup">
+        <div class="signup-benefits">
+          <h3>🎉 PUZZMI 회원이 되면</h3>
+          <ul class="benefits-list">
+            <li>✨ 검증된 메이트와 안전한 여행</li>
+            <li>💖 찜 기능으로 좋아하는 메이트 저장</li>
+            <li>📱 실시간 예약 알림 서비스</li>
+            <li>🎁 신규 회원 특별 혜택</li>
+          </ul>
+        </div>
+        
         <div class="row">
           <div class="field">
             <div class="label">이름(프로필)</div>
-            <input class="input" id="signup_name" type="text" placeholder="예: 김푸즈미" required/>
+            <input class="input" id="signup_name" type="text" placeholder="예: 김푸즈미" required minlength="2" maxlength="20"/>
+            <div class="field-help">실명 또는 닉네임을 입력해주세요 (2-20자)</div>
           </div>
           <div class="field">
             <div class="label">나이 (선택)</div>
-            <input class="input" id="signup_age" type="number" min="1" step="1" placeholder="예: 25"/>
+            <input class="input" id="signup_age" type="number" min="16" max="100" step="1" placeholder="예: 25"/>
+            <div class="field-help">만 16세 이상만 가입 가능합니다</div>
           </div>
         </div>
+        
+        <div class="row single">
+          <div class="field">
+            <div class="label">성별 (선택)</div>
+            <select class="input" id="signup_gender">
+              <option value="">선택하지 않음</option>
+              <option value="여성">여성</option>
+              <option value="남성">남성</option>
+              <option value="기타">기타/비공개</option>
+            </select>
+            <div class="field-help">더 맞춤형 서비스 제공을 위해 선택해주세요</div>
+          </div>
+        </div>
+        
         <div class="row">
           <div class="field">
             <div class="label">이메일</div>
-            <input class="input" id="signup_email" type="email" required/>
+            <input class="input" id="signup_email" type="email" required autocomplete="email"/>
+            <div class="field-help">로그인 및 예약 알림을 받을 이메일</div>
           </div>
           <div class="field">
             <div class="label">비밀번호</div>
-            <input class="input" id="signup_password" type="password" minlength="6" required/>
+            <input class="input" id="signup_password" type="password" minlength="8" required autocomplete="new-password"/>
+            <div class="field-help">8자 이상, 영문+숫자 조합 권장</div>
+          </div>
+        </div>
+        
+        <div class="row single">
+          <div class="field">
+            <div class="label">비밀번호 확인</div>
+            <input class="input" id="signup_password_confirm" type="password" minlength="8" required autocomplete="new-password"/>
+            <div class="field-help" id="password-match-help">비밀번호를 다시 입력해주세요</div>
+          </div>
+        </div>
+        
+        <div class="row single">
+          <div class="field">
+            <div class="label">🌐 사용 가능한 언어 (선택)</div>
+            <div class="language-checkboxes">
+              <label class="checkbox-item">
+                <input type="checkbox" value="한국어" checked disabled/>
+                <span class="checkbox-label">🇰🇷 한국어 (기본)</span>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" value="日本語" id="lang_ja"/>
+                <span class="checkbox-label">🇯🇵 日本語</span>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" value="English" id="lang_en"/>
+                <span class="checkbox-label">🇺🇸 English</span>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" value="中文" id="lang_zh"/>
+                <span class="checkbox-label">🇨🇳 中文</span>
+              </label>
+            </div>
+            <div class="field-help">메이트 활동 시 소통 가능한 언어를 선택해주세요</div>
           </div>
         </div>
 
+        <div class="terms-section">
+          <label class="checkbox-item terms-checkbox">
+            <input type="checkbox" id="agree_terms" required/>
+            <span class="checkbox-label">
+              <a href="#" class="terms-link">이용약관</a> 및 
+              <a href="#" class="terms-link">개인정보처리방침</a>에 동의합니다
+            </span>
+          </label>
+          
+          <label class="checkbox-item marketing-checkbox">
+            <input type="checkbox" id="agree_marketing"/>
+            <span class="checkbox-label">
+              마케팅 정보 수신에 동의합니다 (선택)
+            </span>
+          </label>
+        </div>
         <div class="row gap8">
           <button class="btn btn-primary" type="submit" id="signup_btn">회원가입</button>
           <button type="button" class="btn btn-secondary" id="resend_signup" disabled>인증 메일 재전송</button>
         </div>
 
-        <div class="note">회원가입 후 이메일 인증이 필요할 수 있어요. 메일이 오지 않으면 60초 후 재전송을 눌러주세요.</div>
+        <div class="signup-info">
+          <div class="info-item">
+            <div class="info-icon">📧</div>
+            <div class="info-text">
+              <strong>이메일 인증</strong><br>
+              회원가입 후 이메일 인증이 필요할 수 있습니다
+            </div>
+          </div>
+          <div class="info-item">
+            <div class="info-icon">🔒</div>
+            <div class="info-text">
+              <strong>개인정보 보호</strong><br>
+              모든 정보는 안전하게 암호화되어 저장됩니다
+            </div>
+          </div>
+        </div>
+        
         <div id="signup_result"></div>
 
         <div class="sep">또는</div>
@@ -526,6 +619,51 @@
     // ===== SIGNUP =====
     document.getElementById('signupForm').addEventListener('submit', async (e) => {
       e.preventDefault();
+      
+      // 폼 유효성 검사
+      const name = document.getElementById('signup_name').value.trim();
+      const age = document.getElementById('signup_age').value;
+      const gender = document.getElementById('signup_gender').value;
+      const email = document.getElementById('signup_email').value.trim();
+      const password = document.getElementById('signup_password').value;
+      const passwordConfirm = document.getElementById('signup_password_confirm').value;
+      const agreeTerms = document.getElementById('agree_terms').checked;
+      const agreeMarketing = document.getElementById('agree_marketing').checked;
+      
+      // 선택된 언어들 수집
+      const languages = ['한국어']; // 기본 한국어
+      if (document.getElementById('lang_ja').checked) languages.push('日本語');
+      if (document.getElementById('lang_en').checked) languages.push('English');
+      if (document.getElementById('lang_zh').checked) languages.push('中文');
+      
+      const box = document.getElementById('signup_result');
+      
+      // 클라이언트 사이드 유효성 검사
+      if (name.length < 2 || name.length > 20) {
+        box.innerHTML = '<div class="error">이름은 2-20자 사이로 입력해주세요.</div>';
+        return;
+      }
+      
+      if (age && (parseInt(age) < 16 || parseInt(age) > 100)) {
+        box.innerHTML = '<div class="error">나이는 16-100세 사이로 입력해주세요.</div>';
+        return;
+      }
+      
+      if (password.length < 8) {
+        box.innerHTML = '<div class="error">비밀번호는 8자 이상이어야 합니다.</div>';
+        return;
+      }
+      
+      if (password !== passwordConfirm) {
+        box.innerHTML = '<div class="error">비밀번호가 일치하지 않습니다.</div>';
+        return;
+      }
+      
+      if (!agreeTerms) {
+        box.innerHTML = '<div class="error">이용약관 및 개인정보처리방침에 동의해주세요.</div>';
+        return;
+      }
+      
       const full_name = document.getElementById('signup_name').value.trim();
       const ageRaw    = document.getElementById('signup_age').value;
       const age       = ageRaw ? parseInt(ageRaw, 10) : null;
@@ -534,14 +672,22 @@
 
       const btn = document.getElementById('signup_btn');
       btn.disabled = true;
+      btn.innerHTML = '<div class="loading"></div> 회원가입 처리 중...';
 
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: { full_name }, emailRedirectTo: window.location.origin + '/' + getRedirect() }
+        options: { 
+          data: { 
+            full_name,
+            age,
+            gender: document.getElementById('signup_gender').value || null,
+            languages,
+            marketing_consent: agreeMarketing
+          }, 
+          emailRedirectTo: window.location.origin + '/' + getRedirect() 
+        }
       });
-
-      const box = document.getElementById('signup_result');
 
       if (error) {
         const msg = (error.message || "").toLowerCase();
@@ -551,21 +697,21 @@
           box.innerHTML = '<div class="error">요청이 너무 많습니다. 잠시 후 다시 시도해주세요.</div>';
           cdSignup.start(60);
           cdResend.start(60);
+          btn.innerHTML = '회원가입';
           return;
         }
 
         // 이미 가입된 이메일 → 매직링크로 유도
         if (msg.includes('already') && msg.includes('registered')) {
-          box.innerHTML = '<div class="error">이미 가입된 이메일입니다. 이메일로 로그인 링크를 보내드립니다.</div>';
+          box.innerHTML = '<div class="error">🔄 이미 가입된 이메일입니다. 로그인 페이지로 이동합니다.</div>';
           // 자동으로 매직링크 탭으로 전환 + 전송
-          switchTab('magic');
-          document.getElementById('magic_email').value = email;
-          await sendMagic(email);
+          setTimeout(() => switchTab('login'), 1500);
+          btn.innerHTML = '회원가입';
           return;
         }
 
         box.innerHTML = '<div class="error">회원가입 실패: ' + error.message + '</div>';
-        btn.disabled = false;
+        btn.innerHTML = '회원가입';
         return;
       }
 
@@ -573,20 +719,48 @@
       if (data?.user?.id) {
         const { error: profErr } = await supabase
           .from('profiles')
-          .upsert({ id: data.user.id, full_name, age }, { onConflict: 'id' });
+          .upsert({ 
+            id: data.user.id, 
+            full_name, 
+            age,
+            gender: document.getElementById('signup_gender').value || null,
+            languages,
+            marketing_consent: agreeMarketing,
+            created_at: new Date().toISOString()
+          }, { onConflict: 'id' });
+          
         if (profErr) {
           console.warn('profiles upsert blocked by RLS:', profErr.message);
-          box.innerHTML = '<div class="success">회원가입 완료! 이메일을 확인해주세요. (프로필은 로그인 후 마이페이지에서 수정 가능)</div>';
+          box.innerHTML = `
+            <div class="success">
+              <div style="font-size: 1.5rem; margin-bottom: 12px;">🎉</div>
+              <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 8px;">회원가입 완료!</div>
+              <div>이메일을 확인해주세요. 프로필은 로그인 후 수정 가능합니다.</div>
+            </div>
+          `;
         } else {
-          box.innerHTML = '<div class="success">회원가입 완료! 이메일을 확인해주세요.</div>';
+          box.innerHTML = `
+            <div class="success">
+              <div style="font-size: 1.5rem; margin-bottom: 12px;">🎉</div>
+              <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 8px;">회원가입 완료!</div>
+              <div>이메일을 확인하시고 로그인해주세요.</div>
+            </div>
+          `;
         }
       } else {
-        box.innerHTML = '<div class="success">회원가입 요청이 접수되었습니다. 이메일을 확인해주세요.</div>';
+        box.innerHTML = `
+          <div class="success">
+            <div style="font-size: 1.5rem; margin-bottom: 12px;">📧</div>
+            <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 8px;">회원가입 요청 접수</div>
+            <div>이메일을 확인해주세요.</div>
+          </div>
+        `;
       }
 
       // 쿨다운 시작
       cdSignup.start(60);
       cdResend.start(60);
+      btn.innerHTML = '회원가입';
       renderUser();
     });
 
@@ -687,6 +861,89 @@
         logoutBtn.classList.add('hidden');
       }
     }
+    
+    // 비밀번호 강도 체크
+    function checkPasswordStrength(password) {
+      let score = 0;
+      let feedback = [];
+      
+      if (password.length >= 8) score += 1;
+      else feedback.push('8자 이상');
+      
+      if (/[a-z]/.test(password)) score += 1;
+      else feedback.push('소문자');
+      
+      if (/[A-Z]/.test(password)) score += 1;
+      else feedback.push('대문자');
+      
+      if (/[0-9]/.test(password)) score += 1;
+      else feedback.push('숫자');
+      
+      if (/[^a-zA-Z0-9]/.test(password)) score += 1;
+      else feedback.push('특수문자');
+      
+      if (score <= 2) return { level: 'weak', text: '약함 - ' + feedback.slice(0,2).join(', ') + ' 필요' };
+      if (score <= 3) return { level: 'medium', text: '보통 - ' + feedback.slice(0,1).join(', ') + ' 추가 권장' };
+      return { level: 'strong', text: '강함 - 안전한 비밀번호입니다!' };
+    }
+    
+    // 비밀번호 입력 시 강도 체크
+    document.getElementById('signup_password').addEventListener('input', (e) => {
+      const password = e.target.value;
+      const helpEl = document.querySelector('#signup_password').parentNode.querySelector('.field-help');
+      
+      if (password.length > 0) {
+        const strength = checkPasswordStrength(password);
+        
+        // 기존 강도 표시 제거
+        const existingStrength = document.querySelector('.password-strength');
+        if (existingStrength) existingStrength.remove();
+        
+        // 새 강도 표시 추가
+        const strengthEl = document.createElement('div');
+        strengthEl.className = `password-strength ${strength.level}`;
+        strengthEl.textContent = strength.text;
+        helpEl.parentNode.appendChild(strengthEl);
+      }
+    });
+    
+    // 비밀번호 확인 체크
+    document.getElementById('signup_password_confirm').addEventListener('input', (e) => {
+      const password = document.getElementById('signup_password').value;
+      const confirm = e.target.value;
+      const helpEl = document.getElementById('password-match-help');
+      
+      if (confirm.length > 0) {
+        if (password === confirm) {
+          helpEl.textContent = '✅ 비밀번호가 일치합니다';
+          helpEl.className = 'field-help success';
+        } else {
+          helpEl.textContent = '❌ 비밀번호가 일치하지 않습니다';
+          helpEl.className = 'field-help error';
+        }
+      } else {
+        helpEl.textContent = '비밀번호를 다시 입력해주세요';
+        helpEl.className = 'field-help';
+      }
+    });
+    
+    // 이메일 유효성 실시간 체크
+    document.getElementById('signup_email').addEventListener('blur', async (e) => {
+      const email = e.target.value.trim();
+      const helpEl = e.target.parentNode.querySelector('.field-help');
+      
+      if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        helpEl.textContent = '✅ 유효한 이메일 형식입니다';
+        helpEl.className = 'field-help success';
+      } else if (email) {
+        helpEl.textContent = '❌ 올바른 이메일 형식이 아닙니다';
+        helpEl.className = 'field-help error';
+      } else {
+        helpEl.textContent = '로그인 및 예약 알림을 받을 이메일';
+        helpEl.className = 'field-help';
+      }
+    });
+    
     renderUser();
   </script>
 </body>
