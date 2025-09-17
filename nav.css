@@ -2,7 +2,7 @@
 .app-nav { 
   position: sticky; 
   top: 0; 
-  z-index: 50; 
+  z-index: 1000; 
   background: rgba(255,255,255,.95); 
   backdrop-filter: saturate(120%) blur(15px); 
   border-bottom: 1px solid rgba(0,0,0,.08); 
