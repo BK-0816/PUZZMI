@@ -10,52 +10,709 @@
   <link rel="stylesheet" href="pages-theme.css"/>
   <script type="module" src="nav.js"></script>
   <style>
-    .status-badge{padding:2px 8px;border-radius:999px;background:#eee;font-size:.85rem}
-    .status-pending{background:#fff3cd}
-    .status-confirmed{background:#d1e7dd}
-    .status-declined{background:#f8d7da}
+    body.bg-cream { 
+      background: var(--bg-cream); 
+      background-repeat: no-repeat; 
+      background-size: cover; 
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+    
+    /* 배경 장식 요소 */
+    .decorative-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    
+    .decorative-element {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(70px);
+      opacity: 0.3;
+      animation: float 10s ease-in-out infinite;
+    }
+    
+    .decorative-element:nth-child(1) {
+      width: 280px;
+      height: 280px;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      top: 10%;
+      left: -8%;
+      animation-delay: 0s;
+    }
+    
+    .decorative-element:nth-child(2) {
+      width: 220px;
+      height: 220px;
+      background: linear-gradient(45deg, #f093fb, #f5576c);
+      top: 55%;
+      right: -5%;
+      animation-delay: 3s;
+    }
+    
+    .decorative-element:nth-child(3) {
+      width: 200px;
+      height: 200px;
+      background: linear-gradient(45deg, #4facfe, #00f2fe);
+      bottom: 15%;
+      left: 15%;
+      animation-delay: 6s;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      33% { transform: translateY(-30px) rotate(120deg); }
+      66% { transform: translateY(20px) rotate(240deg); }
+    }
+    
+    /* 메인 컨테이너 */
+    .dashboard-wrap { 
+      max-width: 1200px; 
+      margin: 40px auto; 
+      padding: 0 20px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    /* 페이지 헤더 */
+    .page-header {
+      background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
+      backdrop-filter: blur(25px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 32px;
+      padding: 50px;
+      margin-bottom: 40px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.04);
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+    }
+    
+    .page-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 20%, #f093fb 40%, #f5576c 60%, #4facfe 80%, #00f2fe 100%);
+      animation: shimmer 4s ease-in-out infinite;
+    }
+    
+    @keyframes shimmer {
+      0%, 100% { opacity: 1; transform: translateX(0); }
+      50% { opacity: 0.8; transform: translateX(10px); }
+    }
+    
+    .page-header h2 {
+      font-size: 3.2rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 20px 0;
+      letter-spacing: -0.03em;
+      position: relative;
+    }
+    
+    .page-header h2::after {
+      content: '';
+      position: absolute;
+      bottom: -16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 5px;
+      background: linear-gradient(90deg, #667eea 0%, #f093fb 50%, #4facfe 100%);
+      border-radius: 3px;
+    }
+    
+    .page-subtitle {
+      font-size: 1.3rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      max-width: 600px;
+      margin: 0 auto;
+      font-weight: 500;
+    }
+    
+    /* 통계 카드 */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+    
+    .stat-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+    
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      opacity: 0.8;
+    }
+    
+    .stat-card:nth-child(1)::before {
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .stat-card:nth-child(2)::before {
+      background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    .stat-card:nth-child(3)::before {
+      background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.1), 0 8px 24px rgba(0,0,0,0.06);
+      border-color: rgba(102, 126, 234, 0.3);
+    }
+    
+    .stat-card:hover::before {
+      opacity: 1;
+      height: 5px;
+    }
+    
+    .stat-icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+      opacity: 0.8;
+    }
+    
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+    
+    .stat-label {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    /* 예약 목록 섹션 */
+    .bookings-section {
+      background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 28px;
+      padding: 40px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.04);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    .bookings-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 33%, #f093fb 66%, #f5576c 100%);
+      opacity: 0.8;
+    }
+    
+    .bookings-section:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 32px 80px rgba(0,0,0,0.1), 0 12px 32px rgba(0,0,0,0.06);
+      border-color: rgba(102, 126, 234, 0.3);
+    }
+    
+    .bookings-section:hover::before {
+      opacity: 1;
+      height: 5px;
+    }
+    
+    .section-title {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 32px 0;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .section-title::before {
+      content: '';
+      width: 6px;
+      height: 40px;
+      background: linear-gradient(135deg, #667eea 0%, #f093fb 100%);
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+    
+    /* 예약 카드 */
+    .booking-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 20px;
+      padding: 28px;
+      margin-bottom: 20px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .booking-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 40%, #f093fb 80%, #f5576c 100%);
+      opacity: 0.6;
+    }
+    
+    .booking-card:hover {
+      transform: translateY(-6px) scale(1.01);
+      box-shadow: 0 20px 48px rgba(0,0,0,0.12), 0 8px 20px rgba(0,0,0,0.08);
+      border-color: rgba(102, 126, 234, 0.3);
+    }
+    
+    .booking-card:hover::before {
+      opacity: 1;
+      height: 4px;
+    }
+    
+    .booking-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    
+    .booking-info h3 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin: 0 0 12px 0;
+      letter-spacing: -0.01em;
+    }
+    
+    .booking-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--text-secondary);
+      font-size: 1rem;
+      font-weight: 500;
+    }
+    
+    .meta-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 50%;
+      font-size: 0.8rem;
+      flex-shrink: 0;
+    }
+    
+    /* 상태 배지 */
+    .status-badge {
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border: 2px solid transparent;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .status-pending {
+      background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+      color: #856404;
+      border-color: rgba(255, 193, 7, 0.3);
+    }
+    
+    .status-confirmed {
+      background: linear-gradient(135deg, #d1e7dd 0%, #a3e4d7 100%);
+      color: #0f5132;
+      border-color: rgba(25, 135, 84, 0.3);
+    }
+    
+    .status-completed {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    
+    .status-declined {
+      background: linear-gradient(135deg, #f8d7da 0%, #f1948a 100%);
+      color: #721c24;
+      border-color: rgba(220, 53, 69, 0.3);
+    }
+    
+    .status-canceled_by_mate {
+      background: linear-gradient(135deg, #e2e3e5 0%, #ced4da 100%);
+      color: #495057;
+      border-color: rgba(108, 117, 125, 0.3);
+    }
+    
+    /* 액션 버튼 */
+    .booking-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .btn {
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s ease;
+    }
+    
+    .btn:hover::before {
+      left: 100%;
+    }
+    
+    .btn-confirm {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 6px 16px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-confirm:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-decline {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      box-shadow: 0 6px 16px rgba(240, 147, 251, 0.3);
+    }
+    
+    .btn-decline:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 8px 20px rgba(240, 147, 251, 0.4);
+    }
+    
+    .btn-cancel {
+      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+      color: var(--text-primary);
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    
+    .btn-cancel:hover {
+      background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 100%);
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+      border-color: rgba(102, 126, 234, 0.4);
+    }
+    
+    /* 빈 상태 */
+    .empty-state {
+      text-align: center;
+      padding: 60px 40px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
+      backdrop-filter: blur(15px);
+      border: 2px dashed rgba(102, 126, 234, 0.2);
+      border-radius: 20px;
+      color: var(--text-secondary);
+    }
+    
+    .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+      opacity: 0.6;
+    }
+    
+    .empty-text {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    
+    .empty-subtext {
+      font-size: 1rem;
+      opacity: 0.8;
+    }
+    
+    /* 로딩 상태 */
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* 반응형 디자인 */
+    @media (max-width: 1024px) {
+      .dashboard-wrap {
+        padding: 0 16px;
+        margin: 24px auto;
+      }
+      
+      .page-header {
+        padding: 32px;
+        border-radius: 24px;
+      }
+      
+      .page-header h2 {
+        font-size: 2.5rem;
+      }
+      
+      .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
+      }
+      
+      .bookings-section {
+        padding: 28px;
+        border-radius: 20px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .page-header h2 {
+        font-size: 2rem;
+      }
+      
+      .booking-header {
+        flex-direction: column;
+        gap: 12px;
+      }
+      
+      .booking-actions {
+        flex-direction: column;
+      }
+      
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body class="bg-cream">
+  <!-- 배경 장식 요소 -->
+  <div class="decorative-bg">
+    <div class="decorative-element"></div>
+    <div class="decorative-element"></div>
+    <div class="decorative-element"></div>
+  </div>
+
   <div id="app-nav"></div>
-  <main class="page stack-16">
-    <section class="card">
-      <h2>예약 신청 알림</h2>
-      <div id="list" class="stack-16"></div>
+  
+  <main class="dashboard-wrap">
+    <!-- 페이지 헤더 -->
+    <section class="page-header">
+      <h2>메이트 대시보드</h2>
+      <p class="page-subtitle">예약 신청을 관리하고 고객과 소통하세요</p>
+    </section>
+
+    <!-- 통계 카드 -->
+    <section class="stats-grid" id="statsGrid">
+      <div class="stat-card">
+        <div class="stat-icon">📋</div>
+        <div class="stat-number" id="totalBookings">0</div>
+        <div class="stat-label">총 예약</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-number" id="pendingBookings">0</div>
+        <div class="stat-label">대기중</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-number" id="confirmedBookings">0</div>
+        <div class="stat-label">확정됨</div>
+      </div>
+    </section>
+
+    <!-- 예약 목록 섹션 -->
+    <section class="bookings-section">
+      <h3 class="section-title">📋 예약 신청 관리</h3>
+      <div id="list"></div>
     </section>
   </main>
 
 <script type="module">
 import { supabase } from './nav.js';
 
-const s = (v, fb = '') => (typeof v === 'string' ? v : (v == null ? fb : String(v)));
-
+const list = document.getElementById('list');
+const totalBookingsEl = document.getElementById('totalBookings');
+const pendingBookingsEl = document.getElementById('pendingBookings');
+const confirmedBookingsEl = document.getElementById('confirmedBookings');
 
 function rowHtml(r){
   const dt = `${r.date} ${r.start_time} (${r.duration_hours}h)`;
   const canAct = (r.status === 'pending');
+  const statusClass = `status-${r.status}`;
+  const statusText = r.status === 'pending' ? '⏳ 대기중' :
+                    r.status === 'confirmed' ? '✅ 확정됨' :
+                    r.status === 'completed' ? '🎉 완료됨' :
+                    r.status === 'declined' ? '❌ 거절됨' :
+                    r.status === 'canceled_by_mate' ? '🚫 취소됨' : r.status;
+
   return `
-    <div class="card" data-id="${r.id}">
-      <div class="flex justify-between align-center">
-        <div>
-          <div style="font-weight:800">${dt}</div>
-          <div class="muted">${r.customer_name} • ${r.customer_contact} • 상태: ${r.status}</div>
-          <div class="muted">요청: ${(r.notes||'').replace(/</g,'&lt;')}</div>
+    <div class="booking-card" data-id="${r.id}">
+      <div class="booking-header">
+        <div class="booking-info">
+          <h3>${dt}</h3>
+          <div class="booking-meta">
+            <div class="meta-item">
+              <div class="meta-icon">👤</div>
+              <span>${r.customer_name}</span>
+            </div>
+            <div class="meta-item">
+              <div class="meta-icon">📞</div>
+              <span>${r.customer_contact}</span>
+            </div>
+            ${r.notes ? `
+            <div class="meta-item">
+              <div class="meta-icon">💬</div>
+              <span>${(r.notes||'').replace(/</g,'<')}</span>
+            </div>
+            ` : ''}
+          </div>
         </div>
-        <div class="flex gap-8">
-          ${canAct ? `<button class="btn btn-secondary" data-act="confirm">확정</button>` : ''}
-          ${canAct ? `<button class="btn btn-secondary" data-act="decline">거절</button>` : ''}
-          <!-- 확정 후에도 취소 가능 -->
-          ${r.status === 'confirmed' ? `<button class="btn btn-secondary" data-act="cancel">취소</button>` : ''}
+        <div class="booking-status">
+          <div class="status-badge ${statusClass}">${statusText}</div>
         </div>
       </div>
+      ${canAct || r.status === 'confirmed' ? `
+        <div class="booking-actions">
+          ${canAct ? `
+            <button class="btn btn-confirm" data-act="confirm">
+              <span>✅</span> 확정하기
+            </button>
+            <button class="btn btn-decline" data-act="decline">
+              <span>❌</span> 거절하기
+            </button>
+          ` : ''}
+          ${r.status === 'confirmed' ? `
+            <button class="btn btn-cancel" data-act="cancel">
+              <span>🚫</span> 취소하기
+            </button>
+          ` : ''}
+        </div>
+      ` : ''}
     </div>`;
+}
+
+function updateStats(data) {
+  const total = data.length;
+  const pending = data.filter(r => r.status === 'pending').length;
+  const confirmed = data.filter(r => r.status === 'confirmed').length;
+  
+  totalBookingsEl.textContent = total;
+  pendingBookingsEl.textContent = pending;
+  confirmedBookingsEl.textContent = confirmed;
 }
 
 async function load(){
   const { data:{ user } } = await supabase.auth.getUser();
-  const list = document.getElementById('list');
-  if(!user){ list.innerHTML='<div class="note">로그인 필요</div>'; return; }
+  if(!user){ 
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🔐</div>
+        <div class="empty-text">로그인이 필요합니다</div>
+        <div class="empty-subtext">메이트 대시보드를 이용하려면 로그인해주세요</div>
+      </div>
+    `; 
+    return; 
+  }
+
+  list.innerHTML = `
+    <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+      <div class="loading" style="margin: 0 auto 16px;"></div>
+      예약을 불러오는 중...
+    </div>
+  `;
 
   const { data, error } = await supabase
     .from('bookings')
@@ -63,9 +720,31 @@ async function load(){
     .eq('mate_id', user.id)
     .order('created_at', { ascending:false });
 
-  if(error){ console.error(error); list.innerHTML='<div class="error">'+error.message+'</div>'; return; }
-  if(!data?.length){ list.innerHTML='<div class="muted">예약 신청이 없습니다.</div>'; return; }
+  if(error){ 
+    console.error(error); 
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">❌</div>
+        <div class="empty-text">불러오기 실패</div>
+        <div class="empty-subtext">${error.message}</div>
+      </div>
+    `; 
+    return; 
+  }
+  
+  if(!data?.length){ 
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📋</div>
+        <div class="empty-text">예약 신청이 없습니다</div>
+        <div class="empty-subtext">새로운 예약이 들어오면 여기에 표시됩니다</div>
+      </div>
+    `; 
+    updateStats([]);
+    return; 
+  }
 
+  updateStats(data);
   list.innerHTML = data.map(rowHtml).join('');
 
   // 버튼 핸들러 (이벤트 위임)
@@ -75,48 +754,99 @@ async function load(){
       const id   = Number(card.dataset.id);
       const act  = btn.dataset.act;
 
-      // 1) 현재 예약 정보 조회 (고객 user_id 필요)
-      const { data: rows, error: readErr } = await supabase
-        .from('bookings')
-        .select('id, mate_id, customer_id, customer_name, date, start_time, duration_hours, status')
-        .eq('id', id).limit(1);
-      if (readErr || !rows?.length) { return alert('조회 실패: '+(readErr?.message||'not found')); }
-      const bk = rows[0];
+      // 버튼 로딩 상태
+      const originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<div class="loading"></div> 처리 중...';
 
-      // 2) 상태/사유 입력 및 업데이트
-      let newStatus = bk.status;
-      let reason = '';
+      try {
+        // 1) 현재 예약 정보 조회 (고객 user_id 필요)
+        const { data: rows, error: readErr } = await supabase
+          .from('bookings')
+          .select('id, mate_id, customer_id, customer_name, date, start_time, duration_hours, status')
+          .eq('id', id).limit(1);
+        if (readErr || !rows?.length) { 
+          throw new Error('조회 실패: '+(readErr?.message||'not found')); 
+        }
+        const bk = rows[0];
 
-      if (act === 'confirm') {
-        newStatus = 'confirmed';
-      } else if (act === 'decline') {
-        newStatus = 'declined';
-        reason = prompt('거절 사유를 입력하세요 (고객에게 전달됩니다):') || '';
-      } else if (act === 'cancel') {
-        newStatus = 'canceled_by_mate';
-        reason = prompt('취소 사유를 입력하세요 (고객에게 전달됩니다):') || '';
+        // 2) 상태/사유 입력 및 업데이트
+        let newStatus = bk.status;
+        let reason = '';
+
+        if (act === 'confirm') {
+          newStatus = 'confirmed';
+        } else if (act === 'decline') {
+          newStatus = 'declined';
+          reason = prompt('거절 사유를 입력하세요 (고객에게 전달됩니다):') || '';
+          if (!reason.trim()) {
+            throw new Error('거절 사유를 입력해주세요.');
+          }
+        } else if (act === 'cancel') {
+          newStatus = 'canceled_by_mate';
+          reason = prompt('취소 사유를 입력하세요 (고객에게 전달됩니다):') || '';
+          if (!reason.trim()) {
+            throw new Error('취소 사유를 입력해주세요.');
+          }
+        }
+
+        const patch = { status: newStatus };
+        if (act === 'decline') patch.decline_reason = reason;
+        if (act === 'cancel')  patch.cancel_reason  = reason;
+
+        const { error: updErr } = await supabase.from('bookings').update(patch).eq('id', id);
+        if (updErr) throw updErr;
+
+        // 3) 알림 생성 (수신자=고객, 발신자=메이트)
+        const title = act === 'confirm'
+          ? '예약이 확정되었습니다'
+          : act === 'decline'
+            ? '예약이 거절되었습니다'
+            : '예약이 취소되었습니다';
+        const when = `${bk.date} ${bk.start_time} (${bk.duration_hours}h)`;
+        const body = act === 'confirm'
+          ? `메이트가 예약을 확정했습니다.\n일정: ${when}`
+          : `사유: ${reason || '사유 미기재'}\n일정: ${when}`;
+
+        // 알림 생성 (선택사항 - 실패해도 메인 로직에 영향 없음)
+        try {
+          await supabase.from('notifications').insert({
+            user_id: bk.customer_id,
+            title,
+            body,
+            type: `booking_${act}ed`,
+            link: 'my_bookings.html'
+          });
+        } catch (notifErr) {
+          console.warn('알림 생성 실패:', notifErr);
+        }
+
+        // 4) 성공 메시지 표시
+        const successMsg = act === 'confirm' ? '예약이 확정되었습니다! ✅' :
+                          act === 'decline' ? '예약이 거절되었습니다 ❌' :
+                          '예약이 취소되었습니다 🚫';
+        
+        // 토스트 메시지 표시
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+          position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white; padding: 12px 24px; border-radius: 12px;
+          z-index: 9999; font-weight: 600; box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+        `;
+        toast.textContent = successMsg;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+
+        // 5) 화면 갱신
+        await load();
+
+      } catch (error) {
+        console.error(error);
+        alert(error.message || '처리 중 오류가 발생했습니다.');
+        btn.disabled = false;
+        btn.innerHTML = originalText;
       }
-
-      const patch = { status: newStatus };
-      if (act === 'decline') patch.decline_reason = reason;
-      if (act === 'cancel')  patch.cancel_reason  = reason;
-
-      const { error: updErr } = await supabase.from('bookings').update(patch).eq('id', id);
-      if (updErr) return alert('업데이트 실패: ' + updErr.message);
-
-      // 3) 알림 생성 (수신자=고객, 발신자=메이트)
-      const title = act === 'confirm'
-        ? '예약이 확정되었습니다'
-        : act === 'decline'
-          ? '예약이 거절되었습니다'
-          : '예약이 취소되었습니다';
-      const when = `${bk.date} ${bk.start_time} (${bk.duration_hours}h)`;
-      const body = act === 'confirm'
-        ? `메이트가 예약을 확정했습니다.\n일정: ${when}`
-        : `사유: ${reason || '사유 미기재'}\n일정: ${when}`;
-
-      // 4) 화면 갱신
-      await load();
     };
   });
 }
@@ -128,7 +858,6 @@ const ch = supabase.channel('bookings:mate')
 
 load();
 </script>
-
 
 </body>
 </html>
