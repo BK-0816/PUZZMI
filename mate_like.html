@@ -989,7 +989,7 @@
       reviewsList.innerHTML = rows.map(r => `
         <div class="item card">
           <div class="meta">
-            <span class="author-name">${r.author_name ? maskEmail(r.author_name) : '익명'}</span>
+            <span class="author-name">${maskEmail(r.author_name || '익명')}</span>
             <span>·</span>
             <span>${new Date(r.created_at).toLocaleString('ko-KR')}</span>
             ${r.rating ? `<span>·</span><span class="rating-stars">${star(r.rating)}</span>` : ''}
