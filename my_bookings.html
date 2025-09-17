@@ -522,7 +522,15 @@
           author_id: user?.id || null
         });
 
-        result.textContent = error ? ('등록 실패: '+error.message) : '등록되었습니다.';
+        if (error) {
+          if (error.message && error.message.includes('duplicate')) {
+            result.textContent = '이미 이 예약에 대한 리뷰를 작성하셨습니다.';
+          } else {
+            result.textContent = '등록 실패: ' + error.message;
+          }
+        } else {
+          result.textContent = '등록되었습니다.';
+        }
         if (!error) load();
       }
     });

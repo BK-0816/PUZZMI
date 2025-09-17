@@ -1031,13 +1031,13 @@
       const { data:{ user } } = await supabase.auth.getUser();
       if (!user) return; // 미로그인
 
-      // 내 예약 중 confirmed 또는 completed
+      // 내 예약 중 completed만 (완료된 예약에만 리뷰 작성 가능)
       const { data: bks } = await supabase
         .from('bookings')
         .select('id')
         .eq('customer_id', user.id)
         .eq('mate_id', mateId)
-        .in('status', ['confirmed', 'completed']);
+        .eq('status', 'completed');
 
       if (!bks?.length) return;
 
@@ -1097,7 +1097,11 @@
       });
 
       if (error) {
-        reviewResult.innerHTML = `<div class="error">등록 실패: ${error.message}</div>`;
+        if (error.message && error.message.includes('duplicate')) {
+          reviewResult.innerHTML = `<div class="error">이미 이 예약에 대한 리뷰를 작성하셨습니다.</div>`;
+        } else {
+          reviewResult.innerHTML = `<div class="error">등록 실패: ${error.message}</div>`;
+        }
       } else {
         reviewResult.innerHTML = `<div class="success">등록되었습니다.</div>`;
         reviewText.value = '';
@@ -1154,7 +1158,11 @@
         });
 
         if (error) {
-          reviewResult.innerHTML = `<div class="error">등록 실패: ${error.message}</div>`;
+          if (error.message && error.message.includes('duplicate')) {
+            reviewResult.innerHTML = `<div class="error">이미 이 예약에 대한 리뷰를 작성하셨습니다.</div>`;
+          } else {
+            reviewResult.innerHTML = `<div class="error">등록 실패: ${error.message}</div>`;
+          }
         } else {
           reviewResult.innerHTML = `<div class="success">등록되었습니다.</div>`;
           reviewText.value = '';
