@@ -111,44 +111,139 @@
     /* 메타 정보 그리드 개선 */
     .meta-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 24px;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
       margin-top: 32px;
     }
     
     .meta-card {
-      background: rgba(255,255,255,0.7);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255,255,255,0.2);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.3);
       border-radius: 20px;
-      padding: 16px;
+      padding: 20px 16px;
       transition: all 0.2s ease;
       position: relative;
       overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+    }
+    
+    /* 각 카드별 다채로운 색상 */
+    .meta-card:nth-child(1) {
+      background: linear-gradient(135deg, rgba(255, 182, 193, 0.8) 0%, rgba(255, 218, 185, 0.6) 100%);
+    }
+    
+    .meta-card:nth-child(2) {
+      background: linear-gradient(135deg, rgba(173, 216, 230, 0.8) 0%, rgba(176, 196, 222, 0.6) 100%);
+    }
+    
+    .meta-card:nth-child(3) {
+      background: linear-gradient(135deg, rgba(221, 160, 221, 0.8) 0%, rgba(238, 130, 238, 0.6) 100%);
+    }
+    
+    .meta-card:nth-child(4) {
+      background: linear-gradient(135deg, rgba(152, 251, 152, 0.8) 0%, rgba(144, 238, 144, 0.6) 100%);
+    }
+    
+    .meta-card:nth-child(5) {
+      background: linear-gradient(135deg, rgba(255, 218, 185, 0.8) 0%, rgba(255, 228, 196, 0.6) 100%);
+    }
+    
+    .meta-card:nth-child(6) {
+      background: linear-gradient(135deg, rgba(255, 192, 203, 0.8) 0%, rgba(255, 182, 193, 0.6) 100%);
+    }
+    
+    .meta-card:nth-child(7) {
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.8) 0%, rgba(255, 228, 181, 0.6) 100%);
+    }
+    
+    /* 카드별 아이콘 추가 */
+    .meta-card::before {
+      content: '';
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 24px;
+      height: 24px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      opacity: 0.6;
+    }
+    
+    .meta-card:nth-child(1)::before {
+      content: '💬';
+      font-size: 20px;
+      width: auto;
+      height: auto;
+    }
+    
+    .meta-card:nth-child(2)::before {
+      content: '👤';
+      font-size: 20px;
+      width: auto;
+      height: auto;
+    }
+    
+    .meta-card:nth-child(3)::before {
+      content: '🌍';
+      font-size: 20px;
+      width: auto;
+      height: auto;
+    }
+    
+    .meta-card:nth-child(4)::before {
+      content: '💰';
+      font-size: 20px;
+      width: auto;
+      height: auto;
+    }
+    
+    .meta-card:nth-child(5)::before {
+      content: '🏷️';
+      font-size: 20px;
+      width: auto;
+      height: auto;
+    }
+    
+    .meta-card:nth-child(6)::before {
+      content: '📍';
+      font-size: 20px;
+      width: auto;
+      height: auto;
+    }
+    
+    .meta-card:nth-child(7)::before {
+      content: '⭐';
+      font-size: 20px;
+      width: auto;
+      height: auto;
     }
     
     .meta-card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-      background: rgba(255,255,255,0.85);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.15);
+      transform: translateY(-4px) scale(1.02);
     }
     
     .meta-card strong {
       display: block;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 700;
       color: var(--text-secondary);
-      margin-bottom: 6px;
+      margin-bottom: 8px;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 1.2px;
     }
     
     .meta-card .value {
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       line-height: 1.5;
       color: var(--text-primary);
-      font-weight: 400;
+      font-weight: 500;
     }
     
     /* 액션 버튼 개선 */
