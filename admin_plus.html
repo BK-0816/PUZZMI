@@ -1,46 +1,2195 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PUZZMI 관리자 대시보드</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="pages.css"/>
+  <link rel="stylesheet" href="pages-theme.css"/>
+  <link rel="stylesheet" href="nav.css"/>
+  <script type="module" src="nav.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <style>
+    body.bg-cream { 
+      background: var(--bg-cream); 
+      background-repeat: no-repeat; 
+      background-size: cover; 
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+    
+    /* 배경 장식 요소 */
+    .decorative-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    
+    .decorative-element {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.2;
+      animation: float 15s ease-in-out infinite;
+    }
+    
+    .decorative-element:nth-child(1) {
+      width: 300px;
+      height: 300px;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      top: 5%;
+      left: -8%;
+      animation-delay: 0s;
+    }
+    
+    .decorative-element:nth-child(2) {
+      width: 250px;
+      height: 250px;
+      background: linear-gradient(45deg, #f093fb, #f5576c);
+      top: 40%;
+      right: -10%;
+      animation-delay: 5s;
+    }
+    
+    .decorative-element:nth-child(3) {
+      width: 200px;
+      height: 200px;
+      background: linear-gradient(45deg, #4facfe, #00f2fe);
+      bottom: 10%;
+      left: 15%;
+      animation-delay: 10s;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+      25% { transform: translateY(-30px) rotate(90deg) scale(1.1); }
+      50% { transform: translateY(-15px) rotate(180deg) scale(0.9); }
+      75% { transform: translateY(-25px) rotate(270deg) scale(1.05); }
+    }
+    
+    /* 메인 컨테이너 */
+    .admin-wrap { 
+      max-width: 1400px; 
+      margin: 32px auto; 
+      padding: 0 20px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    /* 페이지 헤더 */
+    .page-header {
+      background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
+      backdrop-filter: blur(25px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 32px;
+      padding: 50px;
+      margin-bottom: 40px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.04);
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+    }
+    
+    .page-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 20%, #f093fb 40%, #f5576c 60%, #4facfe 80%, #00f2fe 100%);
+      animation: shimmer 4s ease-in-out infinite;
+    }
+    
+    @keyframes shimmer {
+      0%, 100% { opacity: 1; transform: translateX(0); }
+      50% { opacity: 0.8; transform: translateX(10px); }
+    }
+    
+    .page-header h2 {
+      font-size: 3.2rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 20px 0;
+      letter-spacing: -0.03em;
+      position: relative;
+    }
+    
+    .page-header h2::after {
+      content: '';
+      position: absolute;
+      bottom: -16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 5px;
+      background: linear-gradient(90deg, #667eea 0%, #f093fb 50%, #4facfe 100%);
+      border-radius: 3px;
+    }
+    
+    .page-subtitle {
+      font-size: 1.3rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      max-width: 600px;
+      margin: 0 auto;
+      font-weight: 500;
+    }
+    
+    /* 대시보드 그리드 */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+    
+    /* 통계 카드 */
+    .stat-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+    
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      opacity: 0.8;
+    }
+    
+    .stat-card:nth-child(1)::before {
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .stat-card:nth-child(2)::before {
+      background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    .stat-card:nth-child(3)::before {
+      background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+    }
+    
+    .stat-card:nth-child(4)::before {
+      background: linear-gradient(90deg, #ffd700 0%, #ffb347 100%);
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.12), 0 8px 24px rgba(0,0,0,0.08);
+      border-color: rgba(102, 126, 234, 0.3);
+    }
+    
+    .stat-card:hover::before {
+      opacity: 1;
+      height: 5px;
+    }
+    
+    .stat-icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+      opacity: 0.8;
+    }
+    
+    .stat-card:nth-child(1) .stat-icon { color: #667eea; }
+    .stat-card:nth-child(2) .stat-icon { color: #f093fb; }
+    .stat-card:nth-child(3) .stat-icon { color: #4facfe; }
+    .stat-card:nth-child(4) .stat-icon { color: #ffd700; }
+    
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .stat-label {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    /* 섹션 카드 */
+    .section-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 28px;
+      padding: 40px;
+      margin-bottom: 32px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.04);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s ease;
+    }
+    
+    .section-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 33%, #f093fb 66%, #f5576c 100%);
+      opacity: 0.8;
+    }
+    
+    .section-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 32px 80px rgba(0,0,0,0.12), 0 12px 32px rgba(0,0,0,0.08);
+      border-color: rgba(102, 126, 234, 0.3);
+    }
+    
+    .section-card:hover::before {
+      opacity: 1;
+      height: 5px;
+    }
+    
+    /* 섹션 제목 */
+    .section-title {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 24px 0;
+      letter-spacing: -0.02em;
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .section-title::before {
+      content: '';
+      width: 6px;
+      height: 40px;
+      background: linear-gradient(135deg, #667eea 0%, #f093fb 100%);
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+    
+    /* 툴바 */
+    .toolbar {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.05) 100%);
+      border: 2px solid rgba(102, 126, 234, 0.15);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 24px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.1);
+    }
+    
+    .toolbar-row {
+      display: grid;
+      grid-template-columns: 2fr 2fr 1fr;
+      gap: 20px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .search-group {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    
+    .search-input {
+      width: 100%;
+      padding: 14px 50px 14px 20px;
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
+      font-size: 1rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(8px);
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.04);
+    }
+    
+    .search-input:focus {
+      outline: none;
+      border-color: rgba(102, 126, 234, 0.5);
+      background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.95) 100%);
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1), inset 0 2px 12px rgba(0,0,0,0.06);
+      transform: translateY(-1px);
+    }
+    
+    .search-clear {
+      position: absolute;
+      right: 12px;
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 50%;
+      transition: all 0.2s ease;
+      font-size: 14px;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .search-clear:hover {
+      background: rgba(102, 126, 234, 0.1);
+      color: #667eea;
+    }
+    
+    .filter-group {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .filter-select {
+      padding: 12px 16px;
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(8px);
+      cursor: pointer;
+      min-width: 140px;
+    }
+    
+    .filter-select:focus {
+      outline: none;
+      border-color: rgba(102, 126, 234, 0.5);
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .action-group {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: flex-end;
+    }
+    
+    .refresh-btn {
+      width: 44px;
+      height: 44px;
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(8px);
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .refresh-btn:hover {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      transform: rotate(180deg) scale(1.1);
+      box-shadow: 0 6px 16px rgba(102, 126, 234, 0.3);
+    }
+    
+    .result-count {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.05) 100%);
+      color: #667eea;
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      border: 1px solid rgba(102, 126, 234, 0.2);
+      white-space: nowrap;
+    }
+    
+    /* 퀵 필터 */
+    .quick-filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .quick-filter {
+      padding: 8px 16px;
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.85rem;
+      font-weight: 600;
+      backdrop-filter: blur(8px);
+    }
+    
+    .quick-filter:hover {
+      border-color: rgba(102, 126, 234, 0.4);
+      background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 100%);
+      transform: translateY(-1px);
+    }
+    
+    .quick-filter.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    
+    /* 테이블 */
+    .table-container {
+      background: rgba(255,255,255,0.9);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+      border: 1px solid rgba(255,255,255,0.6);
+    }
+    
+    .table { 
+      width: 100%; 
+      border-collapse: collapse; 
+      background: transparent;
+    }
+    
+    .table th {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.05) 100%);
+      color: var(--text-primary);
+      padding: 16px 12px;
+      font-weight: 800;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+      text-align: center;
+    }
+    
+    .table td {
+      padding: 14px 12px;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      font-size: 0.9rem;
+      font-weight: 500;
+      vertical-align: middle;
+      text-align: center;
+    }
+    
+    .table tr:hover {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.03) 0%, rgba(240, 147, 251, 0.02) 100%);
+    }
+    
+    /* 상태 배지 */
+    .status-badge {
+      padding: 6px 12px;
+      border-radius: 16px;
+      font-weight: 700;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border: 2px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      min-width: 80px;
+      justify-content: center;
+    }
+    
+    .status-pending {
+      background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+      color: #856404;
+      border-color: rgba(255, 193, 7, 0.3);
+    }
+    
+    .status-confirmed {
+      background: linear-gradient(135deg, #d1e7dd 0%, #a3e4d7 100%);
+      color: #0f5132;
+      border-color: rgba(25, 135, 84, 0.3);
+    }
+    
+    .status-completed {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    }
+    
+    .status-declined {
+      background: linear-gradient(135deg, #f8d7da 0%, #f1948a 100%);
+      color: #721c24;
+      border-color: rgba(220, 53, 69, 0.3);
+    }
+    
+    .status-cancelled {
+      background: linear-gradient(135deg, #e2e3e5 0%, #ced4da 100%);
+      color: #495057;
+      border-color: rgba(108, 117, 125, 0.3);
+    }
+    
+    /* 충돌 표시 */
+    .conflict {
+      color: #ef4444;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .ok {
+      color: #16a34a;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    
+    /* 버튼 */
+    .btn {
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      letter-spacing: 0.3px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s ease;
+    }
+    
+    .btn:hover::before {
+      left: 100%;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-secondary {
+      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+      color: var(--text-primary);
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    
+    .btn-secondary:hover {
+      background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 100%);
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+      border-color: rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-danger {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(240, 147, 251, 0.3);
+    }
+    
+    .btn-danger:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 6px 16px rgba(240, 147, 251, 0.4);
+    }
+    
+    .btn-success {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
+    }
+    
+    .btn-success:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 6px 16px rgba(79, 172, 254, 0.4);
+    }
+    
+    /* 입력 필드 */
+    .input {
+      padding: 12px 16px;
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(8px);
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.04);
+    }
+    
+    .input:focus {
+      outline: none;
+      border-color: rgba(102, 126, 234, 0.5);
+      background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.95) 100%);
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1), inset 0 2px 12px rgba(0,0,0,0.06);
+      transform: translateY(-1px);
+    }
+    
+    /* 알림 메시지 */
+    .success {
+      background: linear-gradient(135deg, #d1f2eb 0%, #a3e4d7 100%);
+      color: #0e6b47;
+      padding: 16px 20px;
+      border-radius: 16px;
+      border: 2px solid rgba(25, 135, 84, 0.3);
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(25, 135, 84, 0.2);
+      margin: 16px 0;
+    }
+    
+    .error {
+      background: linear-gradient(135deg, #fadbd8 0%, #f1948a 100%);
+      color: #922b21;
+      padding: 16px 20px;
+      border-radius: 16px;
+      border: 2px solid rgba(220, 53, 69, 0.3);
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(220, 53, 69, 0.2);
+      margin: 16px 0;
+    }
+    
+    .warning {
+      background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+      color: #856404;
+      padding: 16px 20px;
+      border-radius: 16px;
+      border: 2px solid rgba(255, 193, 7, 0.3);
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(255, 193, 7, 0.2);
+      margin: 16px 0;
+    }
+    
+    /* 설정 폼 */
+    .settings-form {
+      display: grid;
+      gap: 24px;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      align-items: end;
+    }
+    
+    .form-row.single {
+      grid-template-columns: 1fr;
+    }
+    
+    .form-field {
+      position: relative;
+    }
+    
+    .form-label {
+      display: block;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    /* 액션 버튼 그룹 */
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+    
+    /* 시스템 상태 */
+    .system-status {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .status-item {
+      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+      border: 2px solid rgba(255,255,255,0.4);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    }
+    
+    .status-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+      border-color: rgba(102, 126, 234, 0.3);
+    }
+    
+    .status-icon {
+      font-size: 2rem;
+      margin-bottom: 12px;
+    }
+    
+    .status-online .status-icon { color: #28a745; }
+    .status-warning .status-icon { color: #ffc107; }
+    .status-error .status-icon { color: #dc3545; }
+    
+    .status-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .status-value {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    
+    /* 로그 뷰어 */
+    .log-viewer {
+      background: #1a1a1a;
+      color: #00ff00;
+      font-family: 'Courier New', monospace;
+      padding: 20px;
+      border-radius: 12px;
+      max-height: 300px;
+      overflow-y: auto;
+      font-size: 0.85rem;
+      line-height: 1.4;
+      border: 2px solid rgba(102, 126, 234, 0.2);
+    }
+    
+    .log-viewer::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .log-viewer::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+    }
+    
+    .log-viewer::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 4px;
+    }
+    
+    .log-entry {
+      margin-bottom: 4px;
+      padding: 2px 0;
+    }
+    
+    .log-timestamp {
+      color: #888;
+    }
+    
+    .log-level-info { color: #00ff00; }
+    .log-level-warn { color: #ffff00; }
+    .log-level-error { color: #ff0000; }
+    
+    /* 반응형 디자인 */
+    @media (max-width: 1024px) {
+      .admin-wrap {
+        padding: 0 16px;
+        margin: 24px auto;
+      }
+      
+      .page-header {
+        padding: 32px;
+        border-radius: 24px;
+      }
+      
+      .page-header h2 {
+        font-size: 2.5rem;
+      }
+      
+      .dashboard-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+      }
+      
+      .section-card {
+        padding: 28px;
+        border-radius: 20px;
+      }
+      
+      .toolbar-row {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      
+      .filter-group {
+        flex-direction: column;
+        gap: 12px;
+      }
+      
+      .action-group {
+        justify-content: center;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .page-header h2 {
+        font-size: 2rem;
+      }
+      
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .form-row {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      
+      .action-buttons {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .table-container {
+        overflow-x: auto;
+      }
+      
+      .system-status {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    /* 로딩 애니메이션 */
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* 토스트 메시지 */
+    .toast {
+      position: fixed;
+      left: 50%;
+      top: 20px;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 12px;
+      z-index: 9999;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+      animation: slideDown 0.3s ease;
+    }
+    
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+    }
+    
+    /* 차트 컨테이너 */
+    .chart-container {
+      background: rgba(255,255,255,0.8);
+      border-radius: 16px;
+      padding: 24px;
+      margin: 20px 0;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+      border: 1px solid rgba(255,255,255,0.6);
+    }
+    
+    /* 메이트 관리 카드 */
+    .mate-management-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 16px;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+    
+    .mate-management-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+      border-color: rgba(102, 126, 234, 0.4);
+    }
+    
+    .mate-header {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    
+    .mate-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 12px;
+      object-fit: cover;
+      border: 2px solid rgba(255,255,255,0.6);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .mate-info h4 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin: 0 0 4px 0;
+      color: var(--text-primary);
+    }
+    
+    .mate-meta {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    
+    .mate-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body class="bg-cream">
+  <!-- 배경 장식 요소 -->
+  <div class="decorative-bg">
+    <div class="decorative-element"></div>
+    <div class="decorative-element"></div>
+    <div class="decorative-element"></div>
+  </div>
 
-<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>PUZZMI 관리자</title>
-<link rel="stylesheet" href="styles.css"/><link rel="stylesheet" href="pages.css"/><link rel="stylesheet" href="nav.css"/><link rel="stylesheet" href="pages-theme.css"/>
-<script type="module" src="nav.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-<style>body.bg-cream{background:var(--bg-cream);background-repeat:no-repeat;background-size:cover}table{width:100%;border-collapse:collapse}th,td{padding:10px 12px;border-bottom:1px solid rgba(0,0,0,.06);text-align:left;vertical-align:top}th{font-size:12px;color:var(--text-secondary);font-weight:700;text-transform:uppercase;letter-spacing:.02em}.pill{padding:4px 8px;border-radius:999px;font-size:12px;border:1px solid rgba(0,0,0,.08);background:#fff}.conflict{color:#ef4444;font-weight:700}.ok{color:#16a34a;font-weight:700}.badge-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px}</style>
-</head><body class="bg-cream"><div id="app-nav"></div><main class="page stack-16">
-<section class="card"><h2>예약 관리</h2>
-<div class="stack-16"><div class="label">관리자 로그인(OTP)</div><div class="row"><input id="email" class="input" placeholder="admin@example.com"/><button id="sendOtp" class="btn btn-primary">로그인 메일 보내기</button></div></div></section>
-<section class="card stack-16"><h3>운영 설정</h3><div class="row"><input id="slackWebhook" class="input" placeholder="Slack Webhook URL"/><input id="notifyWebhook" class="input" placeholder="일반 Webhook URL"/><button id="saveSettings" class="btn btn-secondary">저장</button><button id="testSlack" class="btn btn-secondary">Slack 테스트</button><button id="testNotify" class="btn btn-secondary">Webhook 테스트</button></div></section>
-<section class="card"><div class="row" style="justify-content:space-between"><div class="row"><select id="statusFilter" class="select"><option value="pending">pending</option><option value="confirmed">confirmed</option><option value="completed">completed</option><option value="declined">declined</option><option value="cancelled">cancelled</option><option value="all">전체</option></select><input id="search" class="input" placeholder="이름/연락처/메이트 검색"/><button id="checkConflicts" class="btn btn-secondary">충돌 전체 점검</button></div><div class="row"><button id="exportCsv" class="btn btn-secondary">CSV</button><button id="refresh" class="btn btn-secondary">새로고침</button></div></div>
-<div style="overflow:auto"><table><thead><tr><th>ID</th><th>상태</th><th>일시</th><th>고객</th><th>연락처</th><th>언어</th><th>메이트</th><th>요청</th><th>충돌</th><th>조치</th></tr></thead><tbody id="tbody"></tbody></table></div></section>
-</main>
-<script type="module">
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-const supabase = createClient("https://eevvgbbokenpjnvtmztk.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4");
-const email=document.getElementById('email'), sendOtp=document.getElementById('sendOtp');
-sendOtp.addEventListener('click', async()=>{const v=email.value.trim(); if(!v) return alert('이메일 입력'); const {error}=await supabase.auth.signInWithOtp({email:v, options:{emailRedirectTo:location.href}}); if(error) alert(error.message); else alert('메일을 보냈습니다.')});
-let rows=[], mates=new Map();
-async function ensureAdmin(){const {data:{user}}=await supabase.auth.getUser(); if(!user) return false; const {data}=await supabase.from('admin_users').select('user_id').eq('user_id', user.id).maybeSingle(); return !!data;}
-async function loadMates(){const {data}=await supabase.from('mate_profiles').select('user_id, profiles(full_name)'); if(data) mates=new Map(data.map(r=>[r.user_id, r.profiles?.full_name||r.user_id]));}
-function ts(row){const s=new Date(row.date+'T'+row.start_time); const e=new Date(s.getTime()+(row.duration_hours||0)*3600000); return {s,e};}
-function overlap(a,b){const A=ts(a),B=ts(b); return A.s < B.e && B.s < A.e;}
-function conflict(r){const st=['confirmed','completed']; if(!st.includes(r.status)) return false; return rows.some(o=>o.id!==r.id && o.mate_id===r.mate_id && st.includes(o.status) && overlap(r,o));}
-function render(){const q=(document.getElementById('search').value||'').toLowerCase(); const st=document.getElementById('statusFilter').value;
-const filtered=rows.filter(r=>(st==='all'||r.status===st)&&(((r.customer_name||'').toLowerCase().includes(q))||((r.customer_contact||'').toLowerCase().includes(q))||((mates.get(r.mate_id)||'').toLowerCase().includes(q))));
-document.getElementById('tbody').innerHTML=filtered.map(r=>{const mate=mates.get(r.mate_id)||r.mate_id; const dt=`${r.date} ${r.start_time} (${r.duration_hours}h)`; const c=conflict(r);
-return `<tr data-id="${r.id}"><td>${r.id}</td><td><span class="pill">${r.status}</span></td><td>${dt}</td><td>${r.customer_name}</td><td>${r.customer_contact}</td><td>${r.language||'-'}</td><td>${mate}</td><td style="max-width:320px">${(r.notes||'').replace(/</g,'<')}</td><td>${c?'<span class=conflict><span class=badge-dot style=background:#ef4444></span>충돌</span>':'<span class=ok><span class=badge-dot style=background:#16a34a></span>정상</span>'}</td><td>${['confirmed','completed','cancelled'].map(s=>`<button class="btn btn-secondary" data-act="set" data-status="${s}" data-id="${r.id}">${s}</button>`).join('')}</td></tr>`}).join('');
-document.querySelectorAll('button[data-act="set"]').forEach(btn=>btn.onclick=async()=>{const id=btn.dataset.id, status=btn.dataset.status; if(['confirmed','completed'].includes(status)){const r=rows.find(x=>x.id===id); if(await hasConflict(r)){if(!confirm('동시간대 확정 건이 있습니다. 진행할까요?')) return;}} const {error}=await supabase.from('bookings').update({status}).eq('id', id); if(error) alert(error.message); if(status==='confirmed'){notify(rows.find(x=>x.id===id));}});}
-async function load(){const {data}=await supabase.from('bookings').select('*').order('created_at', {ascending:false}).limit(300); rows=data||[]; render();}
-const channel=supabase.channel('bookings:*').on('postgres_changes',{event:'*',schema:'public',table:'bookings'},p=>{const i=rows.findIndex(r=>r.id===p.new.id); if(i>=0) rows[i]=p.new; else rows.unshift(p.new); render();}).subscribe();
-document.getElementById('statusFilter').onchange=render; document.getElementById('search').oninput=render; document.getElementById('refresh').onclick=()=>load();
-async function hasConflict(r){if(!r) return false; const {data}=await supabase.from('bookings').select('*').eq('mate_id', r.mate_id).eq('date', r.date).in('status',['confirmed','completed']); return (data||[]).some(b=>b.id!==r.id && overlap(r,b));}
-function save(key, val){localStorage.setItem(key, val||'');}
-function read(key){return localStorage.getItem(key)||'';}
-document.getElementById('saveSettings').onclick=()=>{save('puzzmi.slackWebhook', document.getElementById('slackWebhook').value.trim()); save('puzzmi.notifyWebhook', document.getElementById('notifyWebhook').value.trim()); alert('저장됨');};
-document.getElementById('testSlack').onclick=async()=>{const u=read('puzzmi.slackWebhook'); if(!u) return alert('Slack URL 없음'); const res=await fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:':white_check_mark: 테스트 OK'})}); alert('응답 '+res.status);};
-document.getElementById('testNotify').onclick=async()=>{const u=read('puzzmi.notifyWebhook'); if(!u) return alert('Webhook URL 없음'); const res=await fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'test',source:'puzzmi-admin',ts:Date.now()})}); alert('응답 '+res.status);};
-function toCsvVal(v){const s=(v==null?'':String(v)).replaceAll('"','""'); return `"${s}"`;}
-document.getElementById('exportCsv').onclick=()=>{const q=(document.getElementById('search').value||'').toLowerCase(); const st=document.getElementById('statusFilter').value; const filtered=rows.filter(r=>(st==='all'||r.status===st)&&(((r.customer_name||'').toLowerCase().includes(q))||((r.customer_contact||'').toLowerCase().includes(q))||((mates.get(r.mate_id)||'').toLowerCase().includes(q)))); const headers=['id','status','date','start_time','duration_hours','customer_name','customer_contact','language','mate_id','notes','created_at']; const lines=[headers.map(toCsvVal).join(',')].concat(filtered.map(r=>headers.map(h=>toCsvVal(r[h])).join(','))); const blob=new Blob([lines.join('\n')],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='bookings_export.csv'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),0);};
-function bookingText(r){const m=mates.get(r.mate_id)||r.mate_id; return ['*PUZZMI 예약 확정*',`• 메이트: ${m}`,`• 일시: ${r.date} ${r.start_time} (${r.duration_hours}h)`,`• 고객: ${r.customer_name}`,`• 연락처: ${r.customer_contact}`, r.language?`• 언어: ${r.language}`:null, r.notes?`• 요청: ${r.notes}`:null, `• 예약ID: ${r.id}`].filter(Boolean).join('\n');}
-async function notify(r){const s=localStorage.getItem('puzzmi.slackWebhook')||''; if(s){fetch(s,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:bookingText(r)})});} const n=localStorage.getItem('puzzmi.notifyWebhook')||''; if(n){fetch(n,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'booking_confirmed',source:'puzzmi-admin',data:r})});}}
-await loadMates(); await load();
-document.getElementById('slackWebhook').value=localStorage.getItem('puzzmi.slackWebhook')||''; document.getElementById('notifyWebhook').value=localStorage.getItem('puzzmi.notifyWebhook')||'';
-</script></body></html>
+  <div id="app-nav"></div>
+  
+  <main class="admin-wrap">
+    <!-- 페이지 헤더 -->
+    <section class="page-header">
+      <h2>🛠️ 관리자 대시보드</h2>
+      <p class="page-subtitle">PUZZMI 서비스의 전체 현황을 모니터링하고 관리하세요</p>
+      <div id="adminGuard" class="error" style="display:none; margin-top: 16px;"></div>
+    </section>
+
+    <!-- 통계 대시보드 -->
+    <section class="dashboard-grid">
+      <div class="stat-card">
+        <div class="stat-icon">📊</div>
+        <div class="stat-number" id="totalBookings">0</div>
+        <div class="stat-label">총 예약</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-number" id="totalMates">0</div>
+        <div class="stat-label">등록 메이트</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-number" id="totalRevenue">¥0</div>
+        <div class="stat-label">총 매출</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⭐</div>
+        <div class="stat-number" id="avgRating">0.0</div>
+        <div class="stat-label">평균 평점</div>
+      </div>
+    </section>
+
+    <!-- 시스템 상태 -->
+    <section class="section-card">
+      <h3 class="section-title">🔧 시스템 상태</h3>
+      <div class="system-status">
+        <div class="status-item status-online">
+          <div class="status-icon">🟢</div>
+          <div class="status-label">데이터베이스</div>
+          <div class="status-value">정상</div>
+        </div>
+        <div class="status-item status-online">
+          <div class="status-icon">🟢</div>
+          <div class="status-label">스토리지</div>
+          <div class="status-value">정상</div>
+        </div>
+        <div class="status-item status-online">
+          <div class="status-icon">🟢</div>
+          <div class="status-label">알림 서비스</div>
+          <div class="status-value">정상</div>
+        </div>
+        <div class="status-item status-online">
+          <div class="status-icon">🟢</div>
+          <div class="status-label">결제 시스템</div>
+          <div class="status-value">정상</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 알림 설정 -->
+    <section class="section-card">
+      <h3 class="section-title">🔔 알림 설정</h3>
+      <form class="settings-form">
+        <div class="form-row">
+          <div class="form-field">
+            <label class="form-label" for="slackWebhook">Slack Webhook URL</label>
+            <input id="slackWebhook" class="input" placeholder="https://hooks.slack.com/services/..." />
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="notifyWebhook">일반 Webhook URL</label>
+            <input id="notifyWebhook" class="input" placeholder="https://your-webhook-url.com/notify" />
+          </div>
+        </div>
+        
+        <div class="action-buttons">
+          <button id="saveSettings" class="btn btn-primary" type="button">
+            <i class="fas fa-save"></i> 설정 저장
+          </button>
+          <button id="testSlack" class="btn btn-secondary" type="button">
+            <i class="fab fa-slack"></i> Slack 테스트
+          </button>
+          <button id="testNotify" class="btn btn-secondary" type="button">
+            <i class="fas fa-bell"></i> Webhook 테스트
+          </button>
+        </div>
+        <div id="settingsResult"></div>
+      </form>
+    </section>
+
+    <!-- 메이트 관리 -->
+    <section class="section-card">
+      <h3 class="section-title">👥 메이트 관리</h3>
+      
+      <div class="toolbar">
+        <div class="toolbar-row">
+          <div class="search-group">
+            <input class="search-input" id="mateSearch" type="text" placeholder="🔍 메이트 이름, 태그로 검색..."/>
+            <button class="search-clear" id="clearMateSearch" title="검색 초기화">✕</button>
+          </div>
+          
+          <div class="filter-group">
+            <select class="filter-select" id="mateVerifiedFilter">
+              <option value="">🔍 검증 상태: 전체</option>
+              <option value="true">✅ 검증됨만</option>
+              <option value="false">⏳ 미검증만</option>
+            </select>
+            
+            <select class="filter-select" id="mateSortBy">
+              <option value="rating_desc">⭐ 평점 높은순</option>
+              <option value="rating_asc">⭐ 평점 낮은순</option>
+              <option value="bookings_desc">📊 예약 많은순</option>
+              <option value="name_asc">📝 이름순</option>
+            </select>
+          </div>
+          
+          <div class="action-group">
+            <button class="refresh-btn" id="refreshMates" title="메이트 새로고침">🔄</button>
+            <span class="result-count" id="mateCount">총 0명</span>
+          </div>
+        </div>
+        
+        <div class="quick-filters">
+          <button class="quick-filter active" data-mate-filter="all">👥 전체</button>
+          <button class="quick-filter" data-mate-filter="verified">✅ 검증됨</button>
+          <button class="quick-filter" data-mate-filter="unverified">⏳ 미검증</button>
+          <button class="quick-filter" data-mate-filter="high-rating">⭐ 고평점</button>
+          <button class="quick-filter" data-mate-filter="new">🆕 신규</button>
+        </div>
+      </div>
+      
+      <div id="matesList"></div>
+    </section>
+
+    <!-- 예약 관리 -->
+    <section class="section-card">
+      <h3 class="section-title">📋 예약 관리</h3>
+      
+      <div class="toolbar">
+        <div class="toolbar-row">
+          <div class="search-group">
+            <input class="search-input" id="bookingSearch" type="text" placeholder="🔍 고객명, 연락처, 메이트명으로 검색..."/>
+            <button class="search-clear" id="clearBookingSearch" title="검색 초기화">✕</button>
+          </div>
+          
+          <div class="filter-group">
+            <select class="filter-select" id="statusFilter">
+              <option value="">📊 모든 상태</option>
+              <option value="pending">⏳ 대기중</option>
+              <option value="confirmed">✅ 확정</option>
+              <option value="completed">🎉 완료</option>
+              <option value="declined">❌ 거절</option>
+              <option value="cancelled">🚫 취소</option>
+            </select>
+            
+            <select class="filter-select" id="dateFilter">
+              <option value="">📅 모든 기간</option>
+              <option value="today">📅 오늘</option>
+              <option value="week">📅 이번주</option>
+              <option value="month">📅 이번달</option>
+            </select>
+          </div>
+          
+          <div class="action-group">
+            <button class="refresh-btn" id="refreshBookings" title="예약 새로고침">🔄</button>
+            <span class="result-count" id="bookingCount">총 0건</span>
+          </div>
+        </div>
+        
+        <div class="quick-filters">
+          <button class="quick-filter active" data-booking-filter="all">📋 전체</button>
+          <button class="quick-filter" data-booking-filter="pending">⏳ 대기중</button>
+          <button class="quick-filter" data-booking-filter="today">📅 오늘</button>
+          <button class="quick-filter" data-booking-filter="conflicts">⚠️ 충돌</button>
+          <button class="quick-filter" data-booking-filter="recent">🆕 최근</button>
+        </div>
+      </div>
+      
+      <div class="action-buttons" style="margin-bottom: 20px;">
+        <button id="checkConflicts" class="btn btn-secondary">
+          <i class="fas fa-exclamation-triangle"></i> 충돌 전체 점검
+        </button>
+        <button id="exportCsv" class="btn btn-success">
+          <i class="fas fa-download"></i> CSV 내보내기
+        </button>
+        <button id="autoComplete" class="btn btn-primary">
+          <i class="fas fa-magic"></i> 자동 완료 처리
+        </button>
+      </div>
+      
+      <div class="table-container">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>📋 ID</th>
+              <th>📊 상태</th>
+              <th>📅 일시</th>
+              <th>👤 고객</th>
+              <th>📞 연락처</th>
+              <th>🌐 언어</th>
+              <th>👥 메이트</th>
+              <th>💭 요청사항</th>
+              <th>⚠️ 충돌</th>
+              <th>🔧 조치</th>
+            </tr>
+          </thead>
+          <tbody id="bookingsTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 시스템 로그 -->
+    <section class="section-card">
+      <h3 class="section-title">📜 시스템 로그</h3>
+      <div class="action-buttons" style="margin-bottom: 20px;">
+        <button id="refreshLogs" class="btn btn-secondary">
+          <i class="fas fa-sync"></i> 로그 새로고침
+        </button>
+        <button id="clearLogs" class="btn btn-danger">
+          <i class="fas fa-trash"></i> 로그 지우기
+        </button>
+        <select id="logLevel" class="filter-select">
+          <option value="">모든 레벨</option>
+          <option value="info">정보</option>
+          <option value="warn">경고</option>
+          <option value="error">오류</option>
+        </select>
+      </div>
+      <div class="log-viewer" id="logViewer">
+        <div class="log-entry">
+          <span class="log-timestamp">[2025-01-27 10:00:00]</span>
+          <span class="log-level-info">[INFO]</span>
+          시스템이 정상적으로 시작되었습니다.
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+    const SUPABASE_URL = "https://eevvgbbokenpjnvtmztk.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4";
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // DOM 요소들
+    const adminGuard = document.getElementById('adminGuard');
+    const totalBookingsEl = document.getElementById('totalBookings');
+    const totalMatesEl = document.getElementById('totalMates');
+    const totalRevenueEl = document.getElementById('totalRevenue');
+    const avgRatingEl = document.getElementById('avgRating');
+    
+    const matesList = document.getElementById('matesList');
+    const mateSearch = document.getElementById('mateSearch');
+    const mateVerifiedFilter = document.getElementById('mateVerifiedFilter');
+    const mateSortBy = document.getElementById('mateSortBy');
+    const mateCount = document.getElementById('mateCount');
+    
+    const bookingsTable = document.getElementById('bookingsTable');
+    const bookingSearch = document.getElementById('bookingSearch');
+    const statusFilter = document.getElementById('statusFilter');
+    const dateFilter = document.getElementById('dateFilter');
+    const bookingCount = document.getElementById('bookingCount');
+    
+    const logViewer = document.getElementById('logViewer');
+    const logLevel = document.getElementById('logLevel');
+
+    // 1) 접근 제어: 관리자만
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      adminGuard.textContent = "로그인이 필요합니다. 로그인 페이지로 이동합니다…";
+      adminGuard.style.display = 'block';
+      const redir = encodeURIComponent(location.pathname.replace(/^\//, '') + location.search);
+      setTimeout(() => location.replace('auth_combo.html?redirect=' + redir), 800);
+      throw new Error('login required');
+    }
+    
+    const { data: isAdminRow } = await supabase.from('admin_users').select('user_id').eq('user_id', user.id).maybeSingle();
+    if (!isAdminRow) {
+      adminGuard.textContent = "관리자만 접근할 수 있습니다.";
+      adminGuard.style.display = 'block';
+      throw new Error('admin required');
+    }
+
+    // 2) 상태 변수
+    let allBookings = [];
+    let filteredBookings = [];
+    let allMates = [];
+    let filteredMates = [];
+    let matesMap = new Map();
+    let systemLogs = [];
+
+    // 3) 유틸리티 함수들
+    const yenFormatter = new Intl.NumberFormat('ja-JP', {
+      style: 'currency',
+      currency: 'JPY',
+      maximumFractionDigits: 0
+    });
+
+    function toast(message) {
+      const toastEl = document.createElement('div');
+      toastEl.className = 'toast';
+      toastEl.textContent = message;
+      document.body.appendChild(toastEl);
+      setTimeout(() => toastEl.remove(), 3000);
+    }
+
+    function addLog(level, message) {
+      const timestamp = new Date().toLocaleString('ko-KR');
+      const logEntry = {
+        timestamp,
+        level,
+        message
+      };
+      systemLogs.unshift(logEntry);
+      
+      // 최대 100개 로그만 유지
+      if (systemLogs.length > 100) {
+        systemLogs = systemLogs.slice(0, 100);
+      }
+      
+      updateLogViewer();
+    }
+
+    function updateLogViewer() {
+      const selectedLevel = logLevel.value;
+      const filteredLogs = selectedLevel ? 
+        systemLogs.filter(log => log.level === selectedLevel) : 
+        systemLogs;
+      
+      logViewer.innerHTML = filteredLogs.map(log => `
+        <div class="log-entry">
+          <span class="log-timestamp">[${log.timestamp}]</span>
+          <span class="log-level-${log.level}">[${log.level.toUpperCase()}]</span>
+          ${log.message}
+        </div>
+      `).join('');
+      
+      // 자동 스크롤
+      logViewer.scrollTop = 0;
+    }
+
+    function keyToUrl(key) {
+      if (!key) return 'https://picsum.photos/seed/puzzmi/60/60';
+      if (/^https?:\/\//i.test(key)) return key;
+      const pure = key.startsWith('mates/') ? key.replace(/^mates\//, '') : key;
+      return supabase.storage.from('mates').getPublicUrl(pure).data.publicUrl;
+    }
+
+    // 4) 통계 업데이트
+    async function updateDashboardStats() {
+      try {
+        // 예약 통계
+        const { data: bookings, error: bookingsError } = await supabase
+          .from('bookings')
+          .select('id, status, total_amount, price_total, amount');
+        
+        if (bookingsError) throw bookingsError;
+        
+        const totalBookings = bookings?.length || 0;
+        totalBookingsEl.textContent = totalBookings;
+        
+        // 매출 계산
+        const revenue = bookings?.reduce((sum, booking) => {
+          const amount = booking.total_amount || booking.price_total || booking.amount || 0;
+          return sum + amount;
+        }, 0) || 0;
+        totalRevenueEl.textContent = yenFormatter.format(revenue);
+        
+        // 메이트 수
+        const { count: mateCount, error: mateCountError } = await supabase
+          .from('mate_profiles')
+          .select('user_id', { count: 'exact', head: true });
+        
+        if (!mateCountError) {
+          totalMatesEl.textContent = mateCount || 0;
+        }
+        
+        // 평균 평점
+        const { data: ratings, error: ratingsError } = await supabase
+          .from('reviews')
+          .select('rating');
+        
+        if (!ratingsError && ratings?.length) {
+          const avgRating = ratings.reduce((sum, r) => sum + (r.rating || 0), 0) / ratings.length;
+          avgRatingEl.textContent = avgRating.toFixed(1);
+        }
+        
+        addLog('info', `대시보드 통계 업데이트 완료: 예약 ${totalBookings}건, 매출 ${yenFormatter.format(revenue)}`);
+        
+      } catch (error) {
+        console.error('통계 업데이트 실패:', error);
+        addLog('error', `통계 업데이트 실패: ${error.message}`);
+      }
+    }
+
+    // 5) 메이트 관리
+    async function loadMates() {
+      try {
+        matesList.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--text-secondary);"><div class="loading" style="margin: 0 auto 16px;"></div>메이트 정보를 불러오는 중...</div>';
+        
+        const { data, error } = await supabase
+          .from('mate_profiles')
+          .select(`
+            user_id, is_verified, rating, tags, areas, bio, photos, primary_photo, created_at,
+            profiles!inner ( id, full_name, age, gender, languages, avatar_url )
+          `)
+          .order('rating', { ascending: false })
+          .limit(100);
+
+        if (error) throw error;
+
+        allMates = data || [];
+        
+        // 메이트 맵 업데이트
+        matesMap = new Map(allMates.map(mate => [
+          mate.user_id, 
+          mate.profiles?.full_name || '이름없음'
+        ]));
+        
+        applyMateFilters();
+        addLog('info', `메이트 데이터 로드 완료: ${allMates.length}명`);
+        
+      } catch (error) {
+        console.error('메이트 로드 실패:', error);
+        matesList.innerHTML = `<div class="error">❌ 메이트 로드 실패: ${error.message}</div>`;
+        addLog('error', `메이트 로드 실패: ${error.message}`);
+      }
+    }
+
+    function applyMateFilters() {
+      const searchTerm = (mateSearch?.value || '').toLowerCase();
+      const verifiedFilter = mateVerifiedFilter?.value || '';
+      const sortOption = mateSortBy?.value || 'rating_desc';
+
+      // 검증 상태 필터링
+      filteredMates = allMates.filter(mate => {
+        if (verifiedFilter === 'true') return mate.is_verified === true;
+        if (verifiedFilter === 'false') return mate.is_verified !== true;
+        return true;
+      });
+
+      // 검색어 필터링
+      if (searchTerm) {
+        filteredMates = filteredMates.filter(mate => {
+          const name = (mate.profiles?.full_name || '').toLowerCase();
+          const tags = (Array.isArray(mate.tags) ? mate.tags.join(' ') : '').toLowerCase();
+          const areas = (Array.isArray(mate.areas) ? mate.areas.join(' ') : '').toLowerCase();
+          return name.includes(searchTerm) || tags.includes(searchTerm) || areas.includes(searchTerm);
+        });
+      }
+
+      // 정렬
+      filteredMates.sort((a, b) => {
+        switch (sortOption) {
+          case 'rating_desc':
+            return (b.rating || 0) - (a.rating || 0);
+          case 'rating_asc':
+            return (a.rating || 0) - (b.rating || 0);
+          case 'name_asc':
+            const aName = a.profiles?.full_name || '';
+            const bName = b.profiles?.full_name || '';
+            return aName.localeCompare(bName);
+          default:
+            return (b.rating || 0) - (a.rating || 0);
+        }
+      });
+
+      renderMates();
+    }
+
+    function renderMates() {
+      mateCount.textContent = `총 ${filteredMates.length}명`;
+      
+      if (!filteredMates.length) {
+        matesList.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--text-secondary);">🔍 검색 조건에 맞는 메이트가 없습니다.</div>';
+        return;
+      }
+
+      matesList.innerHTML = filteredMates.map(mate => {
+        const p = mate.profiles || {};
+        const coverPhoto = mate.primary_photo || 
+                          (Array.isArray(mate.photos) && mate.photos[0]) || 
+                          p.avatar_url;
+        const img = keyToUrl(coverPhoto);
+        const name = p.full_name || '이름없음';
+        const age = p.age ? `${p.age}세` : '';
+        const gender = p.gender || '';
+        const rating = mate.rating ?? 0;
+        const createdAt = new Date(mate.created_at).toLocaleDateString('ko-KR');
+
+        return `
+          <div class="mate-management-card">
+            <div class="mate-header">
+              <img class="mate-avatar" src="${img}" alt="avatar"/>
+              <div class="mate-info">
+                <h4>${name}</h4>
+                <div class="mate-meta">${[age, gender].filter(Boolean).join(' • ') || '정보 미기재'} • ⭐ ${rating.toFixed(1)} • 가입: ${createdAt}</div>
+              </div>
+              <div style="margin-left: auto;">
+                <span class="status-badge ${mate.is_verified ? 'status-confirmed' : 'status-pending'}">
+                  ${mate.is_verified ? '✅ 검증됨' : '⏳ 미검증'}
+                </span>
+              </div>
+            </div>
+            <div class="mate-actions">
+              <a class="btn btn-secondary" href="mate_like.html?mate_id=${mate.user_id}" target="_blank">
+                <i class="fas fa-eye"></i> 프로필 보기
+              </a>
+              <a class="btn btn-secondary" href="admin_mates.html" target="_blank">
+                <i class="fas fa-chart-line"></i> 상세 관리
+              </a>
+              <button class="btn ${mate.is_verified ? 'btn-danger' : 'btn-success'}" data-action="toggle-verify" data-id="${mate.user_id}">
+                <i class="fas ${mate.is_verified ? 'fa-times' : 'fa-check'}"></i>
+                ${mate.is_verified ? '검증 해제' : '검증 처리'}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // 이벤트 바인딩
+      matesList.querySelectorAll('[data-action="toggle-verify"]').forEach(btn => {
+        btn.addEventListener('click', () => toggleMateVerification(btn.getAttribute('data-id')));
+      });
+    }
+
+    async function toggleMateVerification(mateId) {
+      const mate = allMates.find(m => m.user_id === mateId);
+      if (!mate) return;
+      
+      const newStatus = !mate.is_verified;
+      const confirmMsg = newStatus ? 
+        '이 메이트를 검증 처리하시겠습니까?' : 
+        '이 메이트의 검증을 해제하시겠습니까?';
+      
+      if (!confirm(confirmMsg)) return;
+
+      try {
+        const { error } = await supabase
+          .from('mate_profiles')
+          .update({ is_verified: newStatus })
+          .eq('user_id', mateId);
+        
+        if (error) throw error;
+        
+        mate.is_verified = newStatus;
+        toast(newStatus ? '✅ 검증 처리되었습니다!' : '❌ 검증이 해제되었습니다!');
+        addLog('info', `메이트 ${mate.profiles?.full_name || mateId} 검증 상태 변경: ${newStatus ? '검증됨' : '미검증'}`);
+        applyMateFilters();
+        
+      } catch (error) {
+        console.error('검증 상태 변경 실패:', error);
+        toast('❌ 검증 상태 변경 실패: ' + error.message);
+        addLog('error', `메이트 검증 상태 변경 실패: ${error.message}`);
+      }
+    }
+
+    // 6) 예약 관리
+    async function loadBookings() {
+      try {
+        bookingsTable.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 40px; color: var(--text-secondary);"><div class="loading" style="margin: 0 auto 16px;"></div>예약 데이터를 불러오는 중...</td></tr>';
+        
+        const { data, error } = await supabase
+          .from('bookings')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(500);
+
+        if (error) throw error;
+
+        allBookings = data || [];
+        applyBookingFilters();
+        addLog('info', `예약 데이터 로드 완료: ${allBookings.length}건`);
+        
+      } catch (error) {
+        console.error('예약 로드 실패:', error);
+        bookingsTable.innerHTML = `<tr><td colspan="10" class="error">❌ 예약 로드 실패: ${error.message}</td></tr>`;
+        addLog('error', `예약 로드 실패: ${error.message}`);
+      }
+    }
+
+    function applyBookingFilters() {
+      const searchTerm = (bookingSearch?.value || '').toLowerCase();
+      const statusFilterValue = statusFilter?.value || '';
+      const dateFilterValue = dateFilter?.value || '';
+
+      filteredBookings = [...allBookings];
+
+      // 검색 필터링
+      if (searchTerm) {
+        filteredBookings = filteredBookings.filter(booking => {
+          const customerName = (booking.customer_name || '').toLowerCase();
+          const customerContact = (booking.customer_contact || '').toLowerCase();
+          const mateName = (matesMap.get(booking.mate_id) || '').toLowerCase();
+          
+          return customerName.includes(searchTerm) || 
+                 customerContact.includes(searchTerm) || 
+                 mateName.includes(searchTerm);
+        });
+      }
+
+      // 상태 필터링
+      if (statusFilterValue) {
+        filteredBookings = filteredBookings.filter(booking => booking.status === statusFilterValue);
+      }
+
+      // 날짜 필터링
+      if (dateFilterValue) {
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        
+        filteredBookings = filteredBookings.filter(booking => {
+          if (!booking.date) return false;
+          const bookingDate = new Date(booking.date);
+          
+          switch (dateFilterValue) {
+            case 'today':
+              return bookingDate.toDateString() === today.toDateString();
+            case 'week':
+              const weekStart = new Date(today);
+              weekStart.setDate(today.getDate() - today.getDay());
+              const weekEnd = new Date(weekStart);
+              weekEnd.setDate(weekStart.getDate() + 6);
+              return bookingDate >= weekStart && bookingDate <= weekEnd;
+            case 'month':
+              return bookingDate.getMonth() === today.getMonth() && 
+                     bookingDate.getFullYear() === today.getFullYear();
+            default:
+              return true;
+          }
+        });
+      }
+
+      renderBookings();
+    }
+
+    function renderBookings() {
+      bookingCount.textContent = `총 ${filteredBookings.length}건`;
+      
+      if (!filteredBookings.length) {
+        bookingsTable.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 40px; color: var(--text-secondary);">📭 검색 조건에 맞는 예약이 없습니다.</td></tr>';
+        return;
+      }
+
+      bookingsTable.innerHTML = filteredBookings.map(booking => {
+        const mateName = matesMap.get(booking.mate_id) || booking.mate_id;
+        const datetime = booking.date && booking.start_time ? 
+          `${booking.date} ${booking.start_time} (${booking.duration_hours || 0}h)` : 
+          '날짜 미정';
+        
+        const hasConflict = checkBookingConflict(booking);
+        const statusClass = `status-${booking.status}`;
+        const statusText = booking.status === 'pending' ? '⏳ 대기중' :
+                          booking.status === 'confirmed' ? '✅ 확정' :
+                          booking.status === 'completed' ? '🎉 완료' :
+                          booking.status === 'declined' ? '❌ 거절' :
+                          booking.status === 'cancelled' ? '🚫 취소' : booking.status;
+
+        return `
+          <tr data-id="${booking.id}">
+            <td>#${booking.id}</td>
+            <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+            <td>${datetime}</td>
+            <td>${booking.customer_name || '고객'}</td>
+            <td>${booking.customer_contact || '-'}</td>
+            <td>${booking.language || '-'}</td>
+            <td>${mateName}</td>
+            <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;" title="${booking.notes || ''}">${(booking.notes || '').substring(0, 30)}${(booking.notes || '').length > 30 ? '...' : ''}</td>
+            <td>
+              ${hasConflict ? 
+                '<span class="conflict"><span class="badge-dot" style="background:#ef4444"></span>충돌</span>' : 
+                '<span class="ok"><span class="badge-dot" style="background:#16a34a"></span>정상</span>'
+              }
+            </td>
+            <td>
+              <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                ${['confirmed', 'completed', 'declined', 'cancelled'].map(status => `
+                  <button class="btn btn-secondary" data-action="set-status" data-status="${status}" data-id="${booking.id}" style="font-size: 0.7rem; padding: 4px 8px;">
+                    ${status === 'confirmed' ? '✅' : status === 'completed' ? '🎉' : status === 'declined' ? '❌' : '🚫'}
+                  </button>
+                `).join('')}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      // 상태 변경 버튼 이벤트
+      bookingsTable.querySelectorAll('[data-action="set-status"]').forEach(btn => {
+        btn.addEventListener('click', () => changeBookingStatus(
+          btn.getAttribute('data-id'),
+          btn.getAttribute('data-status')
+        ));
+      });
+    }
+
+    function checkBookingConflict(booking) {
+      if (!booking.date || !booking.start_time || booking.status !== 'confirmed') return false;
+      
+      const startTime = new Date(`${booking.date}T${booking.start_time}`);
+      const endTime = new Date(startTime.getTime() + (booking.duration_hours || 0) * 60 * 60 * 1000);
+      
+      return allBookings.some(other => {
+        if (other.id === booking.id || other.mate_id !== booking.mate_id || other.status !== 'confirmed') {
+          return false;
+        }
+        
+        if (!other.date || !other.start_time) return false;
+        
+        const otherStart = new Date(`${other.date}T${other.start_time}`);
+        const otherEnd = new Date(otherStart.getTime() + (other.duration_hours || 0) * 60 * 60 * 1000);
+        
+        return startTime < otherEnd && otherStart < endTime;
+      });
+    }
+
+    async function changeBookingStatus(bookingId, newStatus) {
+      const booking = allBookings.find(b => b.id == bookingId);
+      if (!booking) return;
+      
+      // 확정 시 충돌 체크
+      if (['confirmed', 'completed'].includes(newStatus)) {
+        if (checkBookingConflict({ ...booking, status: newStatus })) {
+          if (!confirm('동시간대 확정 건이 있습니다. 진행할까요?')) return;
+        }
+      }
+
+      try {
+        const { error } = await supabase
+          .from('bookings')
+          .update({ status: newStatus })
+          .eq('id', bookingId);
+
+        if (error) throw error;
+
+        // 로컬 데이터 업데이트
+        booking.status = newStatus;
+        
+        toast(`✅ 예약 #${bookingId} 상태가 ${newStatus}로 변경되었습니다`);
+        addLog('info', `예약 #${bookingId} 상태 변경: ${newStatus}`);
+        
+        // 확정 시 알림 발송
+        if (newStatus === 'confirmed') {
+          await sendNotification(booking);
+        }
+        
+        applyBookingFilters();
+        await updateDashboardStats();
+        
+      } catch (error) {
+        console.error('상태 변경 실패:', error);
+        toast('❌ 상태 변경 실패: ' + error.message);
+        addLog('error', `예약 상태 변경 실패: ${error.message}`);
+      }
+    }
+
+    // 7) 알림 발송
+    async function sendNotification(booking) {
+      try {
+        const slackUrl = localStorage.getItem('puzzmi.slackWebhook') || '';
+        const webhookUrl = localStorage.getItem('puzzmi.notifyWebhook') || '';
+        
+        const mateName = matesMap.get(booking.mate_id) || booking.mate_id;
+        const message = [
+          '*PUZZMI 예약 확정*',
+          `• 메이트: ${mateName}`,
+          `• 일시: ${booking.date} ${booking.start_time} (${booking.duration_hours}h)`,
+          `• 고객: ${booking.customer_name}`,
+          `• 연락처: ${booking.customer_contact}`,
+          booking.language ? `• 언어: ${booking.language}` : null,
+          booking.notes ? `• 요청: ${booking.notes}` : null,
+          `• 예약ID: ${booking.id}`
+        ].filter(Boolean).join('\n');
+
+        // Slack 알림
+        if (slackUrl) {
+          fetch(slackUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: message })
+          }).catch(err => console.warn('Slack 알림 실패:', err));
+        }
+
+        // 일반 Webhook 알림
+        if (webhookUrl) {
+          fetch(webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'booking_confirmed',
+              source: 'puzzmi-admin',
+              data: booking
+            })
+          }).catch(err => console.warn('Webhook 알림 실패:', err));
+        }
+        
+        addLog('info', `예약 확정 알림 발송: ${booking.id}`);
+        
+      } catch (error) {
+        console.error('알림 발송 실패:', error);
+        addLog('error', `알림 발송 실패: ${error.message}`);
+      }
+    }
+
+    // 8) 이벤트 리스너들
+    
+    // 설정 저장
+    document.getElementById('saveSettings').addEventListener('click', () => {
+      const slackUrl = document.getElementById('slackWebhook').value.trim();
+      const webhookUrl = document.getElementById('notifyWebhook').value.trim();
+      
+      localStorage.setItem('puzzmi.slackWebhook', slackUrl);
+      localStorage.setItem('puzzmi.notifyWebhook', webhookUrl);
+      
+      document.getElementById('settingsResult').innerHTML = '<div class="success">✅ 설정이 저장되었습니다!</div>';
+      addLog('info', '알림 설정 저장 완료');
+      
+      setTimeout(() => {
+        document.getElementById('settingsResult').innerHTML = '';
+      }, 3000);
+    });
+
+    // Slack 테스트
+    document.getElementById('testSlack').addEventListener('click', async () => {
+      const url = localStorage.getItem('puzzmi.slackWebhook') || '';
+      if (!url) {
+        toast('❌ Slack Webhook URL이 설정되지 않았습니다');
+        return;
+      }
+      
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: ':white_check_mark: PUZZMI 관리자 대시보드 테스트 메시지입니다!' })
+        });
+        
+        if (response.ok) {
+          toast('✅ Slack 테스트 성공!');
+          addLog('info', 'Slack 테스트 성공');
+        } else {
+          toast(`❌ Slack 테스트 실패: ${response.status}`);
+          addLog('error', `Slack 테스트 실패: ${response.status}`);
+        }
+      } catch (error) {
+        toast('❌ Slack 테스트 실패: ' + error.message);
+        addLog('error', `Slack 테스트 실패: ${error.message}`);
+      }
+    });
+
+    // Webhook 테스트
+    document.getElementById('testNotify').addEventListener('click', async () => {
+      const url = localStorage.getItem('puzzmi.notifyWebhook') || '';
+      if (!url) {
+        toast('❌ Webhook URL이 설정되지 않았습니다');
+        return;
+      }
+      
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'test',
+            source: 'puzzmi-admin',
+            message: 'PUZZMI 관리자 대시보드 테스트',
+            timestamp: Date.now()
+          })
+        });
+        
+        if (response.ok) {
+          toast('✅ Webhook 테스트 성공!');
+          addLog('info', 'Webhook 테스트 성공');
+        } else {
+          toast(`❌ Webhook 테스트 실패: ${response.status}`);
+          addLog('error', `Webhook 테스트 실패: ${response.status}`);
+        }
+      } catch (error) {
+        toast('❌ Webhook 테스트 실패: ' + error.message);
+        addLog('error', `Webhook 테스트 실패: ${error.message}`);
+      }
+    });
+
+    // 충돌 점검
+    document.getElementById('checkConflicts').addEventListener('click', () => {
+      const conflicts = allBookings.filter(booking => checkBookingConflict(booking));
+      
+      if (conflicts.length === 0) {
+        toast('✅ 충돌하는 예약이 없습니다!');
+        addLog('info', '예약 충돌 점검 완료: 충돌 없음');
+      } else {
+        toast(`⚠️ ${conflicts.length}건의 충돌이 발견되었습니다`);
+        addLog('warn', `예약 충돌 발견: ${conflicts.length}건`);
+        
+        // 충돌 예약만 표시
+        filteredBookings = conflicts;
+        renderBookings();
+      }
+    });
+
+    // CSV 내보내기
+    document.getElementById('exportCsv').addEventListener('click', () => {
+      if (!filteredBookings.length) {
+        toast('❌ 내보낼 데이터가 없습니다');
+        return;
+      }
+
+      const headers = ['예약ID', '상태', '날짜', '시작시간', '이용시간', '고객명', '연락처', '언어', '메이트', '요청사항', '생성일'];
+      const csvData = [
+        headers.join(','),
+        ...filteredBookings.map(booking => {
+          const values = [
+            booking.id || '',
+            booking.status || '',
+            booking.date || '',
+            booking.start_time || '',
+            booking.duration_hours || '',
+            booking.customer_name || '',
+            booking.customer_contact || '',
+            booking.language || '',
+            matesMap.get(booking.mate_id) || booking.mate_id,
+            (booking.notes || '').replace(/"/g, '""'),
+            new Date(booking.created_at).toLocaleString('ko-KR')
+          ];
+          return values.map(v => `"${v}"`).join(',');
+        })
+      ].join('\n');
+
+      const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `puzzmi_bookings_${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      toast('📊 CSV 파일이 다운로드되었습니다!');
+      addLog('info', `CSV 내보내기 완료: ${filteredBookings.length}건`);
+    });
+
+    // 자동 완료 처리
+    document.getElementById('autoComplete').addEventListener('click', async () => {
+      if (!confirm('과거 예약들을 자동으로 완료 처리하시겠습니까?')) return;
+      
+      try {
+        const now = new Date();
+        const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        const yesterdayStr = yesterday.toISOString().split('T')[0];
+        
+        const { data: toComplete, error: selectError } = await supabase
+          .from('bookings')
+          .select('id, date, start_time, duration_hours')
+          .eq('status', 'confirmed')
+          .lt('date', yesterdayStr);
+        
+        if (selectError) throw selectError;
+        
+        if (!toComplete || toComplete.length === 0) {
+          toast('ℹ️ 자동 완료 처리할 예약이 없습니다');
+          return;
+        }
+        
+        const { error: updateError } = await supabase
+          .from('bookings')
+          .update({ status: 'completed' })
+          .eq('status', 'confirmed')
+          .lt('date', yesterdayStr);
+        
+        if (updateError) throw updateError;
+        
+        toast(`✅ ${toComplete.length}건의 예약이 자동 완료 처리되었습니다`);
+        addLog('info', `자동 완료 처리: ${toComplete.length}건`);
+        
+        await loadBookings();
+        await updateDashboardStats();
+        
+      } catch (error) {
+        console.error('자동 완료 처리 실패:', error);
+        toast('❌ 자동 완료 처리 실패: ' + error.message);
+        addLog('error', `자동 완료 처리 실패: ${error.message}`);
+      }
+    });
+
+    // 검색 및 필터 이벤트
+    let mateSearchTimeout, bookingSearchTimeout;
+    
+    mateSearch?.addEventListener('input', () => {
+      clearTimeout(mateSearchTimeout);
+      mateSearchTimeout = setTimeout(applyMateFilters, 300);
+    });
+    
+    bookingSearch?.addEventListener('input', () => {
+      clearTimeout(bookingSearchTimeout);
+      bookingSearchTimeout = setTimeout(applyBookingFilters, 300);
+    });
+    
+    document.getElementById('clearMateSearch')?.addEventListener('click', () => {
+      mateSearch.value = '';
+      applyMateFilters();
+    });
+    
+    document.getElementById('clearBookingSearch')?.addEventListener('click', () => {
+      bookingSearch.value = '';
+      applyBookingFilters();
+    });
+    
+    mateVerifiedFilter?.addEventListener('change', applyMateFilters);
+    mateSortBy?.addEventListener('change', applyMateFilters);
+    statusFilter?.addEventListener('change', applyBookingFilters);
+    dateFilter?.addEventListener('change', applyBookingFilters);
+    
+    document.getElementById('refreshMates')?.addEventListener('click', async () => {
+      document.getElementById('refreshMates').style.transform = 'rotate(360deg)';
+      await loadMates();
+      setTimeout(() => {
+        document.getElementById('refreshMates').style.transform = '';
+      }, 300);
+    });
+    
+    document.getElementById('refreshBookings')?.addEventListener('click', async () => {
+      document.getElementById('refreshBookings').style.transform = 'rotate(360deg)';
+      await loadBookings();
+      setTimeout(() => {
+        document.getElementById('refreshBookings').style.transform = '';
+      }, 300);
+    });
+
+    // 퀵 필터 이벤트
+    document.querySelectorAll('[data-mate-filter]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-mate-filter]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        const filter = btn.getAttribute('data-mate-filter');
+        const now = new Date();
+        const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        
+        switch (filter) {
+          case 'all':
+            filteredMates = [...allMates];
+            break;
+          case 'verified':
+            filteredMates = allMates.filter(mate => mate.is_verified === true);
+            break;
+          case 'unverified':
+            filteredMates = allMates.filter(mate => mate.is_verified !== true);
+            break;
+          case 'high-rating':
+            filteredMates = allMates.filter(mate => (mate.rating || 0) >= 4.0);
+            break;
+          case 'new':
+            filteredMates = allMates.filter(mate => new Date(mate.created_at) >= thirtyDaysAgo);
+            break;
+          default:
+            filteredMates = [...allMates];
+        }
+        
+        renderMates();
+      });
+    });
+
+    document.querySelectorAll('[data-booking-filter]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-booking-filter]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        const filter = btn.getAttribute('data-booking-filter');
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const todayStr = today.toISOString().split('T')[0];
+        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        
+        switch (filter) {
+          case 'all':
+            filteredBookings = [...allBookings];
+            break;
+          case 'pending':
+            filteredBookings = allBookings.filter(booking => booking.status === 'pending');
+            break;
+          case 'today':
+            filteredBookings = allBookings.filter(booking => booking.date === todayStr);
+            break;
+          case 'conflicts':
+            filteredBookings = allBookings.filter(booking => checkBookingConflict(booking));
+            break;
+          case 'recent':
+            filteredBookings = allBookings.filter(booking => new Date(booking.created_at) >= weekAgo);
+            break;
+          default:
+            filteredBookings = [...allBookings];
+        }
+        
+        renderBookings();
+      });
+    });
+
+    // 로그 관련 이벤트
+    logLevel?.addEventListener('change', updateLogViewer);
+    
+    document.getElementById('refreshLogs')?.addEventListener('click', () => {
+      addLog('info', '로그 새로고침 실행');
+      updateLogViewer();
+    });
+    
+    document.getElementById('clearLogs')?.addEventListener('click', () => {
+      if (confirm('모든 로그를 지우시겠습니까?')) {
+        systemLogs = [];
+        updateLogViewer();
+        addLog('info', '로그가 초기화되었습니다');
+      }
+    });
+
+    // 9) 실시간 업데이트
+    const bookingChannel = supabase
+      .channel('admin-bookings')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'bookings'
+      }, async (payload) => {
+        addLog('info', `실시간 예약 업데이트: ${payload.eventType} - ID ${payload.new?.id || payload.old?.id}`);
+        
+        if (payload.eventType === 'INSERT') {
+          allBookings.unshift(payload.new);
+        } else if (payload.eventType === 'UPDATE') {
+          const index = allBookings.findIndex(b => b.id === payload.new.id);
+          if (index >= 0) {
+            allBookings[index] = payload.new;
+          }
+        } else if (payload.eventType === 'DELETE') {
+          allBookings = allBookings.filter(b => b.id !== payload.old.id);
+        }
+        
+        applyBookingFilters();
+        await updateDashboardStats();
+      })
+      .subscribe();
+
+    // 10) 초기화
+    async function initialize() {
+      try {
+        addLog('info', '관리자 대시보드 초기화 시작');
+        
+        // 저장된 설정 로드
+        document.getElementById('slackWebhook').value = localStorage.getItem('puzzmi.slackWebhook') || '';
+        document.getElementById('notifyWebhook').value = localStorage.getItem('puzzmi.notifyWebhook') || '';
+        
+        // 데이터 로드
+        await Promise.all([
+          loadMates(),
+          loadBookings(),
+          updateDashboardStats()
+        ]);
+        
+        addLog('info', '관리자 대시보드 초기화 완료');
+        
+      } catch (error) {
+        console.error('초기화 실패:', error);
+        addLog('error', `초기화 실패: ${error.message}`);
+      }
+    }
+
+    // 초기화 실행
+    await initialize();
+  </script>
+</body>
+</html>
