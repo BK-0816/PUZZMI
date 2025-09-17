@@ -190,6 +190,10 @@
       background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
     }
     
+    .stat-card:nth-child(5)::before {
+      background: linear-gradient(90deg, #e74c3c 0%, #c0392b 100%);
+    }
+    
     .stat-card:hover {
       transform: translateY(-6px) scale(1.02);
       box-shadow: 0 24px 60px rgba(0,0,0,0.1), 0 8px 24px rgba(0,0,0,0.06);
@@ -583,7 +587,7 @@
       }
       
       .stats-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
       }
       
       .booking-card {
@@ -643,6 +647,11 @@
         <div class="stat-number" id="completedBookings">0</div>
         <div class="stat-label">진행완료</div>
       </div>
+      <div class="stat-card">
+        <div class="stat-icon">❌</div>
+        <div class="stat-number" id="cancelledBookings">0</div>
+        <div class="stat-label">예약 취소</div>
+      </div>
     </section>
 
     <!-- 예약 목록 섹션 -->
@@ -660,6 +669,7 @@ const totalBookingsEl = document.getElementById('totalBookings');
 const pendingBookingsEl = document.getElementById('pendingBookings');
 const confirmedBookingsEl = document.getElementById('confirmedBookings');
 const completedBookingsEl = document.getElementById('completedBookings');
+const cancelledBookingsEl = document.getElementById('cancelledBookings');
 
 function rowHtml(r){
   // 날짜/시간 포맷팅 개선
@@ -744,11 +754,13 @@ function updateStats(data) {
   const pending = data.filter(r => r.status === 'pending').length;
   const confirmed = data.filter(r => r.status === 'confirmed').length;
   const completed = data.filter(r => r.status === 'completed').length;
+  const cancelled = data.filter(r => r.status === 'cancelled').length;
   
   totalBookingsEl.textContent = total;
   pendingBookingsEl.textContent = pending;
   confirmedBookingsEl.textContent = confirmed;
   completedBookingsEl.textContent = completed;
+  cancelledBookingsEl.textContent = cancelled;
 }
 
 async function load(){
