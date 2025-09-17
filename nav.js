@@ -1,4 +1,4 @@
-/* PUZZMI navbar – auth-aware & minimal menu */
+/* PUZZMI navbar – redesigned with centered logo and responsive dropdowns */
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const SUPABASE_URL = "https://eevvgbbokenpjnvtmztk.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4";
@@ -30,56 +30,237 @@ async function getRoles() {
   return { user, isAdmin, isMate };
 }
 
+// 알림 개수 가져오기
+async function getNotificationCount(userId) {
+  const { count } = await supabase
+    .from('notifications')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .is('read_at', null);
+  return count || 0;
+}
+
+// 메이트용 알림 개수 가져오기 (신규 예약, 취소)
+async function getMateNotificationCount(userId) {
+  const { count } = await supabase
+    .from('notifications')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .in('type', ['booking_requested', 'booking_canceled_by_customer'])
+    .is('read_at', null);
+  return count || 0;
+}
+
+// 드롭다운 토글 함수
+function toggleDropdown(dropdownEl) {
+  const isActive = dropdownEl.classList.contains('active');
+  
+  // 모든 드롭다운 닫기
+  document.querySelectorAll('.dropdown.active').forEach(dd => {
+    dd.classList.remove('active');
+  });
+  
+  // 클릭한 드롭다운만 토글
+  if (!isActive) {
+    dropdownEl.classList.add('active');
+  }
+}
+
+// 외부 클릭 시 드롭다운 닫기
+function setupDropdownClose() {
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.dropdown')) {
+      document.querySelectorAll('.dropdown.active').forEach(dd => {
+        dd.classList.remove('active');
+      });
+    }
+  });
+}
+
 export async function renderNavbar(rootId='app-nav') {
   const root = document.getElementById(rootId) || document.body.insertBefore(document.createElement('div'), document.body.firstChild);
   root.id = rootId;
   root.className = 'app-nav';
+  
   const wrap = el('div', { class: 'wrap' });
   root.appendChild(wrap);
 
-  const brand = el('a', { class: 'brand', href: 'index.html' }, [
+  // 왼쪽 메뉴 (공통 네비게이션)
+  const navLeft = el('div', { class: 'nav-left' });
+  wrap.appendChild(navLeft);
+
+  // 공통 메뉴 항목들
+  const commonMenus = [
+    { href: 'index.html#home', text: '홈' },
+    { href: 'index.html#about', text: '서비스 소개' },
+    { href: 'index.html#how-it-works', text: '이용방법' },
+    { href: 'index.html#friends', text: '메이트 예약' },
+    { href: 'index.html#reviews', text: '후기' },
+    { href: 'qna.html', text: 'FAQ' }
+  ];
+
+  commonMenus.forEach(menu => {
+    navLeft.appendChild(el('a', { class: 'nav-link', href: menu.href }, menu.text));
+  });
+
+  // 중앙 로고
+  const navCenter = el('div', { class: 'nav-center' });
+  wrap.appendChild(navCenter);
+
+  const brand = el('a', { class: 'nav-brand', href: 'index.html' }, [
+    el('img', { class: 'logo', src: 'puzzmi_original.png', alt: 'PUZZMI 로고' }),
     el('span', {}, 'PUZZMI')
   ]);
-  wrap.appendChild(brand);
+  navCenter.appendChild(brand);
 
-  const menu = el('div', { class: 'menu' });
-  wrap.appendChild(menu);
+  // 오른쪽 메뉴
+  const navRight = el('div', { class: 'nav-right' });
+  wrap.appendChild(navRight);
 
   const { user, isAdmin, isMate } = await getRoles();
 
-  // ✅ 비로그인: "로그인"만
+  // 비로그인 상태
   if (!user) {
     const _redir = encodeURIComponent(location.pathname + location.search);
-    menu.appendChild(el('a', { href: 'auth_combo.html?redirect=' + _redir }, '로그인'));
+    navRight.appendChild(el('a', { 
+      class: 'nav-link', 
+      href: 'auth_combo.html?redirect=' + _redir 
+    }, '로그인'));
     return;
   }
 
-    if (user && !isAdmin && !isMate) {
-    // 일반 유저
-    menu.appendChild(el('a', { href: 'my_favorites.html' }, '내 찜'));
-    menu.appendChild(el('a', { href: 'my_bookings.html' }, '내 예약'));
-    menu.appendChild(el('a', { href: 'notification.html' }, '알림함'));
+  // 로그인 상태 - 알림 아이콘
+  if (user && !isAdmin && !isMate) {
+    // 일반 고객 - 알림 아이콘
+    const notifCount = await getNotificationCount(user.id);
+    const notifIcon = el('a', { 
+      class: 'notification-icon', 
+      href: 'notification.html',
+      title: '알림함'
+    }, [
+      el('i', { class: 'fas fa-bell' }),
+      notifCount > 0 ? el('span', { class: 'notification-badge' }, String(notifCount)) : null
+    ].filter(Boolean));
+    navRight.appendChild(notifIcon);
   }
 
-  // ✅ 로그인: 이용고객 → "1:1문의", 관리자 → "Q&A관리"
-  if (isAdmin) {
-    
-    menu.appendChild(el('a', { href: 'admin_plus.html' }, '관리자'));
-    menu.appendChild(el('a', { href: 'admin_mates.html' }, '메이트 관리'));
-    menu.appendChild(el('a', { href: 'qna.html' }, 'Q&A관리'));
-  } else {
-    menu.appendChild(el('a', { href: 'qna.html' }, '1:1문의'));
-  }
   if (isMate) {
-    menu.appendChild(el('a', { href: 'mate_dashboard.html' }, '메이트 대시보드'));
-    menu.appendChild(el('a', { href: `mate_like.html?mate_id=${user.id}` }, '내 프로필'));
-
+    // 메이트 - 메이트 전용 알림 아이콘
+    const mateNotifCount = await getMateNotificationCount(user.id);
+    const mateNotifIcon = el('a', { 
+      class: 'notification-icon', 
+      href: 'notification.html',
+      title: '메이트 알림함'
+    }, [
+      el('i', { class: 'fas fa-calendar-alt' }),
+      mateNotifCount > 0 ? el('span', { class: 'notification-badge' }, String(mateNotifCount)) : null
+    ].filter(Boolean));
+    navRight.appendChild(mateNotifIcon);
   }
 
-  // 우측 로그인 정보/로그아웃
-  const me = el('span', { class: 'pill' }, user.email || user.id);
-  menu.appendChild(me);
-  menu.appendChild(el('button', { onclick: async () => { await supabase.auth.signOut(); location.reload(); } }, '로그아웃'));
+  // 사용자 드롭다운
+  if (user && !isAdmin && !isMate) {
+    // 일반 고객 드롭다운
+    const userDropdown = el('div', { class: 'dropdown' });
+    
+    const userBtn = el('button', { 
+      class: 'dropdown-btn',
+      onclick: () => toggleDropdown(userDropdown)
+    }, [
+      el('i', { class: 'fas fa-user' }),
+      el('span', {}, user.email?.split('@')[0] || '사용자'),
+      el('i', { class: 'fas fa-chevron-down', style: 'font-size: 0.8rem; margin-left: 4px;' })
+    ]);
+    
+    const userMenu = el('div', { class: 'dropdown-menu' }, [
+      el('a', { class: 'dropdown-item', href: 'my_favorites.html' }, [
+        el('i', { class: 'fas fa-heart', style: 'margin-right: 8px; color: #f093fb;' }),
+        el('span', {}, '내 찜')
+      ]),
+      el('a', { class: 'dropdown-item', href: 'my_bookings.html' }, [
+        el('i', { class: 'fas fa-calendar-check', style: 'margin-right: 8px; color: #667eea;' }),
+        el('span', {}, '내 예약')
+      ])
+    ]);
+    
+    userDropdown.appendChild(userBtn);
+    userDropdown.appendChild(userMenu);
+    navRight.appendChild(userDropdown);
+  }
+
+  if (isMate) {
+    // 메이트 드롭다운
+    const mateDropdown = el('div', { class: 'dropdown' });
+    
+    const mateBtn = el('button', { 
+      class: 'dropdown-btn',
+      onclick: () => toggleDropdown(mateDropdown)
+    }, [
+      el('i', { class: 'fas fa-user-tie' }),
+      el('span', {}, '메이트'),
+      el('i', { class: 'fas fa-chevron-down', style: 'font-size: 0.8rem; margin-left: 4px;' })
+    ]);
+    
+    const mateMenu = el('div', { class: 'dropdown-menu' }, [
+      el('a', { class: 'dropdown-item', href: `mate_like.html?mate_id=${user.id}` }, [
+        el('i', { class: 'fas fa-id-card', style: 'margin-right: 8px; color: #667eea;' }),
+        el('span', {}, '내 프로필')
+      ]),
+      el('a', { class: 'dropdown-item', href: 'mate_dashboard.html' }, [
+        el('i', { class: 'fas fa-chart-line', style: 'margin-right: 8px; color: #764ba2;' }),
+        el('span', {}, '메이트 대시보드')
+      ])
+    ]);
+    
+    mateDropdown.appendChild(mateBtn);
+    mateDropdown.appendChild(mateMenu);
+    navRight.appendChild(mateDropdown);
+  }
+
+  if (isAdmin) {
+    // 관리자 드롭다운
+    const adminDropdown = el('div', { class: 'dropdown' });
+    
+    const adminBtn = el('button', { 
+      class: 'dropdown-btn',
+      onclick: () => toggleDropdown(adminDropdown)
+    }, [
+      el('i', { class: 'fas fa-cog' }),
+      el('span', {}, '관리자'),
+      el('i', { class: 'fas fa-chevron-down', style: 'font-size: 0.8rem; margin-left: 4px;' })
+    ]);
+    
+    const adminMenu = el('div', { class: 'dropdown-menu' }, [
+      el('a', { class: 'dropdown-item', href: 'admin_plus.html' }, [
+        el('i', { class: 'fas fa-tachometer-alt', style: 'margin-right: 8px; color: #667eea;' }),
+        el('span', {}, '관리자')
+      ]),
+      el('a', { class: 'dropdown-item', href: 'admin_mates.html' }, [
+        el('i', { class: 'fas fa-users', style: 'margin-right: 8px; color: #764ba2;' }),
+        el('span', {}, '메이트 관리')
+      ]),
+      el('a', { class: 'dropdown-item', href: 'qna.html' }, [
+        el('i', { class: 'fas fa-question-circle', style: 'margin-right: 8px; color: #f093fb;' }),
+        el('span', {}, 'Q&A 관리')
+      ])
+    ]);
+    
+    adminDropdown.appendChild(adminBtn);
+    adminDropdown.appendChild(adminMenu);
+    navRight.appendChild(adminDropdown);
+  }
+
+  // 로그아웃 버튼
+  navRight.appendChild(el('button', { 
+    class: 'logout-btn',
+    onclick: async () => { 
+      await supabase.auth.signOut(); 
+      location.reload(); 
+    }
+  }, '로그아웃'));
+
+  // 드롭다운 외부 클릭 처리 설정
+  setupDropdownClose();
 }
 
 document.addEventListener('DOMContentLoaded', () => renderNavbar());
