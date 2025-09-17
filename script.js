@@ -467,7 +467,7 @@ function initializeSmoothScrolling() {
                 });
                 
                 // 모바일 메뉴 닫기
-                if (navMenu.classList.contains('active')) {
+                if (navMenu && navMenu.classList.contains('active')) {
                     navMenu.classList.remove('active');
                 }
             }
