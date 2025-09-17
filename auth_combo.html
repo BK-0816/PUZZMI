@@ -707,7 +707,6 @@
             age,
             gender: document.getElementById('signup_gender').value || null,
             languages,
-            marketing_consent: agreeMarketing,
             created_at: new Date().toISOString()
           }, { onConflict: 'id' });
           
