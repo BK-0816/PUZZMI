@@ -888,7 +888,7 @@
       track.innerHTML = '<div class="muted" style="padding:8px">프로필을 불러오지 못했습니다.</div>';
     } else {
       mateName.textContent = (mp.profiles?.full_name ?? '메이트') + ' 님';
-      currentMateName = mp.profiles?.full_name ?? '메이트';
+      currentMateName = mp.profiles?.full_name ?? '메이트'; // 메이트 이름 업데이트
 
       const allKeys = Array.isArray(mp.photos) ? mp.photos : [];
       const keys = mp.primary_photo ? [mp.primary_photo, ...allKeys.filter(k => k !== mp.primary_photo)] : allKeys;
@@ -952,7 +952,7 @@
     const reviewForm = document.getElementById('reviewForm');
     const ratingWrap = document.getElementById('ratingWrap');
     
-    // 메이트 이름 저장 (리뷰에서 사용)
+    // 메이트 이름 저장 (리뷰에서 사용) - 초기값 설정
     let currentMateName = '메이트';
 
     // 별점 UI
