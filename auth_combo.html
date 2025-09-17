@@ -586,7 +586,7 @@
       <div class="tabs" role="tablist">
         <button class="tab active" data-tab="login">로그인</button>
         <button class="tab" data-tab="signup">회원가입</button>
-        <!--<button class="tab" data-tab="magic">이메일 매직링크</button>-->
+        <button class="tab" data-tab="magic">이메일 매직링크</button>
       </div>
 
       <!-- 로그인 -->
@@ -613,7 +613,7 @@
       </form>
 
       <!-- 회원가입 -->
-      <div id="signupForm" class="stack-16 hidden" data-panel="signup">
+      <form id="signupForm" class="stack-16 hidden" data-panel="signup">
         <div class="signup-benefits">
           <h3>🎉 PUZZMI 회원이 되면</h3>
           <ul class="benefits-list">
@@ -758,12 +758,27 @@
             <div id="signup_result"></div>
           </form>
         </div>
-      </div>
+      </form>
+
+      <!-- 매직링크 -->
+      <form id="magicForm" class="stack-16 hidden" data-panel="magic">
+        <div class="field">
+          <div class="label">이메일</div>
+          <input class="input" id="magic_email" type="email" required/>
+        </div>
+        <button class="btn btn-primary" type="submit" id="magic_btn">로그인 링크 보내기</button>
+        <div id="magic_result"></div>
+      </form>
+
+      <div class="spacer"></div>
+      <button id="logout" class="btn btn-secondary hidden">로그아웃</button>
+      <div id="whoami" class="muted"></div>
     // DOM이 완전히 로드된 후 실행
     document.addEventListener('DOMContentLoaded', () => {
       // ===== Tabs =====
       const tabs = document.querySelectorAll('.tab');
       const panels = document.querySelectorAll('form[data-panel]');
+      
       function switchTab(name){
         tabs.forEach(x => x.classList.toggle('active', x.getAttribute('data-tab')===name));
         panels.forEach(p => {
@@ -774,6 +789,7 @@
           }
         });
       }
+      
       tabs.forEach(t => t.addEventListener('click', () => switchTab(t.getAttribute('data-tab'))));
       
       // 초기 탭 설정
