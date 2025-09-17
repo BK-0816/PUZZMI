@@ -28,6 +28,28 @@
       transition: all 0.3s ease;
     }
     
+    .profile-header-content {
+      position: relative;
+      padding: 40px;
+    }
+    
+    .rating-badge {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      z-index: 10;
+    }
+    
     .profile-header:hover {
       transform: translateY(-2px);
       box-shadow: 0 32px 64px rgba(0,0,0,0.15), 0 12px 24px rgba(0,0,0,0.1);
@@ -499,26 +521,32 @@
   <div id="app-nav"></div>
   <main class="wrap">
     <section class="card profile-header">
-      <h2 id="mateName">메이트 프로필</h2>
+      <div class="profile-header-content">
+        <div id="ratingBadge" class="rating-badge" style="display: none;">
+          <span>⭐</span>
+          <span id="ratingValue">N/A</span>
+        </div>
+        <h2 id="mateName">메이트 프로필</h2>
 
-      <!-- 전체 사진 캐러셀 -->
-      <div class="carousel">
-        <button class="nav prev" aria-label="이전">‹</button>
-        <div class="track" id="photoTrack"></div>
-        <button class="nav next" aria-label="다음">›</button>
-      </div>
+        <!-- 전체 사진 캐러셀 -->
+        <div class="carousel">
+          <button class="nav prev" aria-label="이전">‹</button>
+          <div class="track" id="photoTrack"></div>
+          <button class="nav next" aria-label="다음">›</button>
+        </div>
 
-      <div id="meta" class="meta-grid"></div>
+        <div id="meta" class="meta-grid"></div>
 
-      <div class="action-buttons">
-        <a class="btn-enhanced btn-secondary-enhanced" id="backBtn">
-          <i class="fas fa-arrow-left"></i>
-          목록으로
-        </a>
-        <a class="btn-enhanced btn-primary-enhanced" id="bookBtn">
-          <i class="fas fa-calendar-check"></i>
-          예약하기
-        </a>
+        <div class="action-buttons">
+          <a class="btn-enhanced btn-secondary-enhanced" id="backBtn">
+            <i class="fas fa-arrow-left"></i>
+            목록으로
+          </a>
+          <a class="btn-enhanced btn-primary-enhanced" id="bookBtn">
+            <i class="fas fa-calendar-check"></i>
+            예약하기
+          </a>
+        </div>
       </div>
     </section>
 
@@ -615,6 +643,14 @@
       const areas = (mp.areas || []).join(', ');
       const rating = mp.rating ?? 'N/A';
 
+      // 평점 배지 표시
+      const ratingBadge = document.getElementById('ratingBadge');
+      const ratingValue = document.getElementById('ratingValue');
+      if (rating !== 'N/A') {
+        ratingValue.textContent = rating;
+        ratingBadge.style.display = 'flex';
+      }
+
       meta.innerHTML = `
         <div class="meta-card">
           <strong>기본 정보</strong>
@@ -631,10 +667,6 @@
         <div class="meta-card">
           <strong>활동 지역</strong>
           <div class="value">${areas || '미기재'}</div>
-        </div>
-        <div class="meta-card">
-          <strong>평점</strong>
-          <div class="value">⭐ ${rating}</div>
         </div>
         <div class="meta-card intro-card">
           <strong>소개</strong>
