@@ -253,7 +253,6 @@ btn.classList.add('is-faved');
           )
         `)
         .not('content', 'is', null)
-        .gte('rating', 4) // 4점 이상만
         .order('rating', { ascending: false })
         .limit(50); // 많이 가져와서 JS에서 정렬
 
@@ -278,7 +277,6 @@ btn.classList.add('is-faved');
 
       // 평점 높고 글자수 많은 순으로 정렬
       const sortedReviews = reviews
-        .filter(review => review.content && review.content.trim().length >= 20) // 최소 20자 이상
         .sort((a, b) => {
           // 1차: 평점 높은 순
           if (b.rating !== a.rating) {
