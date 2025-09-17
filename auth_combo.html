@@ -304,6 +304,115 @@
     /* 숨김 상태 */
     .hidden { display:none; }
     
+    /* SMS 인증 섹션 스타일 */
+    .sms-verification-section {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(240, 147, 251, 0.05) 100%);
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 20px;
+      padding: 32px;
+      margin: 24px 0;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .sms-verification-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #667eea 0%, #f093fb 100%);
+      animation: shimmer 2s ease-in-out infinite;
+    }
+    
+    .verification-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    
+    .verification-header h4 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 8px 0;
+    }
+    
+    .verification-desc {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      margin: 0;
+    }
+    
+    .verification-input-group {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 20px;
+      align-items: flex-end;
+    }
+    
+    .verification-code-input {
+      flex: 1;
+      text-align: center;
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: 4px;
+      font-family: 'Courier New', monospace;
+      background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
+    }
+    
+    .verification-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    
+    .verification-timer {
+      text-align: center;
+      background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 152, 0, 0.05) 100%);
+      border: 1px solid rgba(255, 193, 7, 0.3);
+      border-radius: 12px;
+      padding: 12px 20px;
+      font-weight: 600;
+      color: #856404;
+      margin-bottom: 16px;
+    }
+    
+    .verification-timer.expired {
+      background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(220, 53, 69, 0.05) 100%);
+      border-color: rgba(220, 53, 69, 0.3);
+      color: #721c24;
+    }
+    
+    /* 단계별 표시 */
+    .signup-step-1, .signup-step-2 {
+      text-align: center;
+    }
+    
+    .signup-step-2 {
+      background: linear-gradient(135d, rgba(25, 135, 84, 0.1) 0%, rgba(40, 167, 69, 0.05) 100%);
+      border: 2px solid rgba(25, 135, 84, 0.2);
+      border-radius: 16px;
+      padding: 24px;
+      backdrop-filter: blur(8px);
+    }
+    
+    .signup-step-2::before {
+      content: '✅ SMS 인증 완료!';
+      display: block;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #0f5132;
+      margin-bottom: 16px;
+    }
+    
     /* 유틸리티 클래스 */
     .full { width:100%; }
     .muted { 
@@ -456,6 +565,30 @@
           </div>
         </div>
         
+        <!-- SMS 인증 섹션 -->
+        <div class="sms-verification-section" id="smsVerificationSection" style="display: none;">
+          <div class="verification-header">
+            <h4>📱 SMS 인증</h4>
+            <p class="verification-desc">입력하신 전화번호로 인증번호를 발송했습니다</p>
+          </div>
+          
+          <div class="verification-input-group">
+            <input class="input verification-code-input" id="sms_verification_code" type="text" placeholder="000000" maxlength="6" autocomplete="one-time-code"/>
+            <button type="button" class="btn btn-primary" id="verify_sms_btn">인증 확인</button>
+          </div>
+          
+          <div class="verification-actions">
+            <button type="button" class="btn btn-secondary" id="resend_sms_btn">인증번호 재전송</button>
+            <button type="button" class="btn btn-secondary" id="change_phone_btn">전화번호 변경</button>
+          </div>
+          
+          <div class="verification-timer" id="verificationTimer">
+            <span>⏰ 남은 시간: <span id="timerDisplay">05:00</span></span>
+          </div>
+          
+          <div id="sms_verification_result"></div>
+        </div>
+        
         <div class="row single">
           <div class="field">
             <div class="label">🌐 사용 가능한 언어 (선택)</div>
@@ -497,9 +630,14 @@
             </span>
           </label>
         </div>
-        <div class="row gap8">
-          <button class="btn btn-primary" type="submit" id="signup_btn">회원가입</button>
-          <button type="button" class="btn btn-secondary" id="resend_signup" disabled>인증 메일 재전송</button>
+        <!-- 1단계: 전화번호 인증 버튼 -->
+        <div class="signup-step-1" id="signupStep1">
+          <button type="button" class="btn btn-primary" id="send_sms_btn">📱 인증번호 받기</button>
+        </div>
+        
+        <!-- 2단계: 회원가입 완료 버튼 (SMS 인증 후 활성화) -->
+        <div class="signup-step-2" id="signupStep2" style="display: none;">
+          <button class="btn btn-primary" type="submit" id="signup_btn">🎉 회원가입 완료</button>
         </div>
 
         <div class="signup-info">
