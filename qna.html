@@ -880,13 +880,17 @@
 
     document.addEventListener('click', async (e) => {
       const saveBtn  = e.target.closest('button[data-ans-save]');
-      const closeBtn = e.target.closest('button[data-ans-close]');
-      if (!saveBtn && !closeBtn) return;
+      if (!saveBtn) return;
 
       if (saveBtn) {
         const id = saveBtn.getAttribute('data-ans-save');
         const textarea = document.getElementById(`ans_${id}`);
         const txt = (textarea?.value ?? '').trim();
+        
+        if (!txt) {
+          alert('답변 내용을 입력해주세요.');
+          return;
+        }
         
         saveBtn.disabled = true;
         saveBtn.innerHTML = '<div class="loading"></div> 저장 중...';
@@ -898,11 +902,11 @@
               answer: txt,
               answered_by: user.id,
               answered_at: new Date().toISOString(),
-              status: 'answered'
+              status: 'closed'
             })
             .eq('id', id);
           if (error) throw error;
-          toast('답변이 저장되었습니다! ✅');
+          toast('답변이 저장되고 완료처리되었습니다! ✅');
           await loadList();
         } catch (err) {
           console.error(err);
@@ -912,28 +916,6 @@
           saveBtn.innerHTML = '💾 답변 저장';
         }
         return;
-      }
-
-      if (closeBtn) {
-        const id = closeBtn.getAttribute('data-ans-close');
-        closeBtn.disabled = true;
-        closeBtn.innerHTML = '<div class="loading"></div> 처리 중...';
-        
-        try {
-          const { error } = await supabase
-            .from('qna')
-            .update({ status: 'closed' })
-            .eq('id', id);
-          if (error) throw error;
-          toast('완료 처리되었습니다! ✅');
-          await loadList();
-        } catch (err) {
-          console.error(err);
-          alert('완료 처리 실패: ' + (err?.message || err));
-        } finally {
-          closeBtn.disabled = false;
-          closeBtn.innerHTML = '✅ 완료 처리';
-        }
       }
     });
   }
@@ -1095,7 +1077,6 @@
               <textarea id="ans_${row.id}" class="admin-textarea" placeholder="답변을 입력하세요...">${row.answer ?? ''}</textarea>
               <div style="display:flex; gap:12px; flex-wrap:wrap;">
                 <button type="button" class="btn btn-primary" data-ans-save="${row.id}">💾 답변 저장</button>
-                <button type="button" class="btn btn-secondary" data-ans-close="${row.id}">✅ 완료 처리</button>
               </div>
             </div>
           ` : ''}
