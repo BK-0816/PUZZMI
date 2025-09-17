@@ -446,36 +446,16 @@ async function refreshHeartCount() {
             <div class="hero-content">
                 <h1 class="hero-title" data-key="hero-title">잊을 수 없는 추억을<br>당신께 선물합니다</h1>
                 <p class="hero-subtitle" data-key="hero-subtitle">현지 친구와 함께 맛집, 핫플레이스, 숨겨진 명소까지!<br>추억의 퍼즐을 맞춰가세요</p>
-            
-            <div class="hero-actions">
-                <a href="#friends" class="btn btn-primary" data-key="hero-btn-primary">친구 찾기</a>
-                <a href="#about" class="btn btn-secondary" data-key="hero-btn-secondary">서비스 알아보기</a>
-            </div>
-            
-            <div class="hero-stats">
-                <div class="stat">
-                    <div class="stat-number">50+</div>
-                    <div class="stat-label" data-key="stat-friends">활동 친구들</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number">1,200+</div>
-                    <div class="stat-label" data-key="stat-tours">성공한 투어</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number">4.9</div>
-                    <div class="stat-label" data-key="stat-rating">평균 평점</div>
-                </div>
-            </div>
+                
+
             </div>
         </div>
     </section>
 
 <section id="about" class="about">
   <div class="container about-content">
-    <div class="about-image">
-      <img src="about.png" alt="PUZZMI 서비스 소개" class="about-main-image">
-    </div>
-    
+
+
     <div class="about-text">
   <h2 class="section-title">'PUZZMI'는 어떤 서비스인가요?</h2>
 
@@ -671,6 +651,7 @@ async function refreshHeartCount() {
         </div>
     </section>
 
+    <!-- 기존 문의하기 섹션 주석 처리
     <section id="contact" class="contact">
         <div class="container">
             <div class="contact-content">
@@ -748,8 +729,9 @@ async function refreshHeartCount() {
             </div>
         </div>
     </section>
+    -->
 
-    <section id="faq" class="faq">
+    <section id="contact" class="contact">
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">자주 묻는 질문 (FAQ)</h2>
@@ -758,13 +740,13 @@ async function refreshHeartCount() {
             
             <div class="faq-content">
                 <!-- 서비스 소개 -->
-                <div class="faq-category">
+                <div class="faq-category reveal">
                     <h3 class="faq-category-title">
                         <i class="fas fa-info-circle"></i>
                         서비스 소개
                     </h3>
                     
-                    <div class="faq-item">
+                    <div class="faq-item reveal">
                         <div class="faq-question">
                             <i class="fas fa-question-circle"></i>
                             <span>Q1. 렌탈 친구란 무엇입니까?</span>
@@ -775,7 +757,7 @@ async function refreshHeartCount() {
                         </div>
                     </div>
                     
-                    <div class="faq-item">
+                    <div class="faq-item reveal">
                         <div class="faq-question">
                             <i class="fas fa-question-circle"></i>
                             <span>Q2. 연애나 만남 목적으로 이용할 수 있습니까?</span>
@@ -786,7 +768,7 @@ async function refreshHeartCount() {
                         </div>
                     </div>
                     
-                    <div class="faq-item">
+                    <div class="faq-item reveal">
                         <div class="faq-question">
                             <i class="fas fa-question-circle"></i>
                             <span>Q3. 누가 이용할 수 있나요?</span>
@@ -799,13 +781,13 @@ async function refreshHeartCount() {
                 </div>
                 
                 <!-- 예약, 요금 -->
-                <div class="faq-category">
+                <div class="faq-category reveal">
                     <h3 class="faq-category-title">
                         <i class="fas fa-credit-card"></i>
                         예약, 요금에 대해
                     </h3>
                     
-                    <div class="faq-item">
+                    <div class="faq-item reveal">
                         <div class="faq-question">
                             <i class="fas fa-question-circle"></i>
                             <span>Q1. 결제 방법은 무엇인가요?</span>
@@ -816,7 +798,7 @@ async function refreshHeartCount() {
                         </div>
                     </div>
                     
-                    <div class="faq-item">
+                    <div class="faq-item reveal">
                         <div class="faq-question">
                             <i class="fas fa-question-circle"></i>
                             <span>Q2. 당일 예약이 가능한가요?</span>
@@ -827,7 +809,7 @@ async function refreshHeartCount() {
                         </div>
                     </div>
                     
-                    <div class="faq-item">
+                    <div class="faq-item reveal">
                         <div class="faq-question">
                             <i class="fas fa-question-circle"></i>
                             <span>Q3. 식사비나 교통비는 어떻게 되나요?</span>
@@ -838,7 +820,7 @@ async function refreshHeartCount() {
                         </div>
                     </div>
                     
-                    <div class="faq-item">
+                    <div class="faq-item reveal">
                         <div class="faq-question">
                             <i class="fas fa-question-circle"></i>
                             <span>Q4. 추가 비용이 발생하는 경우가 있나요?</span>
@@ -851,13 +833,13 @@ async function refreshHeartCount() {
                 </div>
                 
                 <!-- 안심·안전 -->
-                <div class="faq-category">
+                <div class="faq-category reveal">
                     <h3 class="faq-category-title">
                         <i class="fas fa-shield-alt"></i>
                         안심·안전에 대하여
                     </h3>
                     
-                    <div class="faq-item">
+                    <div class="faq-item reveal">
                         <div class="faq-question">
                             <i class="fas fa-question-circle"></i>
                             <span>Q1. '메이트'의 신원은 제대로 확인되어 있나요?</span>
@@ -868,7 +850,7 @@ async function refreshHeartCount() {
                         </div>
                     </div>
                     
-                    <div class="faq-item">
+                    <div class="faq-item reveal">
                         <div class="faq-question">
                             <i class="fas fa-question-circle"></i>
                             <span>Q2. 문제가 있는 경우는?</span>
@@ -936,9 +918,9 @@ async function refreshHeartCount() {
   <a href="https://x.com/puzzmi19889" target="_blank" class="floating-btn x" aria-label="X (Twitter)">
   <i class="fa-brands fa-x-twitter" aria-hidden="true"></i><span>X</span>
 </a>
-  <!-- 예약하기는 내부 섹션으로 연결하거나 외부 예약 URL을 넣으세요 -->
-  <a href="#contact" class="floating-btn book" aria-label="예약하기">
-    <i class="fas fa-calendar-check" aria-hidden="true"></i><span>예약하기</span>
+  <!-- 문의하기 버튼으로 변경 -->
+  <a href="qna.html" class="floating-btn book" aria-label="문의하기">
+    <i class="fas fa-question-circle" aria-hidden="true"></i><span>문의하기</span>
   </a>
 </div>
 </body>

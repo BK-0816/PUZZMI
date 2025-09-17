@@ -96,7 +96,7 @@ export async function renderNavbar(rootId='app-nav') {
     { href: 'index.html#how-it-works', text: '이용방법' },
     { href: 'index.html#friends', text: '메이트 예약' },
     { href: 'index.html#reviews', text: '후기' },
-    { href: 'qna.html', text: 'FAQ' }
+    { href: 'index.html#contact', text: 'FAQ' }
   ];
 
   commonMenus.forEach(menu => {
