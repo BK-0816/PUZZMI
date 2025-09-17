@@ -1031,13 +1031,13 @@
       const { data:{ user } } = await supabase.auth.getUser();
       if (!user) return; // 미로그인
 
-      // 내 예약 중 completed
+      // 내 예약 중 confirmed 또는 completed
       const { data: bks } = await supabase
         .from('bookings')
         .select('id')
         .eq('customer_id', user.id)
         .eq('mate_id', mateId)
-        .eq('status', 'completed');
+        .in('status', ['confirmed', 'completed']);
 
       if (!bks?.length) return;
 
