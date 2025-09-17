@@ -519,585 +519,592 @@
           <div class="field">
             <div class="label">나이 (선택)</div>
             <input class="input" id="signup_age" type="number" min="16" max="100" step="1" placeholder="예: 25"/>
-            <div class="field-help">만 16세 이상만 가입 가능합니다</div>
-          </div>
-        </div>
-        
-        <div class="row single">
-          <div class="field">
-            <div class="label">성별 (선택)</div>
-            <select class="input" id="signup_gender">
-              <option value="">선택하지 않음</option>
-              <option value="여성">여성</option>
-              <option value="남성">남성</option>
-              <option value="기타">기타/비공개</option>
-            </select>
-            <div class="field-help">더 맞춤형 서비스 제공을 위해 선택해주세요</div>
-          </div>
-        </div>
-        
-        <div class="row">
-          <div class="field">
-            <div class="label">이메일</div>
-            <input class="input" id="signup_email" type="email" required autocomplete="email"/>
-            <div class="field-help">로그인 및 예약 알림을 받을 이메일</div>
-          </div>
-          <div class="field">
-            <div class="label">비밀번호</div>
-            <input class="input" id="signup_password" type="password" minlength="8" required autocomplete="new-password"/>
-            <div class="field-help">8자 이상, 영문+숫자 조합 권장</div>
-          </div>
-        </div>
-        
-        <div class="row single">
-          <div class="field">
-            <div class="label">비밀번호 확인</div>
-            <input class="input" id="signup_password_confirm" type="password" minlength="8" required autocomplete="new-password"/>
-            <div class="field-help" id="password-match-help">비밀번호를 다시 입력해주세요</div>
-          </div>
-        </div>
-        
-        <div class="row single">
-          <div class="field">
-            <div class="label">전화번호</div>
-            <input class="input" id="signup_phone" type="tel" placeholder="010-1234-5678" required/>
-            <div class="field-help">SMS 인증을 위한 전화번호를 입력해주세요</div>
-          </div>
-        </div>
-        
-        <!-- SMS 인증 섹션 -->
-        <div class="sms-verification-section" id="smsVerificationSection" style="display: none;">
-          <div class="verification-header">
-            <h4>📱 SMS 인증</h4>
-            <p class="verification-desc">입력하신 전화번호로 인증번호를 발송했습니다</p>
-          </div>
-          
-          <div class="verification-input-group">
-            <input class="input verification-code-input" id="sms_verification_code" type="text" placeholder="000000" maxlength="6" autocomplete="one-time-code"/>
-            <button type="button" class="btn btn-primary" id="verify_sms_btn">인증 확인</button>
-          </div>
-          
-          <div class="verification-actions">
-            <button type="button" class="btn btn-secondary" id="resend_sms_btn">인증번호 재전송</button>
-            <button type="button" class="btn btn-secondary" id="change_phone_btn">전화번호 변경</button>
-          </div>
-          
-          <div class="verification-timer" id="verificationTimer">
-            <span>⏰ 남은 시간: <span id="timerDisplay">05:00</span></span>
-          </div>
-          
-          <div id="sms_verification_result"></div>
-        </div>
-        
-        <div class="row single">
-          <div class="field">
-            <div class="label">🌐 사용 가능한 언어 (선택)</div>
-            <div class="language-checkboxes">
-              <label class="checkbox-item">
-                <input type="checkbox" value="한국어" checked disabled/>
-                <span class="checkbox-label">🇰🇷 한국어 (기본)</span>
-              </label>
-              <label class="checkbox-item">
-                <input type="checkbox" value="日本語" id="lang_ja"/>
-                <span class="checkbox-label">🇯🇵 日本語</span>
-              </label>
-              <label class="checkbox-item">
-                <input type="checkbox" value="English" id="lang_en"/>
-                <span class="checkbox-label">🇺🇸 English</span>
-              </label>
-              <label class="checkbox-item">
-                <input type="checkbox" value="中文" id="lang_zh"/>
-                <span class="checkbox-label">🇨🇳 中文</span>
-              </label>
-            </div>
-            <div class="field-help">메이트 활동 시 소통 가능한 언어를 선택해주세요</div>
-          </div>
-        </div>
+    // DOM이 완전히 로드된 후 실행
+    document.addEventListener('DOMContentLoaded', () => {
+      // ===== Tabs =====
+      const tabs = document.querySelectorAll('.tab');
+      const panels = document.querySelectorAll('form[data-panel]');
+      function switchTab(name){
+        tabs.forEach(x => x.classList.toggle('active', x.getAttribute('data-tab')===name));
+        panels.forEach(p => p.classList.toggle('hidden', p.getAttribute('data-panel') !== name));
+      }
+      tabs.forEach(t => t.addEventListener('click', () => switchTab(t.getAttribute('data-tab'))));
 
-        <div class="terms-section">
-          <label class="checkbox-item terms-checkbox">
-            <input type="checkbox" id="agree_terms" required/>
-            <span class="checkbox-label">
-              <a href="#" class="terms-link">이용약관</a> 및 
-              <a href="#" class="terms-link">개인정보처리방침</a>에 동의합니다
-            </span>
-          </label>
-          
-          <label class="checkbox-item marketing-checkbox">
-            <input type="checkbox" id="agree_marketing"/>
-            <span class="checkbox-label">
-              마케팅 정보 수신에 동의합니다 (선택)
-            </span>
-          </label>
-        </div>
-        <!-- 1단계: 전화번호 인증 버튼 -->
-        <div class="signup-step-1" id="signupStep1">
-          <button type="button" class="btn btn-primary" id="send_sms_btn">📱 인증번호 받기</button>
-        </div>
-        
-        <!-- 2단계: 회원가입 완료 버튼 (SMS 인증 후 활성화) -->
-        <div class="signup-step-2" id="signupStep2" style="display: none;">
-          <button class="btn btn-primary" type="submit" id="signup_btn">🎉 회원가입 완료</button>
-        </div>
+      function getRedirect() {
+        const url = new URL(window.location.href);
+        return url.searchParams.get('redirect') || 'index.html';
+      }
 
-        <div class="signup-info">
-          <div class="info-item">
-            <div class="info-icon">📧</div>
-            <div class="info-text">
-              <strong>이메일 인증</strong><br>
-              회원가입 후 이메일 인증이 필요할 수 있습니다
-            </div>
-          </div>
-          <div class="info-item">
-            <div class="info-icon">🔒</div>
-            <div class="info-text">
-              <strong>개인정보 보호</strong><br>
-              모든 정보는 안전하게 암호화되어 저장됩니다
-            </div>
-          </div>
-        </div>
-        
-        <div id="signup_result"></div>
+      const whoami   = document.getElementById('whoami');
+      const logoutBtn= document.getElementById('logout');
 
-        <div class="sep">또는</div>
-        <div class="oauth-wrap">
-          <button id="btn_google2" class="oauth-btn"><img src="https://www.google.com/favicon.ico" alt="G"/> Google로 계속하기</button>
-          <button id="btn_twitter2" class="oauth-btn"><img src="https://abs.twimg.com/favicons/twitter.ico" alt="X"/> Twitter(X)로 계속하기</button>
-        </div>
-      </form>
-
-      <!-- 매직링크 -->
-      <form id="magicForm" class="stack-16 hidden" data-panel="magic">
-        <div class="field">
-          <div class="label">이메일</div>
-          <input class="input" id="magic_email" type="email" required/>
-        </div>
-        <button class="btn btn-primary" type="submit" id="magic_btn">로그인 링크 보내기</button>
-        <div class="muted">메일의 링크를 클릭하면 자동 로그인됩니다.</div>
-        <div id="magic_result"></div>
-      </form>
-
-      <div class="spacer"></div>
-      <div class="stack-16">
-        <button id="logout" class="btn btn-secondary hidden full">로그아웃</button>
-        <div id="whoami" class="muted"></div>
-      </div>
-    </section>
-  </main>
-
-  <script type="module">
-    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-    const SUPABASE_URL = "https://eevvgbbokenpjnvtmztk.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4";
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    const ENABLE_GOOGLE_OAUTH = true;
-    const ENABLE_TWITTER_OAUTH = true;
-
-    // ===== Tabs =====
-    const tabs = document.querySelectorAll('.tab');
-    const panels = document.querySelectorAll('form[data-panel]');
-    function switchTab(name){
-      tabs.forEach(x => x.classList.toggle('active', x.getAttribute('data-tab')===name));
-      panels.forEach(p => p.classList.toggle('hidden', p.getAttribute('data-panel') !== name));
-    }
-    tabs.forEach(t => t.addEventListener('click', () => switchTab(t.getAttribute('data-tab'))));
-
-    function getRedirect() {
-      const url = new URL(window.location.href);
-      return url.searchParams.get('redirect') || 'index.html';
-    }
-
-    const whoami   = document.getElementById('whoami');
-    const logoutBtn= document.getElementById('logout');
-
-    // ===== 공통: 쿨다운 도우미 =====
-    function setupCooldown(key, btn, baseText){
-      let timer = null;
-      const tick = () => {
-        const until = Number(localStorage.getItem(key) || 0);
-        const left = Math.ceil((until - Date.now())/1000);
-        if (left > 0) {
-          btn.disabled = true;
-          btn.textContent = `${baseText} (${left}s)`;
-          timer = setTimeout(tick, 500);
-        } else {
-          btn.disabled = false;
-          btn.textContent = baseText;
-          localStorage.removeItem(key);
-          timer && clearTimeout(timer);
-        }
-      };
-      const start = (sec=60) => {
-        localStorage.setItem(key, Date.now() + sec*1000);
+      // ===== 공통: 쿨다운 도우미 =====
+      function setupCooldown(key, btn, baseText){
+        let timer = null;
+        const tick = () => {
+          const until = Number(localStorage.getItem(key) || 0);
+          const left = Math.ceil((until - Date.now())/1000);
+          if (left > 0) {
+            btn.disabled = true;
+            btn.textContent = `${baseText} (${left}s)`;
+            timer = setTimeout(tick, 500);
+          } else {
+            btn.disabled = false;
+            btn.textContent = baseText;
+            localStorage.removeItem(key);
+            timer && clearTimeout(timer);
+          }
+        };
+        const start = (sec=60) => {
+          localStorage.setItem(key, Date.now() + sec*1000);
+          tick();
+        };
+        // 초기 상태 복원
         tick();
-      };
-      // 초기 상태 복원
-      tick();
-      return { start };
-    }
-
-    const cdSignup = setupCooldown("cd_signup", document.getElementById("signup_btn"), "회원가입");
-    const cdMagic  = setupCooldown("cd_magic",  document.getElementById("magic_btn"),  "로그인 링크 보내기");
-
-    // ===== LOGIN =====
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const btn = document.getElementById('login_btn');
-      btn.disabled = true;
-
-      const email = document.getElementById('login_email').value.trim();
-      const password = document.getElementById('login_password').value;
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      const box = document.getElementById('login_result');
-
-      if (error) {
-        box.innerHTML = '<div class="error">로그인 실패: ' + error.message + '</div>';
-        btn.disabled = false;
-      } else {
-        box.innerHTML = '<div class="success">로그인 성공! 잠시 후 이동합니다…</div>';
-        setTimeout(() => location.href = getRedirect(), 600);
-      }
-      renderUser();
-    });
-
-    // ===== SIGNUP =====
-    document.getElementById('signupForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      // 폼 유효성 검사
-      const name = document.getElementById('signup_name').value.trim();
-      const age = document.getElementById('signup_age').value;
-      const gender = document.getElementById('signup_gender').value;
-      const email = document.getElementById('signup_email').value.trim();
-      const password = document.getElementById('signup_password').value;
-      const passwordConfirm = document.getElementById('signup_password_confirm').value;
-      const agreeTerms = document.getElementById('agree_terms').checked;
-      const agreeMarketing = document.getElementById('agree_marketing').checked;
-      
-      // 선택된 언어들 수집
-      const languages = ['한국어']; // 기본 한국어
-      if (document.getElementById('lang_ja').checked) languages.push('日本語');
-      if (document.getElementById('lang_en').checked) languages.push('English');
-      if (document.getElementById('lang_zh').checked) languages.push('中文');
-      
-      const box = document.getElementById('signup_result');
-      
-      // 클라이언트 사이드 유효성 검사
-      if (name.length < 2 || name.length > 20) {
-        box.innerHTML = '<div class="error">이름은 2-20자 사이로 입력해주세요.</div>';
-        return;
+        return { start };
       }
 
-      const btn = document.getElementById('signup_btn');
-      btn.disabled = true;
-      btn.innerHTML = '<div class="loading"></div> 회원가입 처리 중...';
+      const cdSignup = setupCooldown("cd_signup", document.getElementById("signup_btn"), "회원가입");
+      const cdMagic  = setupCooldown("cd_magic",  document.getElementById("magic_btn"),  "로그인 링크 보내기");
 
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { 
-          data: { 
-            full_name: name,
-            age,
-            gender: document.getElementById('signup_gender').value || null,
-            languages,
-            marketing_consent: agreeMarketing
-          }, 
-          emailRedirectTo: window.location.origin + '/' + getRedirect() 
-        }
-      });
+      // ===== LOGIN =====
+      document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('login_btn');
+        btn.disabled = true;
 
-      if (error) {
-        const msg = (error.message || "").toLowerCase();
+        const email = document.getElementById('login_email').value.trim();
+        const password = document.getElementById('login_password').value;
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        const box = document.getElementById('login_result');
 
-        // 레이트 리밋
-        if (msg.includes('rate limit') || msg.includes('too many requests')) {
-          box.innerHTML = '<div class="error">요청이 너무 많습니다. 잠시 후 다시 시도해주세요.</div>';
-          cdSignup.start(60);
-          cdResend.start(60);
-          btn.innerHTML = '회원가입';
-          return;
-        }
-
-        // 이미 가입된 이메일 → 매직링크로 유도
-        if (msg.includes('already') && msg.includes('registered')) {
-          box.innerHTML = '<div class="error">🔄 이미 가입된 이메일입니다. 로그인 페이지로 이동합니다.</div>';
-          // 자동으로 매직링크 탭으로 전환 + 전송
-          setTimeout(() => switchTab('login'), 1500);
-          btn.innerHTML = '회원가입';
-          return;
-        }
-
-        box.innerHTML = '<div class="error">회원가입 실패: ' + error.message + '</div>';
-        btn.innerHTML = '회원가입';
-        return;
-      }
-
-      // 가입 정상 → 프로필 upsert (RLS로 실패해도 가입은 성공 처리)
-      if (data?.user?.id) {
-        const { error: profErr } = await supabase
-          .from('profiles')
-          .upsert({ 
-            id: data.user.id, 
-            full_name: name, 
-            age,
-            gender: document.getElementById('signup_gender').value || null,
-            languages,
-            created_at: new Date().toISOString()
-          }, { onConflict: 'id' });
-          
-        if (profErr) {
-          console.warn('profiles upsert blocked by RLS:', profErr.message);
-          box.innerHTML = `
-            <div class="success">
-              <div style="font-size: 1.5rem; margin-bottom: 12px;">🎉</div>
-              <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 8px;">회원가입 완료!</div>
-              <div>이메일을 확인해주세요. 프로필은 로그인 후 수정 가능합니다.</div>
-            </div>
-          `;
-        } else {
-          box.innerHTML = `
-            <div class="success">
-              <div style="font-size: 1.5rem; margin-bottom: 12px;">🎉</div>
-              <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 8px;">회원가입 완료!</div>
-              <div>이메일을 확인하시고 로그인해주세요.</div>
-            </div>
-          `;
-        }
-      } else {
-        box.innerHTML = `
-          <div class="success">
-            <div style="font-size: 1.5rem; margin-bottom: 12px;">📧</div>
-            <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 8px;">회원가입 요청 접수</div>
-            <div>이메일을 확인해주세요.</div>
-          </div>
-        `;
-      }
-
-      // 쿨다운 시작
-      cdSignup.start(60);
-      cdResend.start(60);
-      btn.innerHTML = '회원가입';
-      renderUser();
-    });
-
-    // ===== RESEND SIGNUP EMAIL =====
-    document.getElementById('resend_signup').addEventListener('click', async () => {
-      const email = document.getElementById('signup_email').value.trim();
-      if (!email) {
-        alert('회원가입 섹션의 이메일을 먼저 입력해주세요.');
-        return;
-      }
-      const btn = document.getElementById('resend_signup');
-      btn.disabled = true;
-      const { error } = await supabase.auth.resend({ type: 'signup', email });
-      if (error) {
-        const msg = (error.message || '').toLowerCase();
-        if (msg.includes('rate limit') || msg.includes('too many requests')) {
-          alert('요청이 너무 많습니다. 잠시 후 다시 시도해주세요.');
-        } else {
-          alert('재전송 실패: ' + error.message);
-        }
-      } else {
-        alert('인증 메일을 다시 보냈습니다. 메일함을 확인해주세요.');
-      }
-      cdResend.start(60);
-    });
-
-    // ===== MAGIC LINK =====
-    async function sendMagic(email){
-      const btn = document.getElementById('magic_btn');
-      btn.disabled = true;
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          emailRedirectTo: window.location.origin + '/' + getRedirect(),
-          shouldCreateUser: false   // 이미 가입된 계정에만 전송
-        }
-      });
-      const box = document.getElementById('magic_result');
-      if (error) {
-        const msg = (error.message || '').toLowerCase();
-        if (msg.includes('rate limit') || msg.includes('too many requests')) {
-          box.innerHTML = '<div class="error">요청이 너무 많습니다. 잠시 후 다시 시도해주세요.</div>';
-          cdMagic.start(60);
-        } else {
-          box.innerHTML = '<div class="error">전송 실패: ' + error.message + '</div>';
+        if (error) {
+          box.innerHTML = '<div class="error">로그인 실패: ' + error.message + '</div>';
           btn.disabled = false;
-        }
-      } else {
-        box.innerHTML = '<div class="success">로그인 링크를 전송했습니다. 메일을 확인해주세요.</div>';
-        cdMagic.start(60);
-      }
-    }
-
-    document.getElementById('magicForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('magic_email').value.trim();
-      await sendMagic(email);
-    });
-
-    // ===== OAUTH =====
-    function handleOAuthError(err) {
-      const hint = document.getElementById('oauth_hint');
-      if (!err) return;
-      console.error(err);
-      if (String(err.message || err).includes('Unsupported provider')) {
-        hint.innerHTML = '<div class="error">해당 소셜 로그인이 비활성화되어 있어요. Supabase 대시보드에서 Provider를 켜주세요.</div>';
-      } else {
-        hint.innerHTML = '<div class="error">' + (err.message || String(err)) + '</div>';
-      }
-    }
-
-    async function oauthSignIn(provider) {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: { redirectTo: window.location.origin + '/' + getRedirect() }
-      });
-      if (error) handleOAuthError(error);
-    }
-
-    const gBtns = ['btn_google','btn_google2'].map(id => document.getElementById(id));
-    const tBtns = ['btn_twitter','btn_twitter2'].map(id => document.getElementById(id));
-    gBtns.forEach(b => { if (!ENABLE_GOOGLE_OAUTH) b.classList.add('hidden'); else b.addEventListener('click', () => oauthSignIn('google')); });
-    tBtns.forEach(b => { if (!ENABLE_TWITTER_OAUTH) b.classList.add('hidden'); else b.addEventListener('click', () => oauthSignIn('twitter')); });
-
-    // ===== LOGOUT / WHOAMI =====
-    logoutBtn.addEventListener('click', async () => {
-      await supabase.auth.signOut();
-      renderUser();
-    });
-
-    async function renderUser() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        whoami.innerHTML = '로그인됨: ' + (user.email || user.id);
-        logoutBtn.classList.remove('hidden');
-      } else {
-        whoami.innerHTML = '로그인되지 않음';
-        logoutBtn.classList.add('hidden');
-      }
-    }
-    
-    // 비밀번호 강도 체크
-    function checkPasswordStrength(password) {
-      let score = 0;
-      let feedback = [];
-      
-      if (password.length >= 8) score += 1;
-      else feedback.push('8자 이상');
-      
-      if (/[a-z]/.test(password)) score += 1;
-      else feedback.push('소문자');
-      
-      if (/[A-Z]/.test(password)) score += 1;
-      else feedback.push('대문자');
-      
-      if (/[0-9]/.test(password)) score += 1;
-      else feedback.push('숫자');
-      
-      if (/[^a-zA-Z0-9]/.test(password)) score += 1;
-      else feedback.push('특수문자');
-      
-      if (score <= 2) return { level: 'weak', text: '약함 - ' + feedback.slice(0,2).join(', ') + ' 필요' };
-      if (score <= 3) return { level: 'medium', text: '보통 - ' + feedback.slice(0,1).join(', ') + ' 추가 권장' };
-      return { level: 'strong', text: '강함 - 안전한 비밀번호입니다!' };
-    }
-    
-    // 비밀번호 입력 시 강도 체크
-    document.getElementById('signup_password').addEventListener('input', (e) => {
-      const password = e.target.value;
-      const helpEl = document.querySelector('#signup_password').parentNode.querySelector('.field-help');
-      
-      if (password.length > 0) {
-        const strength = checkPasswordStrength(password);
-        
-        // 기존 강도 표시 제거
-        const existingStrength = document.querySelector('.password-strength');
-        if (existingStrength) existingStrength.remove();
-        
-        // 새 강도 표시 추가
-        const strengthEl = document.createElement('div');
-        strengthEl.className = `password-strength ${strength.level}`;
-        strengthEl.textContent = strength.text;
-        helpEl.parentNode.appendChild(strengthEl);
-      }
-    });
-    
-    // 비밀번호 확인 체크
-    document.getElementById('signup_password_confirm').addEventListener('input', (e) => {
-      const password = document.getElementById('signup_password').value;
-      const confirm = e.target.value;
-      const helpEl = document.getElementById('password-match-help');
-      
-      if (confirm.length > 0) {
-        if (password === confirm) {
-          helpEl.textContent = '✅ 비밀번호가 일치합니다';
-          helpEl.className = 'field-help success';
         } else {
-          helpEl.textContent = '❌ 비밀번호가 일치하지 않습니다';
+          box.innerHTML = '<div class="success">로그인 성공! 잠시 후 이동합니다…</div>';
+          setTimeout(() => location.href = getRedirect(), 600);
+        }
+        renderUser();
+      });
+
+      // SMS 인증 관련 변수들
+      let smsVerificationCode = null;
+      let smsVerificationExpiry = null;
+      let smsTimer = null;
+      let isPhoneVerified = false;
+
+      // SMS 인증번호 발송
+      async function sendSMSVerification(phoneNumber) {
+        try {
+          // 실제 SMS 서비스가 있다면 사용, 없으면 시뮬레이션
+          if (smsService) {
+            const result = await smsService.sendVerificationCode(phoneNumber);
+            if (result.success) {
+              smsVerificationCode = result.code;
+              smsVerificationExpiry = Date.now() + (5 * 60 * 1000); // 5분
+              return { success: true, message: 'SMS 인증번호가 발송되었습니다.' };
+            } else {
+              return { success: false, message: result.message || 'SMS 발송에 실패했습니다.' };
+            }
+          } else {
+            // 시뮬레이션 모드
+            smsVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+            smsVerificationExpiry = Date.now() + (5 * 60 * 1000); // 5분
+            console.log(`🔐 SMS 시뮬레이션 - 인증번호: ${smsVerificationCode}`);
+            return { success: true, message: 'SMS 인증번호가 발송되었습니다. (개발 모드: 콘솔 확인)' };
+          }
+        } catch (error) {
+          console.error('SMS 발송 오류:', error);
+          return { success: false, message: 'SMS 발송 중 오류가 발생했습니다.' };
+        }
+      }
+
+      // SMS 인증번호 확인
+      function verifySMSCode(inputCode) {
+        if (!smsVerificationCode) {
+          return { success: false, message: '인증번호를 먼저 요청해주세요.' };
+        }
+        
+        if (Date.now() > smsVerificationExpiry) {
+          return { success: false, message: '인증번호가 만료되었습니다. 다시 요청해주세요.' };
+        }
+        
+        if (inputCode === smsVerificationCode) {
+          isPhoneVerified = true;
+          return { success: true, message: 'SMS 인증이 완료되었습니다!' };
+        } else {
+          return { success: false, message: '인증번호가 올바르지 않습니다.' };
+        }
+      }
+
+      // SMS 타이머 시작
+      function startSMSTimer() {
+        const timerDisplay = document.getElementById('timerDisplay');
+        const timerContainer = document.getElementById('verificationTimer');
+        
+        if (smsTimer) clearInterval(smsTimer);
+        
+        smsTimer = setInterval(() => {
+          const remaining = Math.max(0, smsVerificationExpiry - Date.now());
+          const minutes = Math.floor(remaining / 60000);
+          const seconds = Math.floor((remaining % 60000) / 1000);
+          
+          if (remaining > 0) {
+            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            timerContainer.classList.remove('expired');
+          } else {
+            timerDisplay.textContent = '00:00';
+            timerContainer.classList.add('expired');
+            clearInterval(smsTimer);
+          }
+        }, 1000);
+      }
+
+      // SMS 인증번호 발송 버튼
+      document.getElementById('send_sms_btn').addEventListener('click', async () => {
+        const phoneNumber = document.getElementById('signup_phone').value.trim();
+        
+        if (!phoneNumber) {
+          alert('전화번호를 입력해주세요.');
+          return;
+        }
+        
+        // 전화번호 유효성 검사
+        const cleanPhone = phoneNumber.replace(/[^0-9]/g, '');
+        if (cleanPhone.length !== 11 || !cleanPhone.startsWith('010')) {
+          alert('올바른 전화번호를 입력해주세요. (010-XXXX-XXXX)');
+          return;
+        }
+        
+        const btn = document.getElementById('send_sms_btn');
+        const originalText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = '발송 중...';
+        
+        const result = await sendSMSVerification(phoneNumber);
+        
+        if (result.success) {
+          // SMS 인증 섹션 표시
+          document.getElementById('smsVerificationSection').style.display = 'block';
+          document.getElementById('signupStep1').style.display = 'none';
+          
+          // 타이머 시작
+          startSMSTimer();
+          
+          // 결과 표시
+          document.getElementById('sms_verification_result').innerHTML = 
+            `<div class="success">${result.message}</div>`;
+        } else {
+          document.getElementById('sms_verification_result').innerHTML = 
+            `<div class="error">${result.message}</div>`;
+        }
+        
+        btn.disabled = false;
+        btn.textContent = originalText;
+      });
+
+      // SMS 인증 확인 버튼
+      document.getElementById('verify_sms_btn').addEventListener('click', () => {
+        const inputCode = document.getElementById('sms_verification_code').value.trim();
+        
+        if (!inputCode) {
+          alert('인증번호를 입력해주세요.');
+          return;
+        }
+        
+        const result = verifySMSCode(inputCode);
+        const resultBox = document.getElementById('sms_verification_result');
+        
+        if (result.success) {
+          resultBox.innerHTML = `<div class="success">${result.message}</div>`;
+          
+          // SMS 인증 섹션 숨기고 회원가입 완료 버튼 표시
+          document.getElementById('smsVerificationSection').style.display = 'none';
+          document.getElementById('signupStep2').style.display = 'block';
+          
+          // 타이머 정리
+          if (smsTimer) {
+            clearInterval(smsTimer);
+            smsTimer = null;
+          }
+        } else {
+          resultBox.innerHTML = `<div class="error">${result.message}</div>`;
+        }
+      });
+
+      // SMS 재전송 버튼
+      document.getElementById('resend_sms_btn').addEventListener('click', async () => {
+        const phoneNumber = document.getElementById('signup_phone').value.trim();
+        const btn = document.getElementById('resend_sms_btn');
+        const originalText = btn.textContent;
+        
+        btn.disabled = true;
+        btn.textContent = '재전송 중...';
+        
+        const result = await sendSMSVerification(phoneNumber);
+        const resultBox = document.getElementById('sms_verification_result');
+        
+        if (result.success) {
+          resultBox.innerHTML = `<div class="success">인증번호를 다시 발송했습니다.</div>`;
+          startSMSTimer();
+        } else {
+          resultBox.innerHTML = `<div class="error">${result.message}</div>`;
+        }
+        
+        btn.disabled = false;
+        btn.textContent = originalText;
+      });
+
+      // 전화번호 변경 버튼
+      document.getElementById('change_phone_btn').addEventListener('click', () => {
+        // SMS 인증 섹션 숨기고 1단계로 돌아가기
+        document.getElementById('smsVerificationSection').style.display = 'none';
+        document.getElementById('signupStep1').style.display = 'block';
+        document.getElementById('signupStep2').style.display = 'none';
+        
+        // 인증 상태 초기화
+        isPhoneVerified = false;
+        smsVerificationCode = null;
+        smsVerificationExpiry = null;
+        
+        // 타이머 정리
+        if (smsTimer) {
+          clearInterval(smsTimer);
+          smsTimer = null;
+        }
+        
+        // 입력 필드 초기화
+        document.getElementById('sms_verification_code').value = '';
+        document.getElementById('sms_verification_result').innerHTML = '';
+        
+        // 전화번호 입력 필드에 포커스
+        document.getElementById('signup_phone').focus();
+      });
+
+      // ===== SIGNUP =====
+      document.getElementById('signupForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // SMS 인증 확인
+        if (!isPhoneVerified) {
+          alert('전화번호 인증을 먼저 완료해주세요.');
+          return;
+        }
+        
+        // 폼 유효성 검사
+        const name = document.getElementById('signup_name').value.trim();
+        const age = document.getElementById('signup_age').value;
+        const gender = document.getElementById('signup_gender').value;
+        const email = document.getElementById('signup_email').value.trim();
+        const password = document.getElementById('signup_password').value;
+        const passwordConfirm = document.getElementById('signup_password_confirm').value;
+        const agreeTerms = document.getElementById('agree_terms').checked;
+        const agreeMarketing = document.getElementById('agree_marketing').checked;
+        
+        // 비밀번호 확인
+        if (password !== passwordConfirm) {
+          alert('비밀번호가 일치하지 않습니다.');
+          return;
+        }
+        
+        // 약관 동의 확인
+        if (!agreeTerms) {
+          alert('이용약관에 동의해주세요.');
+          return;
+        }
+        
+        // 선택된 언어들 수집
+        const languages = ['한국어']; // 기본 한국어
+        if (document.getElementById('lang_ja').checked) languages.push('日本語');
+        if (document.getElementById('lang_en').checked) languages.push('English');
+        if (document.getElementById('lang_zh').checked) languages.push('中文');
+        
+        const box = document.getElementById('signup_result');
+        
+        // 클라이언트 사이드 유효성 검사
+        if (name.length < 2 || name.length > 20) {
+          box.innerHTML = '<div class="error">이름은 2-20자 사이로 입력해주세요.</div>';
+          return;
+        }
+
+        const btn = document.getElementById('signup_btn');
+        btn.disabled = true;
+        btn.innerHTML = '<div class="loading"></div> 회원가입 처리 중...';
+
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: { 
+            data: { 
+              full_name: name,
+              age,
+              gender: document.getElementById('signup_gender').value || null,
+              languages
+            }, 
+            emailRedirectTo: window.location.origin + '/' + getRedirect() 
+          }
+        });
+
+        if (error) {
+          const msg = (error.message || "").toLowerCase();
+
+          // 레이트 리밋
+          if (msg.includes('rate limit') || msg.includes('too many requests')) {
+            box.innerHTML = '<div class="error">요청이 너무 많습니다. 잠시 후 다시 시도해주세요.</div>';
+            cdSignup.start(60);
+            btn.innerHTML = '🎉 회원가입 완료';
+            return;
+          }
+
+          // 이미 가입된 이메일 → 로그인으로 유도
+          if (msg.includes('already') && msg.includes('registered')) {
+            box.innerHTML = '<div class="error">🔄 이미 가입된 이메일입니다. 로그인 페이지로 이동합니다.</div>';
+            setTimeout(() => switchTab('login'), 1500);
+            btn.innerHTML = '🎉 회원가입 완료';
+            return;
+          }
+
+          box.innerHTML = '<div class="error">회원가입 실패: ' + error.message + '</div>';
+          btn.innerHTML = '🎉 회원가입 완료';
+          return;
+        }
+
+        // 가입 정상 → 프로필 upsert (RLS로 실패해도 가입은 성공 처리)
+        if (data?.user?.id) {
+          const { error: profErr } = await supabase
+            .from('profiles')
+            .upsert({ 
+              id: data.user.id, 
+              full_name: name, 
+              age,
+              gender: document.getElementById('signup_gender').value || null,
+              languages,
+              created_at: new Date().toISOString()
+            }, { onConflict: 'id' });
+            
+          if (profErr) {
+            console.warn('profiles upsert blocked by RLS:', profErr.message);
+            box.innerHTML = `
+              <div class="success">
+                <div style="font-size: 1.5rem; margin-bottom: 12px;">🎉</div>
+                <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 8px;">회원가입 완료!</div>
+                <div>이메일을 확인해주세요. 프로필은 로그인 후 수정 가능합니다.</div>
+              </div>
+            `;
+          } else {
+            box.innerHTML = `
+              <div class="success">
+                <div style="font-size: 1.5rem; margin-bottom: 12px;">🎉</div>
+                <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 8px;">회원가입 완료!</div>
+                <div>이메일을 확인하시고 로그인해주세요.</div>
+              </div>
+            `;
+          }
+        } else {
+          box.innerHTML = `
+            <div class="success">
+              <div style="font-size: 1.5rem; margin-bottom: 12px;">📧</div>
+              <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 8px;">회원가입 요청 접수</div>
+              <div>이메일을 확인해주세요.</div>
+            </div>
+          `;
+        }
+
+        // 쿨다운 시작
+        cdSignup.start(60);
+        btn.innerHTML = '🎉 회원가입 완료';
+        renderUser();
+      });
+
+      // ===== MAGIC LINK =====
+      async function sendMagic(email){
+        const btn = document.getElementById('magic_btn');
+        btn.disabled = true;
+        const { error } = await supabase.auth.signInWithOtp({
+          email,
+          options: {
+            emailRedirectTo: window.location.origin + '/' + getRedirect(),
+            shouldCreateUser: false   // 이미 가입된 계정에만 전송
+          }
+        });
+        const box = document.getElementById('magic_result');
+        if (error) {
+          const msg = (error.message || '').toLowerCase();
+          if (msg.includes('rate limit') || msg.includes('too many requests')) {
+            box.innerHTML = '<div class="error">요청이 너무 많습니다. 잠시 후 다시 시도해주세요.</div>';
+            cdMagic.start(60);
+          } else {
+            box.innerHTML = '<div class="error">전송 실패: ' + error.message + '</div>';
+            btn.disabled = false;
+          }
+        } else {
+          box.innerHTML = '<div class="success">로그인 링크를 전송했습니다. 메일을 확인해주세요.</div>';
+          cdMagic.start(60);
+        }
+      }
+
+      document.getElementById('magicForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('magic_email').value.trim();
+        await sendMagic(email);
+      });
+
+      // ===== OAUTH =====
+      function handleOAuthError(err) {
+        const hint = document.getElementById('oauth_hint');
+        if (!err) return;
+        console.error(err);
+        if (String(err.message || err).includes('Unsupported provider')) {
+          hint.innerHTML = '<div class="error">해당 소셜 로그인이 비활성화되어 있어요. Supabase 대시보드에서 Provider를 켜주세요.</div>';
+        } else {
+          hint.innerHTML = '<div class="error">' + (err.message || String(err)) + '</div>';
+        }
+      }
+
+      async function oauthSignIn(provider) {
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider,
+          options: { redirectTo: window.location.origin + '/' + getRedirect() }
+        });
+        if (error) handleOAuthError(error);
+      }
+
+      const gBtns = ['btn_google','btn_google2'].map(id => document.getElementById(id));
+      const tBtns = ['btn_twitter','btn_twitter2'].map(id => document.getElementById(id));
+      gBtns.forEach(b => { if (!ENABLE_GOOGLE_OAUTH) b.classList.add('hidden'); else b.addEventListener('click', () => oauthSignIn('google')); });
+      tBtns.forEach(b => { if (!ENABLE_TWITTER_OAUTH) b.classList.add('hidden'); else b.addEventListener('click', () => oauthSignIn('twitter')); });
+
+      // ===== LOGOUT / WHOAMI =====
+      logoutBtn.addEventListener('click', async () => {
+        await supabase.auth.signOut();
+        renderUser();
+      });
+
+      async function renderUser() {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          whoami.innerHTML = '로그인됨: ' + (user.email || user.id);
+          logoutBtn.classList.remove('hidden');
+        } else {
+          whoami.innerHTML = '로그인되지 않음';
+          logoutBtn.classList.add('hidden');
+        }
+      }
+      
+      // 비밀번호 강도 체크
+      function checkPasswordStrength(password) {
+        let score = 0;
+        let feedback = [];
+        
+        if (password.length >= 8) score += 1;
+        else feedback.push('8자 이상');
+        
+        if (/[a-z]/.test(password)) score += 1;
+        else feedback.push('소문자');
+        
+        if (/[A-Z]/.test(password)) score += 1;
+        else feedback.push('대문자');
+        
+        if (/[0-9]/.test(password)) score += 1;
+        else feedback.push('숫자');
+        
+        if (/[^a-zA-Z0-9]/.test(password)) score += 1;
+        else feedback.push('특수문자');
+        
+        if (score <= 2) return { level: 'weak', text: '약함 - ' + feedback.slice(0,2).join(', ') + ' 필요' };
+        if (score <= 3) return { level: 'medium', text: '보통 - ' + feedback.slice(0,1).join(', ') + ' 추가 권장' };
+        return { level: 'strong', text: '강함 - 안전한 비밀번호입니다!' };
+      }
+      
+      // 비밀번호 입력 시 강도 체크
+      document.getElementById('signup_password').addEventListener('input', (e) => {
+        const password = e.target.value;
+        const helpEl = document.querySelector('#signup_password').parentNode.querySelector('.field-help');
+        
+        if (password.length > 0) {
+          const strength = checkPasswordStrength(password);
+          
+          // 기존 강도 표시 제거
+          const existingStrength = document.querySelector('.password-strength');
+          if (existingStrength) existingStrength.remove();
+          
+          // 새 강도 표시 추가
+          const strengthEl = document.createElement('div');
+          strengthEl.className = `password-strength ${strength.level}`;
+          strengthEl.textContent = strength.text;
+          helpEl.parentNode.appendChild(strengthEl);
+        }
+      });
+      
+      // 비밀번호 확인 체크
+      document.getElementById('signup_password_confirm').addEventListener('input', (e) => {
+        const password = document.getElementById('signup_password').value;
+        const confirm = e.target.value;
+        const helpEl = document.getElementById('password-match-help');
+        
+        if (confirm.length > 0) {
+          if (password === confirm) {
+            helpEl.textContent = '✅ 비밀번호가 일치합니다';
+            helpEl.className = 'field-help success';
+          } else {
+            helpEl.textContent = '❌ 비밀번호가 일치하지 않습니다';
+            helpEl.className = 'field-help error';
+          }
+        } else {
+          helpEl.textContent = '비밀번호를 다시 입력해주세요';
+          helpEl.className = 'field-help';
+        }
+      });
+      
+      // 이메일 유효성 실시간 체크
+      document.getElementById('signup_email').addEventListener('blur', async (e) => {
+        const email = e.target.value.trim();
+        const helpEl = e.target.parentNode.querySelector('.field-help');
+        
+        if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          helpEl.textContent = '✅ 유효한 이메일 형식입니다';
+          helpEl.className = 'field-help success';
+        } else if (email) {
+          helpEl.textContent = '❌ 올바른 이메일 형식이 아닙니다';
           helpEl.className = 'field-help error';
+        } else {
+          helpEl.textContent = '로그인 및 예약 알림을 받을 이메일';
+          helpEl.className = 'field-help';
         }
-      } else {
-        helpEl.textContent = '비밀번호를 다시 입력해주세요';
-        helpEl.className = 'field-help';
-      }
-    });
-    
-    // 이메일 유효성 실시간 체크
-    document.getElementById('signup_email').addEventListener('blur', async (e) => {
-      const email = e.target.value.trim();
-      const helpEl = e.target.parentNode.querySelector('.field-help');
+      });
       
-      if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        helpEl.textContent = '✅ 유효한 이메일 형식입니다';
-        helpEl.className = 'field-help success';
-      } else if (email) {
-        helpEl.textContent = '❌ 올바른 이메일 형식이 아닙니다';
-        helpEl.className = 'field-help error';
-      } else {
-        helpEl.textContent = '로그인 및 예약 알림을 받을 이메일';
-        helpEl.className = 'field-help';
-      }
-    });
-    
-    renderUser();
-    
-    // SMS 서비스 import
-    import('./sms_service.js').then(module => {
-      window.smsService = module.smsService;
-    }).catch(error => {
-      console.warn('SMS 서비스 로드 실패, 시뮬레이션 모드로 동작:', error);
-    });
-    
-    // 전화번호 입력 시 실시간 포맷팅
-    document.getElementById('signup_phone').addEventListener('input', (e) => {
-      let value = e.target.value.replace(/[^0-9]/g, '');
-      
-      // 한국 전화번호 포맷팅 (010-1234-5678)
-      if (value.startsWith('010') && value.length <= 11) {
-        if (value.length > 3 && value.length <= 7) {
-          value = value.slice(0, 3) + '-' + value.slice(3);
-        } else if (value.length > 7) {
-          value = value.slice(0, 3) + '-' + value.slice(3, 7) + '-' + value.slice(7);
+      // 전화번호 입력 시 실시간 포맷팅
+      document.getElementById('signup_phone').addEventListener('input', (e) => {
+        let value = e.target.value.replace(/[^0-9]/g, '');
+        
+        // 한국 전화번호 포맷팅 (010-1234-5678)
+        if (value.startsWith('010') && value.length <= 11) {
+          if (value.length > 3 && value.length <= 7) {
+            value = value.slice(0, 3) + '-' + value.slice(3);
+          } else if (value.length > 7) {
+            value = value.slice(0, 3) + '-' + value.slice(3, 7) + '-' + value.slice(7);
+          }
         }
-      }
+        
+        e.target.value = value;
+        
+        // 전화번호 유효성 실시간 체크
+        const helpEl = e.target.parentNode.querySelector('.field-help');
+        if (value.replace(/[^0-9]/g, '').length === 11 && value.startsWith('010')) {
+          helpEl.textContent = '✅ 유효한 전화번호 형식입니다';
+          helpEl.className = 'field-help success';
+        } else if (value.length > 0) {
+          helpEl.textContent = '❌ 올바른 전화번호를 입력해주세요';
+          helpEl.className = 'field-help error';
+        } else {
+          helpEl.textContent = 'SMS 인증을 위한 전화번호를 입력해주세요';
+          helpEl.className = 'field-help';
+        }
+      });
       
-      e.target.value = value;
-      
-      // 전화번호 유효성 실시간 체크
-      const helpEl = e.target.parentNode.querySelector('.field-help');
-      if (value.replace(/[^0-9]/g, '').length === 11 && value.startsWith('010')) {
-        helpEl.textContent = '✅ 유효한 전화번호 형식입니다';
-        helpEl.className = 'field-help success';
-      } else if (value.length > 0) {
-        helpEl.textContent = '❌ 올바른 전화번호를 입력해주세요';
-        helpEl.className = 'field-help error';
-      } else {
-        helpEl.textContent = 'SMS 인증을 위한 전화번호를 입력해주세요';
-        helpEl.className = 'field-help';
-      }
+      // 초기 렌더링
+      renderUser();
     });
   </script>
 </body>
