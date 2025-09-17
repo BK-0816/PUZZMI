@@ -632,6 +632,32 @@
       }
     }
     
+    /* 로딩 상태 */
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 60px;
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+    }
+    
+    .loading::before {
+      content: '';
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(102, 126, 234, 0.2);
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 12px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
 
     // 알림 메시지 파싱 및 포맷팅 함수
     function formatNotificationBody(body, type) {
