@@ -786,6 +786,7 @@ function initializeFAQ() {
     
     faqItems.forEach(item => {
         const question = item.querySelector('.faq-question');
+        const answer = item.querySelector('.faq-answer');
         
         question.addEventListener('click', () => {
             const isActive = item.classList.contains('active');
@@ -794,11 +795,28 @@ function initializeFAQ() {
             faqItems.forEach(otherItem => {
                 if (otherItem !== item) {
                     otherItem.classList.remove('active');
+                    const otherAnswer = otherItem.querySelector('.faq-answer');
+                    if (otherAnswer) {
+                        otherAnswer.style.maxHeight = '0';
+                        otherAnswer.style.opacity = '0';
+                    }
                 }
             });
             
             // 현재 아이템 토글
-            item.classList.toggle('active', !isActive);
+            if (isActive) {
+                item.classList.remove('active');
+                if (answer) {
+                    answer.style.maxHeight = '0';
+                    answer.style.opacity = '0';
+                }
+            } else {
+                item.classList.add('active');
+                if (answer) {
+                    answer.style.maxHeight = answer.scrollHeight + 'px';
+                    answer.style.opacity = '1';
+                }
+            }
         });
     });
 }
