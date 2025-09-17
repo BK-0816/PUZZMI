@@ -321,7 +321,11 @@ async function refreshHeartCount() {
             return b.rating - a.rating;
           }
           // 2차: 글자수 많은 순
-          return (b.content?.length || 0) - (a.content?.length || 0);
+          if ((b.content?.length || 0) !== (a.content?.length || 0)) {
+            return (b.content?.length || 0) - (a.content?.length || 0);
+          }
+          // 3차: 최신순
+          return new Date(b.created_at) - new Date(a.created_at);
         })
         .slice(0, 6); // 최대 6개만 표시
 
@@ -401,11 +405,11 @@ async function refreshHeartCount() {
                   <h4 class="reviewer-name">${authorName}</h4>
                 </div>
               </div>
-              <div class="review-rating">
-                ${renderStars(review.rating)}
-              </div>
             </div>
             <p class="review-text">"${review.content}"</p>
+            <div class="review-rating">
+              ${renderStars(review.rating)}
+            </div>
             <p class="review-date">${reviewDate}</p>
             <div class="review-mate" style="margin-top: 12px; padding: 8px 12px; background: rgba(102, 126, 234, 0.1); border-radius: 8px; font-size: 0.9rem; color: var(--text-secondary);">
               메이트 <strong>${mateName}</strong> 님과 함께한 여행
