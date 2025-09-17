@@ -15,31 +15,29 @@
     .grid{ display:grid; gap:16px; }
     .card h2{ margin:0 0 8px; }
     .muted{ color:var(--text-secondary); }
-    .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
-    .pill{ display:inline-block; padding:4px 10px; border-radius:999px; background:#fff; border:1px solid #eee; }
-    /* 캐러셀 */
-    .carousel{ position:relative; margin:8px 0 12px; }
+    .carousel{ position:relative; }
     .carousel .track{ display:flex; gap:8px; overflow-x:auto; scroll-snap-type:x mandatory; padding:6px; }
     .carousel .track::-webkit-scrollbar{ height:8px; }
     .carousel .track > img{ flex:0 0 auto; width:320px; height:220px; object-fit:cover; border-radius:12px; scroll-snap-align:start; background:#f5f5f5; }
     .carousel .nav{ position:absolute; top:50%; transform:translateY(-50%); background:rgba(0,0,0,.5); color:#fff; border:none; width:36px; height:36px; border-radius:50%; cursor:pointer; }
     .carousel .prev{ left:6px; }
     .carousel .next{ right:6px; }
-    /* 리뷰 */
-    .reviews{ margin-top:18px; }
-    .reviews .item + .item{ margin-top:10px; }
-    .reviews .meta{ font-size:.9rem; color:var(--text-secondary); display:flex; gap:8px; flex-wrap:wrap; }
-    .reviews .reply{ background:#fff; border:1px solid #eee; border-radius:10px; padding:10px; margin-top:8px; }
-    .reviews textarea{ width:100%; min-height:110px; }
+    .row{ display:flex; gap:12px; flex-wrap:wrap; align-items:flex-start; }
+    .pill{ padding:6px 10px; border:1px solid rgba(0,0,0,.1); border-radius:999px; background:#fff; cursor:pointer; }
+    .pill.active{ background:var(--primary-color); color:#fff; border-color:transparent; }
+    .reviews{ margin-top:18px }
+    .reviews .item{ padding:12px }
+    .reviews .meta{ color:var(--text-secondary); font-size:.9rem; display:flex; gap:6px; align-items:center }
+    .reply .label{ font-weight:700; color:var(--text-secondary) }
   </style>
 </head>
 <body class="bg-cream">
   <div id="app-nav"></div>
-
   <main class="wrap">
     <section class="card">
       <h2 id="mateName">메이트 프로필</h2>
 
+      <!-- 전체 사진 캐러셀 -->
       <div class="carousel">
         <button class="nav prev" aria-label="이전">‹</button>
         <div class="track" id="photoTrack"></div>
@@ -49,19 +47,28 @@
       <div id="meta" class="grid" style="margin-top:12px"></div>
 
       <div class="row" style="margin-top:8px">
-        <button class="cta-btn" id="backBtn">목록으로</button>
-        <button class="cta-btn" id="bookBtn" data-requires-auth="true">예약하기</button>
-        <button class="cta-btn" id="favBtn" data-requires-auth="true">찜하기</button>
-        <div id="favMsg" class="muted" style="display:none">찜 완료</div>
+        <a class="btn btn-secondary" id="backBtn">목록으로</a>
+        <a class="cta-btn" id="bookBtn">예약하기</a>
       </div>
     </section>
 
     <!-- 리뷰 영역 -->
     <section class="card reviews">
-      <h3>리뷰</h3>
+      <h3 style="margin:0 0 8px">리뷰</h3>
 
-      <!-- 고객 전용: 리뷰 작성 가능할 때만 보임 -->
+      <!-- 작성 폼 (필요할 때만 보여짐) -->
       <form id="reviewForm" class="grid" style="display:none; margin-bottom:12px">
+        <div class="field">
+          <div class="label">별점</div>
+          <div id="ratingWrap" class="row" style="gap:6px">
+            <button type="button" class="pill" data-rate="5">★ 5</button>
+            <button type="button" class="pill" data-rate="4">★ 4</button>
+            <button type="button" class="pill" data-rate="3">★ 3</button>
+            <button type="button" class="pill" data-rate="2">★ 2</button>
+            <button type="button" class="pill" data-rate="1">★ 1</button>
+            <input type="hidden" id="rating" value="">
+          </div>
+        </div>
         <div class="field">
           <div class="label">리뷰 내용</div>
           <textarea class="input" id="reviewText" placeholder="이용 후기를 남겨주세요." required></textarea>
@@ -72,18 +79,13 @@
         </div>
       </form>
 
-      <!-- 목록 -->
-      <div id="reviewsList"></div>
+      <!-- 리뷰 목록 -->
+      <div id="reviewsList" class="stack-16"></div>
     </section>
   </main>
 
   <script type="module">
-    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-    const supabase = createClient(
-      "https://eevvgbbokenpjnvtmztk.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4"
-    );
+    import { supabase } from "./nav.js";
 
     const params = new URLSearchParams(location.search);
     const mateId = params.get('mate_id');
@@ -92,131 +94,104 @@
       history.back();
     }
 
-    // 엘리먼트
-    const track      = document.getElementById('photoTrack');
-    const mateNameEl = document.getElementById('mateName');
-    const meta       = document.getElementById('meta');
-    const backBtn    = document.getElementById('backBtn');
-    const bookBtn    = document.getElementById('bookBtn');
-    const favBtn     = document.getElementById('favBtn');
-    const favMsg     = document.getElementById('favMsg');
-
-    const reviewForm   = document.getElementById('reviewForm');
-    const reviewText   = document.getElementById('reviewText');
-    const reviewResult = document.getElementById('reviewResult');
-    const reviewsList  = document.getElementById('reviewsList');
-
-    // 링크 세팅
+    const backBtn = document.getElementById('backBtn');
+    const bookBtn = document.getElementById('bookBtn');
     backBtn.href = './index.html#friends';
     bookBtn.href = `booking.html?mate_id=${encodeURIComponent(mateId)}`;
 
-    // 스토리지 키 → 공개 URL (mates/ 접두 실수 보정)
     function keyToUrl(key) {
-      if (!key) return null;
-      if (/^https?:\/\//i.test(key)) return key; // 이미 URL이면 그대로
+      if (!key) return '';
+      if (/^https?:\/\//i.test(key)) return key;
       const pure = key.startsWith('mates/') ? key.replace(/^mates\//,'') : key;
       return supabase.storage.from('mates').getPublicUrl(pure).data.publicUrl;
     }
 
-    // 로그인 가드
-    document.addEventListener('click', async (e) => {
-      const guarded = e.target.closest('[data-requires-auth="true"]');
-      if (!guarded) return;
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) return;
-      e.preventDefault();
-      const redir = encodeURIComponent(guarded.getAttribute('href') || (location.pathname + location.search));
-      location.href = `auth_combo.html?redirect=${redir}`;
-    });
+    const track = document.getElementById('photoTrack');
+    const mateName = document.getElementById('mateName');
+    const meta = document.getElementById('meta');
 
-    // 찜하기
-    favBtn.addEventListener('click', async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        const redir = encodeURIComponent(location.pathname + location.search);
-        return (location.href = `auth_combo.html?redirect=${redir}`);
-      }
-      const { error } = await supabase
-        .from('favorites')
-        .upsert({ user_id: user.id, mate_id: mateId }, { onConflict: 'user_id,mate_id', ignoreDuplicates: true });
-      if (error) return alert('찜하기 실패: ' + error.message);
-      favBtn.disabled = true;
-      favMsg.style.display = 'inline';
-    });
+    // ========== 프로필 로드 ==========
+    const { data: mp, error: mpErr } = await supabase
+      .from('mate_profiles')
+      .select(`user_id, bio, hourly_rate, tags, areas, rating, photos, primary_photo, is_verified,
+               profiles ( full_name, age, gender, languages )`)
+      .eq('user_id', mateId)
+      .maybeSingle();
 
-    // 프로필 & 사진 로드 (photos + primary_photo 모두 사용)
-    async function loadProfile() {
-      const { data: row, error } = await supabase
-        .from('mate_profiles')
-        .select(`
-          user_id, bio, hourly_rate, tags, areas, photos, primary_photo,
-          profiles ( full_name, age, gender, languages )
-        `)
-        .eq('user_id', mateId)
-        .maybeSingle();
+    if (mpErr || !mp) {
+      track.innerHTML = '<div class="muted" style="padding:8px">프로필을 불러오지 못했습니다.</div>';
+    } else {
+      mateName.textContent = (mp.profiles?.full_name ?? '메이트') + ' 님';
 
-      if (error || !row) {
-        mateNameEl.textContent = '메이트';
-        track.innerHTML = '<div class="muted" style="padding:8px">프로필을 불러오지 못했습니다.</div>';
-        meta.innerHTML  = '';
-        return;
-      }
-
-      // 이름
-      mateNameEl.textContent = (row.profiles?.full_name ?? '메이트') + ' 님';
-
-      // 사진 캐러셀: primary가 맨 앞, 나머지는 중복 제거 후 뒤에
-      const keys = Array.isArray(row.photos) ? [...row.photos] : [];
-      const list = [];
-      if (row.primary_photo) list.push(row.primary_photo);
-      for (const k of keys) if (!list.includes(k)) list.push(k);
-
-      if (!list.length) {
+      const allKeys = Array.isArray(mp.photos) ? mp.photos : [];
+      const keys = mp.primary_photo ? [mp.primary_photo, ...allKeys.filter(k => k !== mp.primary_photo)] : allKeys;
+      if (!keys.length) {
         track.innerHTML = '<div class="muted" style="padding:8px">등록된 사진이 없습니다.</div>';
       } else {
-        const urls = list.map(keyToUrl).filter(Boolean);
+        const urls = keys.map(keyToUrl);
         track.innerHTML = urls.map(u => `<img src="${u}" alt="메이트 사진">`).join('');
       }
 
-      // 기본 정보
-      const age    = row.profiles?.age ? `${row.profiles.age}세` : '';
-      const gender = row.profiles?.gender || '';
-      const langs  = Array.isArray(row.profiles?.languages) ? row.profiles.languages.join(', ') : '';
-      const priceJpy = new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY', maximumFractionDigits: 0 }).format(4000);
-      const tags  = (row.tags || []).map(s=>`<span class="pill">${s}</span>`).join(' ');
-      const areas = (row.areas || []).map(s=>`<span class="pill">${s}</span>`).join(' ');
+      const age = mp.profiles?.age ? `${mp.profiles.age}세` : '';
+      const gender = mp.profiles?.gender || '';
+      const langs = Array.isArray(mp.profiles?.languages) ? mp.profiles.languages.join(', ') : '';
+      const price = mp.hourly_rate ? new Intl.NumberFormat('ko-KR').format(mp.hourly_rate) : '협의';
+      const tags = (mp.tags || []).join(', ');
+      const areas = (mp.areas || []).join(', ');
+      const rating = mp.rating ?? 'N/A';
 
       meta.innerHTML = `
-        <div><strong>소개</strong><br>${row.bio ?? '소개가 아직 없습니다.'}</div>
+        <div><strong>소개</strong><br>${mp.bio ?? '소개가 아직 없습니다.'}</div>
         <div><strong>기본 정보</strong><br>${[age, gender].filter(Boolean).join(' • ') || '미기재'}</div>
         <div><strong>언어</strong><br>${langs || '미기재'}</div>
-        <div><strong>이용요금</strong><br>${priceJpy} / 시간</div>
+        <div><strong>시급</strong><br>₩ ${price} / 시간</div>
         <div><strong>태그</strong><br>${tags || '없음'}</div>
-        <div><strong>활동 지역</strong><br>${areas || '미기재'}</div>
+        <div><strong>활동 지역</strong><br>${areas || '미기재'} </div>
+        <div><strong>평점</strong><br>${rating}</div>
       `;
     }
 
-    // 리뷰 목록
-    async function loadReviews() {
-      const reviewsList = document.getElementById('reviewsList');
-      reviewsList.innerHTML = '<div class="muted">불러오는 중…</div>';
+    // 좌우 버튼
+    document.querySelector('.carousel .prev').addEventListener('click', ()=> track.scrollBy({ left: -320, behavior:'smooth' }));
+    document.querySelector('.carousel .next').addEventListener('click', ()=> track.scrollBy({ left:  320, behavior:'smooth' }));
+
+    // ========== 리뷰 ==========
+
+    const reviewsList = document.getElementById('reviewsList');
+    const reviewForm = document.getElementById('reviewForm');
+    const ratingWrap = document.getElementById('ratingWrap');
+
+    // 별점 UI
+    ratingWrap?.addEventListener('click', (e)=>{
+      const b = e.target.closest('[data-rate]');
+      if (!b) return;
+      const v = Number(b.getAttribute('data-rate'));
+      document.getElementById('rating').value = String(v);
+      ratingWrap.querySelectorAll('[data-rate]').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+    });
+
+    const star = (n)=>'★'.repeat(n||0) + '☆'.repeat(5-(n||0));
+
+    async function loadReviews(){
       const { data: rows, error } = await supabase
         .from('reviews')
-        .select('id, content, created_at, author_name, mate_reply, replied_at')
+        .select('id, content, rating, created_at, author_name, mate_reply, replied_at')
         .eq('mate_id', mateId)
         .order('created_at', { ascending: false });
 
       if (error) {
-        reviewsList.innerHTML = `<div class="error">리뷰를 불러오지 못했습니다: ${error.message}</div>`;
+        reviewsList.innerHTML = `<div class="error">${error.message}</div>`;
         return;
       }
-      if (!rows || rows.length === 0) {
-        reviewsList.innerHTML = '<div class="muted">아직 리뷰가 없습니다.</div>';
+      if (!rows?.length) {
+        reviewsList.innerHTML = `<div class="muted">아직 리뷰가 없습니다.</div>`;
         return;
       }
 
+      // 내가 메이트本人인지
       const { data:{ user } } = await supabase.auth.getUser();
-      const isMate = !!user && user.id === mateId;
+      const isMate = user?.id === mateId;
 
       reviewsList.innerHTML = rows.map(r => `
         <div class="item card">
@@ -224,16 +199,15 @@
             <span>${r.author_name ?? '고객'}</span>
             <span>·</span>
             <span>${new Date(r.created_at).toLocaleString('ko-KR')}</span>
+            ${r.rating ? `<span>·</span><span>${star(r.rating)}</span>` : ''}
           </div>
-          <div style="white-space:pre-wrap; margin-top:6px">${r.content}</div>
-
+          <div style="white-space:pre-wrap; margin-top:6px">${(r.content||'').replace(/</g,'&lt;')}</div>
           ${r.mate_reply ? `
-            <div class="reply">
+            <div class="reply" style="margin-top:8px">
               <div class="label" style="margin-bottom:4px">메이트 코멘트</div>
-              <div style="white-space:pre-wrap">${r.mate_reply}</div>
-            </div>
-          ` : ''}
-
+              <div style="white-space:pre-wrap">${(r.mate_reply||'').replace(/</g,'&lt;')}</div>
+            </div>` : ''
+          }
           ${isMate ? `
             <div class="reply" style="margin-top:8px">
               <div class="label" style="margin-bottom:4px">코멘트 작성/수정</div>
@@ -243,50 +217,64 @@
           `: ''}
         </div>
       `).join('');
-    }
 
-    // 리뷰 작성 가능 여부 체크 & 폼 표시
-    async function prepareReviewForm() {
-      const reviewForm = document.getElementById('reviewForm');
-      reviewForm.style.display = 'none';
-      reviewForm.dataset.bookingId = '';
-
-      const { data:{ user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { data: bks } = await supabase
-        .from('bookings')
-        .select('id')
-        .eq('mate_id', mateId)
-        .eq('customer_id', user.id)
-        .in('status', ['completed','done'])
-        .order('id', { ascending: false })
-        .limit(5);
-
-      if (!bks || bks.length === 0) return;
-
-      for (const b of bks) {
-        const { data: rv } = await supabase
-          .from('reviews')
-          .select('id')
-          .eq('booking_id', b.id)
-          .maybeSingle();
-        if (!rv) {
-          reviewForm.dataset.bookingId = String(b.id);
-          reviewForm.style.display = 'grid';
-          break;
-        }
+      if (isMate) {
+        reviewsList.querySelectorAll('[data-reply-save]').forEach(btn=>{
+          btn.addEventListener('click', async ()=>{
+            const id = Number(btn.getAttribute('data-reply-save'));
+            const val = document.getElementById(`reply_${id}`).value;
+            const { error } = await supabase.from('reviews').update({
+              mate_reply: val, replied_at: new Date().toISOString()
+            }).eq('id', id);
+            if (error) alert('저장 실패: '+error.message);
+            else alert('저장되었습니다.');
+          });
+        });
       }
     }
 
-    // 리뷰 저장
+    // 리뷰 폼 표시 조건: 이 메이트에 대해 내가 완료된 예약이 있고, 아직 리뷰가 없는 경우
+    async function prepareReviewForm(){
+      const { data:{ user } } = await supabase.auth.getUser();
+      if (!user) return; // 미로그인
+
+      // 내 예약 중 completed
+      const { data: bks } = await supabase
+        .from('bookings')
+        .select('id')
+        .eq('customer_id', user.id)
+        .eq('mate_id', mateId)
+        .eq('status', 'completed');
+
+      if (!bks?.length) return;
+
+      const ids = bks.map(b=>b.id);
+      const { data: rv } = await supabase
+        .from('reviews')
+        .select('booking_id')
+        .in('booking_id', ids);
+
+      const reviewed = new Set((rv||[]).map(r=>r.booking_id));
+      const target = ids.find(id => !reviewed.has(id));
+      if (target) {
+        reviewForm.dataset.bookingId = String(target);
+        reviewForm.style.display = '';
+      }
+    }
+
+    // 등록
     document.getElementById('reviewForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const reviewResult = document.getElementById('reviewResult');
       const reviewText   = document.getElementById('reviewText');
       reviewResult.textContent = '';
+
       const txt = reviewText.value.trim();
-      if (!txt) return;
+      const ratingVal = Number(document.getElementById('rating').value || 0);
+      if (!txt) return (reviewResult.innerHTML = `<div class="error">내용을 입력하세요.</div>`);
+      if (!(ratingVal >= 1 && ratingVal <= 5)) {
+        return (reviewResult.innerHTML = `<div class="error">별점을 선택하세요.</div>`);
+      }
 
       const { data:{ user } } = await supabase.auth.getUser();
       if (!user) {
@@ -295,10 +283,7 @@
       }
 
       let authorName = user.email?.split('@')[0] || '고객';
-      const { data: prof } = await supabase.from('profiles')
-        .select('full_name')
-        .eq('id', user.id)
-        .maybeSingle();
+      const { data: prof } = await supabase.from('profiles').select('full_name').eq('id', user.id).maybeSingle();
       if (prof?.full_name) authorName = prof.full_name;
 
       const bookingId = Number(document.getElementById('reviewForm').dataset.bookingId || '0');
@@ -311,7 +296,9 @@
         booking_id: bookingId,
         mate_id: mateId,
         content: txt,
-        author_name: authorName
+        rating: ratingVal,
+        author_name: authorName,
+        author_id: user.id
       });
 
       if (error) {
@@ -319,46 +306,14 @@
       } else {
         reviewResult.innerHTML = `<div class="success">등록되었습니다.</div>`;
         reviewText.value = '';
+        document.getElementById('rating').value = '';
+        ratingWrap?.querySelectorAll('[data-rate]').forEach(x=>x.classList.remove('active'));
         await loadReviews();
         document.getElementById('reviewForm').style.display = 'none';
       }
     });
 
-    // 메이트 코멘트 저장(이벤트 위임)
-    document.addEventListener('click', async (e) => {
-      const btn = e.target.closest('button[data-reply-save]');
-      if (!btn) return;
-      const id = btn.getAttribute('data-reply-save');
-      const ta = document.getElementById(`reply_${id}`);
-      const txt = (ta?.value ?? '').trim();
-
-      const { data:{ user } } = await supabase.auth.getUser();
-      if (!user || user.id !== mateId) return alert('권한이 없습니다.');
-
-      const { error } = await supabase
-        .from('reviews')
-        .update({ mate_reply: txt, replied_at: new Date().toISOString() })
-        .eq('id', id);
-
-      if (error) alert('저장 실패: ' + error.message);
-      else {
-        const t = document.createElement('div');
-        t.textContent = '저장되었습니다.';
-        t.style.cssText='position:fixed;left:50%;top:16px;transform:translateX(-50%);background:#222;color:#fff;padding:8px 12px;border-radius:8px;z-index:9999;opacity:.95';
-        document.body.appendChild(t);
-        setTimeout(()=>t.remove(), 1400);
-        await loadReviews();
-      }
-    });
-
-    // 캐러셀 좌우
-    const prevBtn = document.querySelector('.carousel .prev');
-    const nextBtn = document.querySelector('.carousel .next');
-    prevBtn.addEventListener('click', ()=> track.scrollBy({ left: -320, behavior:'smooth' }));
-    nextBtn.addEventListener('click', ()=> track.scrollBy({ left:  320, behavior:'smooth' }));
-
-    // 초기 로드
-    await loadProfile();
+    // 초기
     await loadReviews();
     await prepareReviewForm();
   </script>
