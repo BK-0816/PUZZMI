@@ -707,7 +707,7 @@
               </div>
             </div>
           `;
-        } else if (type === 'booking_canceled') {
+        } else if (type === 'booking_cancelled') {
           const reason = reasonMatch ? reasonMatch[1].trim() : '사유 미기재';
           messageHtml = `
             <div class="notification-message">
@@ -921,7 +921,7 @@
               </div>
             </div>
           `;
-        } else if (type === 'booking_canceled') {
+        } else if (type === 'booking_cancelled') {
           const reason = reasonMatch ? reasonMatch[1].trim() : '사유 미기재';
           messageHtml = `
             <div class="notification-message">
