@@ -189,39 +189,27 @@
     }
     
     .meta-card:nth-child(3)::before {
-      content: '🌍';
-      font-size: 20px;
-      width: auto;
-      height: auto;
-    }
-    
-    .meta-card:nth-child(4)::before {
-      content: '💰';
-      font-size: 20px;
-      width: auto;
-      height: auto;
-    }
-    
-    .meta-card:nth-child(5)::before {
       content: '🏷️';
       font-size: 20px;
       width: auto;
       height: auto;
     }
     
-    .meta-card:nth-child(6)::before {
+    .meta-card:nth-child(4)::before {
       content: '📍';
       font-size: 20px;
       width: auto;
       height: auto;
     }
     
-    .meta-card:nth-child(7)::before {
+    .meta-card:nth-child(5)::before {
       content: '⭐';
       font-size: 20px;
       width: auto;
       height: auto;
     }
+    
+    .meta-card:nth-child(6)::before {
     
     .meta-card:hover {
       transform: translateY(-2px);
@@ -613,7 +601,6 @@
       const age = mp.profiles?.age ? `${mp.profiles.age}세` : '';
       const gender = mp.profiles?.gender || '';
       const langs = Array.isArray(mp.profiles?.languages) ? mp.profiles.languages.join(', ') : '';
-      const price = mp.hourly_rate ? new Intl.NumberFormat('ko-KR').format(mp.hourly_rate) : '협의';
       const tags = (mp.tags || []).join(', ');
       const areas = (mp.areas || []).join(', ');
       const rating = mp.rating ?? 'N/A';
@@ -626,10 +613,6 @@
         <div class="meta-card">
           <strong>언어</strong>
           <div class="value">${langs || '미기재'}</div>
-        </div>
-        <div class="meta-card">
-          <strong>시급</strong>
-          <div class="value">₩ ${price} / 시간</div>
         </div>
         <div class="meta-card">
           <strong>태그</strong>
