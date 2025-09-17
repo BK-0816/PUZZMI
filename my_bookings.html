@@ -1,16 +1,155 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>내 예약 - PUZZMI</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="pages.css"/>
+  <link rel="stylesheet" href="nav.css"/>
+  <link rel="stylesheet" href="pages-theme.css"/>
+  <script type="module" src="nav.js"></script>
+  <style>
+    .pill{ padding:6px 10px; border:1px solid rgba(0,0,0,.1); border-radius:999px; background:#fff; cursor:pointer; }
+    .pill.active{ background:var(--primary-color); color:#fff; border-color:transparent; }
+  </style>
+</head>
+<body class="bg-cream">
+  <div id="app-nav"></div>
+  <main class="page stack-16">
+    <section class="card">
+      <h2>내 예약</h2>
+      <div id="list" class="stack-16"></div>
+    </section>
+  </main>
 
-<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>내 예약 - PUZZMI</title>
-<link rel="stylesheet" href="styles.css"/><link rel="stylesheet" href="pages.css"/><link rel="stylesheet" href="nav.css"/><link rel="stylesheet" href="pages-theme.css"/>
-<script type="module" src="nav.js"></script></head>
-<body class="bg-cream"><div id="app-nav"></div><main class="page"><section class="card"><h2>내 예약 내역</h2><div id="list" class="stack-16"></div></section></main>
-<script type="module">
-import { supabase } from './nav.js';
-function rowHtml(r, name){const dt=`${r.date} ${r.start_time} (${r.duration_hours}h)`; return `<div class="card"><div class="flex justify-between align-center"><div><div style="font-weight:800">${name}</div><div class="muted">${dt} • 상태: ${r.status}</div><div class="muted">요청: ${(r.notes||'').replace(/</g,'&lt;')}</div></div>${r.status==='pending'?`<button class="btn btn-secondary" data-cancel="${r.id}">예약 취소</button>`:''}</div></div>`;}
-async function load(){const {data:{user}}=await supabase.auth.getUser(); const list=document.getElementById('list'); if(!user){list.innerHTML='<div class="note">로그인 필요</div>'; return;}
-const {data,error}=await supabase.from('bookings').select('*, mate_profiles(user_id, profiles(full_name))').eq('customer_id', user.id).order('created_at',{ascending:false}); if(error){console.error(error); return;} if(!data||!data.length){list.innerHTML='<div class="muted">예약 내역이 없습니다.</div>'; return;}
-list.innerHTML=data.map(r=>rowHtml(r, r.mate_profiles?.profiles?.full_name||r.mate_id)).join('');
-list.querySelectorAll('button[data-cancel]').forEach(btn=>btn.onclick=async()=>{const id=btn.dataset.cancel; if(!confirm('취소하시겠어요?')) return; const {error}=await supabase.from('bookings').update({status:'cancelled'}).eq('id', id); if(error) alert(error.message); else load();});}
-const ch=supabase.channel('bookings:my').on('postgres_changes',{event:'*',schema:'public',table:'bookings'},p=>load()).subscribe();
-load();
-</script></body></html>
+  <script type="module">
+    import { supabase } from './nav.js';
+
+    const list = document.getElementById('list');
+
+    function rowHtml(bk){
+      const canReview = bk.status === 'completed' && !bk.has_review;
+      const dt = `${bk.date} ${bk.start_time} (${bk.duration_hours}h)`;
+      return `
+        <div class="card" data-id="${bk.id}">
+          <div class="flex justify-between align-center">
+            <div>
+              <div style="font-weight:800">${dt}</div>
+              <div class="muted">메이트: ${bk.mate_name ?? bk.mate_id}</div>
+              <div class="muted">상태: ${bk.status}</div>
+              ${bk.notes ? `<div class="muted">메모: ${(bk.notes||'').replace(/</g,'&lt;')}</div>`:''}
+            </div>
+            <div class="flex gap-8">
+              ${canReview ? `<button class="btn btn-primary" data-act="review">리뷰 작성</button>` : ''}
+            </div>
+          </div>
+          <div class="stack-16 hidden" data-review="${bk.id}" style="margin-top:10px">
+            <div class="row">
+              <div class="label">별점</div>
+              <div class="row" style="gap:6px">
+                <button class="pill" data-rate="5">★ 5</button>
+                <button class="pill" data-rate="4">★ 4</button>
+                <button class="pill" data-rate="3">★ 3</button>
+                <button class="pill" data-rate="2">★ 2</button>
+                <button class="pill" data-rate="1">★ 1</button>
+                <input type="hidden" data-rating value="">
+              </div>
+            </div>
+            <textarea class="input" data-text placeholder="후기를 입력하세요"></textarea>
+            <button class="btn btn-primary" data-save="${bk.id}">등록</button>
+            <div class="muted" data-result></div>
+          </div>
+        </div>`;
+    }
+
+    async function load(){
+      const { data:{ user } } = await supabase.auth.getUser();
+      if(!user){ list.innerHTML='<div class="note">로그인이 필요합니다.</div>'; return; }
+
+      // 내 예약
+      const { data, error } = await supabase
+        .from('bookings')
+        .select('id, mate_id, customer_id, date, start_time, duration_hours, status, notes')
+        .eq('customer_id', user.id)
+        .order('created_at', { ascending:false });
+
+      if (error){ list.innerHTML = `<div class="error">${error.message}</div>`; return; }
+      if (!data?.length){ list.innerHTML = `<div class="muted">예약이 없습니다.</div>`; return; }
+
+      // 메이트 이름 join
+      const mateIds = [...new Set(data.map(d=>d.mate_id))];
+      const { data: mates } = await supabase
+        .from('mate_profiles')
+        .select('user_id, profiles(full_name)')
+        .in('user_id', mateIds);
+
+      const mapMate = new Map((mates||[]).map(m=>[m.user_id, m.profiles?.full_name || null]));
+      data.forEach(d => d.mate_name = mapMate.get(d.mate_id) || null);
+
+      // 리뷰 존재 여부
+      const ids = data.map(d=>d.id);
+      const { data: rv } = await supabase
+        .from('reviews')
+        .select('booking_id')
+        .in('booking_id', ids);
+
+      const setReviewed = new Set((rv||[]).map(r=>r.booking_id));
+      data.forEach(d => d.has_review = setReviewed.has(d.id));
+
+      list.innerHTML = data.map(rowHtml).join('');
+    }
+
+    // 버튼 동작
+    list.addEventListener('click', async (e)=>{
+      // 리뷰 폼 열기
+      const btn = e.target.closest('[data-act="review"]');
+      if (btn) {
+        const card = btn.closest('[data-id]');
+        card.querySelector(`[data-review="${card.dataset.id}"]`).classList.remove('hidden');
+        return;
+      }
+
+      // 별점 선택
+      const rateBtn = e.target.closest('[data-rate]');
+      if (rateBtn) {
+        const wrap = rateBtn.closest('[data-review]');
+        wrap.querySelectorAll('[data-rate]').forEach(x=>x.classList.remove('active'));
+        rateBtn.classList.add('active');
+        wrap.querySelector('[data-rating]').value = rateBtn.getAttribute('data-rate');
+        return;
+      }
+
+      // 리뷰 저장
+      const save = e.target.closest('[data-save]');
+      if (save) {
+        const id = Number(save.getAttribute('data-save'));
+        const block = list.querySelector(`[data-review="${id}"]`);
+        const rating = Number(block.querySelector('[data-rating]').value||0);
+        const text = block.querySelector('[data-text]').value.trim();
+        const result = block.querySelector('[data-result]');
+        if (!(rating>=1 && rating<=5)) return result.textContent = '별점을 선택하세요.';
+        if (!text) return result.textContent = '내용을 입력하세요.';
+
+        // mate_id
+        const { data: one, error: oneErr } = await supabase.from('bookings').select('mate_id').eq('id', id).maybeSingle();
+        if (oneErr || !one) { result.textContent = '조회 실패'; return; }
+
+        const { data:{ user } } = await supabase.auth.getUser();
+        const { error } = await supabase.from('reviews').insert({
+          booking_id: id,
+          mate_id: one.mate_id,
+          rating,
+          content: text,
+          author_id: user?.id || null
+        });
+
+        result.textContent = error ? ('등록 실패: '+error.message) : '등록되었습니다.';
+        if (!error) load();
+      }
+    });
+
+    load();
+  </script>
+</body>
+</html>
