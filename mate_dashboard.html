@@ -707,7 +707,7 @@ function rowHtml(r){
   const statusText = r.status === 'pending' ? '⏳ 대기중' :
                     r.status === 'confirmed' ? '✅ 예약 확정' :
                     r.status === 'completed' ? '🎉 진행 완료' :
-                    r.status === 'cancelled' ? '❌ 예약 취소' : r.status;
+                    (r.status === 'cancelled' || r.status === 'canceled_by_mate') ? '❌ 예약 취소' : r.status;
 
   return `
     <div class="booking-card" data-id="${r.id}">

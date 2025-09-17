@@ -382,7 +382,7 @@
       const statusText = bk.status === 'pending' ? '⏳ 대기중' :
                         bk.status === 'confirmed' ? '✅ 예약 확정' :
                         bk.status === 'completed' ? '🎉 진행 완료' :
-                        bk.status === 'cancelled' ? '❌ 예약 취소' : bk.status;
+                        (bk.status === 'cancelled' || bk.status === 'canceled_by_mate') ? '❌ 예약 취소' : bk.status;
       
       return `
         <div class="booking-card" data-id="${bk.id}">
