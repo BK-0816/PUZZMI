@@ -1535,6 +1535,8 @@ async function load(){
 
 async function loadData() {
   await load();
+  calendarBookings = [...allBookings];
+  renderCalendar();
 }
 
 // 검색 이벤트 (디바운스)
@@ -1772,7 +1774,7 @@ async function loadData() {
 // 캘린더 초기화
 initializeCalendar();
 
-load();
+loadData();
 </script>
 
 </body>
