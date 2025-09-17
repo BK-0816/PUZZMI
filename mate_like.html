@@ -1041,17 +1041,27 @@
 
       if (!bks?.length) return;
 
-      const ids = bks.map(b=>b.id);
-      const { data: rv } = await supabase
+      // 각 완료된 예약에 대해 리뷰가 있는지 확인
+      const bookingIds = bks.map(b => b.id);
+      const { data: existingReviews } = await supabase
         .from('reviews')
         .select('booking_id')
-        .in('booking_id', ids);
+        .in('booking_id', bookingIds);
 
-      const reviewed = new Set((rv||[]).map(r=>r.booking_id));
-      const target = ids.find(id => !reviewed.has(id));
-      if (target) {
-        reviewForm.dataset.bookingId = String(target);
+      const reviewedBookings = new Set((existingReviews || []).map(r => r.booking_id));
+      
+      // 리뷰가 없는 첫 번째 완료된 예약을 찾기
+      const availableBooking = bks.find(booking => !reviewedBookings.has(booking.id));
+      
+      if (availableBooking) {
+        reviewForm.dataset.bookingId = String(availableBooking.id);
         reviewForm.style.display = '';
+        
+        // 폼 제목에 예약 정보 표시
+        const formTitle = reviewForm.querySelector('h4');
+        if (formTitle) {
+          formTitle.textContent = `리뷰 작성하기 (예약 #${availableBooking.id})`;
+        }
       }
     }
 
@@ -1098,7 +1108,7 @@
 
       if (error) {
         if (error.message && error.message.includes('duplicate')) {
-          reviewResult.innerHTML = `<div class="error">이미 이 예약에 대한 리뷰를 작성하셨습니다.</div>`;
+          reviewResult.innerHTML = `<div class="error">이미 이 예약에 대한 리뷰를 작성하셨습니다. 다른 예약이 있다면 페이지를 새로고침해주세요.</div>`;
         } else {
           reviewResult.innerHTML = `<div class="error">등록 실패: ${error.message}</div>`;
         }
@@ -1108,7 +1118,8 @@
         document.getElementById('rating').value = '';
         ratingWrap?.querySelectorAll('.rating-pill').forEach(x=>x.classList.remove('active'));
         await loadReviews();
-        document.getElementById('reviewForm').style.display = 'none';
+        // 리뷰 작성 후 다른 작성 가능한 예약이 있는지 다시 확인
+        await prepareReviewForm();
       }
     });
 
@@ -1159,7 +1170,7 @@
 
         if (error) {
           if (error.message && error.message.includes('duplicate')) {
-            reviewResult.innerHTML = `<div class="error">이미 이 예약에 대한 리뷰를 작성하셨습니다.</div>`;
+            reviewResult.innerHTML = `<div class="error">이미 이 예약에 대한 리뷰를 작성하셨습니다. 다른 예약이 있다면 페이지를 새로고침해주세요.</div>`;
           } else {
             reviewResult.innerHTML = `<div class="error">등록 실패: ${error.message}</div>`;
           }
@@ -1169,7 +1180,8 @@
           document.getElementById('rating').value = '';
           ratingWrap?.querySelectorAll('.rating-pill').forEach(x => x.classList.remove('active'));
           await loadReviews();
-          document.getElementById('reviewForm').style.display = 'none';
+          // 리뷰 작성 후 다른 작성 가능한 예약이 있는지 다시 확인
+          await prepareReviewForm();
         }
       });
     }
