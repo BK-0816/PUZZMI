@@ -393,16 +393,10 @@
       box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
     }
     
-    .status-declined {
+    .status-cancelled {
       background: linear-gradient(135deg, #f8d7da 0%, #f1948a 100%);
       color: #721c24;
       border-color: rgba(220, 53, 69, 0.3);
-    }
-    
-    .status-canceled_by_mate {
-      background: linear-gradient(135deg, #e2e3e5 0%, #ced4da 100%);
-      color: #495057;
-      border-color: rgba(108, 117, 125, 0.3);
     }
     
     /* 액션 버튼 */
@@ -685,10 +679,9 @@ function rowHtml(r){
   const canAct = (r.status === 'pending');
   const statusClass = `status-${r.status}`;
   const statusText = r.status === 'pending' ? '⏳ 대기중' :
-                    r.status === 'confirmed' ? '✅ 확정됨' :
-                    r.status === 'completed' ? '🎉 완료됨' :
-                    r.status === 'declined' ? '❌ 거절됨' :
-                    r.status === 'canceled_by_mate' ? '🚫 취소됨' : r.status;
+                    r.status === 'confirmed' ? '✅ 예약 확정' :
+                    r.status === 'completed' ? '🎉 진행 완료' :
+                    r.status === 'cancelled' ? '❌ 예약 취소' : r.status;
 
   return `
     <div class="booking-card" data-id="${r.id}">
@@ -829,13 +822,13 @@ async function load(){
         if (act === 'confirm') {
           newStatus = 'confirmed';
         } else if (act === 'decline') {
-          newStatus = 'declined';
+          newStatus = 'cancelled';
           reason = prompt('거절 사유를 입력하세요 (고객에게 전달됩니다):') || '';
           if (!reason.trim()) {
             throw new Error('거절 사유를 입력해주세요.');
           }
         } else if (act === 'cancel') {
-          newStatus = 'canceled_by_mate';
+          newStatus = 'cancelled';
           reason = prompt('취소 사유를 입력하세요 (고객에게 전달됩니다):') || '';
           if (!reason.trim()) {
             throw new Error('취소 사유를 입력해주세요.');
@@ -843,8 +836,7 @@ async function load(){
         }
 
         const patch = { status: newStatus };
-        if (act === 'decline') patch.decline_reason = reason;
-        if (act === 'cancel')  patch.cancel_reason  = reason;
+        if (act === 'decline' || act === 'cancel') patch.cancel_reason = reason;
 
         const { error: updErr } = await supabase.from('bookings').update(patch).eq('id', id);
         if (updErr) throw updErr;
@@ -858,7 +850,7 @@ async function load(){
         const when = `${bk.date} ${bk.start_time} (${bk.duration_hours}h)`;
         const body = act === 'confirm'
           ? `메이트가 예약을 확정했습니다.\n일정: ${when}`
-          : `사유: ${reason || '사유 미기재'}\n일정: ${when}`;
+          : `예약이 취소되었습니다.\n사유: ${reason || '사유 미기재'}\n일정: ${when}`;
 
         // 알림 생성 (선택사항 - 실패해도 메인 로직에 영향 없음)
         try {
@@ -866,7 +858,7 @@ async function load(){
             user_id: bk.customer_id,
             title,
             body,
-            type: `booking_${act}ed`,
+            type: act === 'confirm' ? 'booking_confirmed' : 'booking_cancelled',
             link: 'my_bookings.html'
           });
         } catch (notifErr) {
@@ -875,8 +867,7 @@ async function load(){
 
         // 4) 성공 메시지 표시
         const successMsg = act === 'confirm' ? '예약이 확정되었습니다! ✅' :
-                          act === 'decline' ? '예약이 거절되었습니다 ❌' :
-                          '예약이 취소되었습니다 🚫';
+                          '예약이 취소되었습니다 ❌';
         
         // 토스트 메시지 표시
         const toast = document.createElement('div');

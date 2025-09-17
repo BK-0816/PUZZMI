@@ -1026,7 +1026,7 @@
       const cls = row.read_at ? '' : 'unread';
       const when = new Date(row.created_at).toLocaleString('ko-KR');
       const typeKo = row.type === 'booking_declined' ? '예약 거절'
-                    : row.type === 'booking_canceled' ? '예약 취소'
+                    : row.type === 'booking_cancelled' ? '예약 취소'
                     : row.type === 'booking_confirmed' ? '예약 확정'
                     : row.type === 'review_received' ? '리뷰 등록'
                     : row.type || '일반';

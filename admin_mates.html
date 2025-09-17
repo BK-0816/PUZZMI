@@ -1338,11 +1338,9 @@
   function getStatusText(status) {
     switch (status) {
       case 'pending': return '대기중';
-      case 'confirmed': return '확정됨';
-      case 'completed': return '완료됨';
-      case 'declined': return '거절됨';
-      case 'cancelled': return '취소됨';
-      case 'canceled_by_mate': return '메이트취소';
+      case 'confirmed': return '예약 확정';
+      case 'completed': return '진행 완료';
+      case 'cancelled': return '예약 취소';
       default: return status || '미정';
     }
   }
@@ -1352,9 +1350,7 @@
       case 'pending': return 'table-status-pending';
       case 'confirmed': return 'table-status-confirmed';
       case 'completed': return 'table-status-completed';
-      case 'declined': return 'table-status-declined';
-      case 'cancelled':
-      case 'canceled_by_mate': return 'table-status-cancelled';
+      case 'cancelled': return 'table-status-declined';
       default: return 'table-status-pending';
     }
   }

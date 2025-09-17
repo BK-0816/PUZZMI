@@ -175,13 +175,11 @@
       box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
     }
     
-    .status-declined {
+    .status-cancelled {
       background: linear-gradient(135deg, #f8d7da 0%, #f1948a 100%);
       color: #721c24;
       border-color: rgba(220, 53, 69, 0.3);
     }
-    
-    .status-cancelled {
       background: linear-gradient(135deg, #e2e3e5 0%, #ced4da 100%);
       color: #495057;
       border-color: rgba(108, 117, 125, 0.3);
@@ -381,6 +379,11 @@
       const canReview = bk.status === 'completed' && !bk.has_review;
       const dt = `${bk.date} ${bk.start_time} (${bk.duration_hours}h)`;
       const statusClass = `status-${bk.status}`;
+      const statusText = bk.status === 'pending' ? '⏳ 대기중' :
+                        bk.status === 'confirmed' ? '✅ 예약 확정' :
+                        bk.status === 'completed' ? '🎉 진행 완료' :
+                        bk.status === 'cancelled' ? '❌ 예약 취소' : bk.status;
+      
       return `
         <div class="booking-card" data-id="${bk.id}">
           <div class="booking-header">
@@ -400,7 +403,7 @@
               </div>
             </div>
             <div class="booking-status">
-              <div class="status-badge ${statusClass}">${bk.status}</div>
+              <div class="status-badge ${statusClass}">${statusText}</div>
             </div>
           </div>
           ${canReview ? `
