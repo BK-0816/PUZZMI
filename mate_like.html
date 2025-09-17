@@ -1111,6 +1111,60 @@
     // 초기
     await loadReviews();
     await prepareReviewForm();
+
+    // 리뷰 폼 제출 이벤트 리스너 추가
+    const reviewFormElement = document.querySelector('#reviewForm form');
+    if (reviewFormElement) {
+      reviewFormElement.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const reviewResult = document.getElementById('reviewResult');
+        const reviewText = document.getElementById('reviewText');
+        reviewResult.textContent = '';
+
+        const txt = reviewText.value.trim();
+        const ratingVal = Number(document.getElementById('rating').value || 0);
+        if (!txt) return (reviewResult.innerHTML = `<div class="error">내용을 입력하세요.</div>`);
+        if (!(ratingVal >= 1 && ratingVal <= 5)) {
+          return (reviewResult.innerHTML = `<div class="error">별점을 선택하세요.</div>`);
+        }
+
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          const redir = encodeURIComponent(location.pathname + location.search);
+          return (location.href = `auth_combo.html?redirect=${redir}`);
+        }
+
+        let authorName = user.email || '익명';
+        const { data: prof } = await supabase.from('profiles').select('full_name').eq('id', user.id).maybeSingle();
+        if (prof?.full_name) authorName = prof.full_name;
+
+        const bookingId = Number(document.getElementById('reviewForm').dataset.bookingId || '0');
+        if (!bookingId) {
+          reviewResult.innerHTML = `<div class="error">리뷰 가능한 예약이 없습니다.</div>`;
+          return;
+        }
+
+        const { error } = await supabase.from('reviews').insert({
+          booking_id: bookingId,
+          mate_id: mateId,
+          content: txt,
+          rating: ratingVal,
+          author_name: authorName,
+          author_id: user.id
+        });
+
+        if (error) {
+          reviewResult.innerHTML = `<div class="error">등록 실패: ${error.message}</div>`;
+        } else {
+          reviewResult.innerHTML = `<div class="success">등록되었습니다.</div>`;
+          reviewText.value = '';
+          document.getElementById('rating').value = '';
+          ratingWrap?.querySelectorAll('.rating-pill').forEach(x => x.classList.remove('active'));
+          await loadReviews();
+          document.getElementById('reviewForm').style.display = 'none';
+        }
+      });
+    }
   </script>
 </body>
 </html>
