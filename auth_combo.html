@@ -642,8 +642,7 @@
       if (name.length < 2 || name.length > 20) {
         box.innerHTML = '<div class="error">이름은 2-20자 사이로 입력해주세요.</div>';
         return;
-      const email     = document.getElementById('signup_email').value.trim();
-      const password  = document.getElementById('signup_password').value;
+      }
 
       const btn = document.getElementById('signup_btn');
       btn.disabled = true;
