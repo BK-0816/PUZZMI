@@ -345,23 +345,6 @@ btn.classList.add('is-faved');
       }
 
       // 랜덤 지역 생성 함수
-      function getRandomLocation(index) {
-        const locations = [
-          '일본, 도쿄',
-          '미국, 뉴욕', 
-          '영국, 런던',
-          '프랑스, 파리',
-          '독일, 베를린',
-          '호주, 시드니',
-          '캐나다, 토론토',
-          '싱가포르',
-          '태국, 방콕',
-          '중국, 상하이'
-        ];
-        return locations[index % locations.length];
-      }
-
-      // 리뷰 카드 렌더링
       reviewsGrid.innerHTML = sortedReviews.map((review, index) => {
         const mateName = review.mate_profiles?.profiles?.full_name || '메이트';
         const authorName = maskEmail(review.author_name || '익명');
@@ -370,7 +353,6 @@ btn.classList.add('is-faved');
           month: 'long' 
         });
         const avatar = getRandomAvatar(index);
-        const location = getRandomLocation(index);
         
         return `
           <div class="review-card">
@@ -379,7 +361,6 @@ btn.classList.add('is-faved');
                 <img src="${avatar}" alt="${authorName}" class="reviewer-avatar">
                 <div>
                   <h4 class="reviewer-name">${authorName}</h4>
-                  <p class="reviewer-location">${location}</p>
                 </div>
               </div>
               <div class="review-rating">
