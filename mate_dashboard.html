@@ -285,8 +285,8 @@
       backdrop-filter: blur(15px);
       border: 1px solid rgba(255,255,255,0.4);
       border-radius: 20px;
-      padding: 28px;
-      margin-bottom: 20px;
+      padding: 20px;
+      margin-bottom: 16px;
       box-shadow: 0 12px 32px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
       transition: all 0.3s ease;
       position: relative;
@@ -319,60 +319,60 @@
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       flex-wrap: wrap;
-      gap: 16px;
+      gap: 12px;
     }
     
     .booking-info h3 {
-      font-size: 1.4rem;
+      font-size: 1.2rem;
       font-weight: 800;
       color: var(--text-primary);
-      margin: 0 0 12px 0;
+      margin: 0 0 8px 0;
       letter-spacing: -0.01em;
     }
     
     .booking-meta {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
     }
     
     .meta-item {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
       color: var(--text-secondary);
-      font-size: 1rem;
+      font-size: 0.9rem;
       font-weight: 500;
     }
     
     .meta-icon {
-      width: 20px;
-      height: 20px;
+      width: 16px;
+      height: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
       border-radius: 50%;
-      font-size: 0.8rem;
+      font-size: 0.7rem;
       flex-shrink: 0;
     }
     
     /* 상태 배지 */
     .status-badge {
-      padding: 10px 20px;
+      padding: 8px 16px;
       border-radius: 20px;
       font-weight: 700;
-      font-size: 0.9rem;
+      font-size: 0.8rem;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       border: 2px solid transparent;
       transition: all 0.3s ease;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
     
     .status-pending {
@@ -408,16 +408,16 @@
     /* 액션 버튼 */
     .booking-actions {
       display: flex;
-      gap: 12px;
-      margin-top: 20px;
+      gap: 8px;
+      margin-top: 16px;
       flex-wrap: wrap;
     }
     
     .btn {
-      padding: 12px 24px;
+      padding: 10px 20px;
       border-radius: 12px;
       font-weight: 700;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       border: none;
       cursor: pointer;
       transition: all 0.3s ease;
@@ -427,7 +427,7 @@
       text-transform: uppercase;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
     
     .btn::before {
@@ -559,7 +559,7 @@
       
       .booking-header {
         flex-direction: column;
-        gap: 12px;
+        gap: 8px;
       }
       
       .booking-actions {
@@ -573,6 +573,14 @@
       
       .stats-grid {
         grid-template-columns: 1fr;
+      }
+      
+      .booking-card {
+        padding: 16px;
+      }
+      
+      .meta-item {
+        font-size: 0.85rem;
       }
     }
   </style>
@@ -629,7 +637,30 @@ const pendingBookingsEl = document.getElementById('pendingBookings');
 const confirmedBookingsEl = document.getElementById('confirmedBookings');
 
 function rowHtml(r){
-  const dt = `${r.date} ${r.start_time} (${r.duration_hours}h)`;
+  // 날짜/시간 포맷팅 개선
+  const formatDateTime = (date, time, duration) => {
+    try {
+      const dateObj = new Date(date);
+      const dateStr = dateObj.toLocaleDateString('ko-KR', { 
+        month: 'short', 
+        day: 'numeric',
+        weekday: 'short'
+      });
+      
+      // 시간 포맷팅 (24시간 → 12시간)
+      const [hour, minute] = time.split(':');
+      const hourNum = parseInt(hour, 10);
+      const period = hourNum >= 12 ? '오후' : '오전';
+      const displayHour = hourNum === 0 ? 12 : hourNum > 12 ? hourNum - 12 : hourNum;
+      const timeStr = `${period} ${displayHour}:${minute}`;
+      
+      return `${dateStr} ${timeStr} (${duration}시간)`;
+    } catch (e) {
+      return `${date} ${time} (${duration}h)`;
+    }
+  };
+  
+  const dt = formatDateTime(r.date, r.start_time, r.duration_hours);
   const canAct = (r.status === 'pending');
   const statusClass = `status-${r.status}`;
   const statusText = r.status === 'pending' ? '⏳ 대기중' :
