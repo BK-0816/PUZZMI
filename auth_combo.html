@@ -642,31 +642,6 @@
       if (name.length < 2 || name.length > 20) {
         box.innerHTML = '<div class="error">이름은 2-20자 사이로 입력해주세요.</div>';
         return;
-      }
-      
-      if (age && (parseInt(age) < 16 || parseInt(age) > 100)) {
-        box.innerHTML = '<div class="error">나이는 16-100세 사이로 입력해주세요.</div>';
-        return;
-      }
-      
-      if (password.length < 8) {
-        box.innerHTML = '<div class="error">비밀번호는 8자 이상이어야 합니다.</div>';
-        return;
-      }
-      
-      if (password !== passwordConfirm) {
-        box.innerHTML = '<div class="error">비밀번호가 일치하지 않습니다.</div>';
-        return;
-      }
-      
-      if (!agreeTerms) {
-        box.innerHTML = '<div class="error">이용약관 및 개인정보처리방침에 동의해주세요.</div>';
-        return;
-      }
-      
-      const full_name = document.getElementById('signup_name').value.trim();
-      const ageRaw    = document.getElementById('signup_age').value;
-      const age       = ageRaw ? parseInt(ageRaw, 10) : null;
       const email     = document.getElementById('signup_email').value.trim();
       const password  = document.getElementById('signup_password').value;
 
