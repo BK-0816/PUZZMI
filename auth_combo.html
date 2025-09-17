@@ -425,6 +425,120 @@
       align-items: center;
     }
     
+    /* 언어 체크박스 스타일 */
+    .language-checkboxes {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 16px;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(240, 147, 251, 0.03) 100%);
+      border: 1px solid rgba(102, 126, 234, 0.2);
+      border-radius: 12px;
+      backdrop-filter: blur(8px);
+    }
+    
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      padding: 12px 16px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.6) 100%);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(8px);
+    }
+    
+    .checkbox-item:hover {
+      background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.8) 100%);
+      border-color: rgba(102, 126, 234, 0.3);
+      transform: translateY(-1px);
+    }
+    
+    .checkbox-item input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(102, 126, 234, 0.3);
+      border-radius: 6px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+      cursor: pointer;
+      position: relative;
+      appearance: none;
+      transition: all 0.3s ease;
+    }
+    
+    .checkbox-item input[type="checkbox"]:checked {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-color: transparent;
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    }
+    
+    .checkbox-item input[type="checkbox"]:checked::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-weight: 700;
+      font-size: 12px;
+    }
+    
+    .checkbox-label {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      flex: 1;
+    }
+    
+    .agreement-section {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .field-help {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+    
+    .field-help.success {
+      color: #0f5132;
+    }
+    
+    .field-help.error {
+      color: #922b21;
+    }
+    
+    .password-strength {
+      margin-top: 8px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    
+    .password-strength.weak {
+      background: linear-gradient(135d, rgba(220, 53, 69, 0.1) 0%, rgba(220, 53, 69, 0.05) 100%);
+      color: #721c24;
+      border: 1px solid rgba(220, 53, 69, 0.3);
+    }
+    
+    .password-strength.medium {
+      background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 152, 0, 0.05) 100%);
+      color: #856404;
+      border: 1px solid rgba(255, 193, 7, 0.3);
+    }
+    
+    .password-strength.strong {
+      background: linear-gradient(135deg, rgba(25, 135, 84, 0.1) 0%, rgba(40, 167, 69, 0.05) 100%);
+      color: #0f5132;
+      border: 1px solid rgba(25, 135, 84, 0.3);
+    }
+    
     /* 반응형 디자인 */
     @media (max-width: 640px) {
       .page {
@@ -499,7 +613,7 @@
       </form>
 
       <!-- 회원가입 -->
-      <form id="signupForm" class="stack-16 hidden" data-panel="signup">
+      <div id="signupForm" class="stack-16 hidden" data-panel="signup">
         <div class="signup-benefits">
           <h3>🎉 PUZZMI 회원이 되면</h3>
           <ul class="benefits-list">
@@ -510,15 +624,141 @@
           </ul>
         </div>
         
-        <div class="row">
-          <div class="field">
-            <div class="label">이름(프로필)</div>
-            <input class="input" id="signup_name" type="text" placeholder="예: 김푸즈미" required minlength="2" maxlength="20"/>
-            <div class="field-help">실명 또는 닉네임을 입력해주세요 (2-20자)</div>
+        <!-- 1단계: 기본 정보 입력 -->
+        <div id="signupStep1" class="signup-step-1">
+          <form id="signupFormStep1" class="stack-16">
+            <div class="row">
+              <div class="field">
+                <div class="label">이름(프로필)</div>
+                <input class="input" id="signup_name" type="text" placeholder="예: 김푸즈미" required minlength="2" maxlength="20"/>
+                <div class="field-help">실명 또는 닉네임을 입력해주세요 (2-20자)</div>
+              </div>
+              <div class="field">
+                <div class="label">나이 (선택)</div>
+                <input class="input" id="signup_age" type="number" min="16" max="100" step="1" placeholder="예: 25"/>
+                <div class="field-help">만 16세 이상만 가입 가능합니다</div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="field">
+                <div class="label">성별 (선택)</div>
+                <select class="input" id="signup_gender">
+                  <option value="">선택 안함</option>
+                  <option value="여성">여성</option>
+                  <option value="남성">남성</option>
+                  <option value="기타">기타</option>
+                </select>
+                <div class="field-help">프로필에 표시됩니다</div>
+              </div>
+              <div class="field">
+                <div class="label">전화번호</div>
+                <input class="input" id="signup_phone" type="tel" placeholder="010-1234-5678" required/>
+                <div class="field-help">SMS 인증을 위한 전화번호를 입력해주세요</div>
+              </div>
+            </div>
+            
+            <div class="row single">
+              <div class="field">
+                <div class="label">이메일</div>
+                <input class="input" id="signup_email" type="email" placeholder="example@email.com" required/>
+                <div class="field-help">로그인 및 예약 알림을 받을 이메일</div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="field">
+                <div class="label">비밀번호</div>
+                <input class="input" id="signup_password" type="password" required minlength="6"/>
+                <div class="field-help">6자 이상 입력해주세요</div>
+              </div>
+              <div class="field">
+                <div class="label">비밀번호 확인</div>
+                <input class="input" id="signup_password_confirm" type="password" required minlength="6"/>
+                <div class="field-help" id="password-match-help">비밀번호를 다시 입력해주세요</div>
+              </div>
+            </div>
+            
+            <div class="row single">
+              <div class="field">
+                <div class="label">사용 가능한 언어 (복수 선택 가능)</div>
+                <div class="language-checkboxes">
+                  <label class="checkbox-item">
+                    <input type="checkbox" id="lang_ja" value="日本語" checked/>
+                    <span class="checkbox-label">🇯🇵 日本語</span>
+                  </label>
+                  <label class="checkbox-item">
+                    <input type="checkbox" id="lang_en" value="English"/>
+                    <span class="checkbox-label">🇺🇸 English</span>
+                  </label>
+                  <label class="checkbox-item">
+                    <input type="checkbox" id="lang_zh" value="中文"/>
+                    <span class="checkbox-label">🇨🇳 中文</span>
+                  </label>
+                </div>
+                <div class="field-help">메이트와 소통 가능한 언어를 선택해주세요</div>
+              </div>
+            </div>
+            
+            <div class="row single">
+              <div class="field">
+                <div class="agreement-section">
+                  <label class="checkbox-item">
+                    <input type="checkbox" id="agree_terms" required/>
+                    <span class="checkbox-label">이용약관 및 개인정보처리방침에 동의합니다 (필수)</span>
+                  </label>
+                  <label class="checkbox-item">
+                    <input type="checkbox" id="agree_marketing"/>
+                    <span class="checkbox-label">마케팅 정보 수신에 동의합니다 (선택)</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+            
+            <button class="btn btn-primary" type="submit" id="send_sms_btn">
+              📱 인증번호 받기
+            </button>
+            
+            <div id="sms_verification_result"></div>
+          </form>
+        </div>
+        
+        <!-- 2단계: SMS 인증 -->
+        <div id="smsVerificationSection" class="sms-verification-section" style="display: none;">
+          <div class="verification-header">
+            <h4>📱 SMS 인증</h4>
+            <p class="verification-desc">전화번호로 발송된 6자리 인증번호를 입력해주세요</p>
           </div>
-          <div class="field">
-            <div class="label">나이 (선택)</div>
-            <input class="input" id="signup_age" type="number" min="16" max="100" step="1" placeholder="예: 25"/>
+          
+          <div class="verification-input-group">
+            <input class="input verification-code-input" id="sms_verification_code" type="text" placeholder="000000" maxlength="6" autocomplete="one-time-code"/>
+            <button type="button" class="btn btn-primary" id="verify_sms_btn">확인</button>
+          </div>
+          
+          <div class="verification-timer" id="verificationTimer">
+            <span>⏰ 남은 시간: </span>
+            <span id="timerDisplay">05:00</span>
+          </div>
+          
+          <div class="verification-actions">
+            <button type="button" class="btn btn-secondary" id="resend_sms_btn">📱 재전송</button>
+            <button type="button" class="btn btn-secondary" id="change_phone_btn">📞 전화번호 변경</button>
+          </div>
+        </div>
+        
+        <!-- 3단계: 회원가입 완료 -->
+        <div id="signupStep2" class="signup-step-2" style="display: none;">
+          <h4>✅ SMS 인증 완료!</h4>
+          <p>이제 PUZZMI 회원가입을 완료하세요</p>
+          
+          <form id="signupFormFinal" class="stack-16">
+            <button class="btn btn-primary full" type="submit" id="signup_btn">
+              🎉 회원가입 완료
+            </button>
+            <div id="signup_result"></div>
+          </form>
+        </div>
+      </div>
     // DOM이 완전히 로드된 후 실행
     document.addEventListener('DOMContentLoaded', () => {
       // ===== Tabs =====
@@ -526,9 +766,18 @@
       const panels = document.querySelectorAll('form[data-panel]');
       function switchTab(name){
         tabs.forEach(x => x.classList.toggle('active', x.getAttribute('data-tab')===name));
-        panels.forEach(p => p.classList.toggle('hidden', p.getAttribute('data-panel') !== name));
+        panels.forEach(p => {
+          if (p.getAttribute('data-panel') === name) {
+            p.classList.remove('hidden');
+          } else {
+            p.classList.add('hidden');
+          }
+        });
       }
       tabs.forEach(t => t.addEventListener('click', () => switchTab(t.getAttribute('data-tab'))));
+      
+      // 초기 탭 설정
+      switchTab('login');
 
       function getRedirect() {
         const url = new URL(window.location.href);
