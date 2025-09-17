@@ -397,59 +397,6 @@ btn.classList.add('is-faved');
         `;
       }).join('');
 
-      // 리뷰가 3개 미만인 경우 기본 리뷰로 채우기
-      if (sortedReviews.length < 3) {
-        const defaultReviews = [
-          {
-            author: "Sarah Johnson",
-            location: "미국, 뉴욕",
-            rating: 5,
-            text: "지은이와 함께한 서울 여행은 정말 최고였어요! 관광 가이드북에서는 찾을 수 없는 숨겨진 맛집들을 발견할 수 있었고, 한국 문화를 진짜로 체험할 수 있었습니다. 완전 추천해요!",
-            date: "2024년 1월",
-            avatar: "https://images.pexels.com/photos/1382731/pexels-photo-1382731.jpeg?auto=compress&cs=tinysrgb&w=100"
-          },
-          {
-            author: "田中 博",
-            location: "일본, 도쿄", 
-            rating: 5,
-            text: "민준 씨 덕분에 홍대와 강남의 진짜 모습을 볼 수 있었어요. K-팝 문화에 대해서도 많이 배웠고, 쇼핑도 너무 재미있었습니다. 다음에 또 이용하고 싶어요!",
-            date: "2024년 2월",
-            avatar: "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=100"
-          },
-          {
-            author: "Emma Thompson",
-            location: "영국, 런던",
-            rating: 5,
-            text: "소영이와 함께한 서울 나이트라이프는 정말 환상적이었어요! 안전하면서도 재미있는 밤 문화를 경험할 수 있었습니다. 혼자서는 절대 갈 수 없었을 곳들을 가봤어요.",
-            date: "2024년 3월",
-            avatar: "https://images.pexels.com/photos/1542085/pexels-photo-1542085.jpeg?auto=compress&cs=tinysrgb&w=100"
-          }
-        ];
-
-        const remainingSlots = 3 - sortedReviews.length;
-        const defaultToShow = defaultReviews.slice(0, remainingSlots);
-        
-        const defaultHtml = defaultToShow.map(defaultReview => `
-          <div class="review-card">
-            <div class="review-header">
-              <div class="reviewer-info">
-                <img src="${defaultReview.avatar}" alt="${defaultReview.author}" class="reviewer-avatar">
-                <div>
-                  <h4 class="reviewer-name">${defaultReview.author}</h4>
-                  <p class="reviewer-location">${defaultReview.location}</p>
-                </div>
-              </div>
-              <div class="review-rating">
-                ${renderStars(defaultReview.rating)}
-              </div>
-            </div>
-            <p class="review-text">"${defaultReview.text}"</p>
-            <p class="review-date">${defaultReview.date}</p>
-          </div>
-        `).join('');
-        
-        reviewsGrid.innerHTML += defaultHtml;
-      }
 
     } catch (error) {
       console.error('리뷰 로드 중 오류:', error);
