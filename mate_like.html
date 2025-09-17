@@ -345,6 +345,61 @@
       box-shadow: 0 12px 28px rgba(0,0,0,0.12);
     }
     
+    /* 편집 권한 알림 */
+    .edit-notice {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(240, 147, 251, 0.05) 100%);
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 20px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      text-align: center;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.1);
+    }
+    
+    .edit-notice .icon {
+      font-size: 2rem;
+      margin-bottom: 12px;
+    }
+    
+    .edit-notice .title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+    
+    .edit-notice .desc {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+    
+    .edit-btn {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 16px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 8px 20px rgba(240, 147, 251, 0.3);
+      letter-spacing: 0.3px;
+      margin-top: 16px;
+    }
+    
+    .edit-btn:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 12px 28px rgba(240, 147, 251, 0.4);
+    }
+    
     /* 별점 UI 개선 */
     .pill{ padding:6px 10px; border:1px solid rgba(0,0,0,.1); border-radius:999px; background:#fff; cursor:pointer; }
     .pill.active{ 
@@ -835,10 +890,33 @@
       history.back();
     }
 
+    // 현재 로그인한 사용자가 이 메이트 본인인지 확인
+    const { data: { user } } = await supabase.auth.getUser();
+    const isOwnProfile = user && user.id === mateId;
+
     const backBtn = document.getElementById('backBtn');
     const bookBtn = document.getElementById('bookBtn');
     backBtn.href = './index.html#friends';
     bookBtn.href = `booking.html?mate_id=${encodeURIComponent(mateId)}`;
+
+    // 본인 프로필인 경우 편집 안내 표시
+    if (isOwnProfile) {
+      const editNotice = document.createElement('div');
+      editNotice.className = 'edit-notice';
+      editNotice.innerHTML = `
+        <div class="icon">✨</div>
+        <div class="title">내 프로필을 확인하고 있습니다</div>
+        <div class="desc">프로필을 수정하거나 사진을 업데이트하려면 편집 페이지를 이용해주세요</div>
+        <a href="mate_edit.html" class="edit-btn">
+          <i class="fas fa-edit"></i>
+          프로필 편집하기
+        </a>
+      `;
+      
+      // 메타 정보 다음에 삽입
+      const metaElement = document.getElementById('meta');
+      metaElement.parentNode.insertBefore(editNotice, metaElement.nextSibling);
+    }
 
     function keyToUrl(key) {
       if (!key) return '';
