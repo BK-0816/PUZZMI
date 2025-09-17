@@ -21,23 +21,7 @@
   // nav.js에서 만든 싱글톤 supabase 재사용 (중복 인스턴스 방지)
   import { supabase } from "./nav.js";
 
-  // ===== 1) 로그인 버튼 UI =====
-  const loginBtn = document.querySelector(".login-btn");
-  async function refreshAuthUI() {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      loginBtn.textContent = "로그아웃";
-      loginBtn.onclick = async () => { await supabase.auth.signOut(); location.reload(); };
-    } else {
-      loginBtn.textContent = "로그인";
-      loginBtn.onclick = () => {
-        const redir = encodeURIComponent(location.pathname + location.search);
-        location.href = `auth_combo.html?redirect=${redir}`;
-      };
-    }
-  }
-
-  // ===== 2) 메이트 목록 (페이지네이션) =====
+  // ===== 1) 메이트 목록 (페이지네이션) =====
   const ONLY_VERIFIED = false;          // 공개만 노출하려면 true
   const PAGE_SIZE     = 8;
   let page = 0, isLoading = false, hasMore = true;
@@ -268,7 +252,6 @@ async function refreshHeartCount() {
 
   // 초기 실행
   (async () => {
-    await refreshAuthUI();
     await loadMates({ reset: true });
     await refreshHeartCount();
     await loadHomepageReviews();
