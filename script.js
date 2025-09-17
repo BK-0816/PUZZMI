@@ -341,6 +341,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeEnhancedAnimations();
     initializeScrollProgress();
     initializeHeroParallax();
+    initializeFAQ();
 
 });
 
@@ -778,6 +779,30 @@ function initializeHeroParallax(){
   });
   hero.addEventListener('mouseleave', () => content.style.transform = 'translate3d(0,0,0)');
 }
+
+// FAQ 아코디언 기능
+function initializeFAQ() {
+    const faqItems = document.querySelectorAll('.faq-item');
+    
+    faqItems.forEach(item => {
+        const question = item.querySelector('.faq-question');
+        
+        question.addEventListener('click', () => {
+            const isActive = item.classList.contains('active');
+            
+            // 다른 모든 FAQ 아이템 닫기
+            faqItems.forEach(otherItem => {
+                if (otherItem !== item) {
+                    otherItem.classList.remove('active');
+                }
+            });
+            
+            // 현재 아이템 토글
+            item.classList.toggle('active', !isActive);
+        });
+    });
+}
+
 // 접근성 개선
 function improveAccessibility() {
     // 포커스 가능한 요소들에 포커스 스타일 추가
