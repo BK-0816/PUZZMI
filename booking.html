@@ -1,29 +1,739 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PUZZMI 예약하기</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="pages.css"/>
+  <link rel="stylesheet" href="pages-theme.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body.bg-cream { 
+      background: var(--bg-cream); 
+      background-repeat: no-repeat; 
+      background-size: cover; 
+      min-height: 100vh;
+    }
+    
+    /* 메인 컨테이너 */
+    .page { 
+      max-width: 1200px; 
+      margin: 0 auto; 
+      padding: 40px 20px; 
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+    
+    /* 뒤로가기 버튼 */
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 16px;
+      color: var(--text-primary);
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      align-self: flex-start;
+    }
+    
+    .back-btn:hover {
+      background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 100%);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+      border-color: rgba(102, 126, 234, 0.3);
+    }
+    
+    /* 메인 예약 컨테이너 */
+    .booking-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: start;
+    }
+    
+    /* 메이트 프로필 카드 */
+    .mate-profile-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 28px;
+      padding: 40px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.04);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    .mate-profile-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 30%, #f093fb 60%, #f5576c 100%);
+      animation: shimmer 3s ease-in-out infinite;
+    }
+    
+    @keyframes shimmer {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
+    }
+    
+    .mate-profile-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 32px 80px rgba(0,0,0,0.12), 0 12px 32px rgba(0,0,0,0.08);
+    }
+    
+    /* 메이트 헤더 */
+    .mate-header {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+    
+    .mate-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 24px;
+      object-fit: cover;
+      border: 4px solid rgba(255,255,255,0.8);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
+    }
+    
+    .mate-avatar:hover {
+      transform: scale(1.05);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.2);
+    }
+    
+    .mate-info h2 {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 8px 0;
+      letter-spacing: -0.02em;
+    }
+    
+    .mate-meta {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+    
+    /* 로그인 상태 */
+    .login-status {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.05) 100%);
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    
+    .login-status.logged-in {
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(21, 128, 61, 0.05) 100%);
+      border-color: rgba(34, 197, 94, 0.2);
+    }
+    
+    .login-status-icon {
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+    
+    /* 예약 폼 카드 */
+    .booking-form-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 28px;
+      padding: 40px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.04);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    .booking-form-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, #f093fb 0%, #f5576c 30%, #4facfe 60%, #00f2fe 100%);
+      animation: shimmer 3s ease-in-out infinite reverse;
+    }
+    
+    .booking-form-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 32px 80px rgba(0,0,0,0.12), 0 12px 32px rgba(0,0,0,0.08);
+    }
+    
+    .form-title {
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-align: center;
+      margin: 0 0 32px 0;
+      letter-spacing: -0.02em;
+      position: relative;
+    }
+    
+    .form-title::after {
+      content: '';
+      position: absolute;
+      bottom: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 3px;
+      background: linear-gradient(90deg, #f093fb 0%, #4facfe 100%);
+      border-radius: 2px;
+    }
+    
+    /* 폼 그리드 */
+    .form-grid {
+      display: grid;
+      gap: 32px;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    
+    .form-row.single {
+      grid-template-columns: 1fr;
+    }
+    
+    /* 폼 필드 */
+    .form-field {
+      position: relative;
+    }
+    
+    .form-label {
+      display: block;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+      font-size: 1rem;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      position: relative;
+    }
+    
+    .form-label::before {
+      content: '';
+      position: absolute;
+      left: -16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 16px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 2px;
+    }
+    
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      padding: 18px 24px;
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
+      font-family: inherit;
+      font-size: 1.1rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(8px);
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.04);
+    }
+    
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      outline: none;
+      border-color: rgba(102, 126, 234, 0.6);
+      background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.98) 100%);
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15), inset 0 2px 12px rgba(0,0,0,0.06);
+      transform: translateY(-2px);
+    }
+    
+    .form-textarea {
+      min-height: 140px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+    
+    .form-input::placeholder, .form-textarea::placeholder {
+      color: rgba(102, 126, 234, 0.5);
+      font-style: italic;
+    }
+    
+    /* 특별한 필드 스타일 */
+    .highlight-field {
+      position: relative;
+    }
+    
+    .highlight-field::after {
+      content: '✨';
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.2rem;
+      opacity: 0.6;
+    }
+    
+    /* 제출 버튼 */
+    .submit-btn {
+      width: 100%;
+      padding: 20px 32px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      color: white;
+      border: none;
+      border-radius: 16px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 12px 32px rgba(102, 126, 234, 0.4);
+      margin-top: 16px;
+    }
+    
+    .submit-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s ease;
+    }
+    
+    .submit-btn:hover::before {
+      left: 100%;
+    }
+    
+    .submit-btn:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 16px 40px rgba(102, 126, 234, 0.5);
+    }
+    
+    .submit-btn:disabled {
+      opacity: 0.6;
+      transform: none;
+      cursor: not-allowed;
+    }
+    
+    /* 결과 메시지 */
+    .result-message {
+      margin-top: 24px;
+      padding: 20px 24px;
+      border-radius: 16px;
+      font-weight: 600;
+      text-align: center;
+      backdrop-filter: blur(8px);
+    }
+    
+    .result-success {
+      background: linear-gradient(135deg, #d1f2eb 0%, #a3e4d7 100%);
+      color: #0e6b47;
+      border: 2px solid rgba(25, 135, 84, 0.3);
+      box-shadow: 0 8px 24px rgba(25, 135, 84, 0.2);
+    }
+    
+    .result-error {
+      background: linear-gradient(135deg, #fadbd8 0%, #f1948a 100%);
+      color: #922b21;
+      border: 2px solid rgba(220, 53, 69, 0.3);
+      box-shadow: 0 8px 24px rgba(220, 53, 69, 0.2);
+    }
+    
+    /* 반응형 디자인 */
+    @media (max-width: 1024px) {
+      .booking-container {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+      
+      .mate-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+      }
+      
+      .mate-avatar {
+        width: 100px;
+        height: 100px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .page {
+        padding: 20px 16px;
+        gap: 24px;
+      }
+      
+      .mate-profile-card, .booking-form-card {
+        padding: 24px;
+        border-radius: 20px;
+      }
+      
+      .form-row {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      
+      .mate-info h2 {
+        font-size: 1.6rem;
+      }
+      
+      .form-title {
+        font-size: 1.8rem;
+      }
+      
+      .form-input, .form-select, .form-textarea {
+        padding: 16px 20px;
+        font-size: 1rem;
+      }
+    }
+    
+    /* 로딩 애니메이션 */
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* 추가 장식 요소 */
+    .decorative-element {
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      background: linear-gradient(45deg, rgba(102, 126, 234, 0.1), rgba(240, 147, 251, 0.1));
+      border-radius: 50%;
+      filter: blur(40px);
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    .decorative-element:nth-child(1) {
+      top: 10%;
+      left: 10%;
+      animation-delay: 0s;
+    }
+    
+    .decorative-element:nth-child(2) {
+      top: 60%;
+      right: 10%;
+      animation-delay: 2s;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+  </style>
+</head>
+<body class="bg-cream">
+  <!-- 장식 요소 -->
+  <div class="decorative-element"></div>
+  <div class="decorative-element"></div>
+  
+  <main class="page">
+    <a href="index.html#friends" class="back-btn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="m12 19-7-7 7-7"/>
+        <path d="m19 12H5"/>
+      </svg>
+      메이트 목록으로 돌아가기
+    </a>
 
-<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>PUZZMI 예약하기</title>
-<link rel="stylesheet" href="styles.css"/><link rel="stylesheet" href="pages.css"/><link rel="stylesheet" href="pages-theme.css"/></head>
-<body class="bg-cream"><main class="page stack-16">
-<section class="card"><header class="media"><img id="mateAvatar" class="round" src=""/><div><h2 id="mateName" style="margin:0 0 4px">메이트</h2><div class="muted" id="mateMeta"></div></div></header><div class="note" id="whoami"></div>
-<form id="bookingForm" class="stack-16">
-<div class="row"><div class="field"><div class="label">예약 날짜</div><input class="input" type="date" id="date" required/></div><div class="field"><div class="label">시작 시간</div><input class="input" type="time" id="start_time" required/></div></div>
-<div class="row"><div class="field"><div class="label">이용 시간</div><select class="select" id="duration_hours" required><option value="2">2시간</option><option value="3">3시간</option><option value="4">4시간</option></select></div><div class="field"><div class="label">언어</div><select class="select" id="language" required><option value="ko">한국어</option><option value="ja">日本語</option><option value="en">English</option></select></div></div>
-<div class="row"><div class="field"><div class="label">예약자 성함</div><input class="input" id="customer_name" required/></div><div class="field"><div class="label">연락처</div><input class="input" id="customer_contact" required/></div></div>
-<div class="row single"><div class="field"><div class="label">요청사항</div><textarea class="textarea" id="notes"></textarea></div></div>
-<button class="btn btn-primary" id="submitBtn" type="submit">예약 신청하기</button><div id="result"></div></form></section></main>
-<script type="module">
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-const supabase = createClient("https://eevvgbbokenpjnvtmztk.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4");
-const params=new URLSearchParams(location.search); const mateId=params.get('mate_id');
-async function loadMate(){if(!mateId) return; const {data}=await supabase.from('mate_profiles').select(`user_id,bio,mbti,hobbies,profiles!inner(id,full_name,age,gender,languages,avatar_url)`).eq('user_id', mateId).single(); const p=data?.profiles||{}; document.getElementById('mateAvatar').src=p.avatar_url||"https://picsum.photos/seed/puzzmi/140/140"; document.getElementById('mateName').textContent=p.full_name||'이름 비공개'; const age=p.age?`${p.age}세`:''; const gender=p.gender||''; const mbti=data.mbti?` • MBTI ${data.mbti}`:''; document.getElementById('mateMeta').textContent=[age,gender].filter(Boolean).join(' • ')+mbti;}
-async function renderUser(){const {data:{user}}=await supabase.auth.getUser(); document.getElementById('whoami').innerHTML=user?('로그인 됨: '+(user.email||user.id)):'로그인되지 않음';}
-loadMate(); renderUser();
-document.getElementById('bookingForm').onsubmit=async(e)=>{e.preventDefault(); const btn=document.getElementById('submitBtn'); btn.disabled=true;
-const date=document.getElementById('date').value; const start_time=document.getElementById('start_time').value; const duration_hours=parseInt(document.getElementById('duration_hours').value,10); const language=document.getElementById('language').value; const customer_name=document.getElementById('customer_name').value.trim(); const customer_contact=document.getElementById('customer_contact').value.trim(); const notes=document.getElementById('notes').value.trim();
-const {data:{user}}=await supabase.auth.getUser(); const payload={mate_id:mateId, customer_id:user?.id||null, customer_name, customer_contact, date, start_time, duration_hours, language, notes, status:'pending'};
-const {data,error}=await supabase.from('bookings').insert(payload).select().single(); document.getElementById('result').innerHTML= error?('<div class=error>오류: '+error.message+'</div>'):(`<div class=success>예약 신청 완료! (ID: ${data.id})</div>`); btn.disabled=false;};
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    const redir = encodeURIComponent(location.pathname + location.search);
-    location.replace(`auth_combo.html?redirect=${redir}`);
-  }
-</script></body></html>
+    <div class="booking-container">
+      <!-- 메이트 프로필 섹션 -->
+      <section class="mate-profile-card">
+        <div class="mate-header">
+          <img id="mateAvatar" class="mate-avatar" src="" alt="메이트 프로필"/>
+          <div class="mate-info">
+            <h2 id="mateName">메이트</h2>
+            <div class="mate-meta" id="mateMeta">프로필 로딩 중...</div>
+          </div>
+        </div>
+        
+        <div class="login-status" id="whoami">
+          <div class="login-status-icon">👤</div>
+          <div>로그인 상태 확인 중...</div>
+        </div>
+      </section>
+
+      <!-- 예약 폼 섹션 -->
+      <section class="booking-form-card">
+        <h1 class="form-title">✨ 특별한 여행 예약하기</h1>
+        
+        <form id="bookingForm" class="form-grid">
+          <div class="form-row">
+            <div class="form-field highlight-field">
+              <label class="form-label" for="date">📅 예약 날짜</label>
+              <input class="form-input" type="date" id="date" required/>
+            </div>
+            <div class="form-field highlight-field">
+              <label class="form-label" for="start_time">🕐 시작 시간</label>
+              <input class="form-input" type="time" id="start_time" required/>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label" for="duration_hours">⏰ 이용 시간</label>
+              <select class="form-select" id="duration_hours" required>
+                <option value="">시간을 선택해주세요</option>
+                <option value="2">2시간 - 카페 & 간단한 투어</option>
+                <option value="3">3시간 - 맛집 탐방</option>
+                <option value="4">4시간 - 반나절 투어</option>
+                <option value="5">5시간 - 쇼핑 & 문화체험</option>
+                <option value="6">6시간 - 하루 종일 투어</option>
+                <option value="7">7시간 - 프리미엄 투어</option>
+                <option value="8">8시간 - 완전한 하루</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="language">🌐 소통 언어</label>
+              <select class="form-select" id="language" required>
+                <option value="">언어를 선택해주세요</option>
+                <option value="ko">🇰🇷 한국어</option>
+                <option value="ja">🇯🇵 日本語</option>
+                <option value="en">🇺🇸 English</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label" for="customer_name">👤 예약자 성함</label>
+              <input class="form-input" type="text" id="customer_name" placeholder="예: Yuki Tanaka" required/>
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="customer_contact">📞 연락처</label>
+              <input class="form-input" type="text" id="customer_contact" placeholder="이메일 또는 LINE ID" required/>
+            </div>
+          </div>
+          
+          <div class="form-row single">
+            <div class="form-field">
+              <label class="form-label" for="notes">💭 특별한 요청사항</label>
+              <textarea class="form-textarea" id="notes" placeholder="가고 싶은 카페나 음식점, 선호하는 지역, 관심사, 기타 요청사항을 자유롭게 적어주세요. 메이트가 더 맞춤형 경험을 준비할 수 있어요! ✨"></textarea>
+            </div>
+          </div>
+          
+          <button class="submit-btn" type="submit" id="submitBtn">
+            🎉 예약 신청하기
+          </button>
+          
+          <div id="result"></div>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+    const SUPABASE_URL = "https://eevvgbbokenpjnvtmztk.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4";
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const params = new URLSearchParams(location.search);
+    const mateId = params.get('mate_id');
+
+    const avatarEl = document.getElementById('mateAvatar');
+    const nameEl = document.getElementById('mateName');
+    const metaEl = document.getElementById('mateMeta');
+    const whoamiEl = document.getElementById('whoami');
+
+    // 메이트 정보 로드
+    async function loadMate() {
+      if (!mateId) {
+        nameEl.textContent = '메이트 정보 없음';
+        metaEl.textContent = '올바른 메이트 ID가 필요합니다.';
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('mate_profiles')
+          .select(`
+            user_id, bio, hourly_rate, mbti, hobbies, rating, photos, primary_photo,
+            profiles!inner ( id, full_name, age, gender, languages, avatar_url )
+          `)
+          .eq('user_id', mateId)
+          .single();
+
+        if (error) throw error;
+
+        const p = data.profiles || {};
+        const coverPhoto = data.primary_photo || (Array.isArray(data.photos) && data.photos[0]) || p.avatar_url;
+        
+        avatarEl.src = coverPhoto || "https://picsum.photos/seed/puzzmi/240/240";
+        nameEl.textContent = p.full_name || '이름 비공개';
+        
+        const age = p.age ? `${p.age}세` : '';
+        const gender = p.gender || '';
+        const rating = data.rating ? `⭐ ${data.rating}` : '';
+        const langs = Array.isArray(p.languages) ? p.languages.join(', ') : '';
+        
+        const metaInfo = [age, gender, rating, langs].filter(Boolean);
+        metaEl.innerHTML = metaInfo.length ? metaInfo.join(' • ') : '프로필 정보 준비 중';
+        
+        if (data.bio) {
+          metaEl.innerHTML += `<br><em style="color: var(--text-secondary); font-size: 0.95rem;">"${data.bio}"</em>`;
+        }
+      } catch (error) {
+        console.error('메이트 정보 로드 실패:', error);
+        nameEl.textContent = '메이트 정보 로드 실패';
+        metaEl.textContent = '잠시 후 다시 시도해주세요.';
+      }
+    }
+
+    // 사용자 상태 렌더링
+    async function renderUser() {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          whoamiEl.innerHTML = `
+            <div class="login-status-icon">✅</div>
+            <div><strong>로그인됨:</strong> ${user.email || user.id}</div>
+          `;
+          whoamiEl.classList.add('logged-in');
+        } else {
+          whoamiEl.innerHTML = `
+            <div class="login-status-icon">⚠️</div>
+            <div><strong>로그인이 필요합니다</strong><br>예약을 위해 먼저 로그인해주세요.</div>
+          `;
+        }
+      } catch (error) {
+        whoamiEl.innerHTML = `
+          <div class="login-status-icon">❌</div>
+          <div>사용자 정보를 확인할 수 없습니다.</div>
+        `;
+      }
+    }
+
+    // 폼 제출 처리
+    const form = document.getElementById('bookingForm');
+    const result = document.getElementById('result');
+    const submitBtn = document.getElementById('submitBtn');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      // 로그인 체크
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        const redir = encodeURIComponent(location.pathname + location.search);
+        location.replace(`auth_combo.html?redirect=${redir}`);
+        return;
+      }
+
+      // 버튼 로딩 상태
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<div class="loading"></div> 예약 처리 중...';
+
+      try {
+        const formData = {
+          mate_id: mateId,
+          customer_id: user.id,
+          customer_name: document.getElementById('customer_name').value.trim(),
+          customer_contact: document.getElementById('customer_contact').value.trim(),
+          date: document.getElementById('date').value,
+          start_time: document.getElementById('start_time').value,
+          duration_hours: parseInt(document.getElementById('duration_hours').value, 10),
+          language: document.getElementById('language').value,
+          notes: document.getElementById('notes').value.trim(),
+          status: 'pending'
+        };
+
+        const { data, error } = await supabase
+          .from('bookings')
+          .insert(formData)
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        result.innerHTML = `
+          <div class="result-message result-success">
+            <div style="font-size: 2rem; margin-bottom: 12px;">🎉</div>
+            <div style="font-size: 1.2rem; font-weight: 800; margin-bottom: 8px;">예약 신청이 완료되었습니다!</div>
+            <div>신청번호: <strong>#${data.id}</strong></div>
+            <div style="margin-top: 12px; font-size: 0.95rem; opacity: 0.9;">
+              메이트가 확인 후 24시간 내에 연락드릴 예정입니다.
+            </div>
+          </div>
+        `;
+        
+        form.reset();
+        
+        // 성공 후 3초 뒤 내 예약 페이지로 이동
+        setTimeout(() => {
+          if (confirm('내 예약 페이지로 이동하시겠습니까?')) {
+            location.href = 'my_bookings.html';
+          }
+        }, 3000);
+
+      } catch (error) {
+        console.error('예약 실패:', error);
+        result.innerHTML = `
+          <div class="result-message result-error">
+            <div style="font-size: 2rem; margin-bottom: 12px;">😔</div>
+            <div style="font-size: 1.2rem; font-weight: 800; margin-bottom: 8px;">예약 신청 중 오류가 발생했습니다</div>
+            <div style="font-size: 0.95rem;">${error.message || '잠시 후 다시 시도해주세요.'}</div>
+          </div>
+        `;
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '🎉 예약 신청하기';
+      }
+    });
+
+    // 초기화
+    loadMate();
+    renderUser();
+
+    // 오늘 날짜를 최소값으로 설정
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('date').setAttribute('min', today);
+  </script>
+</body>
+</html>
