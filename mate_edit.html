@@ -776,12 +776,7 @@
           </div>
         </div>
         
-        <div class="form-row">
-          <div class="field">
-            <label class="label" for="hourly">시급 (원)</label>
-            <input id="hourly" type="number" class="input" min="0" step="1000" placeholder="예: 40000"/>
-            <div class="help-text">원화(₩) 기준으로 입력해주세요</div>
-          </div>
+        <div class="form-row single">
           <div class="field">
             <label class="label" for="tags">전문 태그</label>
             <input id="tags" class="input" placeholder="맛집, 카페, 쇼핑, K-POP"/>
@@ -826,7 +821,6 @@
 
     const formProfile = document.getElementById('formProfile');
     const bioEl   = document.getElementById('bio');
-    const hourlyEl= document.getElementById('hourly');
     const tagsEl  = document.getElementById('tags');
     const areasEl = document.getElementById('areas');
     const saveMsg = document.getElementById('saveMsg');
@@ -872,7 +866,7 @@
       // mate_profiles
       const { data: mp } = await supabase
         .from('mate_profiles')
-        .select('user_id, bio, hourly_rate, tags, areas, photos, primary_photo')
+        .select('user_id, bio, tags, areas, photos, primary_photo')
         .eq('user_id', user.id)
         .maybeSingle();
 
@@ -893,7 +887,6 @@
     function renderProfile(p) {
       profileRow = p;
       bioEl.value    = p.bio ?? '';
-      hourlyEl.value = p.hourly_rate ?? '';
       tagsEl.value   = Array.isArray(p.tags) ? p.tags.join(', ') : '';
       areasEl.value  = Array.isArray(p.areas) ? p.areas.join(', ') : '';
       renderThumbs(p.photos || [], p.primary_photo);
@@ -1055,12 +1048,10 @@
       e.preventDefault();
       const tags  = tagsEl.value.split(',').map(s => s.trim()).filter(Boolean);
       const areas = areasEl.value.split(',').map(s => s.trim()).filter(Boolean);
-      const hourly= hourlyEl.value ? parseInt(hourlyEl.value, 10) : null;
 
       const { error } = await supabase.from('mate_profiles')
         .update({
           bio: bioEl.value || null,
-          hourly_rate: isNaN(hourly) ? null : hourly,
           tags,
           areas
         })
