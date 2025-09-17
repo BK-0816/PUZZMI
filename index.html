@@ -233,7 +233,233 @@ btn.classList.add('is-faved');
   (async () => {
     await refreshAuthUI();
     await loadMates({ reset: true });
+    await loadHomepageReviews();
   })();
+
+  // ===== 4) 메인페이지 리뷰 로드 =====
+  async function loadHomepageReviews() {
+    const reviewsGrid = document.getElementById('reviewsGrid');
+    if (!reviewsGrid) return;
+
+    try {
+      // 평점 높고 글자수 많은 순으로 리뷰 가져오기
+      const { data: reviews, error } = await supabase
+        .from('reviews')
+        .select(`
+          id, content, rating, created_at, author_name,
+          mate_profiles!inner (
+            user_id,
+            profiles!inner ( full_name )
+          )
+        `)
+        .not('content', 'is', null)
+        .gte('rating', 4) // 4점 이상만
+        .order('rating', { ascending: false })
+        .limit(50); // 많이 가져와서 JS에서 정렬
+
+      if (error) {
+        console.error('리뷰 로드 실패:', error);
+        reviewsGrid.innerHTML = `
+          <div class="review-card">
+            <p class="review-text">리뷰를 불러오는 중 오류가 발생했습니다.</p>
+          </div>
+        `;
+        return;
+      }
+
+      if (!reviews || reviews.length === 0) {
+        reviewsGrid.innerHTML = `
+          <div class="review-card">
+            <p class="review-text">아직 등록된 리뷰가 없습니다. 첫 번째 리뷰를 남겨보세요!</p>
+          </div>
+        `;
+        return;
+      }
+
+      // 평점 높고 글자수 많은 순으로 정렬
+      const sortedReviews = reviews
+        .filter(review => review.content && review.content.trim().length >= 20) // 최소 20자 이상
+        .sort((a, b) => {
+          // 1차: 평점 높은 순
+          if (b.rating !== a.rating) {
+            return b.rating - a.rating;
+          }
+          // 2차: 글자수 많은 순
+          return (b.content?.length || 0) - (a.content?.length || 0);
+        })
+        .slice(0, 6); // 최대 6개만 표시
+
+      // 이메일 마스킹 함수
+      function maskEmail(email) {
+        if (!email || typeof email !== 'string') return '익명';
+        
+        const atIndex = email.indexOf('@');
+        if (atIndex === -1) return email; // @ 없으면 원본 반환 (실명)
+        
+        const localPart = email.substring(0, atIndex);
+        const domain = email.substring(atIndex);
+        
+        if (localPart.length <= 2) {
+          return localPart[0] + '*'.repeat(localPart.length - 1) + domain;
+        } else if (localPart.length <= 4) {
+          return localPart[0] + '*'.repeat(localPart.length - 2) + localPart[localPart.length - 1] + domain;
+        } else {
+          const start = localPart.substring(0, 2);
+          const end = localPart.substring(localPart.length - 2);
+          const middle = '*'.repeat(localPart.length - 4);
+          return start + middle + end + domain;
+        }
+      }
+
+      // 별점 표시 함수
+      function renderStars(rating) {
+        const fullStars = Math.floor(rating);
+        const hasHalfStar = rating % 1 >= 0.5;
+        let starsHtml = '';
+        
+        for (let i = 0; i < fullStars; i++) {
+          starsHtml += '<i class="fas fa-star"></i>';
+        }
+        
+        if (hasHalfStar) {
+          starsHtml += '<i class="fas fa-star-half-alt"></i>';
+        }
+        
+        const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+        for (let i = 0; i < emptyStars; i++) {
+          starsHtml += '<i class="far fa-star"></i>';
+        }
+        
+        return starsHtml;
+      }
+
+      // 랜덤 아바타 생성 함수
+      function getRandomAvatar(index) {
+        const avatars = [
+          'https://images.pexels.com/photos/1382731/pexels-photo-1382731.jpeg?auto=compress&cs=tinysrgb&w=100',
+          'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=100',
+          'https://images.pexels.com/photos/1542085/pexels-photo-1542085.jpeg?auto=compress&cs=tinysrgb&w=100',
+          'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100',
+          'https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=100',
+          'https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpeg?auto=compress&cs=tinysrgb&w=100'
+        ];
+        return avatars[index % avatars.length];
+      }
+
+      // 랜덤 지역 생성 함수
+      function getRandomLocation(index) {
+        const locations = [
+          '일본, 도쿄',
+          '미국, 뉴욕', 
+          '영국, 런던',
+          '프랑스, 파리',
+          '독일, 베를린',
+          '호주, 시드니',
+          '캐나다, 토론토',
+          '싱가포르',
+          '태국, 방콕',
+          '중국, 상하이'
+        ];
+        return locations[index % locations.length];
+      }
+
+      // 리뷰 카드 렌더링
+      reviewsGrid.innerHTML = sortedReviews.map((review, index) => {
+        const mateName = review.mate_profiles?.profiles?.full_name || '메이트';
+        const authorName = maskEmail(review.author_name || '익명');
+        const reviewDate = new Date(review.created_at).toLocaleDateString('ko-KR', { 
+          year: 'numeric', 
+          month: 'long' 
+        });
+        const avatar = getRandomAvatar(index);
+        const location = getRandomLocation(index);
+        
+        return `
+          <div class="review-card">
+            <div class="review-header">
+              <div class="reviewer-info">
+                <img src="${avatar}" alt="${authorName}" class="reviewer-avatar">
+                <div>
+                  <h4 class="reviewer-name">${authorName}</h4>
+                  <p class="reviewer-location">${location}</p>
+                </div>
+              </div>
+              <div class="review-rating">
+                ${renderStars(review.rating)}
+              </div>
+            </div>
+            <p class="review-text">"${review.content}"</p>
+            <p class="review-date">${reviewDate}</p>
+            <div class="review-mate" style="margin-top: 12px; padding: 8px 12px; background: rgba(102, 126, 234, 0.1); border-radius: 8px; font-size: 0.9rem; color: var(--text-secondary);">
+              <strong>${mateName}</strong> 님과 함께한 여행
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // 리뷰가 3개 미만인 경우 기본 리뷰로 채우기
+      if (sortedReviews.length < 3) {
+        const defaultReviews = [
+          {
+            author: "Sarah Johnson",
+            location: "미국, 뉴욕",
+            rating: 5,
+            text: "지은이와 함께한 서울 여행은 정말 최고였어요! 관광 가이드북에서는 찾을 수 없는 숨겨진 맛집들을 발견할 수 있었고, 한국 문화를 진짜로 체험할 수 있었습니다. 완전 추천해요!",
+            date: "2024년 1월",
+            avatar: "https://images.pexels.com/photos/1382731/pexels-photo-1382731.jpeg?auto=compress&cs=tinysrgb&w=100"
+          },
+          {
+            author: "田中 博",
+            location: "일본, 도쿄", 
+            rating: 5,
+            text: "민준 씨 덕분에 홍대와 강남의 진짜 모습을 볼 수 있었어요. K-팝 문화에 대해서도 많이 배웠고, 쇼핑도 너무 재미있었습니다. 다음에 또 이용하고 싶어요!",
+            date: "2024년 2월",
+            avatar: "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=100"
+          },
+          {
+            author: "Emma Thompson",
+            location: "영국, 런던",
+            rating: 5,
+            text: "소영이와 함께한 서울 나이트라이프는 정말 환상적이었어요! 안전하면서도 재미있는 밤 문화를 경험할 수 있었습니다. 혼자서는 절대 갈 수 없었을 곳들을 가봤어요.",
+            date: "2024년 3월",
+            avatar: "https://images.pexels.com/photos/1542085/pexels-photo-1542085.jpeg?auto=compress&cs=tinysrgb&w=100"
+          }
+        ];
+
+        const remainingSlots = 3 - sortedReviews.length;
+        const defaultToShow = defaultReviews.slice(0, remainingSlots);
+        
+        const defaultHtml = defaultToShow.map(defaultReview => `
+          <div class="review-card">
+            <div class="review-header">
+              <div class="reviewer-info">
+                <img src="${defaultReview.avatar}" alt="${defaultReview.author}" class="reviewer-avatar">
+                <div>
+                  <h4 class="reviewer-name">${defaultReview.author}</h4>
+                  <p class="reviewer-location">${defaultReview.location}</p>
+                </div>
+              </div>
+              <div class="review-rating">
+                ${renderStars(defaultReview.rating)}
+              </div>
+            </div>
+            <p class="review-text">"${defaultReview.text}"</p>
+            <p class="review-date">${defaultReview.date}</p>
+          </div>
+        `).join('');
+        
+        reviewsGrid.innerHTML += defaultHtml;
+      }
+
+    } catch (error) {
+      console.error('리뷰 로드 중 오류:', error);
+      reviewsGrid.innerHTML = `
+        <div class="review-card">
+          <p class="review-text">리뷰를 불러오는 중 오류가 발생했습니다.</p>
+        </div>
+      `;
+    }
+  }
 </script>
 
 
@@ -306,7 +532,7 @@ btn.classList.add('is-faved');
 </div>
 
   <!-- 핵심 한 줄 카피(리드) -->
-  <p class="lead-copy">당신의 ‘함께 가고 싶다’는 마음을 이루어 드리는 서비스!</p>
+  <p class="lead-copy">당신의 '함께 가고 싶다'는 마음을 이루어 드리는 서비스!</p>
 
   <!-- 보조 카피(두 줄) -->
   <p class="section-subtitle">
@@ -349,7 +575,7 @@ btn.classList.add('is-faved');
 
   <!-- 마무리 메시지(인용 카드) -->
   <div class="about-quote">
-    <span class="quote-mark">“</span>
+    <span class="quote-mark">"</span>
      당신의 한국에서의 여행을 최고의 시간으로 만들어 드리겠습니다！
   </div>
 </div>
@@ -479,69 +705,8 @@ btn.classList.add('is-faved');
                 <p class="section-subtitle" data-key="reviews-subtitle">PUZZMI와 함께한 여행객들의 진솔한 이야기</p>
             </div>
             
-            <div class="reviews-grid">
-                <div class="review-card">
-                    <div class="review-header">
-                        <div class="reviewer-info">
-                            <img src="https://images.pexels.com/photos/1382731/pexels-photo-1382731.jpeg?auto=compress&cs=tinysrgb&w=100" alt="Sarah" class="reviewer-avatar">
-                            <div>
-                                <h4 class="reviewer-name">Sarah Johnson</h4>
-                                <p class="reviewer-location" data-key="reviewer1-location">미국, 뉴욕</p>
-                            </div>
-                        </div>
-                        <div class="review-rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                        </div>
-                    </div>
-                    <p class="review-text" data-key="review1-text">"지은이와 함께한 서울 여행은 정말 최고였어요! 관광 가이드북에서는 찾을 수 없는 숨겨진 맛집들을 발견할 수 있었고, 한국 문화를 진짜로 체험할 수 있었습니다. 완전 추천해요!"</p>
-                    <p class="review-date">2024년 1월</p>
-                </div>
-                
-                <div class="review-card">
-                    <div class="review-header">
-                        <div class="reviewer-info">
-                            <img src="https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=100" alt="Hiroshi" class="reviewer-avatar">
-                            <div>
-                                <h4 class="reviewer-name">田中 博</h4>
-                                <p class="reviewer-location" data-key="reviewer2-location">일본, 도쿄</p>
-                            </div>
-                        </div>
-                        <div class="review-rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                        </div>
-                    </div>
-                    <p class="review-text" data-key="review2-text">"민준 씨 덕분에 홍대와 강남의 진짜 모습을 볼 수 있었어요. K-팝 문화에 대해서도 많이 배웠고, 쇼핑도 너무 재미있었습니다. 다음에 또 이용하고 싶어요!"</p>
-                    <p class="review-date">2024년 2월</p>
-                </div>
-                
-                <div class="review-card">
-                    <div class="review-header">
-                        <div class="reviewer-info">
-                            <img src="https://images.pexels.com/photos/1542085/pexels-photo-1542085.jpeg?auto=compress&cs=tinysrgb&w=100" alt="Emma" class="reviewer-avatar">
-                            <div>
-                                <h4 class="reviewer-name">Emma Thompson</h4>
-                                <p class="reviewer-location" data-key="reviewer3-location">영국, 런던</p>
-                            </div>
-                        </div>
-                        <div class="review-rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                        </div>
-                    </div>
-                    <p class="review-text" data-key="review3-text">"소영이와 함께한 서울 나이트라이프는 정말 환상적이었어요! 안전하면서도 재미있는 밤 문화를 경험할 수 있었습니다. 혼자서는 절대 갈 수 없었을 곳들을 가봤어요."</p>
-                    <p class="review-date">2024년 3월</p>
-                </div>
+            <div class="reviews-grid" id="reviewsGrid">
+                <!-- 실제 리뷰 데이터가 여기에 로드됩니다 -->
             </div>
         </div>
     </section>
