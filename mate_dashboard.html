@@ -146,7 +146,7 @@
     /* 통계 카드 */
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      grid-template-columns: repeat(5, 1fr);
       gap: 24px;
       margin-bottom: 40px;
     }
@@ -156,12 +156,13 @@
       backdrop-filter: blur(20px);
       border: 1px solid rgba(255,255,255,0.4);
       border-radius: 24px;
-      padding: 32px;
+      padding: 20px 16px;
       box-shadow: 0 16px 40px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04);
       position: relative;
       overflow: hidden;
       transition: all 0.3s ease;
       text-align: center;
+      min-width: 0;
     }
     
     .stat-card::before {
@@ -206,23 +207,23 @@
     }
     
     .stat-icon {
-      font-size: 3rem;
-      margin-bottom: 16px;
+      font-size: 2rem;
+      margin-bottom: 12px;
       opacity: 0.8;
     }
     
     .stat-number {
-      font-size: 2.5rem;
+      font-size: 1.8rem;
       font-weight: 800;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
     
     .stat-label {
-      font-size: 1.1rem;
+      font-size: 0.9rem;
       color: var(--text-secondary);
       font-weight: 600;
       text-transform: uppercase;
@@ -544,7 +545,7 @@
       }
       
       .stats-grid {
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
         gap: 20px;
       }
       
@@ -588,6 +589,11 @@
       
       .stats-grid {
         grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+      
+      .stat-card {
+        padding: 16px 12px;
       }
       
       .booking-card {
@@ -754,7 +760,7 @@ function updateStats(data) {
   const pending = data.filter(r => r.status === 'pending').length;
   const confirmed = data.filter(r => r.status === 'confirmed').length;
   const completed = data.filter(r => r.status === 'completed').length;
-  const cancelled = data.filter(r => r.status === 'cancelled').length;
+  const cancelled = data.filter(r => r.status === 'cancelled' || r.status === 'canceled_by_mate').length;
   
   totalBookingsEl.textContent = total;
   pendingBookingsEl.textContent = pending;
