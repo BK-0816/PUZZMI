@@ -536,45 +536,104 @@
       line-height: 1;
     }
     
+    .reply {
+      margin-top: 20px;
+      padding: 24px;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.05) 100%);
+      border-radius: 20px;
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      margin-left: 40px;
+      margin-right: 20px;
+      position: relative;
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.1);
+      backdrop-filter: blur(8px);
+    }
+    
+    /* 답글 화살표 (말풍선 효과) */
+    .reply::before {
+      content: '';
+      position: absolute;
+      top: -12px;
+      left: 30px;
+      width: 0;
+      height: 0;
+      border-left: 12px solid transparent;
+      border-right: 12px solid transparent;
+      border-bottom: 12px solid rgba(102, 126, 234, 0.2);
+    }
+    
+    .reply::after {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: 31px;
+      width: 0;
+      height: 0;
+      border-left: 11px solid transparent;
+      border-right: 11px solid transparent;
+      border-bottom: 11px solid rgba(255, 255, 255, 0.95);
+    }
+    
     .reply .label{ 
       font-weight:700; 
       background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      font-size: 1rem;
+      font-size: 1.1rem;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 1.2px;
       margin-bottom: 12px;
       display: flex;
       align-items: center;
-      gap: 8px;
-    }
-    
-    .reply .label::before {
-      content: '💬';
-      font-size: 1.2rem;
-    }
-    
-    .reply {
-      margin-top: 20px;
-      padding: 20px;
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.03) 100%);
-      border-radius: 16px;
-      border-left: 4px solid rgba(102, 126, 234, 0.3);
+      gap: 10px;
       position: relative;
     }
     
+    .reply .label::before {
+      content: '↳';
+      font-size: 1.4rem;
+      color: #667eea;
+      font-weight: 800;
+      margin-right: 4px;
+    }
+    
+    .reply .label::after {
+      content: '메이트 답변';
+      font-size: 0.85rem;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 12px;
+      margin-left: auto;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    }
+    
     .reply .content {
-      font-size: 1rem;
+      font-size: 1.05rem;
       line-height: 1.6;
       color: var(--text-primary);
-      font-style: italic;
+      font-style: normal;
       padding-left: 0;
+      background: rgba(255, 255, 255, 0.7);
+      padding: 16px 20px;
+      border-radius: 12px;
+      border-left: 4px solid #667eea;
+      margin-top: 12px;
+      position: relative;
     }
     
     .reply .content::before {
-      display: none;
+      content: '"';
+      position: absolute;
+      left: 8px;
+      top: -4px;
+      font-size: 2rem;
+      color: rgba(102, 126, 234, 0.3);
+      font-family: serif;
+      line-height: 1;
     }
     
     /* 리뷰 폼 개선 */
