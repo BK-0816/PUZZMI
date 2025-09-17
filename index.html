@@ -272,6 +272,16 @@ async function refreshHeartCount() {
     await loadMates({ reset: true });
     await refreshHeartCount();
     await loadHomepageReviews();
+    
+    // 자동 완료 체크 실행
+    try {
+      const { autoCompleteBookings } = await import('./auto_complete_bookings.js');
+      await autoCompleteBookings();
+      // 5분마다 자동 완료 체크
+      setInterval(autoCompleteBookings, 5 * 60 * 1000);
+    } catch (error) {
+      console.warn('자동 완료 기능 로드 실패:', error);
+    }
   })();
 
   // ===== 4) 메인페이지 리뷰 로드 =====
