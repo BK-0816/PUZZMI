@@ -620,6 +620,171 @@
         transform: translateX(-50%) translateY(0);
       }
     }
+    
+    /* 관리자 툴바 */
+    .admin-toolbar {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.05) 100%);
+      border: 2px solid rgba(102, 126, 234, 0.15);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 32px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.1);
+    }
+    
+    .toolbar-row {
+      display: grid;
+      grid-template-columns: 2fr 2fr 1fr;
+      gap: 20px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .search-group {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    
+    .search-input {
+      width: 100%;
+      padding: 14px 20px 14px 20px;
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
+      font-size: 1rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(8px);
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.04);
+    }
+    
+    .search-input:focus {
+      outline: none;
+      border-color: rgba(102, 126, 234, 0.5);
+      background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.95) 100%);
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1), inset 0 2px 12px rgba(0,0,0,0.06);
+      transform: translateY(-1px);
+    }
+    
+    .search-clear {
+      position: absolute;
+      right: 12px;
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 50%;
+      transition: all 0.2s ease;
+      font-size: 14px;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .search-clear:hover {
+      background: rgba(102, 126, 234, 0.1);
+      color: #667eea;
+    }
+    
+    .filter-group {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .filter-select {
+      padding: 12px 16px;
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(8px);
+      cursor: pointer;
+      min-width: 140px;
+    }
+    
+    .filter-select:focus {
+      outline: none;
+      border-color: rgba(102, 126, 234, 0.5);
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .action-group {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: flex-end;
+    }
+    
+    .refresh-btn {
+      width: 44px;
+      height: 44px;
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(8px);
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .refresh-btn:hover {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      transform: rotate(180deg) scale(1.1);
+      box-shadow: 0 6px 16px rgba(102, 126, 234, 0.3);
+    }
+    
+    .result-count {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.05) 100%);
+      color: #667eea;
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      border: 1px solid rgba(102, 126, 234, 0.2);
+      white-space: nowrap;
+    }
+    
+    /* 퀵 필터 */
+    .quick-filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .quick-filter {
+      padding: 8px 16px;
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.85rem;
+      font-weight: 600;
+      backdrop-filter: blur(8px);
+    }
+    
+    .quick-filter:hover {
+      border-color: rgba(102, 126, 234, 0.4);
+      background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 100%);
+      transform: translateY(-1px);
+    }
+    
+    .quick-filter.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
   </style>
 </head>
 <body class="bg-cream">
@@ -660,6 +825,46 @@
     <!-- 문의 목록 섹션 -->
     <section class="section-card">
       <h3 class="section-title" id="listTitle">📋 내 문의 목록</h3>
+      
+      <!-- 관리자용 검색/필터 툴바 -->
+      <div class="admin-toolbar" id="adminToolbar" style="display:none;">
+        <div class="toolbar-row">
+          <div class="search-group">
+            <input class="search-input" id="searchInput" type="text" placeholder="🔍 제목, 내용, 이메일로 검색..."/>
+            <button class="search-clear" id="clearSearch" title="검색 초기화">✕</button>
+          </div>
+          
+          <div class="filter-group">
+            <select class="filter-select" id="statusFilter">
+              <option value="">📊 모든 상태</option>
+              <option value="open">⏳ 대기중</option>
+              <option value="answered">💬 답변완료</option>
+              <option value="closed">✅ 완료</option>
+            </select>
+            
+            <select class="filter-select" id="sortBy">
+              <option value="created_at_desc">📅 최신순</option>
+              <option value="created_at_asc">📅 오래된순</option>
+              <option value="status_asc">📊 상태순</option>
+              <option value="answered_at_desc">💬 답변일순</option>
+            </select>
+          </div>
+          
+          <div class="action-group">
+            <button class="refresh-btn" id="refreshBtn" title="새로고침">🔄</button>
+            <span class="result-count" id="resultCount">총 0건</span>
+          </div>
+        </div>
+        
+        <div class="quick-filters">
+          <button class="quick-filter active" data-filter="all">📋 전체</button>
+          <button class="quick-filter" data-filter="unanswered">❓ 미답변</button>
+          <button class="quick-filter" data-filter="answered">💬 답변완료</button>
+          <button class="quick-filter" data-filter="today">📅 오늘</button>
+          <button class="quick-filter" data-filter="week">📅 이번주</button>
+        </div>
+      </div>
+      
       <div id="list"></div>
     </section>
   </main>
@@ -773,13 +978,18 @@
     qnaTitle.textContent = '🛠️ Q&A 관리';
     listTitle.innerHTML = '<span style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">📊 전체 문의 관리</span>';
     newInquirySection.style.display = 'none';
+    document.getElementById('adminToolbar').style.display = 'block';
   } else {
     qnaTitle.textContent = '💬 1:1 문의';
     listTitle.innerHTML = '<span style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">📋 내 문의 목록</span>';
     newInquirySection.style.display = 'block';
+    document.getElementById('adminToolbar').style.display = 'none';
   }
 
   // ===== 목록 로드 =====
+  let allQnaData = []; // 전체 데이터 캐시
+  let filteredData = []; // 필터링된 데이터
+  
   async function loadList() {
     list.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--text-secondary);"><div class="loading" style="margin: 0 auto 16px;"></div>문의를 불러오는 중...</div>';
     
@@ -792,12 +1002,73 @@
       list.innerHTML = `<div class="error">❌ 불러오기 실패: ${error.message}</div>`;
       return;
     }
-    if (!data || data.length === 0) {
+    
+    allQnaData = data || [];
+    applyFilters();
+  }
+  
+  function applyFilters() {
+    const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
+    const statusFilter = document.getElementById('statusFilter')?.value || '';
+    const sortBy = document.getElementById('sortBy')?.value || 'created_at_desc';
+    
+    // 검색 필터링
+    filteredData = allQnaData.filter(row => {
+      if (!searchTerm) return true;
+      
+      const title = (row.title || row.subject || '').toLowerCase();
+      const content = (row.content || row.message || '').toLowerCase();
+      const email = (row.user_email || '').toLowerCase();
+      
+      return title.includes(searchTerm) || 
+             content.includes(searchTerm) || 
+             email.includes(searchTerm);
+    });
+    
+    // 상태 필터링
+    if (statusFilter) {
+      filteredData = filteredData.filter(row => {
+        const status = row.status || (row.answer ? 'answered' : 'open');
+        return status === statusFilter;
+      });
+    }
+    
+    // 정렬
+    filteredData.sort((a, b) => {
+      switch (sortBy) {
+        case 'created_at_asc':
+          return new Date(a.created_at) - new Date(b.created_at);
+        case 'created_at_desc':
+          return new Date(b.created_at) - new Date(a.created_at);
+        case 'status_asc':
+          const statusA = a.status || (a.answer ? 'answered' : 'open');
+          const statusB = b.status || (b.answer ? 'answered' : 'open');
+          return statusA.localeCompare(statusB);
+        case 'answered_at_desc':
+          const dateA = a.answered_at ? new Date(a.answered_at) : new Date(0);
+          const dateB = b.answered_at ? new Date(b.answered_at) : new Date(0);
+          return dateB - dateA;
+        default:
+          return new Date(b.created_at) - new Date(a.created_at);
+      }
+    });
+    
+    renderList();
+  }
+  
+  function renderList() {
+    // 결과 카운트 업데이트
+    const resultCount = document.getElementById('resultCount');
+    if (resultCount) {
+      resultCount.textContent = `총 ${filteredData.length}건`;
+    }
+    
+    if (!filteredData || filteredData.length === 0) {
       list.innerHTML = `<div class="muted">문의 내역이 없습니다.<br>궁금한 점이 있으시면 언제든 문의해주세요!</div>`;
       return;
     }
 
-    list.innerHTML = data.map(row => {
+    list.innerHTML = filteredData.map(row => {
       const created = new Date(row.created_at).toLocaleString('ko-KR');
       const answered = row.answered_at ? new Date(row.answered_at).toLocaleString('ko-KR') : '';
       const status = row.status ?? (row.answer ? 'answered' : 'open');
@@ -836,6 +1107,106 @@
   // 관리자 이벤트 위임 바인딩 → 그 다음 목록 로드
   bindAdminHandlers(isAdmin, user, supabase, loadList);
   await loadList();
+
+  // ===== 관리자 검색/필터 기능 =====
+  if (isAdmin) {
+    const searchInput = document.getElementById('searchInput');
+    const clearSearch = document.getElementById('clearSearch');
+    const statusFilter = document.getElementById('statusFilter');
+    const sortBy = document.getElementById('sortBy');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const quickFilters = document.querySelectorAll('.quick-filter');
+    
+    // 검색 입력
+    let searchTimeout;
+    searchInput?.addEventListener('input', () => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(applyFilters, 300); // 300ms 디바운스
+    });
+    
+    // 검색 초기화
+    clearSearch?.addEventListener('click', () => {
+      searchInput.value = '';
+      applyFilters();
+    });
+    
+    // 필터 변경
+    statusFilter?.addEventListener('change', applyFilters);
+    sortBy?.addEventListener('change', applyFilters);
+    
+    // 새로고침
+    refreshBtn?.addEventListener('click', async () => {
+      refreshBtn.style.transform = 'rotate(360deg)';
+      await loadList();
+      setTimeout(() => {
+        refreshBtn.style.transform = '';
+      }, 300);
+    });
+    
+    // 퀵 필터
+    quickFilters.forEach(btn => {
+      btn.addEventListener('click', () => {
+        // 활성 상태 토글
+        quickFilters.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        const filter = btn.getAttribute('data-filter');
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const weekStart = new Date(today);
+        weekStart.setDate(today.getDate() - today.getDay());
+        
+        // 필터 적용
+        switch (filter) {
+          case 'all':
+            filteredData = [...allQnaData];
+            break;
+          case 'unanswered':
+            filteredData = allQnaData.filter(row => !row.answer);
+            break;
+          case 'answered':
+            filteredData = allQnaData.filter(row => !!row.answer);
+            break;
+          case 'today':
+            filteredData = allQnaData.filter(row => {
+              const created = new Date(row.created_at);
+              return created >= today;
+            });
+            break;
+          case 'week':
+            filteredData = allQnaData.filter(row => {
+              const created = new Date(row.created_at);
+              return created >= weekStart;
+            });
+            break;
+          default:
+            filteredData = [...allQnaData];
+        }
+        
+        // 기존 검색어와 상태 필터 다시 적용
+        const searchTerm = searchInput?.value.toLowerCase() || '';
+        const statusFilterValue = statusFilter?.value || '';
+        
+        if (searchTerm) {
+          filteredData = filteredData.filter(row => {
+            const title = (row.title || row.subject || '').toLowerCase();
+            const content = (row.content || row.message || '').toLowerCase();
+            const email = (row.user_email || '').toLowerCase();
+            return title.includes(searchTerm) || content.includes(searchTerm) || email.includes(searchTerm);
+          });
+        }
+        
+        if (statusFilterValue) {
+          filteredData = filteredData.filter(row => {
+            const status = row.status || (row.answer ? 'answered' : 'open');
+            return status === statusFilterValue;
+          });
+        }
+        
+        renderList();
+      });
+    });
+  }
 
   // ===== 새 문의 등록(일반 사용자) =====
   formNew?.addEventListener('submit', async (e) => {

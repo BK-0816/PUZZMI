@@ -550,6 +550,19 @@
         padding: 28px;
         border-radius: 20px;
       }
+      
+      .toolbar-row {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      
+      .filter-group {
+        flex-direction: column;
+      }
+      
+      .action-group {
+        justify-content: center;
+      }
     }
     
     @media (max-width: 768px) {
@@ -581,6 +594,14 @@
       
       .meta-item {
         font-size: 0.85rem;
+      }
+      
+      .quick-filters {
+        justify-content: center;
+      }
+      
+      .search-input {
+        font-size: 16px; /* iOS 줌 방지 */
       }
     }
   </style>
