@@ -51,7 +51,7 @@ async function refreshHeartCount() {
 
   const ids = [...new Set(badges.map(b => b.getAttribute('data-heart')).filter(Boolean))];
 
-  // 이 페이지에 보이는 mate_id들의 favorites를 전부 가져와서 JS에서 그룹핑
+  // 각 메이트별 찜 개수 조회
   const { data, error } = await supabase
     .from('favorites')
     .select('mate_id')
@@ -61,6 +61,7 @@ async function refreshHeartCount() {
     console.warn('heart refresh error:', error);
     return;
   }
+  
   const counts = {};
   for (const row of (data || [])) {
     counts[row.mate_id] = (counts[row.mate_id] || 0) + 1;
@@ -104,8 +105,6 @@ async function refreshHeartCount() {
     const tagsTxt  = (row.tags ?? []).slice(0,3).join(", ") || "서울 투어";
     const subline  = [gIcon, age].filter(Boolean).join(" • ");
 
-    // 안전한 기본값(이전 코드의 ReferenceError 방지)
-    const favCount = Number(row.favorites_count ?? 0);
 
     const card = document.createElement("div");
     card.className = "friend-card";
@@ -113,7 +112,7 @@ async function refreshHeartCount() {
       <div class="friend-image">
         <img src="${img}" alt="${name}">
         <div class="heart-badge" data-heart="${row.user_id}" style="position:absolute;right:8px;top:8px;background:#e0245e;color:#fff;border-radius:16px;padding:4px 8px;font-size:12px;display:flex;gap:6px;align-items:center;">
-          <i class="fas fa-heart"></i><span class="count">${favCount}</span>
+          <i class="fas fa-heart"></i><span class="count">0</span>
         </div>
       </div>
       <div class="friend-info">
@@ -135,8 +134,6 @@ async function refreshHeartCount() {
       </div>
     `;
     grid.appendChild(card);
-    
-    refreshHeartCount(row.user_id);
 
   }
 
@@ -187,52 +184,93 @@ async function refreshHeartCount() {
 
   // ===== 3) 인증 가드 & 찜하기 처리 =====
 
-document.addEventListener('click', async (e) => {
-  const btn = e.target.closest('[data-fav-mate]');
-  if (!btn) return;
-  e.preventDefault();                 // a/button 혼선 방지
-  btn.disabled = true; 
+  // 찜하기 기능
+  document.addEventListener('click', async (e) => {
+    const btn = e.target.closest('[data-fav-mate]');
+    if (!btn) return;
+    e.preventDefault();
+    
+    // 로그인 체크
+    const { data: { user }, error: authErr } = await supabase.auth.getUser();
+    if (authErr || !user) {
+      const redir = encodeURIComponent(location.pathname + location.search);
+      location.href = `auth_combo.html?redirect=${redir}`;
+      return;
+    }
 
-  const { data: { user }, error: authErr } = await supabase.auth.getUser();
-  if (authErr || !user) {
-    const redir = encodeURIComponent(location.pathname + location.search);
-    location.href = `auth_combo.html?redirect=${redir}`;
-    return;
+    const mateId = btn.getAttribute('data-fav-mate');
+    const originalText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '처리중...';
+
+    try {
+      // 이미 찜했는지 확인
+      const { data: existing } = await supabase
+        .from('favorites')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('mate_id', mateId)
+        .maybeSingle();
+
+      if (existing) {
+        // 이미 찜한 경우 - 찜 해제
+        const { error } = await supabase
+          .from('favorites')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('mate_id', mateId);
+        
+        if (error) throw error;
+        
+        btn.textContent = '찜하기';
+        btn.classList.remove('is-faved');
+        showToast('💔 찜 해제되었습니다');
+      } else {
+        // 찜하기
+        const { error } = await supabase
+          .from('favorites')
+          .insert({ user_id: user.id, mate_id: mateId });
+        
+        if (error) throw error;
+        
+        btn.textContent = '찜 완료';
+        btn.classList.add('is-faved');
+        showToast('💖 찜 목록에 추가되었습니다!');
+      }
+
+      // 하트 카운트 업데이트
+      await refreshHeartCount();
+      
+    } catch (error) {
+      console.error('찜하기 오류:', error);
+      btn.textContent = originalText;
+      showToast('❌ 오류가 발생했습니다: ' + error.message);
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  // 토스트 메시지 함수
+  function showToast(message) {
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+      position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white; padding: 12px 24px; border-radius: 12px;
+      z-index: 9999; font-weight: 600; box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+      animation: slideDown 0.3s ease;
+    `;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
   }
-
-  const mateId = btn.getAttribute('data-fav-mate');
-
-  // 중복 방지용 unique(user_id, mate_id) 를 DB에 만들어둔다고 가정
-  const { error } = await supabase
-    .from('favorites')
-    .upsert({ user_id: user.id, mate_id: mateId }, { onConflict: 'user_id,mate_id',ignoreDuplicates: true });
-
-  if (error) {
-    btn.disabled = false;
-    return alert('찜하기 실패: ' + error.message);
-  }
-
-  // 하트 배지 숫자 다시 읽기
-  const { count } = await supabase
-  .from('favorites')
-  .select('id', { count: 'exact', head: true })
-  .eq('mate_id', mateId);
-
-const countEl = document.querySelector(`.heart-badge[data-heart="${mateId}"] .count`);
-if (typeof count === 'number' && countEl) countEl.textContent = count;
-
-  btn.disabled = true;
-  await refreshHeartCount(mateId);
-  btn.setAttribute('aria-disabled', 'true');
-btn.classList.add('is-faved');
-  btn.textContent = '찜 완료';
-});
 
 
   // 초기 실행
   (async () => {
     await refreshAuthUI();
     await loadMates({ reset: true });
+    await refreshHeartCount();
     await loadHomepageReviews();
   })();
 
