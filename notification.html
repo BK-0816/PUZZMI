@@ -873,6 +873,122 @@
       subscribeRealtime();
     })();
 
+    // 알림 메시지 파싱 및 포맷팅 함수
+    function formatNotificationBody(body, type) {
+      if (!body) return '';
+      
+      // 기존 메시지에서 일정 정보 추출
+      const scheduleMatch = body.match(/일정:\s*(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2})\s*\((\d+)h?\)/);
+      const reasonMatch = body.match(/사유:\s*(.+?)(?:\n|$)/);
+      
+      if (scheduleMatch) {
+        const [, date, time, duration] = scheduleMatch;
+        const formattedDateTime = formatDateTime(date, time);
+        const durationText = `${duration}시간`;
+        
+        let messageHtml = '';
+        
+        if (type === 'booking_confirmed') {
+          messageHtml = `
+            <div class="notification-message">
+              <div class="message-header">
+                <div class="message-icon">🎉</div>
+                <span>예약이 확정되었습니다!</span>
+              </div>
+              <div class="message-details">
+                <span class="detail-label">📅 일정</span>
+                <span class="detail-value detail-date">${formattedDateTime}</span>
+                <span class="detail-label">⏰ 시간</span>
+                <span class="detail-value detail-highlight">${durationText}</span>
+              </div>
+            </div>
+          `;
+        } else if (type === 'booking_declined') {
+          const reason = reasonMatch ? reasonMatch[1].trim() : '사유 미기재';
+          messageHtml = `
+            <div class="notification-message">
+              <div class="message-header">
+                <div class="message-icon">😔</div>
+                <span>예약이 거절되었습니다</span>
+              </div>
+              <div class="message-details">
+                <span class="detail-label">📅 일정</span>
+                <span class="detail-value detail-date">${formattedDateTime}</span>
+                <span class="detail-label">⏰ 시간</span>
+                <span class="detail-value">${durationText}</span>
+                <span class="detail-label">💬 사유</span>
+                <span class="detail-value">${reason}</span>
+              </div>
+            </div>
+          `;
+        } else if (type === 'booking_canceled') {
+          const reason = reasonMatch ? reasonMatch[1].trim() : '사유 미기재';
+          messageHtml = `
+            <div class="notification-message">
+              <div class="message-header">
+                <div class="message-icon">🚫</div>
+                <span>예약이 취소되었습니다</span>
+              </div>
+              <div class="message-details">
+                <span class="detail-label">📅 일정</span>
+                <span class="detail-value detail-date">${formattedDateTime}</span>
+                <span class="detail-label">⏰ 시간</span>
+                <span class="detail-value">${durationText}</span>
+                <span class="detail-label">💬 사유</span>
+                <span class="detail-value">${reason}</span>
+              </div>
+            </div>
+          `;
+        } else {
+          // 기본 포맷
+          messageHtml = `
+            <div class="notification-message">
+              <div class="message-header">
+                <div class="message-icon">📋</div>
+                <span>예약 관련 알림</span>
+              </div>
+              <div class="message-details">
+                <span class="detail-label">📅 일정</span>
+                <span class="detail-value detail-date">${formattedDateTime}</span>
+                <span class="detail-label">⏰ 시간</span>
+                <span class="detail-value">${durationText}</span>
+              </div>
+            </div>
+          `;
+        }
+        
+        return messageHtml;
+      }
+      
+      // 일정 정보가 없는 경우 기본 메시지
+      return `<div class="body">${body.replace(/</g,'&lt;')}</div>`;
+    }
+
+    // 날짜/시간 포맷팅 함수
+    function formatDateTime(dateStr, timeStr) {
+      try {
+        if (!dateStr || !timeStr) return '날짜 미정';
+        
+        const dateObj = new Date(dateStr);
+        const dateFormatted = dateObj.toLocaleDateString('ko-KR', { 
+          month: 'long', 
+          day: 'numeric',
+          weekday: 'long'
+        });
+        
+        // 시간 포맷팅 (24시간 → 12시간)
+        const [hour, minute] = timeStr.split(':');
+        const hourNum = parseInt(hour, 10);
+        const period = hourNum >= 12 ? '오후' : '오전';
+        const displayHour = hourNum === 0 ? 12 : hourNum > 12 ? hourNum - 12 : hourNum;
+        const timeFormatted = `${period} ${displayHour}:${minute}`;
+        
+        return `${dateFormatted} ${timeFormatted}`;
+      } catch (e) {
+        return `${dateStr} ${timeStr}`;
+      }
+    }
+
     function bindEvents(){
       // 필터 탭
       document.querySelectorAll('.pill[data-filter]').forEach(btn=>{
