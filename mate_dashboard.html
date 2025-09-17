@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>메이트 대시보드 - PUZZMI</title>
+  <title>PUZZMI - 메이트 대시보드</title>
   <link rel="stylesheet" href="styles.css"/>
   <link rel="stylesheet" href="pages.css"/>
-  <link rel="stylesheet" href="nav.css"/>
   <link rel="stylesheet" href="pages-theme.css"/>
+  <link rel="stylesheet" href="nav.css"/>
   <script type="module" src="nav.js"></script>
   <style>
     body.bg-cream { 
@@ -33,42 +33,42 @@
     .decorative-element {
       position: absolute;
       border-radius: 50%;
-      filter: blur(70px);
-      opacity: 0.3;
+      filter: blur(60px);
+      opacity: 0.25;
       animation: float 10s ease-in-out infinite;
     }
     
     .decorative-element:nth-child(1) {
-      width: 280px;
-      height: 280px;
+      width: 250px;
+      height: 250px;
       background: linear-gradient(45deg, #667eea, #764ba2);
-      top: 10%;
-      left: -8%;
+      top: 15%;
+      left: -5%;
       animation-delay: 0s;
     }
     
     .decorative-element:nth-child(2) {
-      width: 220px;
-      height: 220px;
+      width: 200px;
+      height: 200px;
       background: linear-gradient(45deg, #f093fb, #f5576c);
-      top: 55%;
-      right: -5%;
+      top: 50%;
+      right: -8%;
       animation-delay: 3s;
     }
     
     .decorative-element:nth-child(3) {
-      width: 200px;
-      height: 200px;
+      width: 180px;
+      height: 180px;
       background: linear-gradient(45deg, #4facfe, #00f2fe);
-      bottom: 15%;
-      left: 15%;
+      bottom: 20%;
+      left: 10%;
       animation-delay: 6s;
     }
     
     @keyframes float {
       0%, 100% { transform: translateY(0px) rotate(0deg); }
-      33% { transform: translateY(-30px) rotate(120deg); }
-      66% { transform: translateY(20px) rotate(240deg); }
+      33% { transform: translateY(-25px) rotate(120deg); }
+      66% { transform: translateY(15px) rotate(240deg); }
     }
     
     /* 메인 컨테이너 */
@@ -83,12 +83,12 @@
     /* 페이지 헤더 */
     .page-header {
       background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
-      backdrop-filter: blur(25px);
+      backdrop-filter: blur(20px);
       border: 1px solid rgba(255,255,255,0.4);
-      border-radius: 32px;
-      padding: 50px;
-      margin-bottom: 40px;
-      box-shadow: 0 30px 80px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.04);
+      border-radius: 28px;
+      padding: 40px;
+      margin-bottom: 32px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.04);
       position: relative;
       overflow: hidden;
       text-align: center;
@@ -100,132 +100,353 @@
       top: 0;
       left: 0;
       right: 0;
-      height: 6px;
-      background: linear-gradient(90deg, #667eea 0%, #764ba2 20%, #f093fb 40%, #f5576c 60%, #4facfe 80%, #00f2fe 100%);
-      animation: shimmer 4s ease-in-out infinite;
+      height: 5px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+      animation: shimmer 3s ease-in-out infinite;
     }
     
     @keyframes shimmer {
-      0%, 100% { opacity: 1; transform: translateX(0); }
-      50% { opacity: 0.8; transform: translateX(10px); }
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
     }
     
     .page-header h2 {
-      font-size: 3.2rem;
-      font-weight: 900;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 30%, #f093fb 70%, #f5576c 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      margin: 0 0 20px 0;
-      letter-spacing: -0.03em;
+      margin: 0 0 16px 0;
+      letter-spacing: -0.02em;
       position: relative;
     }
     
     .page-header h2::after {
       content: '';
       position: absolute;
-      bottom: -16px;
+      bottom: -12px;
       left: 50%;
       transform: translateX(-50%);
-      width: 120px;
-      height: 5px;
-      background: linear-gradient(90deg, #667eea 0%, #f093fb 50%, #4facfe 100%);
-      border-radius: 3px;
+      width: 80px;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea 0%, #f093fb 100%);
+      border-radius: 2px;
     }
     
     .page-subtitle {
-      font-size: 1.3rem;
       color: var(--text-secondary);
-      line-height: 1.7;
-      max-width: 600px;
-      margin: 0 auto;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin: 0;
       font-weight: 500;
     }
     
-    /* 통계 카드 */
-    .stats-grid {
+    /* 대시보드 그리드 */
+    .dashboard-grid {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 24px;
-      margin-bottom: 40px;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-bottom: 32px;
     }
     
-    .stat-card {
+    /* 캘린더 섹션 */
+    .calendar-section {
       background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
       backdrop-filter: blur(20px);
       border: 1px solid rgba(255,255,255,0.4);
       border-radius: 24px;
-      padding: 20px 16px;
+      padding: 32px;
       box-shadow: 0 16px 40px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04);
       position: relative;
       overflow: hidden;
-      transition: all 0.3s ease;
-      text-align: center;
-      min-width: 0;
     }
     
-    .stat-card::before {
+    .calendar-section::before {
       content: '';
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
-      height: 4px;
+      height: 3px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 33%, #f093fb 66%, #f5576c 100%);
       opacity: 0.8;
     }
     
-    .stat-card:nth-child(1)::before {
-      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
     }
     
-    .stat-card:nth-child(2)::before {
-      background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
-    }
-    
-    .stat-card:nth-child(3)::before {
-      background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
-    }
-    
-    .stat-card:nth-child(4)::before {
-      background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
-    }
-    
-    .stat-card:nth-child(5)::before {
-      background: linear-gradient(90deg, #e74c3c 0%, #c0392b 100%);
-    }
-    
-    .stat-card:hover {
-      transform: translateY(-6px) scale(1.02);
-      box-shadow: 0 24px 60px rgba(0,0,0,0.1), 0 8px 24px rgba(0,0,0,0.06);
-      border-color: rgba(102, 126, 234, 0.3);
-    }
-    
-    .stat-card:hover::before {
-      opacity: 1;
-      height: 5px;
-    }
-    
-    .stat-icon {
-      font-size: 2rem;
-      margin-bottom: 12px;
-      opacity: 0.8;
-    }
-    
-    .stat-number {
+    .calendar-title {
       font-size: 1.8rem;
       font-weight: 800;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      margin-bottom: 6px;
+      margin: 0;
+    }
+    
+    .calendar-nav {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    
+    .calendar-nav-btn {
+      width: 40px;
+      height: 40px;
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(8px);
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .calendar-nav-btn:hover {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      transform: scale(1.1);
+      box-shadow: 0 6px 16px rgba(102, 126, 234, 0.3);
+      border-color: transparent;
+    }
+    
+    .current-month {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      min-width: 120px;
+      text-align: center;
+    }
+    
+    /* 캘린더 그리드 */
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+      background: rgba(102, 126, 234, 0.1);
+      border-radius: 12px;
+      padding: 2px;
+      margin-bottom: 20px;
+    }
+    
+    .calendar-day-header {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.05) 100%);
+      padding: 12px 8px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--text-primary);
+      border-radius: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .calendar-day {
+      background: rgba(255,255,255,0.9);
+      padding: 12px 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-radius: 8px;
+      position: relative;
+      min-height: 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 4px;
+      backdrop-filter: blur(8px);
+    }
+    
+    .calendar-day:hover {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.05) 100%);
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    }
+    
+    .calendar-day.today {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+    }
+    
+    .calendar-day.selected {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 6px 16px rgba(240, 147, 251, 0.4);
+      transform: scale(1.1);
+    }
+    
+    .calendar-day.other-month {
+      opacity: 0.3;
+      pointer-events: none;
+    }
+    
+    .calendar-day.has-bookings {
+      font-weight: 700;
+    }
+    
+    /* 예약 상태 점들 */
+    .booking-dots {
+      display: flex;
+      gap: 2px;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 100%;
+    }
+    
+    .booking-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    
+    .booking-dot.pending {
+      background: #ffc107;
+      box-shadow: 0 0 4px rgba(255, 193, 7, 0.6);
+    }
+    
+    .booking-dot.confirmed {
+      background: #28a745;
+      box-shadow: 0 0 4px rgba(40, 167, 69, 0.6);
+    }
+    
+    .booking-dot.completed {
+      background: #007bff;
+      box-shadow: 0 0 4px rgba(0, 123, 255, 0.6);
+    }
+    
+    .booking-dot.cancelled,
+    .booking-dot.canceled_by_mate,
+    .booking-dot.declined {
+      background: #dc3545;
+      box-shadow: 0 0 4px rgba(220, 53, 69, 0.6);
+    }
+    
+    .booking-count {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+    
+    .calendar-day.today .booking-count,
+    .calendar-day.selected .booking-count {
+      color: rgba(255,255,255,0.9);
+    }
+    
+    /* 캘린더 범례 */
+    .calendar-legend {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 16px;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(240, 147, 251, 0.03) 100%);
+      border-radius: 12px;
+      border: 1px solid rgba(102, 126, 234, 0.1);
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    
+    .legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    
+    /* 통계 섹션 */
+    .stats-section {
+      background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .stats-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #f093fb 0%, #f5576c 33%, #4facfe 66%, #00f2fe 100%);
+      opacity: 0.8;
+    }
+    
+    .stats-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 24px 0;
+      text-align: center;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 16px;
+    }
+    
+    .stat-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+      border: 2px solid rgba(255,255,255,0.4);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+      border-color: rgba(102, 126, 234, 0.3);
+    }
+    
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
     }
     
     .stat-label {
       font-size: 0.9rem;
-      color: var(--text-secondary);
       font-weight: 600;
+      color: var(--text-secondary);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
@@ -235,12 +456,11 @@
       background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
       backdrop-filter: blur(20px);
       border: 1px solid rgba(255,255,255,0.4);
-      border-radius: 28px;
-      padding: 40px;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.04);
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04);
       position: relative;
       overflow: hidden;
-      transition: all 0.3s ease;
     }
     
     .bookings-section::before {
@@ -249,59 +469,47 @@
       top: 0;
       left: 0;
       right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, #667eea 0%, #764ba2 33%, #f093fb 66%, #f5576c 100%);
+      height: 3px;
+      background: linear-gradient(90deg, #4facfe 0%, #00f2fe 33%, #667eea 66%, #764ba2 100%);
       opacity: 0.8;
     }
     
-    .bookings-section:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 32px 80px rgba(0,0,0,0.1), 0 12px 32px rgba(0,0,0,0.06);
-      border-color: rgba(102, 126, 234, 0.3);
-    }
-    
-    .bookings-section:hover::before {
-      opacity: 1;
-      height: 5px;
-    }
-    
     .section-title {
-      font-size: 2rem;
+      font-size: 1.8rem;
       font-weight: 800;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 50%, #667eea 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      margin: 0 0 32px 0;
-      letter-spacing: -0.02em;
+      margin: 0 0 24px 0;
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 12px;
     }
     
     .section-title::before {
       content: '';
-      width: 6px;
-      height: 40px;
-      background: linear-gradient(135deg, #667eea 0%, #f093fb 100%);
-      border-radius: 3px;
+      width: 4px;
+      height: 28px;
+      background: linear-gradient(135deg, #4facfe 0%, #667eea 100%);
+      border-radius: 2px;
       flex-shrink: 0;
     }
     
-    /* 필터 툴바 */
-    .filter-toolbar {
+    /* 툴바 */
+    .toolbar {
       background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.05) 100%);
       border: 2px solid rgba(102, 126, 234, 0.15);
       border-radius: 20px;
       padding: 24px;
-      margin-bottom: 32px;
+      margin-bottom: 24px;
       backdrop-filter: blur(10px);
       box-shadow: 0 8px 24px rgba(102, 126, 234, 0.1);
     }
     
     .toolbar-row {
       display: grid;
-      grid-template-columns: 2fr 1fr 1fr;
+      grid-template-columns: 2fr 2fr 1fr;
       gap: 20px;
       align-items: center;
       margin-bottom: 20px;
@@ -315,7 +523,7 @@
     
     .search-input {
       width: 100%;
-      padding: 14px 50px 14px 20px;
+      padding: 14px 20px 14px 20px;
       border: 2px solid rgba(102, 126, 234, 0.2);
       border-radius: 16px;
       background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
@@ -357,6 +565,11 @@
       color: #667eea;
     }
     
+    .filter-group {
+      display: flex;
+      gap: 12px;
+    }
+    
     .filter-select {
       padding: 12px 16px;
       border: 2px solid rgba(102, 126, 234, 0.2);
@@ -376,6 +589,47 @@
       box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     }
     
+    .action-group {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: flex-end;
+    }
+    
+    .refresh-btn {
+      width: 44px;
+      height: 44px;
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(8px);
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .refresh-btn:hover {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      transform: rotate(180deg) scale(1.1);
+      box-shadow: 0 6px 16px rgba(102, 126, 234, 0.3);
+    }
+    
+    .result-count {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.05) 100%);
+      color: #667eea;
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      border: 1px solid rgba(102, 126, 234, 0.2);
+      white-space: nowrap;
+    }
+    
+    /* 퀵 필터 */
     .quick-filters {
       display: flex;
       gap: 8px;
@@ -413,7 +667,7 @@
       backdrop-filter: blur(15px);
       border: 1px solid rgba(255,255,255,0.4);
       border-radius: 20px;
-      padding: 20px;
+      padding: 24px;
       margin-bottom: 16px;
       box-shadow: 0 12px 32px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
       transition: all 0.3s ease;
@@ -433,7 +687,7 @@
     }
     
     .booking-card:hover {
-      transform: translateY(-6px) scale(1.01);
+      transform: translateY(-4px) scale(1.01);
       box-shadow: 0 20px 48px rgba(0,0,0,0.12), 0 8px 20px rgba(0,0,0,0.08);
       border-color: rgba(102, 126, 234, 0.3);
     }
@@ -449,159 +703,76 @@
       align-items: flex-start;
       margin-bottom: 16px;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 16px;
     }
     
-    .booking-info h3 {
-      font-size: 1.2rem;
+    .booking-info h4 {
+      font-size: 1.3rem;
       font-weight: 800;
       color: var(--text-primary);
       margin: 0 0 8px 0;
-      letter-spacing: -0.01em;
     }
     
     .booking-meta {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    
-    .meta-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
       color: var(--text-secondary);
-      font-size: 0.9rem;
+      font-size: 0.95rem;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
       font-weight: 500;
     }
     
-    .meta-icon {
-      width: 16px;
-      height: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border-radius: 50%;
-      font-size: 0.7rem;
-      flex-shrink: 0;
-    }
-    
-    /* 상태 배지 */
     .status-badge {
-      padding: 8px 16px;
-      border-radius: 20px;
+      padding: 6px 12px;
+      border-radius: 16px;
       font-weight: 700;
       font-size: 0.8rem;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      border: 2px solid transparent;
-      transition: all 0.3s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
     }
     
     .status-pending {
       background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
       color: #856404;
-      border-color: rgba(255, 193, 7, 0.3);
+      border: 1px solid rgba(255, 193, 7, 0.3);
     }
     
     .status-confirmed {
       background: linear-gradient(135deg, #d1e7dd 0%, #a3e4d7 100%);
       color: #0f5132;
-      border-color: rgba(25, 135, 84, 0.3);
+      border: 1px solid rgba(25, 135, 84, 0.3);
     }
     
     .status-completed {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
     }
     
-    .status-cancelled {
+    .status-cancelled,
+    .status-canceled_by_mate,
+    .status-declined {
       background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
       color: white;
-      box-shadow: 0 4px 12px rgba(240, 147, 251, 0.3);
+      box-shadow: 0 2px 8px rgba(240, 147, 251, 0.3);
     }
     
-    /* 액션 버튼 */
-    .booking-actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 16px;
-      flex-wrap: wrap;
-    }
-    
-    .btn {
-      padding: 10px 20px;
+    .booking-details {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(240, 147, 251, 0.03) 100%);
+      border: 1px solid rgba(102, 126, 234, 0.1);
       border-radius: 12px;
-      font-weight: 700;
-      font-size: 0.85rem;
-      border: none;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-      letter-spacing: 0.3px;
-      text-transform: uppercase;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
+      padding: 16px;
+      margin: 16px 0;
     }
     
-    .btn::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-      transition: left 0.5s ease;
-    }
-    
-    .btn:hover::before {
-      left: 100%;
-    }
-    
-    .btn-confirm {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      box-shadow: 0 6px 16px rgba(102, 126, 234, 0.3);
-    }
-    
-    .btn-confirm:hover {
-      transform: translateY(-2px) scale(1.05);
-      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
-    }
-    
-    .btn-decline {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      color: white;
-      box-shadow: 0 6px 16px rgba(240, 147, 251, 0.3);
-    }
-    
-    .btn-decline:hover {
-      transform: translateY(-2px) scale(1.05);
-      box-shadow: 0 8px 20px rgba(240, 147, 251, 0.4);
-    }
-    
-    .btn-cancel {
-      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
-      color: var(--text-primary);
-      border: 2px solid rgba(102, 126, 234, 0.2);
-      backdrop-filter: blur(8px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    }
-    
-    .btn-cancel:hover {
-      background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 100%);
-      transform: translateY(-2px) scale(1.05);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-      border-color: rgba(102, 126, 234, 0.4);
+    .booking-notes {
+      font-style: italic;
+      color: var(--text-secondary);
+      margin-top: 12px;
+      padding: 12px;
+      background: rgba(255,255,255,0.6);
+      border-radius: 8px;
+      border-left: 3px solid #667eea;
     }
     
     /* 빈 상태 */
@@ -634,297 +805,55 @@
     
     /* 로딩 상태 */
     .loading {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(255,255,255,0.3);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 60px;
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+    }
+    
+    .loading::before {
+      content: '';
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(102, 126, 234, 0.2);
+      border-top: 3px solid #667eea;
       border-radius: 50%;
-      border-top-color: #fff;
-      animation: spin 1s ease-in-out infinite;
+      animation: spin 1s linear infinite;
+      margin-right: 12px;
     }
     
     @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    
-    /* 캘린더 스타일 */
-    .calendar-section {
-      background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255,255,255,0.4);
-      border-radius: 28px;
-      padding: 40px;
-      margin-bottom: 40px;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.04);
-      position: relative;
-      overflow: hidden;
-      transition: all 0.3s ease;
-    }
-    
-    .calendar-section::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, #667eea 0%, #764ba2 33%, #f093fb 66%, #f5576c 100%);
-      opacity: 0.8;
-    }
-    
-    .calendar-section:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 32px 80px rgba(0,0,0,0.1), 0 12px 32px rgba(0,0,0,0.06);
-      border-color: rgba(102, 126, 234, 0.3);
-    }
-    
-    .calendar-section:hover::before {
-      opacity: 1;
-      height: 5px;
-    }
-    
-    .calendar-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 32px;
-    }
-    
-    .calendar-nav {
-      width: 48px;
-      height: 48px;
-      border: 2px solid rgba(102, 126, 234, 0.2);
-      border-radius: 50%;
-      background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
-      color: var(--text-primary);
-      cursor: pointer;
-      font-size: 1.5rem;
-      font-weight: bold;
-      transition: all 0.3s ease;
-      backdrop-filter: blur(8px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    }
-    
-    .calendar-nav:hover {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      transform: scale(1.1);
-      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
-      border-color: transparent;
-    }
-    
-    .calendar-title {
-      font-size: 2rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin: 0;
-      letter-spacing: -0.02em;
-    }
-    
-    .calendar-grid {
-      background: linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.6) 100%);
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
-      border: 1px solid rgba(255,255,255,0.4);
-      backdrop-filter: blur(8px);
-    }
-    
-    .calendar-weekdays {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.05) 100%);
-      border-bottom: 2px solid rgba(102, 126, 234, 0.2);
-    }
-    
-    .weekday {
-      padding: 16px 8px;
-      text-align: center;
-      font-weight: 800;
-      font-size: 0.9rem;
-      color: var(--text-primary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    
-    .calendar-days {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 1px;
-      background: rgba(102, 126, 234, 0.1);
-    }
-    
-    .calendar-day {
-      background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
-      min-height: 80px;
-      padding: 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      transition: all 0.3s ease;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .calendar-day:hover {
-      background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.95) 100%);
-      transform: scale(1.02);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-      z-index: 10;
-    }
-    
-    .calendar-day.other-month {
-      background: linear-gradient(135deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.3) 100%);
-      color: var(--text-secondary);
-      opacity: 0.6;
-    }
-    
-    .calendar-day.today {
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.1) 100%);
-      border: 2px solid rgba(102, 126, 234, 0.4);
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
-    }
-    
-    .calendar-day.today .day-number {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      font-weight: 800;
-    }
-    
-    .day-number {
-      font-weight: 700;
-      font-size: 1rem;
-      color: var(--text-primary);
-      margin-bottom: 4px;
-      text-align: center;
-    }
-    
-    .booking-dots {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 2px;
-      justify-content: center;
-      align-items: center;
-      flex: 1;
-    }
-    
-    .booking-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      transition: all 0.3s ease;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-    
-    .booking-dot:hover {
-      transform: scale(1.5);
-    }
-    
-    .booking-dot.status-pending {
-      background: linear-gradient(135deg, #ffc107 0%, #ff8f00 100%);
-    }
-    
-    .booking-dot.status-confirmed {
-      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-    }
-    
-    .booking-dot.status-completed {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-    
-    .booking-dot.status-cancelled {
-      background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
-    }
-    
-    .booking-count {
-      font-size: 0.7rem;
-      font-weight: 700;
-      color: var(--text-secondary);
-      text-align: center;
-      margin-top: 2px;
-    }
-    
-    /* 캘린더 범례 */
-    .calendar-legend {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-top: 24px;
-      padding: 20px;
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.03) 100%);
-      border-radius: 16px;
-      border: 1px solid rgba(102, 126, 234, 0.1);
-    }
-    
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-    
-    .legend-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      flex-shrink: 0;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    }
-    
-    .legend-dot.status-pending {
-      background: linear-gradient(135deg, #ffc107 0%, #ff8f00 100%);
-    }
-    
-    .legend-dot.status-confirmed {
-      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-    }
-    
-    .legend-dot.status-completed {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-    
-    .legend-dot.status-cancelled {
-      background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
     
     /* 반응형 디자인 */
     @media (max-width: 1024px) {
       .dashboard-wrap {
-        padding: 0 16px;
         margin: 24px auto;
+        padding: 0 16px;
+      }
+      
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
       }
       
       .page-header {
-        padding: 32px;
-        border-radius: 24px;
+        padding: 28px;
+        border-radius: 20px;
       }
       
       .page-header h2 {
-        font-size: 2.5rem;
+        font-size: 2rem;
       }
       
-      .stats-grid {
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 20px;
-      }
-      
+      .calendar-section,
+      .stats-section,
       .bookings-section {
-        padding: 28px;
+        padding: 24px;
         border-radius: 20px;
       }
       
@@ -935,115 +864,47 @@
       
       .filter-group {
         flex-direction: column;
+        gap: 12px;
       }
       
       .action-group {
         justify-content: center;
       }
-      
-      .calendar-section {
-        padding: 28px;
-        border-radius: 20px;
-      }
-      
-      .calendar-header {
-        flex-direction: column;
-        gap: 16px;
-      }
-      
-      .calendar-nav {
-        width: 40px;
-        height: 40px;
-        font-size: 1.2rem;
-      }
-      
-      .calendar-title {
-        font-size: 1.5rem;
-      }
-      
-      .calendar-legend {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-      }
     }
     
     @media (max-width: 768px) {
-      .page-header h2 {
-        font-size: 2rem;
+      .calendar-grid {
+        gap: 1px;
+      }
+      
+      .calendar-day {
+        min-height: 50px;
+        padding: 8px 4px;
+        font-size: 0.9rem;
       }
       
       .booking-header {
         flex-direction: column;
-        gap: 8px;
+        align-items: flex-start;
+        gap: 12px;
       }
       
-      .booking-actions {
+      .booking-meta {
         flex-direction: column;
-      }
-      
-      .btn {
-        width: 100%;
-        justify-content: center;
+        gap: 8px;
       }
       
       .stats-grid {
         grid-template-columns: repeat(2, 1fr);
-        gap: 16px;
       }
       
-      .stat-card {
-        padding: 16px 12px;
-      }
-      
-      .booking-card {
-        padding: 16px;
-      }
-      
-      .meta-item {
-        font-size: 0.85rem;
-      }
-      
-      .quick-filters {
-        justify-content: center;
-      }
-      
-      .search-input {
-        font-size: 16px; /* iOS 줌 방지 */
-      }
-      
-      .calendar-grid {
-        font-size: 0.85rem;
-      }
-      
-      .calendar-day {
-        min-height: 60px;
-        padding: 6px;
-      }
-      
-      .day-number {
-        font-size: 0.9rem;
-      }
-      
-      .booking-dot {
-        width: 6px;
-        height: 6px;
-      }
-      
-      .calendar-legend {
-        grid-template-columns: 1fr;
+      .calendar-nav {
         gap: 8px;
       }
       
-      .legend-item {
-        font-size: 0.85rem;
-      }
-      
-      .calendar-day.selected {
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.15) 100%);
-        border: 2px solid rgba(102, 126, 234, 0.5);
-        transform: scale(1.05);
-        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
-        z-index: 10;
+      .current-month {
+        font-size: 1rem;
+        min-width: 100px;
       }
     }
   </style>
@@ -1062,113 +923,113 @@
     <!-- 페이지 헤더 -->
     <section class="page-header">
       <h2>메이트 대시보드</h2>
-      <p class="page-subtitle">예약 신청을 관리하고 고객과 소통하세요</p>
+      <p class="page-subtitle">예약 현황을 한눈에 확인하고 관리하세요</p>
+      <div id="mateGuard" class="error" style="display:none; margin-top: 16px;"></div>
     </section>
 
-    <!-- 통계 카드 -->
-    <section class="stats-grid" id="statsGrid">
-      <div class="stat-card">
-        <div class="stat-icon">📋</div>
-        <div class="stat-number" id="totalBookings">0</div>
-        <div class="stat-label">총 예약</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">⏳</div>
-        <div class="stat-number" id="pendingBookings">0</div>
-        <div class="stat-label">대기중</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">✅</div>
-        <div class="stat-number" id="confirmedBookings">0</div>
-        <div class="stat-label">확정됨</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">🎉</div>
-        <div class="stat-number" id="completedBookings">0</div>
-        <div class="stat-label">진행완료</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">❌</div>
-        <div class="stat-number" id="cancelledBookings">0</div>
-        <div class="stat-label">예약 취소</div>
-      </div>
-    </section>
+    <!-- 대시보드 그리드 -->
+    <div class="dashboard-grid">
+      <!-- 캘린더 섹션 -->
+      <section class="calendar-section">
+        <div class="calendar-header">
+          <h3 class="calendar-title">📅 예약 캘린더</h3>
+          <div class="calendar-nav">
+            <button class="calendar-nav-btn" id="prevMonth">‹</button>
+            <span class="current-month" id="currentMonth">2025년 1월</span>
+            <button class="calendar-nav-btn" id="nextMonth">›</button>
+          </div>
+        </div>
+        
+        <div class="calendar-grid" id="calendarGrid">
+          <!-- 요일 헤더 -->
+          <div class="calendar-day-header">일</div>
+          <div class="calendar-day-header">월</div>
+          <div class="calendar-day-header">화</div>
+          <div class="calendar-day-header">수</div>
+          <div class="calendar-day-header">목</div>
+          <div class="calendar-day-header">금</div>
+          <div class="calendar-day-header">토</div>
+          <!-- 날짜들이 여기에 동적으로 추가됩니다 -->
+        </div>
+        
+        <div class="calendar-legend">
+          <div class="legend-item">
+            <div class="legend-dot" style="background: #ffc107;"></div>
+            <span>대기중</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background: #28a745;"></div>
+            <span>확정됨</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background: #007bff;"></div>
+            <span>완료됨</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background: #dc3545;"></div>
+            <span>취소됨</span>
+          </div>
+        </div>
+      </section>
 
-    <!-- 캘린더 섹션 -->
-    <section class="calendar-section">
-      <h3 class="section-title">📅 예약 캘린더</h3>
-      
-      <!-- 캘린더 헤더 -->
-      <div class="calendar-header">
-        <button class="calendar-nav" id="prevMonth">‹</button>
-        <h4 class="calendar-title" id="calendarTitle">2025년 1월</h4>
-        <button class="calendar-nav" id="nextMonth">›</button>
-      </div>
-      
-      <!-- 캘린더 그리드 -->
-      <div class="calendar-grid">
-        <div class="calendar-weekdays">
-          <div class="weekday">일</div>
-          <div class="weekday">월</div>
-          <div class="weekday">화</div>
-          <div class="weekday">수</div>
-          <div class="weekday">목</div>
-          <div class="weekday">금</div>
-          <div class="weekday">토</div>
+      <!-- 통계 섹션 -->
+      <section class="stats-section">
+        <h3 class="stats-title">📊 이번 달 통계</h3>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-number" id="statTotal">0</div>
+            <div class="stat-label">총 예약</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="statPending">0</div>
+            <div class="stat-label">대기중</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="statConfirmed">0</div>
+            <div class="stat-label">확정됨</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="statCompleted">0</div>
+            <div class="stat-label">완료됨</div>
+          </div>
         </div>
-        <div class="calendar-days" id="calendarDays">
-          <!-- 날짜들이 여기에 동적으로 생성됩니다 -->
-        </div>
-      </div>
-      
-      <!-- 범례 -->
-      <div class="calendar-legend">
-        <div class="legend-item">
-          <div class="legend-dot status-pending"></div>
-          <span>⏳ 대기중</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-dot status-confirmed"></div>
-          <span>✅ 확정됨</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-dot status-completed"></div>
-          <span>🎉 완료됨</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-dot status-cancelled"></div>
-          <span>❌ 취소됨</span>
-        </div>
-      </div>
-    </section>
+      </section>
+    </div>
 
     <!-- 예약 목록 섹션 -->
     <section class="bookings-section">
-      <h3 class="section-title">📋 예약 신청 관리</h3>
+      <h3 class="section-title">📋 예약 목록</h3>
       
-      <!-- 필터 툴바 -->
-      <div class="filter-toolbar">
+      <!-- 툴바 -->
+      <div class="toolbar">
         <div class="toolbar-row">
           <div class="search-group">
             <input class="search-input" id="searchInput" type="text" placeholder="🔍 고객명, 연락처, 요청사항으로 검색..."/>
             <button class="search-clear" id="clearSearch" title="검색 초기화">✕</button>
           </div>
           
-          <select class="filter-select" id="statusFilter">
-            <option value="">📊 모든 상태</option>
-            <option value="pending">⏳ 대기중</option>
-            <option value="confirmed">✅ 확정됨</option>
-            <option value="completed">🎉 완료됨</option>
-            <option value="cancelled">❌ 취소됨</option>
-          </select>
+          <div class="filter-group">
+            <select class="filter-select" id="statusFilter">
+              <option value="">📊 모든 상태</option>
+              <option value="pending">⏳ 대기중</option>
+              <option value="confirmed">✅ 확정됨</option>
+              <option value="completed">🎉 완료됨</option>
+              <option value="cancelled">❌ 취소됨</option>
+            </select>
+            
+            <select class="filter-select" id="sortBy">
+              <option value="created_at_desc">📅 신청일 최신순</option>
+              <option value="created_at_asc">📅 신청일 오래된순</option>
+              <option value="date_desc">📅 예약일 최신순</option>
+              <option value="date_asc">📅 예약일 오래된순</option>
+              <option value="status_asc">📊 상태순</option>
+            </select>
+          </div>
           
-          <select class="filter-select" id="sortBy">
-            <option value="created_at_desc">📅 최신순</option>
-            <option value="created_at_asc">📅 오래된순</option>
-            <option value="date_desc">📅 예약일 최신순</option>
-            <option value="date_asc">📅 예약일 오래된순</option>
-            <option value="status_asc">📊 상태순</option>
-          </select>
+          <div class="action-group">
+            <button class="refresh-btn" id="refreshBtn" title="새로고침">🔄</button>
+            <span class="result-count" id="resultCount">총 0건</span>
+          </div>
         </div>
         
         <div class="quick-filters">
@@ -1185,419 +1046,258 @@
   </main>
 
 <script type="module">
-import { supabase } from './nav.js';
+  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+  const SUPABASE_URL = "https://eevvgbbokenpjnvtmztk.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4";
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const list = document.getElementById('list');
-const totalBookingsEl = document.getElementById('totalBookings');
-const pendingBookingsEl = document.getElementById('pendingBookings');
-const confirmedBookingsEl = document.getElementById('confirmedBookings');
-const completedBookingsEl = document.getElementById('completedBookings');
-const cancelledBookingsEl = document.getElementById('cancelledBookings');
-
-// 필터 요소들
-const searchInput = document.getElementById('searchInput');
-const clearSearch = document.getElementById('clearSearch');
-const statusFilter = document.getElementById('statusFilter');
-const sortBy = document.getElementById('sortBy');
-const quickFilters = document.querySelectorAll('.quick-filter');
-
-// 전체 데이터와 필터링된 데이터
-let allBookings = [];
-let filteredBookings = [];
-
-// 캘린더 상태
-let currentDate = new Date();
-let calendarBookings = [];
-
-function rowHtml(r){
-  // 날짜/시간 포맷팅 개선
-  const formatDateTime = (date, time, duration) => {
-    try {
-      const dateObj = new Date(date);
-      const dateStr = dateObj.toLocaleDateString('ko-KR', { 
-        month: 'short', 
-        day: 'numeric',
-        weekday: 'short'
-      });
-      
-      // 시간 포맷팅 (24시간 → 12시간)
-      const [hour, minute] = time.split(':');
-      const hourNum = parseInt(hour, 10);
-      const period = hourNum >= 12 ? '오후' : '오전';
-      const displayHour = hourNum === 0 ? 12 : hourNum > 12 ? hourNum - 12 : hourNum;
-      const timeStr = `${period} ${displayHour}:${minute}`;
-      
-      return `${dateStr} ${timeStr} (${duration}시간)`;
-    } catch (e) {
-      return `${date} ${time} (${duration}h)`;
-    }
-  };
+  // DOM 요소들
+  const mateGuard = document.getElementById('mateGuard');
+  const list = document.getElementById('list');
+  const resultCount = document.getElementById('resultCount');
   
-  const dt = formatDateTime(r.date, r.start_time, r.duration_hours);
-  const canAct = (r.status === 'pending');
-  const statusClass = `status-${r.status}`;
-  const statusText = r.status === 'pending' ? '⏳ 대기중' :
-                    r.status === 'confirmed' ? '✅ 예약 확정' :
-                    r.status === 'completed' ? '🎉 진행 완료' :
-                    (r.status === 'cancelled' || r.status === 'canceled_by_mate') ? '❌ 예약 취소' : 
-                    r.status === 'declined' ? '❌ 예약 거절' : r.status;
-
-  return `
-    <div class="booking-card" data-id="${r.id}">
-      <div class="booking-header">
-        <div class="booking-info">
-          <h3>${dt}</h3>
-          <div class="booking-meta">
-            <div class="meta-item">
-              <div class="meta-icon">👤</div>
-              <span>${r.customer_name}</span>
-            </div>
-            <div class="meta-item">
-              <div class="meta-icon">📞</div>
-              <span>${r.customer_contact}</span>
-            </div>
-            ${r.notes ? `
-            <div class="meta-item">
-              <div class="meta-icon">💬</div>
-              <span>${(r.notes||'').replace(/</g,'<')}</span>
-            </div>
-            ` : ''}
-          </div>
-        </div>
-        <div class="booking-status">
-          <div class="status-badge ${statusClass}">${statusText}</div>
-        </div>
-      </div>
-      ${canAct || r.status === 'confirmed' ? `
-        <div class="booking-actions">
-          ${canAct ? `
-            <button class="btn btn-confirm" data-act="confirm">
-              <span>✅</span> 확정하기
-            </button>
-            <button class="btn btn-decline" data-act="decline">
-              <span>❌</span> 거절하기
-            </button>
-          ` : ''}
-          ${r.status === 'confirmed' ? `
-            <button class="btn btn-cancel" data-act="cancel">
-              <span>🚫</span> 취소하기
-            </button>
-          ` : ''}
-        </div>
-      ` : ''}
-    </div>`;
-}
-
-function updateStats(data) {
-  const total = data.length;
-  const pending = data.filter(r => r.status === 'pending').length;
-  const confirmed = data.filter(r => r.status === 'confirmed').length;
-  const completed = data.filter(r => r.status === 'completed').length;
-  const cancelled = data.filter(r => r.status === 'cancelled' || r.status === 'canceled_by_mate' || r.status === 'declined').length;
+  // 캘린더 요소들
+  const calendarGrid = document.getElementById('calendarGrid');
+  const currentMonthEl = document.getElementById('currentMonth');
+  const prevMonthBtn = document.getElementById('prevMonth');
+  const nextMonthBtn = document.getElementById('nextMonth');
   
-  totalBookingsEl.textContent = total;
-  pendingBookingsEl.textContent = pending;
-  confirmedBookingsEl.textContent = confirmed;
-  completedBookingsEl.textContent = completed;
-  cancelledBookingsEl.textContent = cancelled;
-}
-
-function applyFilters() {
-  const searchTerm = (searchInput?.value || '').trim().toLowerCase();
-  const statusFilterValue = statusFilter?.value || '';
-  const sortOption = sortBy?.value || 'created_at_desc';
+  // 통계 요소들
+  const statTotal = document.getElementById('statTotal');
+  const statPending = document.getElementById('statPending');
+  const statConfirmed = document.getElementById('statConfirmed');
+  const statCompleted = document.getElementById('statCompleted');
   
-  // 검색 필터링
-  filteredBookings = allBookings.filter(booking => {
-    if (!searchTerm) return true;
+  // 필터 요소들
+  const searchInput = document.getElementById('searchInput');
+  const clearSearch = document.getElementById('clearSearch');
+  const statusFilter = document.getElementById('statusFilter');
+  const sortBy = document.getElementById('sortBy');
+  const refreshBtn = document.getElementById('refreshBtn');
+  const quickFilters = document.querySelectorAll('.quick-filter');
+
+  // 1) 접근 제어: 메이트만
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    mateGuard.textContent = "로그인이 필요합니다. 로그인 페이지로 이동합니다…";
+    mateGuard.style.display = 'block';
+    const redir = encodeURIComponent(location.pathname.replace(/^\//, '') + location.search);
+    setTimeout(() => location.replace('auth_combo.html?redirect=' + redir), 800);
+    throw new Error('login required');
+  }
+  
+  const { data: isMateRow } = await supabase.from('mate_profiles').select('user_id').eq('user_id', user.id).maybeSingle();
+  if (!isMateRow) {
+    mateGuard.textContent = "메이트만 접근할 수 있습니다.";
+    mateGuard.style.display = 'block';
+    throw new Error('mate required');
+  }
+
+  // 2) 상태 변수
+  let allBookings = [];
+  let filteredBookings = [];
+  let currentDate = new Date();
+  let selectedDate = null;
+
+  // 3) 캘린더 관련 함수들
+  function renderCalendar() {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
     
-    const customerName = (booking.customer_name || '').toLowerCase();
-    const customerContact = (booking.customer_contact || '').toLowerCase();
-    const notes = (booking.notes || '').toLowerCase();
+    // 월 표시 업데이트
+    currentMonthEl.textContent = `${year}년 ${month + 1}월`;
     
-    return customerName.includes(searchTerm) || 
-           customerContact.includes(searchTerm) || 
-           notes.includes(searchTerm);
-  });
-  
-  // 상태 필터링
-  if (statusFilterValue) {
-    filteredBookings = filteredBookings.filter(booking => {
-      if (statusFilterValue === 'cancelled') {
-        return booking.status === 'cancelled' || booking.status === 'canceled_by_mate' || booking.status === 'declined';
+    // 이번 달 첫째 날과 마지막 날
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    
+    // 캘린더 시작일 (이전 달 마지막 주 포함)
+    const startDate = new Date(firstDay);
+    startDate.setDate(startDate.getDate() - firstDay.getDay());
+    
+    // 캘린더 종료일 (다음 달 첫 주 포함)
+    const endDate = new Date(lastDay);
+    endDate.setDate(endDate.getDate() + (6 - lastDay.getDay()));
+    
+    // 기존 날짜 셀들 제거 (요일 헤더는 유지)
+    const existingDays = calendarGrid.querySelectorAll('.calendar-day');
+    existingDays.forEach(day => day.remove());
+    
+    // 날짜별 예약 데이터 그룹화
+    const bookingsByDate = {};
+    allBookings.forEach(booking => {
+      if (booking.date) {
+        const dateKey = booking.date;
+        if (!bookingsByDate[dateKey]) {
+          bookingsByDate[dateKey] = [];
+        }
+        bookingsByDate[dateKey].push(booking);
       }
-      return booking.status === statusFilterValue;
     });
-  }
-  
-  // 정렬
-  filteredBookings.sort((a, b) => {
-    switch (sortOption) {
-      case 'created_at_asc':
-        return new Date(a.created_at) - new Date(b.created_at);
-      case 'created_at_desc':
-        return new Date(b.created_at) - new Date(a.created_at);
-      case 'date_asc':
-        if (!a.date || !b.date) return 0;
-        return new Date(a.date) - new Date(b.date);
-      case 'date_desc':
-        if (!a.date || !b.date) return 0;
-        return new Date(b.date) - new Date(a.date);
-      case 'status_asc':
-        const statusOrder = { 'pending': 1, 'confirmed': 2, 'completed': 3, 'cancelled': 4, 'canceled_by_mate': 4, 'declined': 4 };
-        return (statusOrder[a.status] || 5) - (statusOrder[b.status] || 5);
-      default:
-        return new Date(b.created_at) - new Date(a.created_at);
-    }
-  });
-  
-  renderBookings();
-}
-
-function renderBookings() {
-  if (!filteredBookings.length) {
-    list.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">🔍</div>
-        <div class="empty-text">검색 조건에 맞는 예약이 없습니다</div>
-        <div class="empty-subtext">다른 조건으로 검색해보세요</div>
-      </div>
-    `;
-    return;
-  }
-  
-  list.innerHTML = filteredBookings.map(rowHtml).join('');
-  
-  // 버튼 핸들러 재바인딩
-  bindBookingActions();
-}
-
-function bindBookingActions() {
-  list.querySelectorAll('button[data-act]').forEach(btn=>{
-    btn.onclick = async () => {
-      const card = btn.closest('[data-id]');
-      const id   = Number(card.dataset.id);
-      const act  = btn.dataset.act;
-
-      // 버튼 로딩 상태
-      const originalText = btn.innerHTML;
-      btn.disabled = true;
-      btn.innerHTML = '<div class="loading"></div> 처리 중...';
-
-      try {
-        // 1) 현재 예약 정보 조회 (고객 user_id 필요)
-        const { data: rows, error: readErr } = await supabase
-          .from('bookings')
-          .select('id, mate_id, customer_id, customer_name, date, start_time, duration_hours, status')
-          .eq('id', id).limit(1);
-        if (readErr || !rows?.length) { 
-          throw new Error('조회 실패: '+(readErr?.message||'not found')); 
-        }
-        const bk = rows[0];
-
-        // 2) 상태/사유 입력 및 업데이트
-        let newStatus = bk.status;
-        let reason = '';
-
-        if (act === 'confirm') {
-          newStatus = 'confirmed';
-        } else if (act === 'decline') {
-          newStatus = 'cancelled';
-          reason = prompt('거절 사유를 입력하세요 (고객에게 전달됩니다):') || '';
-          if (!reason.trim()) {
-            throw new Error('거절 사유를 입력해주세요.');
-          }
-        } else if (act === 'cancel') {
-          newStatus = 'canceled_by_mate';
-          reason = prompt('취소 사유를 입력하세요 (고객에게 전달됩니다):') || '';
-          if (!reason.trim()) {
-            throw new Error('취소 사유를 입력해주세요.');
-          }
-        }
-
-        const patch = { status: newStatus };
-        if (act === 'decline' || act === 'cancel') patch.cancel_reason = reason;
-
-        const { error: updErr } = await supabase.from('bookings').update(patch).eq('id', id);
-        if (updErr) throw updErr;
-
-        // 3) 알림 생성 (수신자=고객, 발신자=메이트)
-        const title = act === 'confirm'
-          ? '예약이 확정되었습니다'
-          : act === 'decline'
-            ? '예약이 거절되었습니다'
-            : '예약이 취소되었습니다';
-        const when = `${bk.date} ${bk.start_time} (${bk.duration_hours}h)`;
-        const body = act === 'confirm'
-          ? `메이트가 예약을 확정했습니다.\n일정: ${when}`
-          : `예약이 취소되었습니다.\n사유: ${reason || '사유 미기재'}\n일정: ${when}`;
-
-        // 알림 생성 (선택사항 - 실패해도 메인 로직에 영향 없음)
-        try {
-          await supabase.from('notifications').insert({
-            user_id: bk.customer_id,
-            title,
-            body,
-            type: act === 'confirm' ? 'booking_confirmed' : 'booking_cancelled',
-            link: 'my_bookings.html'
-          });
-        } catch (notifErr) {
-          console.warn('알림 생성 실패:', notifErr);
-        }
-
-        // 4) 성공 메시지 표시
-        const successMsg = act === 'confirm' ? '예약이 확정되었습니다! ✅' :
-                          '예약이 취소되었습니다 ❌';
+    
+    // 날짜 셀들 생성
+    const today = new Date();
+    const todayStr = today.toISOString().split('T')[0];
+    
+    for (let date = new Date(startDate); date <= endDate; date.setDate(date.getDate() + 1)) {
+      const dateStr = date.toISOString().split('T')[0];
+      const dayNum = date.getDate();
+      const isCurrentMonth = date.getMonth() === month;
+      const isToday = dateStr === todayStr;
+      const isSelected = selectedDate === dateStr;
+      
+      const dayBookings = bookingsByDate[dateStr] || [];
+      const hasBookings = dayBookings.length > 0;
+      
+      const dayEl = document.createElement('div');
+      dayEl.className = `calendar-day ${!isCurrentMonth ? 'other-month' : ''} ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${hasBookings ? 'has-bookings' : ''}`;
+      dayEl.dataset.date = dateStr;
+      
+      // 날짜 숫자
+      const dayNumber = document.createElement('div');
+      dayNumber.textContent = dayNum;
+      dayEl.appendChild(dayNumber);
+      
+      // 예약 점들
+      if (hasBookings && isCurrentMonth) {
+        const dotsContainer = document.createElement('div');
+        dotsContainer.className = 'booking-dots';
         
-        // 토스트 메시지 표시
-        const toast = document.createElement('div');
-        toast.style.cssText = `
-          position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white; padding: 12px 24px; border-radius: 12px;
-          z-index: 9999; font-weight: 600; box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
-        `;
-        toast.textContent = successMsg;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
-
-        // 5) 화면 갱신
-        await loadData();
-
-      } catch (error) {
-        console.error(error);
-        alert(error.message || '처리 중 오류가 발생했습니다.');
-        btn.disabled = false;
-        btn.innerHTML = originalText;
+        // 상태별로 그룹화
+        const statusCounts = {};
+        dayBookings.forEach(booking => {
+          let status = booking.status;
+          // canceled_by_mate를 cancelled로 통합
+          if (status === 'canceled_by_mate' || status === 'declined') {
+            status = 'cancelled';
+          }
+          statusCounts[status] = (statusCounts[status] || 0) + 1;
+        });
+        
+        // 최대 4개까지 점 표시
+        let dotCount = 0;
+        Object.entries(statusCounts).forEach(([status, count]) => {
+          for (let i = 0; i < Math.min(count, 4 - dotCount); i++) {
+            if (dotCount >= 4) break;
+            const dot = document.createElement('div');
+            dot.className = `booking-dot ${status}`;
+            dotsContainer.appendChild(dot);
+            dotCount++;
+          }
+        });
+        
+        // 5개 이상이면 +숫자 표시
+        if (dayBookings.length > 4) {
+          const countEl = document.createElement('div');
+          countEl.className = 'booking-count';
+          countEl.textContent = `+${dayBookings.length - 4}`;
+          dayEl.appendChild(countEl);
+        }
+        
+        dayEl.appendChild(dotsContainer);
+        
+        // 툴팁 (title 속성)
+        dayEl.title = `${dayBookings.length}개 예약`;
       }
-    };
-  });
-}
-
-async function load(){
-  const { data:{ user } } = await supabase.auth.getUser();
-  if(!user){ 
-    list.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">🔐</div>
-        <div class="empty-text">로그인이 필요합니다</div>
-        <div class="empty-subtext">메이트 대시보드를 이용하려면 로그인해주세요</div>
-      </div>
-    `; 
-    return; 
-  }
-
-  list.innerHTML = `
-    <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
-      <div class="loading" style="margin: 0 auto 16px;"></div>
-      예약을 불러오는 중...
-    </div>
-  `;
-
-  const { data, error } = await supabase
-    .from('bookings')
-    .select('*')
-    .eq('mate_id', user.id)
-    .order('created_at', { ascending:false });
-
-  if(error){ 
-    console.error(error); 
-    list.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">❌</div>
-        <div class="empty-text">불러오기 실패</div>
-        <div class="empty-subtext">${error.message}</div>
-      </div>
-    `; 
-    return; 
-  }
-  
-  allBookings = data || [];
-  
-  if(!data?.length){ 
-    list.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">📋</div>
-        <div class="empty-text">예약 신청이 없습니다</div>
-        <div class="empty-subtext">새로운 예약이 들어오면 여기에 표시됩니다</div>
-      </div>
-    `; 
-    updateStats([]);
-    return; 
-  }
-
-  updateStats(data);
-  
-  // 초기 필터 적용
-  filteredBookings = [...allBookings];
-  applyFilters();
-}
-
-async function loadData() {
-  await load();
-  calendarBookings = [...allBookings];
-  renderCalendar();
-}
-
-// 검색 이벤트 (디바운스)
-let searchTimeout;
-searchInput?.addEventListener('input', () => {
-  clearTimeout(searchTimeout);
-  searchTimeout = setTimeout(applyFilters, 300);
-});
-
-// 검색 초기화
-clearSearch?.addEventListener('click', () => {
-  searchInput.value = '';
-  applyFilters();
-});
-
-// 필터 변경
-statusFilter?.addEventListener('change', applyFilters);
-sortBy?.addEventListener('change', applyFilters);
-
-// 퀵 필터
-quickFilters.forEach(btn => {
-  btn.addEventListener('click', () => {
-    // 활성 상태 토글
-    quickFilters.forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    
-    const filter = btn.getAttribute('data-filter');
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    
-    // 필터 적용
-    switch (filter) {
-      case 'all':
-        filteredBookings = [...allBookings];
-        break;
-      case 'pending':
-        filteredBookings = allBookings.filter(booking => booking.status === 'pending');
-        break;
-      case 'confirmed':
-        filteredBookings = allBookings.filter(booking => booking.status === 'confirmed');
-        break;
-      case 'today':
-        filteredBookings = allBookings.filter(booking => {
-          if (!booking.date) return false;
-          const bookingDate = new Date(booking.date);
-          return bookingDate.toDateString() === today.toDateString();
+      
+      // 클릭 이벤트
+      if (isCurrentMonth) {
+        dayEl.addEventListener('click', () => {
+          // 이전 선택 해제
+          document.querySelectorAll('.calendar-day.selected').forEach(el => {
+            el.classList.remove('selected');
+          });
+          
+          // 현재 날짜 선택
+          dayEl.classList.add('selected');
+          selectedDate = dateStr;
+          
+          // 해당 날짜 예약만 필터링
+          filterByDate(dateStr);
+          
+          // 예약 목록으로 스크롤
+          document.querySelector('.bookings-section').scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start'
+          });
         });
-        break;
-      case 'upcoming':
-        filteredBookings = allBookings.filter(booking => {
-          if (!booking.date || !booking.start_time) return false;
-          const bookingDateTime = new Date(`${booking.date}T${booking.start_time}`);
-          return bookingDateTime.getTime() >= now.getTime();
-        });
-        break;
-      default:
-        filteredBookings = [...allBookings];
+      }
+      
+      calendarGrid.appendChild(dayEl);
     }
+  }
+  
+  function filterByDate(dateStr) {
+    // 퀵 필터 초기화
+    quickFilters.forEach(btn => btn.classList.remove('active'));
     
-    // 기존 검색어와 상태 필터 다시 적용
-    const searchTerm = (searchInput?.value || '').trim().toLowerCase();
+    // 해당 날짜 예약만 필터링
+    filteredBookings = allBookings.filter(booking => booking.date === dateStr);
+    
+    // 기존 검색어와 상태 필터도 적용
+    applyCurrentFilters();
+    renderBookings();
+    
+    // 결과 카운트 업데이트
+    resultCount.textContent = `${dateStr} - 총 ${filteredBookings.length}건`;
+  }
+
+  // 캘린더 네비게이션
+  prevMonthBtn.addEventListener('click', () => {
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    renderCalendar();
+    updateStats();
+  });
+  
+  nextMonthBtn.addEventListener('click', () => {
+    currentDate.setMonth(currentDate.getMonth() + 1);
+    renderCalendar();
+    updateStats();
+  });
+
+  // 4) 통계 업데이트
+  function updateStats() {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    
+    // 이번 달 예약만 필터링
+    const thisMonthBookings = allBookings.filter(booking => {
+      if (!booking.date) return false;
+      const bookingDate = new Date(booking.date);
+      return bookingDate.getFullYear() === year && bookingDate.getMonth() === month;
+    });
+    
+    // 상태별 카운트
+    const stats = {
+      total: thisMonthBookings.length,
+      pending: 0,
+      confirmed: 0,
+      completed: 0,
+      cancelled: 0
+    };
+    
+    thisMonthBookings.forEach(booking => {
+      let status = booking.status;
+      // canceled_by_mate를 cancelled로 통합
+      if (status === 'canceled_by_mate' || status === 'declined') {
+        status = 'cancelled';
+      }
+      
+      if (stats.hasOwnProperty(status)) {
+        stats[status]++;
+      }
+    });
+    
+    // 통계 표시 업데이트
+    statTotal.textContent = stats.total;
+    statPending.textContent = stats.pending;
+    statConfirmed.textContent = stats.confirmed;
+    statCompleted.textContent = stats.completed;
+  }
+
+  // 5) 예약 목록 관련 함수들
+  function applyCurrentFilters() {
+    const searchTerm = (searchInput?.value || '').toLowerCase();
     const statusFilterValue = statusFilter?.value || '';
     
     if (searchTerm) {
@@ -1605,177 +1305,312 @@ quickFilters.forEach(btn => {
         const customerName = (booking.customer_name || '').toLowerCase();
         const customerContact = (booking.customer_contact || '').toLowerCase();
         const notes = (booking.notes || '').toLowerCase();
-        return customerName.includes(searchTerm) || customerContact.includes(searchTerm) || notes.includes(searchTerm);
+        
+        return customerName.includes(searchTerm) || 
+               customerContact.includes(searchTerm) || 
+               notes.includes(searchTerm);
       });
     }
     
     if (statusFilterValue) {
       filteredBookings = filteredBookings.filter(booking => {
-        if (statusFilterValue === 'cancelled') {
-          return booking.status === 'cancelled' || booking.status === 'canceled_by_mate' || booking.status === 'declined';
+        let status = booking.status;
+        // canceled_by_mate와 declined을 cancelled로 통합
+        if (status === 'canceled_by_mate' || status === 'declined') {
+          status = 'cancelled';
         }
-        return booking.status === statusFilterValue;
+        return status === statusFilterValue;
+      });
+    }
+  }
+
+  function applyFilters() {
+    const searchTerm = (searchInput?.value || '').toLowerCase();
+    const statusFilterValue = statusFilter?.value || '';
+    const sortOption = sortBy?.value || 'created_at_desc';
+    
+    // 선택된 날짜가 있으면 해당 날짜만, 없으면 전체
+    if (selectedDate) {
+      filteredBookings = allBookings.filter(booking => booking.date === selectedDate);
+    } else {
+      filteredBookings = [...allBookings];
+    }
+    
+    // 검색 필터링
+    if (searchTerm) {
+      filteredBookings = filteredBookings.filter(booking => {
+        const customerName = (booking.customer_name || '').toLowerCase();
+        const customerContact = (booking.customer_contact || '').toLowerCase();
+        const notes = (booking.notes || '').toLowerCase();
+        
+        return customerName.includes(searchTerm) || 
+               customerContact.includes(searchTerm) || 
+               notes.includes(searchTerm);
       });
     }
     
-    renderBookings();
-  });
-});
-
-// 실시간 반영
-const ch = supabase.channel('bookings:mate')
-  .on('postgres_changes',{event:'*',schema:'public',table:'bookings'}, ()=>loadData())
-  .subscribe();
-
-// 캘린더 기능
-function initializeCalendar() {
-  const prevBtn = document.getElementById('prevMonth');
-  const nextBtn = document.getElementById('nextMonth');
-  const titleEl = document.getElementById('calendarTitle');
-  const daysEl = document.getElementById('calendarDays');
-  
-  prevBtn.addEventListener('click', () => {
-    currentDate.setMonth(currentDate.getMonth() - 1);
-    renderCalendar();
-  });
-  
-  nextBtn.addEventListener('click', () => {
-    currentDate.setMonth(currentDate.getMonth() + 1);
-    renderCalendar();
-  });
-  
-  renderCalendar();
-}
-
-function renderCalendar() {
-  const titleEl = document.getElementById('calendarTitle');
-  const daysEl = document.getElementById('calendarDays');
-  
-  // 제목 업데이트
-  const year = currentDate.getFullYear();
-  const month = currentDate.getMonth();
-  titleEl.textContent = `${year}년 ${month + 1}월`;
-  
-  // 달력 날짜 계산
-  const firstDay = new Date(year, month, 1);
-  const lastDay = new Date(year, month + 1, 0);
-  const startDate = new Date(firstDay);
-  startDate.setDate(startDate.getDate() - firstDay.getDay()); // 일요일부터 시작
-  
-  const today = new Date();
-  const days = [];
-  
-  // 6주 분량의 날짜 생성 (42일)
-  for (let i = 0; i < 42; i++) {
-    const date = new Date(startDate);
-    date.setDate(startDate.getDate() + i);
-    days.push(date);
-  }
-  
-  // 날짜별 예약 그룹화
-  const bookingsByDate = {};
-  calendarBookings.forEach(booking => {
-    if (!booking.date) return;
-    const dateKey = booking.date;
-    if (!bookingsByDate[dateKey]) {
-      bookingsByDate[dateKey] = [];
+    // 상태 필터링
+    if (statusFilterValue) {
+      filteredBookings = filteredBookings.filter(booking => {
+        let status = booking.status;
+        // canceled_by_mate와 declined을 cancelled로 통합
+        if (status === 'canceled_by_mate' || status === 'declined') {
+          status = 'cancelled';
+        }
+        return status === statusFilterValue;
+      });
     }
-    bookingsByDate[dateKey].push(booking);
-  });
-  
-  // 캘린더 렌더링
-  daysEl.innerHTML = days.map(date => {
-    const dateStr = date.toISOString().split('T')[0];
-    const dayBookings = bookingsByDate[dateStr] || [];
-    const isToday = date.toDateString() === today.toDateString();
-    const isOtherMonth = date.getMonth() !== month;
     
-    // 상태별 예약 개수
-    const statusCounts = dayBookings.reduce((acc, booking) => {
+    // 정렬
+    filteredBookings.sort((a, b) => {
+      switch (sortOption) {
+        case 'created_at_asc':
+          return new Date(a.created_at) - new Date(b.created_at);
+        case 'created_at_desc':
+          return new Date(b.created_at) - new Date(a.created_at);
+        case 'date_asc':
+          if (!a.date && !b.date) return 0;
+          if (!a.date) return 1;
+          if (!b.date) return -1;
+          return new Date(a.date) - new Date(b.date);
+        case 'date_desc':
+          if (!a.date && !b.date) return 0;
+          if (!a.date) return 1;
+          if (!b.date) return -1;
+          return new Date(b.date) - new Date(a.date);
+        case 'status_asc':
+          const statusOrder = { pending: 1, confirmed: 2, completed: 3, cancelled: 4, canceled_by_mate: 4, declined: 4 };
+          const aOrder = statusOrder[a.status] || 5;
+          const bOrder = statusOrder[b.status] || 5;
+          return aOrder - bOrder;
+        default:
+          return new Date(b.created_at) - new Date(a.created_at);
+      }
+    });
+    
+    renderBookings();
+  }
+
+  function renderBookings() {
+    // 결과 카운트 업데이트
+    if (selectedDate) {
+      resultCount.textContent = `${selectedDate} - 총 ${filteredBookings.length}건`;
+    } else {
+      resultCount.textContent = `총 ${filteredBookings.length}건`;
+    }
+    
+    if (!filteredBookings || filteredBookings.length === 0) {
+      list.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">📭</div>
+          <div class="empty-text">예약이 없습니다</div>
+          <div class="empty-subtext">새로운 예약을 기다리고 있어요!</div>
+        </div>
+      `;
+      return;
+    }
+
+    list.innerHTML = filteredBookings.map(booking => {
+      const created = new Date(booking.created_at).toLocaleString('ko-KR');
+      const datetime = booking.date && booking.start_time ? 
+        `${booking.date} ${booking.start_time} (${booking.duration_hours || 0}시간)` : 
+        '날짜 미정';
+      
       let status = booking.status;
+      let statusText = booking.status;
+      let statusClass = `status-${booking.status}`;
+      
+      // canceled_by_mate와 declined을 cancelled로 통합
       if (status === 'canceled_by_mate' || status === 'declined') {
         status = 'cancelled';
+        statusText = 'cancelled';
+        statusClass = 'status-cancelled';
       }
-      acc[status] = (acc[status] || 0) + 1;
-      return acc;
-    }, {});
-    
-    // 예약 점들 생성
-    const dots = [];
-    Object.entries(statusCounts).forEach(([status, count]) => {
-      for (let i = 0; i < Math.min(count, 4); i++) { // 최대 4개까지만 표시
-        dots.push(`<div class="booking-dot status-${status}" title="${status}: ${count}개"></div>`);
-      }
-    });
-    
-    // 5개 이상인 경우 숫자로 표시
-    const totalCount = dayBookings.length;
-    const countDisplay = totalCount > 4 ? `<div class="booking-count">+${totalCount - 4}</div>` : '';
-    
-    const dayClasses = [
-      'calendar-day',
-      isToday ? 'today' : '',
-      isOtherMonth ? 'other-month' : '',
-      totalCount > 0 ? 'has-bookings' : ''
-    ].filter(Boolean).join(' ');
-    
-    return `
-      <div class="${dayClasses}" data-date="${dateStr}" title="${totalCount}개 예약">
-        <div class="day-number">${date.getDate()}</div>
-        <div class="booking-dots">
-          ${dots.join('')}
-          ${countDisplay}
+      
+      const statusDisplay = status === 'pending' ? '⏳ 대기중' :
+                           status === 'confirmed' ? '✅ 확정됨' :
+                           status === 'completed' ? '🎉 완료됨' :
+                           status === 'cancelled' ? '❌ 취소됨' : statusText;
+
+      return `
+        <div class="booking-card">
+          <div class="booking-header">
+            <div class="booking-info">
+              <h4>📅 ${datetime}</h4>
+              <div class="booking-meta">
+                <span>👤 ${booking.customer_name || '고객'}</span>
+                <span>📞 ${booking.customer_contact || '-'}</span>
+                <span>🌐 ${booking.language || '-'}</span>
+                <span>📅 신청: ${created}</span>
+              </div>
+            </div>
+            <div class="booking-status">
+              <span class="status-badge ${statusClass}">${statusDisplay}</span>
+            </div>
+          </div>
+          
+          <div class="booking-details">
+            <strong>📋 예약 정보</strong>
+            <div style="margin-top: 8px; display: grid; grid-template-columns: auto 1fr; gap: 8px 16px; font-size: 0.95rem;">
+              <span style="color: var(--text-secondary);">예약 ID:</span>
+              <span>#${booking.id}</span>
+              <span style="color: var(--text-secondary);">언어:</span>
+              <span>${booking.language || '미지정'}</span>
+              <span style="color: var(--text-secondary);">이용시간:</span>
+              <span>${booking.duration_hours || 0}시간</span>
+            </div>
+          </div>
+          
+          ${booking.notes ? `
+            <div class="booking-notes">
+              <strong>💭 고객 요청사항:</strong><br>
+              ${booking.notes.replace(/</g,'&lt;')}
+            </div>
+          ` : ''}
         </div>
-      </div>
-    `;
-  }).join('');
+      `;
+    }).join('');
+  }
+
+  // 6) 데이터 로드
+  async function load() {
+    list.innerHTML = '<div class="loading">예약 데이터를 불러오는 중...</div>';
+    
+    try {
+      const { data, error } = await supabase
+        .from('bookings')
+        .select('*')
+        .eq('mate_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(500);
+
+      if (error) {
+        console.error('예약 로드 실패:', error);
+        list.innerHTML = `<div class="error">❌ 예약 로드 실패: ${error.message}</div>`;
+        return;
+      }
+
+      allBookings = data || [];
+      applyFilters();
+      renderCalendar();
+      updateStats();
+      
+    } catch (error) {
+      console.error('예약 로드 중 오류:', error);
+      list.innerHTML = `<div class="error">❌ 예약 로드 중 오류가 발생했습니다: ${error.message}</div>`;
+    }
+  }
+
+  // 7) 이벤트 리스너들
   
-  // 날짜 클릭 이벤트
-  daysEl.querySelectorAll('.calendar-day').forEach(dayEl => {
-    dayEl.addEventListener('click', () => {
-      const dateStr = dayEl.getAttribute('data-date');
-      filterBookingsByDate(dateStr);
+  // 검색 입력 (디바운스)
+  let searchTimeout;
+  searchInput?.addEventListener('input', () => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+      selectedDate = null; // 검색 시 날짜 선택 해제
+      document.querySelectorAll('.calendar-day.selected').forEach(el => {
+        el.classList.remove('selected');
+      });
+      applyFilters();
+    }, 300);
+  });
+  
+  // 검색 초기화
+  clearSearch?.addEventListener('click', () => {
+    searchInput.value = '';
+    selectedDate = null;
+    document.querySelectorAll('.calendar-day.selected').forEach(el => {
+      el.classList.remove('selected');
+    });
+    applyFilters();
+  });
+  
+  // 필터 변경
+  statusFilter?.addEventListener('change', () => {
+    selectedDate = null;
+    document.querySelectorAll('.calendar-day.selected').forEach(el => {
+      el.classList.remove('selected');
+    });
+    applyFilters();
+  });
+  
+  sortBy?.addEventListener('change', applyFilters);
+  
+  // 새로고침
+  refreshBtn?.addEventListener('click', async () => {
+    refreshBtn.style.transform = 'rotate(360deg)';
+    await load();
+    setTimeout(() => {
+      refreshBtn.style.transform = '';
+    }, 300);
+  });
+  
+  // 퀵 필터
+  quickFilters.forEach(btn => {
+    btn.addEventListener('click', () => {
+      // 활성 상태 토글
+      quickFilters.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      // 날짜 선택 해제
+      selectedDate = null;
+      document.querySelectorAll('.calendar-day.selected').forEach(el => {
+        el.classList.remove('selected');
+      });
+      
+      const filter = btn.getAttribute('data-filter');
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      
+      // 필터 적용
+      switch (filter) {
+        case 'all':
+          filteredBookings = [...allBookings];
+          break;
+        case 'pending':
+          filteredBookings = allBookings.filter(booking => booking.status === 'pending');
+          break;
+        case 'confirmed':
+          filteredBookings = allBookings.filter(booking => booking.status === 'confirmed');
+          break;
+        case 'today':
+          const todayStr = today.toISOString().split('T')[0];
+          filteredBookings = allBookings.filter(booking => booking.date === todayStr);
+          break;
+        case 'upcoming':
+          const todayStr2 = today.toISOString().split('T')[0];
+          filteredBookings = allBookings.filter(booking => {
+            if (!booking.date) return false;
+            return booking.date >= todayStr2;
+          });
+          break;
+        default:
+          filteredBookings = [...allBookings];
+      }
+      
+      // 기존 검색어와 상태 필터 다시 적용
+      applyCurrentFilters();
+      renderBookings();
     });
   });
-}
 
-function filterBookingsByDate(dateStr) {
-  // 해당 날짜의 예약만 필터링
-  filteredBookings = allBookings.filter(booking => booking.date === dateStr);
-  
-  // 퀵 필터 상태 초기화
-  quickFilters.forEach(btn => btn.classList.remove('active'));
-  
-  // 검색 및 상태 필터 초기화
-  if (searchInput) searchInput.value = '';
-  if (statusFilter) statusFilter.value = '';
-  
-  renderBookings();
-  
-  // 선택된 날짜 강조
-  document.querySelectorAll('.calendar-day').forEach(day => {
-    day.classList.remove('selected');
-  });
-  document.querySelector(`[data-date="${dateStr}"]`)?.classList.add('selected');
-  
-  // 예약 목록 섹션으로 스크롤
-  document.querySelector('.bookings-section').scrollIntoView({ 
-    behavior: 'smooth',
-    block: 'start'
-  });
-}
+  // 8) 실시간 업데이트
+  const channel = supabase
+    .channel('mate-bookings')
+    .on('postgres_changes', {
+      event: '*',
+      schema: 'public',
+      table: 'bookings',
+      filter: `mate_id=eq.${user.id}`
+    }, async (payload) => {
+      console.log('실시간 예약 업데이트:', payload);
+      await load(); // 새 데이터로 전체 새로고침
+    })
+    .subscribe();
 
-async function loadData() {
+  // 9) 초기 로드
   await load();
-  calendarBookings = [...allBookings];
-  renderCalendar();
-}
-
-// 캘린더 초기화
-initializeCalendar();
-
-loadData();
-    await load();
-
+</script>
 </body>
 </html>
