@@ -111,8 +111,8 @@
     /* 메타 정보 그리드 개선 */
     .meta-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 10px;
       margin-top: 32px;
     }
     
@@ -120,12 +120,12 @@
       backdrop-filter: blur(12px);
       border: 1px solid rgba(255,255,255,0.3);
       border-radius: 20px;
-      padding: 16px 12px;
+      padding: 10px 8px;
       transition: all 0.2s ease;
       position: relative;
       overflow: hidden;
       box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-      min-height: 100px;
+      min-height: 80px;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -165,8 +165,8 @@
     .meta-card::before {
       content: '';
       position: absolute;
-      top: 12px;
-      right: 12px;
+      top: 8px;
+      right: 8px;
       width: 24px;
       height: 24px;
       background-size: contain;
@@ -183,33 +183,38 @@
     
     .meta-card:nth-child(2)::before {
       content: '👤';
-      font-size: 20px;
+      font-size: 16px;
       width: auto;
       height: auto;
     }
     
     .meta-card:nth-child(3)::before {
       content: '🏷️';
-      font-size: 20px;
+      font-size: 16px;
       width: auto;
       height: auto;
     }
     
     .meta-card:nth-child(4)::before {
       content: '📍';
-      font-size: 20px;
+      font-size: 16px;
       width: auto;
       height: auto;
     }
     
     .meta-card:nth-child(5)::before {
       content: '⭐';
-      font-size: 20px;
+      font-size: 16px;
       width: auto;
       height: auto;
     }
     
     .meta-card:nth-child(6)::before {
+      content: '💬';
+      font-size: 16px;
+      width: auto;
+      height: auto;
+    }
     
     .meta-card:hover {
       transform: translateY(-2px);
@@ -219,22 +224,22 @@
     
     .meta-card strong {
       display: block;
-      font-size: 0.75rem;
+      font-size: 0.65rem;
       font-weight: 700;
       color: var(--text-secondary);
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       text-transform: uppercase;
       letter-spacing: 1.2px;
       text-align: center;
       position: absolute;
-      top: 12px;
+      top: 8px;
       left: 50%;
       transform: translateX(-50%);
-      width: calc(100% - 24px);
+      width: calc(100% - 16px);
     }
     
     .meta-card .value {
-      font-size: 0.8rem;
+      font-size: 0.7rem;
       line-height: 1.5;
       color: var(--text-primary);
       font-weight: 500;
@@ -451,14 +456,14 @@
     
     /* 소개 카드는 더 큰 높이 */
     .meta-card.intro-card {
-      min-height: 120px;
+      min-height: 100px;
       grid-column: 1 / -1;
     }
     
     .meta-card.intro-card .value {
       text-align: left;
       line-height: 1.6;
-      font-size: 0.85rem;
+      font-size: 0.75rem;
       backdrop-filter: blur(8px);
       box-shadow: inset 0 2px 8px rgba(0,0,0,0.05);
     }
