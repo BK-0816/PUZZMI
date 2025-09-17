@@ -631,9 +631,38 @@
         if (error) throw error;
 
         const p = data.profiles || {};
-        const coverPhoto = data.primary_photo || (Array.isArray(data.photos) && data.photos[0]) || p.avatar_url;
         
-        avatarEl.src = coverPhoto || "https://picsum.photos/seed/puzzmi/240/240";
+        // 대표사진 우선순위: primary_photo > photos[0] > avatar_url > 기본이미지
+        let coverPhoto = null;
+        if (data.primary_photo) {
+          // primary_photo가 URL인지 storage key인지 확인
+          if (data.primary_photo.startsWith('http')) {
+            coverPhoto = data.primary_photo;
+          } else {
+            // storage key인 경우 URL로 변환
+            const key = data.primary_photo.startsWith('mates/') ? 
+              data.primary_photo.replace(/^mates\//, '') : data.primary_photo;
+            coverPhoto = supabase.storage.from('mates').getPublicUrl(key).data.publicUrl;
+          }
+        } else if (Array.isArray(data.photos) && data.photos.length > 0) {
+          // photos 배열의 첫 번째 사진 사용
+          const firstPhoto = data.photos[0];
+          if (firstPhoto.startsWith('http')) {
+            coverPhoto = firstPhoto;
+          } else {
+            const key = firstPhoto.startsWith('mates/') ? 
+              firstPhoto.replace(/^mates\//, '') : firstPhoto;
+            coverPhoto = supabase.storage.from('mates').getPublicUrl(key).data.publicUrl;
+          }
+        } else if (p.avatar_url) {
+          // profiles의 avatar_url 사용
+          coverPhoto = p.avatar_url;
+        } else {
+          // 기본 이미지
+          coverPhoto = "https://picsum.photos/seed/puzzmi/240/240";
+        }
+        
+        avatarEl.src = coverPhoto;
         nameEl.textContent = p.full_name || '이름 비공개';
         
         const age = p.age ? `${p.age}세` : '';
