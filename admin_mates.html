@@ -1283,7 +1283,7 @@
             <span class="stat-pill">📊 총예약 ${total}</span>
             <span class="stat-pill">📅 예정 ${upcoming}</span>
             ${Object.entries(byStatus).map(([status, count]) => 
-              `<span class="stat-pill">${getStatusEmoji(status)} ${status} ${count}</span>`
+              `<span class="stat-pill">${getStatusEmoji(status)} ${getStatusText(status)} ${count}</span>`
             ).join('')}
           </div>
           
