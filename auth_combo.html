@@ -1106,6 +1106,137 @@
       // 초기 렌더링
       renderUser();
     });
+
+    // ===== SIGNUP FORM EVENT =====
+    document.getElementById('signupForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      // SMS 인증 확인
+      if (!isPhoneVerified) {
+        alert('전화번호 인증을 먼저 완료해주세요.');
+        return;
+      }
+      
+      // 폼 유효성 검사
+      const name = document.getElementById('signup_name').value.trim();
+      const age = document.getElementById('signup_age').value;
+      const gender = document.getElementById('signup_gender').value;
+      const email = document.getElementById('signup_email').value.trim();
+      const password = document.getElementById('signup_password').value;
+      const passwordConfirm = document.getElementById('signup_password_confirm').value;
+      const agreeTerms = document.getElementById('agree_terms').checked;
+      
+      // 비밀번호 확인
+      if (password !== passwordConfirm) {
+        alert('비밀번호가 일치하지 않습니다.');
+        return;
+      }
+      
+      // 약관 동의 확인
+      if (!agreeTerms) {
+        alert('이용약관에 동의해주세요.');
+        return;
+      }
+      
+      // 선택된 언어들 수집
+      const languages = ['한국어']; // 기본 한국어
+      if (document.getElementById('lang_ja').checked) languages.push('日本語');
+      if (document.getElementById('lang_en').checked) languages.push('English');
+      if (document.getElementById('lang_zh').checked) languages.push('中文');
+      
+      const box = document.getElementById('signup_result');
+      
+      // 클라이언트 사이드 유효성 검사
+      if (name.length < 2 || name.length > 20) {
+        box.innerHTML = '<div class="error">이름은 2-20자 사이로 입력해주세요.</div>';
+        return;
+      }
+
+      const btn = document.getElementById('signup_btn');
+      btn.disabled = true;
+      btn.innerHTML = '<div class="loading"></div> 회원가입 처리 중...';
+
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { 
+          data: { 
+            full_name: name,
+            age,
+            gender: document.getElementById('signup_gender').value || null,
+            languages
+          }, 
+          emailRedirectTo: window.location.origin + '/' + getRedirect() 
+        }
+      });
+
+      if (error) {
+        const msg = (error.message || "").toLowerCase();
+
+        // 레이트 리밋
+        if (msg.includes('rate limit') || msg.includes('too many requests')) {
+          box.innerHTML = '<div class="error">요청이 너무 많습니다. 잠시 후 다시 시도해주세요.</div>';
+          btn.innerHTML = '🎉 회원가입 완료';
+          return;
+        }
+
+        // 이미 가입된 이메일 → 로그인으로 유도
+        if (msg.includes('already') && msg.includes('registered')) {
+          box.innerHTML = '<div class="error">🔄 이미 가입된 이메일입니다. 로그인 페이지로 이동합니다.</div>';
+          setTimeout(() => switchTab('login'), 1500);
+          btn.innerHTML = '🎉 회원가입 완료';
+          return;
+        }
+
+        box.innerHTML = '<div class="error">회원가입 실패: ' + error.message + '</div>';
+        btn.innerHTML = '🎉 회원가입 완료';
+        return;
+      }
+
+      // 가입 정상 → 프로필 upsert (RLS로 실패해도 가입은 성공 처리)
+      if (data?.user?.id) {
+        const { error: profErr } = await supabase
+          .from('profiles')
+          .upsert({ 
+            id: data.user.id, 
+            full_name: name, 
+            age,
+            gender: document.getElementById('signup_gender').value || null,
+            languages,
+            created_at: new Date().toISOString()
+          }, { onConflict: 'id' });
+          
+        if (profErr) {
+          console.warn('profiles upsert blocked by RLS:', profErr.message);
+          box.innerHTML = `
+            <div class="success">
+              <div style="font-size: 1.5rem; margin-bottom: 12px;">🎉</div>
+              <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 8px;">회원가입 완료!</div>
+              <div>이메일을 확인해주세요. 프로필은 로그인 후 수정 가능합니다.</div>
+            </div>
+          `;
+        } else {
+          box.innerHTML = `
+            <div class="success">
+              <div style="font-size: 1.5rem; margin-bottom: 12px;">🎉</div>
+              <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 8px;">회원가입 완료!</div>
+              <div>이메일을 확인하시고 로그인해주세요.</div>
+            </div>
+          `;
+        }
+      } else {
+        box.innerHTML = `
+          <div class="success">
+            <div style="font-size: 1.5rem; margin-bottom: 12px;">📧</div>
+            <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 8px;">회원가입 요청 접수</div>
+            <div>이메일을 확인해주세요.</div>
+          </div>
+        `;
+      }
+
+      btn.innerHTML = '🎉 회원가입 완료';
+      renderUser();
+    });
   </script>
 </body>
 </html>
