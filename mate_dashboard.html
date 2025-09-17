@@ -288,6 +288,125 @@
       flex-shrink: 0;
     }
     
+    /* 필터 툴바 */
+    .filter-toolbar {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.05) 100%);
+      border: 2px solid rgba(102, 126, 234, 0.15);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 32px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.1);
+    }
+    
+    .toolbar-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 20px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .search-group {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    
+    .search-input {
+      width: 100%;
+      padding: 14px 50px 14px 20px;
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
+      font-size: 1rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(8px);
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.04);
+    }
+    
+    .search-input:focus {
+      outline: none;
+      border-color: rgba(102, 126, 234, 0.5);
+      background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.95) 100%);
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1), inset 0 2px 12px rgba(0,0,0,0.06);
+      transform: translateY(-1px);
+    }
+    
+    .search-clear {
+      position: absolute;
+      right: 12px;
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 50%;
+      transition: all 0.2s ease;
+      font-size: 14px;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .search-clear:hover {
+      background: rgba(102, 126, 234, 0.1);
+      color: #667eea;
+    }
+    
+    .filter-select {
+      padding: 12px 16px;
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(8px);
+      cursor: pointer;
+      min-width: 140px;
+    }
+    
+    .filter-select:focus {
+      outline: none;
+      border-color: rgba(102, 126, 234, 0.5);
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .quick-filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .quick-filter {
+      padding: 8px 16px;
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.85rem;
+      font-weight: 600;
+      backdrop-filter: blur(8px);
+    }
+    
+    .quick-filter:hover {
+      border-color: rgba(102, 126, 234, 0.4);
+      background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 100%);
+      transform: translateY(-1px);
+    }
+    
+    .quick-filter.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    
     /* 예약 카드 */
     .booking-card {
       background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
@@ -663,6 +782,41 @@
     <!-- 예약 목록 섹션 -->
     <section class="bookings-section">
       <h3 class="section-title">📋 예약 신청 관리</h3>
+      
+      <!-- 필터 툴바 -->
+      <div class="filter-toolbar">
+        <div class="toolbar-row">
+          <div class="search-group">
+            <input class="search-input" id="searchInput" type="text" placeholder="🔍 고객명, 연락처, 요청사항으로 검색..."/>
+            <button class="search-clear" id="clearSearch" title="검색 초기화">✕</button>
+          </div>
+          
+          <select class="filter-select" id="statusFilter">
+            <option value="">📊 모든 상태</option>
+            <option value="pending">⏳ 대기중</option>
+            <option value="confirmed">✅ 확정됨</option>
+            <option value="completed">🎉 완료됨</option>
+            <option value="cancelled">❌ 취소됨</option>
+          </select>
+          
+          <select class="filter-select" id="sortBy">
+            <option value="created_at_desc">📅 최신순</option>
+            <option value="created_at_asc">📅 오래된순</option>
+            <option value="date_desc">📅 예약일 최신순</option>
+            <option value="date_asc">📅 예약일 오래된순</option>
+            <option value="status_asc">📊 상태순</option>
+          </select>
+        </div>
+        
+        <div class="quick-filters">
+          <button class="quick-filter active" data-filter="all">📋 전체</button>
+          <button class="quick-filter" data-filter="pending">⏳ 대기중</button>
+          <button class="quick-filter" data-filter="confirmed">✅ 확정됨</button>
+          <button class="quick-filter" data-filter="today">📅 오늘</button>
+          <button class="quick-filter" data-filter="upcoming">📅 예정</button>
+        </div>
+      </div>
+      
       <div id="list"></div>
     </section>
   </main>
@@ -676,6 +830,17 @@ const pendingBookingsEl = document.getElementById('pendingBookings');
 const confirmedBookingsEl = document.getElementById('confirmedBookings');
 const completedBookingsEl = document.getElementById('completedBookings');
 const cancelledBookingsEl = document.getElementById('cancelledBookings');
+
+// 필터 요소들
+const searchInput = document.getElementById('searchInput');
+const clearSearch = document.getElementById('clearSearch');
+const statusFilter = document.getElementById('statusFilter');
+const sortBy = document.getElementById('sortBy');
+const quickFilters = document.querySelectorAll('.quick-filter');
+
+// 전체 데이터와 필터링된 데이터
+let allBookings = [];
+let filteredBookings = [];
 
 function rowHtml(r){
   // 날짜/시간 포맷팅 개선
@@ -707,7 +872,8 @@ function rowHtml(r){
   const statusText = r.status === 'pending' ? '⏳ 대기중' :
                     r.status === 'confirmed' ? '✅ 예약 확정' :
                     r.status === 'completed' ? '🎉 진행 완료' :
-                    (r.status === 'cancelled' || r.status === 'canceled_by_mate') ? '❌ 예약 취소' : r.status;
+                    (r.status === 'cancelled' || r.status === 'canceled_by_mate') ? '❌ 예약 취소' : 
+                    r.status === 'declined' ? '❌ 예약 거절' : r.status;
 
   return `
     <div class="booking-card" data-id="${r.id}">
@@ -760,7 +926,7 @@ function updateStats(data) {
   const pending = data.filter(r => r.status === 'pending').length;
   const confirmed = data.filter(r => r.status === 'confirmed').length;
   const completed = data.filter(r => r.status === 'completed').length;
-  const cancelled = data.filter(r => r.status === 'cancelled' || r.status === 'canceled_by_mate').length;
+  const cancelled = data.filter(r => r.status === 'cancelled' || r.status === 'canceled_by_mate' || r.status === 'declined').length;
   
   totalBookingsEl.textContent = total;
   pendingBookingsEl.textContent = pending;
@@ -769,60 +935,77 @@ function updateStats(data) {
   cancelledBookingsEl.textContent = cancelled;
 }
 
-async function load(){
-  const { data:{ user } } = await supabase.auth.getUser();
-  if(!user){ 
-    list.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">🔐</div>
-        <div class="empty-text">로그인이 필요합니다</div>
-        <div class="empty-subtext">메이트 대시보드를 이용하려면 로그인해주세요</div>
-      </div>
-    `; 
-    return; 
-  }
-
-  list.innerHTML = `
-    <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
-      <div class="loading" style="margin: 0 auto 16px;"></div>
-      예약을 불러오는 중...
-    </div>
-  `;
-
-  const { data, error } = await supabase
-    .from('bookings')
-    .select('*')
-    .eq('mate_id', user.id)
-    .order('created_at', { ascending:false });
-
-  if(error){ 
-    console.error(error); 
-    list.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">❌</div>
-        <div class="empty-text">불러오기 실패</div>
-        <div class="empty-subtext">${error.message}</div>
-      </div>
-    `; 
-    return; 
+function applyFilters() {
+  const searchTerm = (searchInput?.value || '').trim().toLowerCase();
+  const statusFilterValue = statusFilter?.value || '';
+  const sortOption = sortBy?.value || 'created_at_desc';
+  
+  // 검색 필터링
+  filteredBookings = allBookings.filter(booking => {
+    if (!searchTerm) return true;
+    
+    const customerName = (booking.customer_name || '').toLowerCase();
+    const customerContact = (booking.customer_contact || '').toLowerCase();
+    const notes = (booking.notes || '').toLowerCase();
+    
+    return customerName.includes(searchTerm) || 
+           customerContact.includes(searchTerm) || 
+           notes.includes(searchTerm);
+  });
+  
+  // 상태 필터링
+  if (statusFilterValue) {
+    filteredBookings = filteredBookings.filter(booking => {
+      if (statusFilterValue === 'cancelled') {
+        return booking.status === 'cancelled' || booking.status === 'canceled_by_mate' || booking.status === 'declined';
+      }
+      return booking.status === statusFilterValue;
+    });
   }
   
-  if(!data?.length){ 
+  // 정렬
+  filteredBookings.sort((a, b) => {
+    switch (sortOption) {
+      case 'created_at_asc':
+        return new Date(a.created_at) - new Date(b.created_at);
+      case 'created_at_desc':
+        return new Date(b.created_at) - new Date(a.created_at);
+      case 'date_asc':
+        if (!a.date || !b.date) return 0;
+        return new Date(a.date) - new Date(b.date);
+      case 'date_desc':
+        if (!a.date || !b.date) return 0;
+        return new Date(b.date) - new Date(a.date);
+      case 'status_asc':
+        const statusOrder = { 'pending': 1, 'confirmed': 2, 'completed': 3, 'cancelled': 4, 'canceled_by_mate': 4, 'declined': 4 };
+        return (statusOrder[a.status] || 5) - (statusOrder[b.status] || 5);
+      default:
+        return new Date(b.created_at) - new Date(a.created_at);
+    }
+  });
+  
+  renderBookings();
+}
+
+function renderBookings() {
+  if (!filteredBookings.length) {
     list.innerHTML = `
       <div class="empty-state">
-        <div class="empty-icon">📋</div>
-        <div class="empty-text">예약 신청이 없습니다</div>
-        <div class="empty-subtext">새로운 예약이 들어오면 여기에 표시됩니다</div>
+        <div class="empty-icon">🔍</div>
+        <div class="empty-text">검색 조건에 맞는 예약이 없습니다</div>
+        <div class="empty-subtext">다른 조건으로 검색해보세요</div>
       </div>
-    `; 
-    updateStats([]);
-    return; 
+    `;
+    return;
   }
+  
+  list.innerHTML = filteredBookings.map(rowHtml).join('');
+  
+  // 버튼 핸들러 재바인딩
+  bindBookingActions();
+}
 
-  updateStats(data);
-  list.innerHTML = data.map(rowHtml).join('');
-
-  // 버튼 핸들러 (이벤트 위임)
+function bindBookingActions() {
   list.querySelectorAll('button[data-act]').forEach(btn=>{
     btn.onclick = async () => {
       const card = btn.closest('[data-id]');
@@ -858,7 +1041,7 @@ async function load(){
             throw new Error('거절 사유를 입력해주세요.');
           }
         } else if (act === 'cancel') {
-          newStatus = 'cancelled';
+          newStatus = 'canceled_by_mate';
           reason = prompt('취소 사유를 입력하세요 (고객에게 전달됩니다):') || '';
           if (!reason.trim()) {
             throw new Error('취소 사유를 입력해주세요.');
@@ -912,7 +1095,7 @@ async function load(){
         setTimeout(() => toast.remove(), 3000);
 
         // 5) 화면 갱신
-        await load();
+        await loadData();
 
       } catch (error) {
         console.error(error);
@@ -924,9 +1107,155 @@ async function load(){
   });
 }
 
+async function load(){
+  const { data:{ user } } = await supabase.auth.getUser();
+  if(!user){ 
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🔐</div>
+        <div class="empty-text">로그인이 필요합니다</div>
+        <div class="empty-subtext">메이트 대시보드를 이용하려면 로그인해주세요</div>
+      </div>
+    `; 
+    return; 
+  }
+
+  list.innerHTML = `
+    <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+      <div class="loading" style="margin: 0 auto 16px;"></div>
+      예약을 불러오는 중...
+    </div>
+  `;
+
+  const { data, error } = await supabase
+    .from('bookings')
+    .select('*')
+    .eq('mate_id', user.id)
+    .order('created_at', { ascending:false });
+
+  if(error){ 
+    console.error(error); 
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">❌</div>
+        <div class="empty-text">불러오기 실패</div>
+        <div class="empty-subtext">${error.message}</div>
+      </div>
+    `; 
+    return; 
+  }
+  
+  allBookings = data || [];
+  
+  if(!data?.length){ 
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📋</div>
+        <div class="empty-text">예약 신청이 없습니다</div>
+        <div class="empty-subtext">새로운 예약이 들어오면 여기에 표시됩니다</div>
+      </div>
+    `; 
+    updateStats([]);
+    return; 
+  }
+
+  updateStats(data);
+  
+  // 초기 필터 적용
+  filteredBookings = [...allBookings];
+  applyFilters();
+}
+
+async function loadData() {
+  await load();
+}
+
+// 검색 이벤트 (디바운스)
+let searchTimeout;
+searchInput?.addEventListener('input', () => {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(applyFilters, 300);
+});
+
+// 검색 초기화
+clearSearch?.addEventListener('click', () => {
+  searchInput.value = '';
+  applyFilters();
+});
+
+// 필터 변경
+statusFilter?.addEventListener('change', applyFilters);
+sortBy?.addEventListener('change', applyFilters);
+
+// 퀵 필터
+quickFilters.forEach(btn => {
+  btn.addEventListener('click', () => {
+    // 활성 상태 토글
+    quickFilters.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    
+    const filter = btn.getAttribute('data-filter');
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
+    // 필터 적용
+    switch (filter) {
+      case 'all':
+        filteredBookings = [...allBookings];
+        break;
+      case 'pending':
+        filteredBookings = allBookings.filter(booking => booking.status === 'pending');
+        break;
+      case 'confirmed':
+        filteredBookings = allBookings.filter(booking => booking.status === 'confirmed');
+        break;
+      case 'today':
+        filteredBookings = allBookings.filter(booking => {
+          if (!booking.date) return false;
+          const bookingDate = new Date(booking.date);
+          return bookingDate.toDateString() === today.toDateString();
+        });
+        break;
+      case 'upcoming':
+        filteredBookings = allBookings.filter(booking => {
+          if (!booking.date || !booking.start_time) return false;
+          const bookingDateTime = new Date(`${booking.date}T${booking.start_time}`);
+          return bookingDateTime.getTime() >= now.getTime();
+        });
+        break;
+      default:
+        filteredBookings = [...allBookings];
+    }
+    
+    // 기존 검색어와 상태 필터 다시 적용
+    const searchTerm = (searchInput?.value || '').trim().toLowerCase();
+    const statusFilterValue = statusFilter?.value || '';
+    
+    if (searchTerm) {
+      filteredBookings = filteredBookings.filter(booking => {
+        const customerName = (booking.customer_name || '').toLowerCase();
+        const customerContact = (booking.customer_contact || '').toLowerCase();
+        const notes = (booking.notes || '').toLowerCase();
+        return customerName.includes(searchTerm) || customerContact.includes(searchTerm) || notes.includes(searchTerm);
+      });
+    }
+    
+    if (statusFilterValue) {
+      filteredBookings = filteredBookings.filter(booking => {
+        if (statusFilterValue === 'cancelled') {
+          return booking.status === 'cancelled' || booking.status === 'canceled_by_mate' || booking.status === 'declined';
+        }
+        return booking.status === statusFilterValue;
+      });
+    }
+    
+    renderBookings();
+  });
+});
+
 // 실시간 반영
 const ch = supabase.channel('bookings:mate')
-  .on('postgres_changes',{event:'*',schema:'public',table:'bookings'}, ()=>load())
+  .on('postgres_changes',{event:'*',schema:'public',table:'bookings'}, ()=>loadData())
   .subscribe();
 
 load();
