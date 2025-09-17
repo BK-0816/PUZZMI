@@ -952,9 +952,9 @@
     const reviewForm = document.getElementById('reviewForm');
     const ratingWrap = document.getElementById('ratingWrap');
     
-    // 메이트 이름 저장 (리뷰에서 사용) - 초기값 설정
+    // 메이트 이름 저장 (리뷰에서 사용)
     let currentMateName = '메이트';
-
+    
     // 별점 UI
     ratingWrap?.addEventListener('click', (e)=>{
       const b = e.target.closest('[data-rate]');
