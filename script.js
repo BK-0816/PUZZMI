@@ -632,7 +632,7 @@ function debounce(func, wait) {
 // 윈도우 리사이즈 핸들러
 window.addEventListener('resize', debounce(() => {
     // 모바일 메뉴 초기화
-    if (window.innerWidth > 1024) {
+    if (window.innerWidth > 1024 && navMenu) {
         navMenu.classList.remove('active');
     }
 }, 250));
