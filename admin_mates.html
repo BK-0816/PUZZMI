@@ -702,6 +702,7 @@
       text-transform: uppercase;
       letter-spacing: 0.5px;
       border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+      text-align: center;
     }
     
     .table td {
@@ -710,15 +711,62 @@
       font-size: 0.9rem;
       font-weight: 500;
       vertical-align: middle;
+      text-align: center;
     }
     
     .table tr:hover {
       background: linear-gradient(135deg, rgba(102, 126, 234, 0.03) 0%, rgba(240, 147, 251, 0.02) 100%);
     }
     
-    .table .right {
-      text-align: right;
+    .table .amount {
       font-weight: 700;
+      color: var(--primary-color);
+    }
+    
+    /* 상태 배지 (테이블용) */
+    .table-status-badge {
+      padding: 6px 12px;
+      border-radius: 16px;
+      font-weight: 700;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border: 2px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      min-width: 80px;
+      justify-content: center;
+    }
+    
+    .table-status-pending {
+      background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+      color: #856404;
+      border-color: rgba(255, 193, 7, 0.3);
+    }
+    
+    .table-status-confirmed {
+      background: linear-gradient(135deg, #d1e7dd 0%, #a3e4d7 100%);
+      color: #0f5132;
+      border-color: rgba(25, 135, 84, 0.3);
+    }
+    
+    .table-status-completed {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    }
+    
+    .table-status-declined {
+      background: linear-gradient(135deg, #f8d7da 0%, #f1948a 100%);
+      color: #721c24;
+      border-color: rgba(220, 53, 69, 0.3);
+    }
+    
+    .table-status-cancelled {
+      background: linear-gradient(135deg, #e2e3e5 0%, #ced4da 100%);
+      color: #495057;
+      border-color: rgba(108, 117, 125, 0.3);
     }
     
     /* 상태 표시 */
@@ -958,7 +1006,7 @@
               <th>⏰ 종료</th>
               <th>📊 상태</th>
               <th>👤 고객</th>
-              <th class="right">💰 금액</th>
+              <th>💰 금액</th>
             </tr>
           </thead>
           <tbody id="bookingsBody">
@@ -1286,6 +1334,30 @@
       default: return '❓';
     }
   }
+  
+  function getStatusText(status) {
+    switch (status) {
+      case 'pending': return '대기중';
+      case 'confirmed': return '확정됨';
+      case 'completed': return '완료됨';
+      case 'declined': return '거절됨';
+      case 'cancelled': return '취소됨';
+      case 'canceled_by_mate': return '메이트취소';
+      default: return status || '미정';
+    }
+  }
+  
+  function getStatusClass(status) {
+    switch (status) {
+      case 'pending': return 'table-status-pending';
+      case 'confirmed': return 'table-status-confirmed';
+      case 'completed': return 'table-status-completed';
+      case 'declined': return 'table-status-declined';
+      case 'cancelled':
+      case 'canceled_by_mate': return 'table-status-cancelled';
+      default: return 'table-status-pending';
+    }
+  }
 
   async function toggleVerify(mateId) {
     const mate = allMates.find(x => x.user_id === mateId);
@@ -1349,16 +1421,17 @@
         const startFormatted = formatDateTime(booking.date, booking.start_time);
         const endFormatted = calculateEndTime(booking.date, booking.start_time, booking.duration_hours);
         const customer = profileMap[booking.customer_id] || booking.customer_name || '고객';
-        const statusEmoji = getStatusEmoji(booking.status);
+        const statusText = getStatusText(booking.status);
+        const statusClass = getStatusClass(booking.status);
         
         return `
           <tr>
             <td>#${booking.id || ''}</td>
             <td>${startFormatted}</td>
             <td>${endFormatted}</td>
-            <td>${statusEmoji} ${booking.status || ''}</td>
+            <td><span class="table-status-badge ${statusClass}">${statusText}</span></td>
             <td>${customer}</td>
-            <td class="right">${amountText(booking)}</td>
+            <td class="amount">${amountText(booking)}</td>
           </tr>
         `;
       }).join('');
