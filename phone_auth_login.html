@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PUZZMI - 전화번호 로그인</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="pages.css"/>
+  <link rel="stylesheet" href="pages-theme.css"/>
+  <style>
+    body.bg-cream { background: var(--bg-cream); background-repeat:no-repeat; background-size:cover; }
+    
+    .page { 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      min-height: 100vh; 
+      padding: 20px; 
+    }
+    
+    .card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.1), 0 8px 24px rgba(0,0,0,0.05);
+      padding: 40px;
+      width: 100%;
+      max-width: 480px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      animation: shimmer 3s ease-in-out infinite;
+    }
+    
+    @keyframes shimmer {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
+    }
+    
+    .phone-login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    
+    .input-group {
+      position: relative;
+    }
+    
+    .label {
+      display: block;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+    
+    .input {
+      width: 100%;
+      padding: 16px 20px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.6) 100%);
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(8px);
+    }
+    
+    .input:focus {
+      outline: none;
+      border-color: #667eea;
+      background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.8) 100%);
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+      transform: translateY(-1px);
+    }
+    
+    .btn {
+      padding: 16px 24px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 1rem;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(102, 126, 234, 0.4);
+    }
+    
+    .verification-section {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(240, 147, 251, 0.05) 100%);
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 16px;
+      padding: 24px;
+      margin-top: 20px;
+    }
+    
+    .verification-input-group {
+      display: flex;
+      gap: 12px;
+      margin: 16px 0;
+    }
+    
+    .verification-input {
+      flex: 1;
+      text-align: center;
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      font-family: 'Courier New', monospace;
+    }
+  </style>
+</head>
+<body class="bg-cream">
+  <main class="page">
+    <section class="card">
+      <h2 style="text-align: center; margin-bottom: 32px;">📱 전화번호 로그인</h2>
+      
+      <form class="phone-login-form" id="phoneLoginForm">
+        <div class="input-group">
+          <label class="label" for="login_phone">전화번호</label>
+          <input class="input" id="login_phone" type="tel" placeholder="010-1234-5678" required/>
+        </div>
+        
+        <button class="btn btn-primary" type="submit" id="send_code_btn">
+          📱 인증번호 받기
+        </button>
+        
+        <div class="verification-section" id="verificationSection" style="display: none;">
+          <h4 style="text-align: center; margin-bottom: 16px;">인증번호 입력</h4>
+          <div class="verification-input-group">
+            <input class="input verification-input" id="login_verification_code" type="text" placeholder="000000" maxlength="6"/>
+            <button type="button" class="btn btn-primary" id="verify_login_btn">확인</button>
+          </div>
+          <div style="text-align: center;">
+            <button type="button" class="btn btn-secondary" id="resend_login_btn">재전송</button>
+          </div>
+        </div>
+        
+        <div id="login_result"></div>
+      </form>
+      
+      <div style="text-align: center; margin-top: 24px;">
+        <a href="auth_combo.html" style="color: #667eea; text-decoration: none;">
+          이메일로 로그인하기
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+    import { smsService } from './sms_service.js';
+    
+    const supabase = createClient(
+      "https://eevvgbbokenpjnvtmztk.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4"
+    );
+
+    let currentVerificationId = null;
+
+    // 전화번호 로그인 폼 제출
+    document.getElementById('phoneLoginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const phone = document.getElementById('login_phone').value.trim();
+      const btn = document.getElementById('send_code_btn');
+      const resultEl = document.getElementById('login_result');
+      
+      if (!phone) {
+        resultEl.innerHTML = '<div class="error">전화번호를 입력해주세요.</div>';
+        return;
+      }
+      
+      btn.disabled = true;
+      btn.innerHTML = '<div class="loading"></div> 발송 중...';
+      
+      try {
+        // 해당 전화번호로 가입된 계정 확인
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('id, phone_number')
+          .eq('phone_number', smsService.normalizePhoneNumber(phone))
+          .maybeSingle();
+        
+        if (profileError) throw profileError;
+        
+        if (!profile) {
+          resultEl.innerHTML = '<div class="error">가입되지 않은 전화번호입니다. 회원가입을 먼저 진행해주세요.</div>';
+          btn.disabled = false;
+          btn.innerHTML = '📱 인증번호 받기';
+          return;
+        }
+        
+        // SMS 인증번호 발송
+        const result = await smsService.sendVerificationCode(phone, profile.id);
+        currentVerificationId = result.verificationId;
+        
+        // 인증 섹션 표시
+        document.getElementById('verificationSection').style.display = 'block';
+        
+        resultEl.innerHTML = `
+          <div class="success">
+            📱 ${phone}로 인증번호를 발송했습니다.<br>
+            5분 내에 입력해주세요.
+          </div>
+        `;
+        
+        btn.innerHTML = '📱 인증번호 받기';
+        btn.disabled = false;
+        
+      } catch (error) {
+        console.error('SMS 발송 실패:', error);
+        resultEl.innerHTML = `<div class="error">SMS 발송 실패: ${error.message}</div>`;
+        btn.disabled = false;
+        btn.innerHTML = '📱 인증번호 받기';
+      }
+    });
+    
+    // 인증번호 확인
+    document.getElementById('verify_login_btn').addEventListener('click', async () => {
+      const phone = document.getElementById('login_phone').value.trim();
+      const code = document.getElementById('login_verification_code').value.trim();
+      const btn = document.getElementById('verify_login_btn');
+      const resultEl = document.getElementById('login_result');
+      
+      if (!code) {
+        resultEl.innerHTML = '<div class="error">인증번호를 입력해주세요.</div>';
+        return;
+      }
+      
+      btn.disabled = true;
+      btn.innerHTML = '<div class="loading"></div> 확인 중...';
+      
+      try {
+        // 인증번호 확인
+        await smsService.verifyCode(phone, code);
+        
+        // 해당 전화번호의 사용자 정보로 로그인 처리
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('phone_number', smsService.normalizePhoneNumber(phone))
+          .single();
+        
+        // 마지막 로그인 시간 업데이트
+        await supabase
+          .from('profiles')
+          .update({ last_login_at: new Date().toISOString() })
+          .eq('id', profile.id);
+        
+        resultEl.innerHTML = `
+          <div class="success">
+            <div style="font-size: 1.5rem; margin-bottom: 12px;">🎉</div>
+            <div style="font-size: 1.1rem; font-weight: 700;">로그인 성공!</div>
+            <div>잠시 후 메인 페이지로 이동합니다...</div>
+          </div>
+        `;
+        
+        // 리디렉션
+        const redirect = new URLSearchParams(location.search).get('redirect') || 'index.html';
+        setTimeout(() => {
+          location.href = redirect;
+        }, 1500);
+        
+      } catch (error) {
+        console.error('인증 실패:', error);
+        resultEl.innerHTML = `<div class="error">인증 실패: ${error.message}</div>`;
+        btn.disabled = false;
+        btn.innerHTML = '확인';
+      }
+    });
+    
+    // 재전송
+    document.getElementById('resend_login_btn').addEventListener('click', async () => {
+      const phone = document.getElementById('login_phone').value.trim();
+      const btn = document.getElementById('resend_login_btn');
+      
+      btn.disabled = true;
+      btn.innerHTML = '<div class="loading"></div> 재전송 중...';
+      
+      try {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('phone_number', smsService.normalizePhoneNumber(phone))
+          .single();
+        
+        await smsService.sendVerificationCode(phone, profile.id);
+        
+        document.getElementById('login_result').innerHTML = '<div class="success">📱 인증번호를 재전송했습니다.</div>';
+        
+      } catch (error) {
+        document.getElementById('login_result').innerHTML = `<div class="error">재전송 실패: ${error.message}</div>`;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '재전송';
+      }
+    });
+  </script>
+</body>
+</html>

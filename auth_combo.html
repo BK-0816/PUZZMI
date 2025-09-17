@@ -919,6 +919,55 @@
     });
     
     renderUser();
+    
+    // SMS 서비스 import
+    import('./sms_service.js').then(module => {
+      window.smsService = module.smsService;
+    });
+    
+    // SMS 발송 함수 (전역)
+    window.sendSMSVerification = async function(phoneNumber) {
+      if (!window.smsService) {
+        throw new Error('SMS 서비스가 로드되지 않았습니다.');
+      }
+      
+      // 전화번호 중복 확인
+      const isDuplicate = await window.smsService.checkPhoneDuplicate(phoneNumber);
+      if (isDuplicate) {
+        throw new Error('이미 가입된 전화번호입니다. 로그인을 시도해주세요.');
+      }
+      
+      return await window.smsService.sendVerificationCode(phoneNumber);
+    };
+    
+    // 전화번호 입력 시 실시간 포맷팅
+    document.getElementById('signup_phone').addEventListener('input', (e) => {
+      let value = e.target.value.replace(/[^0-9]/g, '');
+      
+      // 한국 전화번호 포맷팅 (010-1234-5678)
+      if (value.startsWith('010') && value.length <= 11) {
+        if (value.length > 3 && value.length <= 7) {
+          value = value.slice(0, 3) + '-' + value.slice(3);
+        } else if (value.length > 7) {
+          value = value.slice(0, 3) + '-' + value.slice(3, 7) + '-' + value.slice(7);
+        }
+      }
+      
+      e.target.value = value;
+      
+      // 전화번호 유효성 실시간 체크
+      const helpEl = e.target.parentNode.querySelector('.field-help');
+      if (value.length >= 10) {
+        helpEl.textContent = '✅ 유효한 전화번호 형식입니다';
+        helpEl.className = 'field-help success';
+      } else if (value.length > 0) {
+        helpEl.textContent = '❌ 올바른 전화번호를 입력해주세요';
+        helpEl.className = 'field-help error';
+      } else {
+        helpEl.textContent = 'SMS 인증을 위한 전화번호를 입력해주세요';
+        helpEl.className = 'field-help';
+      }
+    });
   </script>
 </body>
 </html>
