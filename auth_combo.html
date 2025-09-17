@@ -1068,22 +1068,9 @@
     // SMS 서비스 import
     import('./sms_service.js').then(module => {
       window.smsService = module.smsService;
+    }).catch(error => {
+      console.warn('SMS 서비스 로드 실패, 시뮬레이션 모드로 동작:', error);
     });
-    
-    // SMS 발송 함수 (전역)
-    window.sendSMSVerification = async function(phoneNumber) {
-      if (!window.smsService) {
-        throw new Error('SMS 서비스가 로드되지 않았습니다.');
-      }
-      
-      // 전화번호 중복 확인
-      const isDuplicate = await window.smsService.checkPhoneDuplicate(phoneNumber);
-      if (isDuplicate) {
-        throw new Error('이미 가입된 전화번호입니다. 로그인을 시도해주세요.');
-      }
-      
-      return await window.smsService.sendVerificationCode(phoneNumber);
-    };
     
     // 전화번호 입력 시 실시간 포맷팅
     document.getElementById('signup_phone').addEventListener('input', (e) => {
@@ -1102,7 +1089,7 @@
       
       // 전화번호 유효성 실시간 체크
       const helpEl = e.target.parentNode.querySelector('.field-help');
-      if (value.length >= 10) {
+      if (value.replace(/[^0-9]/g, '').length === 11 && value.startsWith('010')) {
         helpEl.textContent = '✅ 유효한 전화번호 형식입니다';
         helpEl.className = 'field-help success';
       } else if (value.length > 0) {
