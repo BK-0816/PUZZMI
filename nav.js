@@ -72,7 +72,6 @@ export async function renderNavbar(rootId='app-nav') {
   }
   if (isMate) {
     menu.appendChild(el('a', { href: 'mate_dashboard.html' }, '메이트 대시보드'));
-    menu.appendChild(el('a', { href: 'mate_edit.html' }, '프로필 편집'));
     menu.appendChild(el('a', { href: `mate_like.html?mate_id=${user.id}` }, '내 프로필'));
 
   }
