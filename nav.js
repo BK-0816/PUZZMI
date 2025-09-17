@@ -107,11 +107,7 @@ export async function renderNavbar(rootId='app-nav') {
   const navCenter = el('div', { class: 'nav-center' });
   wrap.appendChild(navCenter);
 
-  const brand = el('a', { class: 'nav-brand', href: 'index.html' }, [
-    el('img', { class: 'logo', src: 'puzzmi_original.png', alt: 'PUZZMI 로고' }),
-    el('span', {}, 'PUZZMI')
-  ]);
-  navCenter.appendChild(brand);
+  // 중앙 로고 제거 - 빈 공간으로 유지
 
   // 오른쪽 메뉴
   const navRight = el('div', { class: 'nav-right' });
