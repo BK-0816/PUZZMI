@@ -1,3 +1,5 @@
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from './nav.js';
+
 // LINE API 설정 - 서버사이드 처리 버전
 export const LINE_CONFIG = {
   // 클라이언트에서는 API 키를 직접 노출하지 않음
@@ -5,7 +7,7 @@ export const LINE_CONFIG = {
   
   // Supabase Functions URL
   get FUNCTIONS_URL() {
-    return `${import.meta.env.VITE_SUPABASE_URL}/functions/v1`;
+    return `${SUPABASE_URL}/functions/v1`;
   },
   
   // 자동으로 현재 도메인 감지
@@ -21,7 +23,7 @@ export const LINE_CONFIG = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
         },
         body: JSON.stringify({ userId })
       });
@@ -63,7 +65,7 @@ export const LINE_CONFIG = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
         },
         body: JSON.stringify({ 
           code,
@@ -103,7 +105,7 @@ export const LINE_CONFIG = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
         },
         body: JSON.stringify({ accessToken })
       });
