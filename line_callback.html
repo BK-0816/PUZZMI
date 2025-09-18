@@ -169,7 +169,7 @@
         body: new URLSearchParams({
           grant_type: 'authorization_code',
           code: code,
-          redirect_uri: `${window.location.origin}/line_callback.html`,
+          redirect_uri: window.location.href.split('?')[0], // 현재 콜백 URL 사용
           client_id: 'YOUR_LINE_CHANNEL_ID',
           client_secret: 'YOUR_LINE_CHANNEL_SECRET'
         })

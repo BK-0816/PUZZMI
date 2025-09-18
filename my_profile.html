@@ -1163,7 +1163,7 @@
     // LINE Login URL 생성
     function generateLineLoginUrl() {
       const clientId = 'YOUR_LINE_CHANNEL_ID'; // 실제 환경에서 설정
-      const redirectUri = encodeURIComponent(`${window.location.origin}/line_callback.html`);
+      const redirectUri = encodeURIComponent(`${window.location.protocol}//${window.location.host}/line_callback.html`);
       const state = btoa(JSON.stringify({ userId: user.id, timestamp: Date.now() }));
       const scope = 'profile openid';
       
