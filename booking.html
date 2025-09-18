@@ -570,6 +570,140 @@
           <div id="result"></div>
         </form>
       </section>
+
+      <!-- 환불·취소 정책 섹션 -->
+      <section class="policy-section expanded">
+        <div class="policy-header" onclick="togglePolicy()">
+          <h3 class="policy-title">
+            <i class="fas fa-shield-alt"></i>
+            PUZZMI 환불·취소 안내
+          </h3>
+          <div class="policy-toggle">
+            <i class="fas fa-chevron-up"></i>
+          </div>
+        </div>
+        
+        <div class="policy-content">
+          <!-- 환불 기준 요약 -->
+          <div class="refund-summary">
+            <div class="refund-item full-refund">
+              <div class="refund-icon">💚</div>
+              <div class="refund-text">
+                <strong>이용 24시간 전까지</strong><br>
+                전액 환불
+              </div>
+            </div>
+            <div class="refund-item partial-refund">
+              <div class="refund-icon">💛</div>
+              <div class="refund-text">
+                <strong>24~4시간 전</strong><br>
+                50% 환불
+              </div>
+            </div>
+            <div class="refund-item no-refund">
+              <div class="refund-icon">❤️</div>
+              <div class="refund-text">
+                <strong>4시간 이내/당일·노쇼</strong><br>
+                환불 불가
+              </div>
+            </div>
+          </div>
+          
+          <!-- 상세 정책 -->
+          <div class="policy-details">
+            <div class="policy-category">
+              <h4><i class="fas fa-calendar-check"></i> 예약·결제 진행 과정</h4>
+              <ol>
+                <li>고객님이 날짜와 시간을 선택</li>
+                <li>관리자가 일정 확인 후, 메이트와 스케줄 조정</li>
+                <li>시간이 맞으면 예약 확정</li>
+                <li>결제 요청을 LINE으로 발송 (링크 유효시간: 일반 12시간 / 긴급 예약 2시간)</li>
+              </ol>
+            </div>
+            
+            <div class="policy-category">
+              <h4><i class="fas fa-times-circle"></i> 취소·환불 정책 (고객 사유)</h4>
+              <ul>
+                <li><strong>예약확정 전(Pending):</strong> 자유 취소 (결제 전이므로 환불 없음)</li>
+                <li><strong>예약확정 후 ~ 결제 전:</strong> 자유 취소 가능</li>
+                <li><strong>결제 후:</strong>
+                  <ul>
+                    <li class="full-refund-text">이용 24시간 전까지: 전액 환불</li>
+                    <li class="partial-refund-text">이용 24~4시간 전: 50% 환불</li>
+                    <li class="no-refund-text">이용 4시간 이내/당일 취소, 노쇼: 환불 불가</li>
+                    <li class="no-refund-text">이용 중 개인 사유로 조기 종료: 환불 불가</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+            
+            <div class="policy-category">
+              <h4><i class="fas fa-shield-alt"></i> PUZZMI/메이트 문제 시 보장</h4>
+              <ul>
+                <li><strong>메이트 지각 15분 초과:</strong> 지연분 시간 연장 또는 지연분 금액 환불 중 선택</li>
+                <li><strong>메이트 노쇼·중도 이탈·중대한 서비스 문제:</strong> 전액 환불 또는 즉시 다른 메이트로 교체</li>
+                <li><strong>교체 불가 시:</strong> 전액 환불 + 재예약 우선권/쿠폰 제공</li>
+              </ul>
+            </div>
+            
+            <div class="policy-category">
+              <h4><i class="fas fa-cloud-rain"></i> 날씨·안전</h4>
+              <ul>
+                <li><strong>기상특보/안전 위험:</strong> 1회 무료 변경 또는 전액 환불 (고객 선택)</li>
+                <li><strong>일반적인 비/흐림:</strong> 실내 코스로 변경 제안 (환불 사유 아님)</li>
+              </ul>
+            </div>
+            
+            <div class="policy-category">
+              <h4><i class="fas fa-edit"></i> 일정 변경</h4>
+              <ul>
+                <li><strong>결제 후 ~ 이용 12시간 전:</strong> 1회 무료 변경 (날짜/시간)</li>
+                <li><strong>이용 12시간 이내:</strong> 위 취소·환불 규정 적용</li>
+              </ul>
+            </div>
+            
+            <div class="policy-category">
+              <h4><i class="fas fa-credit-card"></i> 환불 방법·기간</h4>
+              <ul>
+                <li>원결제 수단으로 환불 (영업일 기준 3~10일 소요)</li>
+                <li>해외 결제 시 환율 변동·중개 수수료로 금액 차이 발생 가능</li>
+                <li>카드사/PG/환전 등 회수 불가 수수료는 환불액에서 제외될 수 있음</li>
+                <li>현장 비용 (교통비, 입장료, 식음료 등)은 환불 대상 아님</li>
+              </ul>
+            </div>
+          </div>
+          
+          <!-- 정책 동의 체크박스 -->
+          <div class="policy-agreement">
+            <label class="agreement-checkbox">
+              <input type="checkbox" id="policyAgreement" required/>
+              <span class="checkmark"></span>
+              <span class="agreement-text">
+                위 환불·취소 정책을 확인했으며, 이에 동의합니다.
+              </span>
+            </label>
+          </div>
+          
+          <!-- 문의 안내 -->
+          <div class="contact-info">
+            <h4><i class="fas fa-headset"></i> 문의</h4>
+            <div class="contact-methods">
+              <div class="contact-item">
+                <i class="fab fa-line"></i>
+                <span>LINE 채널 메시지</span>
+              </div>
+              <div class="contact-item">
+                <i class="fas fa-envelope"></i>
+                <span>puzzmi0721@gmail.com</span>
+              </div>
+              <div class="contact-item">
+                <i class="fas fa-comments"></i>
+                <span>앱/웹 채팅</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   </main>
 
