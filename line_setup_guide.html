@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LINE 연동 설정 가이드 - PUZZMI</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="pages.css"/>
+  <link rel="stylesheet" href="pages-theme.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <style>
+    body.bg-cream { 
+      background: var(--bg-cream); 
+      background-repeat: no-repeat; 
+      background-size: cover; 
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+    
+    .guide-container {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 0 20px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .guide-header {
+      background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
+      backdrop-filter: blur(25px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 28px;
+      padding: 50px;
+      margin-bottom: 40px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.04);
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+    }
+    
+    .guide-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, #00C300 0%, #00B900 25%, #667eea 50%, #764ba2 75%, #f093fb 100%);
+      animation: shimmer 4s ease-in-out infinite;
+    }
+    
+    @keyframes shimmer {
+      0%, 100% { opacity: 1; transform: translateX(0); }
+      50% { opacity: 0.8; transform: translateX(10px); }
+    }
+    
+    .guide-title {
+      font-size: 3.2rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #00C300 0%, #667eea 30%, #764ba2 60%, #f093fb 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 20px 0;
+      letter-spacing: -0.03em;
+      position: relative;
+    }
+    
+    .guide-title::after {
+      content: '';
+      position: absolute;
+      bottom: -16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 5px;
+      background: linear-gradient(90deg, #00C300 0%, #667eea 50%, #f093fb 100%);
+      border-radius: 3px;
+    }
+    
+    .guide-subtitle {
+      color: var(--text-secondary);
+      font-size: 1.3rem;
+      line-height: 1.7;
+      max-width: 700px;
+      margin: 0 auto;
+      font-weight: 500;
+    }
+    
+    .step-section {
+      background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 24px;
+      padding: 40px;
+      margin-bottom: 32px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .step-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #00C300 0%, #667eea 50%, #f093fb 100%);
+      opacity: 0.8;
+    }
+    
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+    
+    .step-number {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #00C300 0%, #00B900 100%);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 800;
+      box-shadow: 0 8px 24px rgba(0, 195, 0, 0.4);
+      flex-shrink: 0;
+    }
+    
+    .step-title {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #00C300 0%, #667eea 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0;
+      letter-spacing: -0.02em;
+    }
+    
+    .step-content {
+      line-height: 1.8;
+      font-size: 1.1rem;
+      color: var(--text-primary);
+    }
+    
+    .code-block {
+      background: linear-gradient(135deg, rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0.02) 100%);
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 12px;
+      padding: 24px;
+      margin: 20px 0;
+      font-family: 'Courier New', monospace;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      overflow-x: auto;
+      backdrop-filter: blur(8px);
+      position: relative;
+    }
+    
+    .code-block::before {
+      content: '💻';
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      font-size: 1.2rem;
+      opacity: 0.6;
+    }
+    
+    .warning-box {
+      background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+      border: 2px solid rgba(255, 193, 7, 0.3);
+      border-radius: 16px;
+      padding: 24px;
+      margin: 24px 0;
+      box-shadow: 0 8px 24px rgba(255, 193, 7, 0.2);
+    }
+    
+    .warning-box h4 {
+      color: #856404;
+      font-weight: 800;
+      margin: 0 0 12px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .info-box {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.05) 100%);
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 16px;
+      padding: 24px;
+      margin: 24px 0;
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.1);
+    }
+    
+    .info-box h4 {
+      color: #667eea;
+      font-weight: 800;
+      margin: 0 0 12px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .checklist {
+      list-style: none;
+      padding: 0;
+      margin: 20px 0;
+    }
+    
+    .checklist li {
+      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(8px);
+    }
+    
+    .checklist li:hover {
+      border-color: rgba(102, 126, 234, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+    
+    .checklist li::before {
+      content: '✅';
+      font-size: 1.2rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    
+    .link-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #00C300 0%, #00B900 100%);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 700;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 20px rgba(0, 195, 0, 0.3);
+      margin: 16px 8px 16px 0;
+    }
+    
+    .link-button:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 12px 28px rgba(0, 195, 0, 0.4);
+    }
+    
+    .secondary-button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    .secondary-button:hover {
+      box-shadow: 0 12px 28px rgba(102, 126, 234, 0.4);
+    }
+    
+    .env-example {
+      background: linear-gradient(135deg, rgba(0, 195, 0, 0.05) 0%, rgba(0, 185, 0, 0.03) 100%);
+      border: 2px solid rgba(0, 195, 0, 0.2);
+      border-radius: 12px;
+      padding: 20px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin: 16px 0;
+    }
+    
+    .flow-diagram {
+      background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 16px;
+      padding: 32px;
+      margin: 32px 0;
+      text-align: center;
+    }
+    
+    .flow-step {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 20px;
+      margin: 8px;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    
+    .flow-arrow {
+      font-size: 1.5rem;
+      color: var(--text-secondary);
+      margin: 0 8px;
+    }
+  </style>
+</head>
+<body class="bg-cream">
+  <div class="guide-container">
+    <!-- 헤더 -->
+    <section class="guide-header">
+      <h1 class="guide-title">💬 LINE 연동 설정 가이드</h1>
+      <p class="guide-subtitle">
+        PUZZMI 서비스에 LINE Login과 신원확인 기능을 연동하기 위한<br>
+        단계별 설정 방법을 안내해드립니다
+      </p>
+    </section>
+
+    <!-- 1단계: LINE Developers 계정 생성 -->
+    <section class="step-section">
+      <div class="step-header">
+        <div class="step-number">1</div>
+        <h2 class="step-title">LINE Developers 계정 생성</h2>
+      </div>
+      
+      <div class="step-content">
+        <p>먼저 LINE Developers 콘솔에서 개발자 계정을 생성하고 새 채널을 만들어야 합니다.</p>
+        
+        <ul class="checklist">
+          <li><a href="https://developers.line.biz/console/" target="_blank">LINE Developers 콘솔</a>에 접속</li>
+          <li>LINE 계정으로 로그인 (개인 또는 비즈니스 계정)</li>
+          <li>"Create a new provider" 클릭하여 새 프로바이더 생성</li>
+          <li>프로바이더 이름: "PUZZMI" 입력</li>
+          <li>"Create a LINE Login channel" 선택</li>
+        </ul>
+        
+        <a href="https://developers.line.biz/console/" target="_blank" class="link-button">
+          <i class="fab fa-line"></i>
+          LINE Developers 콘솔 열기
+        </a>
+      </div>
+    </section>
+
+    <!-- 2단계: LINE Login 채널 설정 -->
+    <section class="step-section">
+      <div class="step-header">
+        <div class="step-number">2</div>
+        <h2 class="step-title">LINE Login 채널 설정</h2>
+      </div>
+      
+      <div class="step-content">
+        <p>LINE Login 채널을 생성하고 필요한 설정을 진행합니다.</p>
+        
+        <h4 style="color: #00C300; margin: 24px 0 16px 0;">📋 채널 기본 정보</h4>
+        <ul class="checklist">
+          <li><strong>Channel name:</strong> PUZZMI</li>
+          <li><strong>Channel description:</strong> 서울 렌탈친구 서비스</li>
+          <li><strong>App type:</strong> Web app</li>
+          <li><strong>Email address:</strong> 관리자 이메일 주소</li>
+        </ul>
+        
+        <h4 style="color: #00C300; margin: 24px 0 16px 0;">🔗 Callback URL 설정</h4>
+        <div class="code-block">
+# 개발 환경
+http://localhost:3000/line_callback.html
+
+# 운영 환경 (실제 도메인으로 변경)
+https://yourdomain.com/line_callback.html
+        </div>
+        
+        <h4 style="color: #00C300; margin: 24px 0 16px 0;">🔐 권한 설정</h4>
+        <ul class="checklist">
+          <li><strong>OpenID Connect:</strong> 활성화 (필수)</li>
+          <li><strong>Profile:</strong> 활성화 (이름, 프로필 사진)</li>
+          <li><strong>Email address:</strong> 활성화 (선택사항)</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 3단계: API 키 및 설정값 확인 -->
+    <section class="step-section">
+      <div class="step-header">
+        <div class="step-number">3</div>
+        <h2 class="step-title">API 키 및 설정값 확인</h2>
+      </div>
+      
+      <div class="step-content">
+        <p>LINE Developers 콘솔에서 다음 정보들을 확인하고 기록해두세요.</p>
+        
+        <h4 style="color: #667eea; margin: 24px 0 16px 0;">🔑 필수 설정값</h4>
+        <div class="env-example">
+# LINE Login 설정
+LINE_CHANNEL_ID=your_channel_id_here
+LINE_CHANNEL_SECRET=your_channel_secret_here
+
+# LINE Messaging API (선택사항 - 메시지 발송용)
+LINE_CHANNEL_ACCESS_TOKEN=your_access_token_here
+
+# 콜백 URL
+LINE_CALLBACK_URL=https://yourdomain.com/line_callback.html
+        </div>
+        
+        <div class="warning-box">
+          <h4><i class="fas fa-exclamation-triangle"></i> 보안 주의사항</h4>
+          <p>
+            • Channel Secret은 절대 클라이언트 코드에 노출하면 안됩니다<br>
+            • 서버 환경변수나 안전한 설정 파일에만 저장하세요<br>
+            • 정기적으로 키를 갱신하는 것을 권장합니다
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4단계: 코드 구현 -->
+    <section class="step-section">
+      <div class="step-header">
+        <div class="step-number">4</div>
+        <h2 class="step-title">코드 구현 및 연동</h2>
+      </div>
+      
+      <div class="step-content">
+        <p>실제 LINE API와 연동하기 위한 코드를 구현합니다.</p>
+        
+        <h4 style="color: #667eea; margin: 24px 0 16px 0;">🔧 주요 구현 파일들</h4>
+        <ul class="checklist">
+          <li><strong>line_identity_service.js:</strong> LINE 신원확인 서비스 (이미 구현됨)</li>
+          <li><strong>line_callback.html:</strong> LINE OAuth 콜백 처리 (이미 구현됨)</li>
+          <li><strong>admin_identity_verification.html:</strong> 관리자 신원확인 관리 (이미 구현됨)</li>
+        </ul>
+        
+        <h4 style="color: #667eea; margin: 24px 0 16px 0;">🔄 실제 API 연동 수정 필요 부분</h4>
+        <div class="code-block">
+// line_identity_service.js에서 수정할 부분들:
+
+1. generateLineLoginUrl() 함수:
+   - YOUR_LINE_CHANNEL_ID를 실제 채널 ID로 변경
+
+2. exchangeCodeForToken() 함수:
+   - 실제 LINE Token API 호출 구현
+
+3. getLineUserProfile() 함수:
+   - 실제 LINE Profile API 호출 구현
+
+4. getLineIdentityInfo() 함수:
+   - LINE에서 제공하는 실명/나이 정보 추출
+        </div>
+        
+        <div class="info-box">
+          <h4><i class="fas fa-info-circle"></i> 현재 상태</h4>
+          <p>
+            현재는 시뮬레이션 모드로 구현되어 있습니다.<br>
+            실제 LINE API 키를 설정하면 바로 실제 연동이 가능합니다!
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5단계: 테스트 및 검증 -->
+    <section class="step-section">
+      <div class="step-header">
+        <div class="step-number">5</div>
+        <h2 class="step-title">테스트 및 검증</h2>
+      </div>
+      
+      <div class="step-content">
+        <p>LINE 연동이 올바르게 작동하는지 테스트합니다.</p>
+        
+        <h4 style="color: #f093fb; margin: 24px 0 16px 0;">🧪 테스트 시나리오</h4>
+        <ul class="checklist">
+          <li><strong>LINE 로그인:</strong> 사용자가 LINE 계정으로 로그인 가능한지 확인</li>
+          <li><strong>프로필 정보 수신:</strong> LINE에서 이름, 나이 정보를 받아오는지 확인</li>
+          <li><strong>신원 검증:</strong> 프로필 정보와 LINE 정보 비교 검증</li>
+          <li><strong>나이 제한:</strong> 18세 미만 사용자 예약 차단 테스트</li>
+          <li><strong>관리자 대시보드:</strong> 인증 현황이 올바르게 표시되는지 확인</li>
+        </ul>
+        
+        <a href="check_migration.html" class="link-button secondary-button">
+          <i class="fas fa-check-circle"></i>
+          마이그레이션 상태 확인
+        </a>
+        
+        <a href="admin_identity_verification.html" class="link-button secondary-button">
+          <i class="fas fa-user-shield"></i>
+          관리자 신원확인 관리
+        </a>
+      </div>
+    </section>
+
+    <!-- 6단계: 운영 환경 배포 -->
+    <section class="step-section">
+      <div class="step-header">
+        <div class="step-number">6</div>
+        <h2 class="step-title">운영 환경 배포</h2>
+      </div>
+      
+      <div class="step-content">
+        <p>테스트가 완료되면 운영 환경에 배포합니다.</p>
+        
+        <h4 style="color: #f5576c; margin: 24px 0 16px 0;">🚀 배포 체크리스트</h4>
+        <ul class="checklist">
+          <li><strong>환경변수 설정:</strong> 운영 환경에 LINE API 키 설정</li>
+          <li><strong>도메인 등록:</strong> LINE 콘솔에 운영 도메인 추가</li>
+          <li><strong>HTTPS 설정:</strong> SSL 인증서 적용 (LINE은 HTTPS 필수)</li>
+          <li><strong>개인정보 처리방침:</strong> LINE 연동 관련 내용 추가</li>
+          <li><strong>모니터링 설정:</strong> 연동 오류 알림 시스템 구축</li>
+        </ul>
+        
+        <div class="warning-box">
+          <h4><i class="fas fa-shield-alt"></i> 개인정보 보호 준수사항</h4>
+          <p>
+            • LINE에서 받은 개인정보는 최소한으로만 수집하고 안전하게 보관<br>
+            • 사용자 동의 없이 마케팅 목적으로 사용 금지<br>
+            • 개인정보 처리방침에 LINE 연동 관련 내용 명시<br>
+            • 사용자가 언제든 연동 해제할 수 있도록 기능 제공
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 연동 플로우 다이어그램 -->
+    <section class="step-section">
+      <div class="step-header">
+        <div class="step-number">💡</div>
+        <h2 class="step-title">LINE 연동 플로우</h2>
+      </div>
+      
+      <div class="flow-diagram">
+        <div class="flow-step">사용자 LINE 연동 클릭</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">LINE OAuth 페이지로 이동</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">사용자 로그인 및 권한 승인</div>
+        <br><br>
+        <div class="flow-step">Authorization Code 받기</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">Access Token 교환</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">사용자 프로필 정보 조회</div>
+        <br><br>
+        <div class="flow-step">실명/나이 검증</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">인증 레벨 결정</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">DB 저장 및 완료</div>
+      </div>
+    </section>
+
+    <!-- 관리자 활용 방안 -->
+    <section class="step-section">
+      <div class="step-header">
+        <div class="step-number">📊</div>
+        <h2 class="step-title">관리자 활용 방안</h2>
+      </div>
+      
+      <div class="step-content">
+        <h4 style="color: #667eea; margin: 24px 0 16px 0;">🔐 신원확인 강화</h4>
+        <ul class="checklist">
+          <li><strong>실명 검증:</strong> LINE 실명과 프로필 이름 자동 비교</li>
+          <li><strong>나이 검증:</strong> LINE 생년월일로 정확한 나이 확인</li>
+          <li><strong>중복 계정 방지:</strong> LINE ID 기반 중복 가입 차단</li>
+          <li><strong>인증 레벨 관리:</strong> Premium/Enhanced/Basic 등급별 서비스 제공</li>
+        </ul>
+        
+        <h4 style="color: #f093fb; margin: 24px 0 16px 0;">🚫 안전성 강화</h4>
+        <ul class="checklist">
+          <li><strong>미성년자 차단:</strong> 18세 미만 자동 예약 제한</li>
+          <li><strong>허위 정보 방지:</strong> LINE 인증으로 신뢰도 향상</li>
+          <li><strong>법적 리스크 감소:</strong> 나이 확인 의무 자동 이행</li>
+          <li><strong>사기 방지:</strong> 실명 인증으로 악용 차단</li>
+        </ul>
+        
+        <h4 style="color: #4facfe; margin: 24px 0 16px 0;">📈 서비스 개선</h4>
+        <ul class="checklist">
+          <li><strong>맞춤 서비스:</strong> 나이대별 메이트 추천</li>
+          <li><strong>신뢰도 표시:</strong> 인증 배지로 메이트 신뢰성 강화</li>
+          <li><strong>통계 분석:</strong> 연령대별 이용 패턴 분석</li>
+          <li><strong>마케팅 활용:</strong> 연령대별 타겟 마케팅</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 다음 단계 안내 -->
+    <section class="step-section">
+      <div class="step-header">
+        <div class="step-number">🎯</div>
+        <h2 class="step-title">다음 단계</h2>
+      </div>
+      
+      <div class="step-content">
+        <p>LINE 연동 설정이 완료되면 다음과 같은 추가 기능들을 구현할 수 있습니다:</p>
+        
+        <ul class="checklist">
+          <li><strong>LINE Pay 연동:</strong> 결제 시스템 통합</li>
+          <li><strong>LINE 메시지 발송:</strong> 예약 알림 자동화</li>
+          <li><strong>LINE Bot 구축:</strong> 고객 상담 자동화</li>
+          <li><strong>LINE LIFF 앱:</strong> LINE 내에서 서비스 이용</li>
+        </ul>
+        
+        <div style="text-align: center; margin-top: 32px;">
+          <a href="my_profile.html" class="link-button">
+            <i class="fas fa-user-cog"></i>
+            내 정보에서 LINE 연동 테스트
+          </a>
+          
+          <a href="enhanced_signup.html" class="link-button secondary-button">
+            <i class="fas fa-user-plus"></i>
+            회원가입에서 LINE 연동 테스트
+          </a>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+</html>
