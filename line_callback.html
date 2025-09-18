@@ -94,19 +94,43 @@
       
       try {
         const urlParams = new URLSearchParams(window.location.search);
+        const hash = window.location.hash;
         const code = urlParams.get('code');
         const state = urlParams.get('state');
         const error = urlParams.get('error');
+        const errorDescription = urlParams.get('error_description');
         
-        console.log('콜백 파라미터:', { code, state, error });
+        console.log('콜백 파라미터:', { 
+          code, 
+          state, 
+          error, 
+          errorDescription,
+          fullUrl: window.location.href,
+          search: window.location.search,
+          hash: hash
+        });
         
         // 에러 체크
         if (error) {
-          throw new Error(`LINE 로그인 오류: ${error}`);
+          const errorMsg = errorDescription ? `${error}: ${errorDescription}` : error;
+          throw new Error(`LINE 로그인 오류: ${errorMsg}`);
         }
         
+        // URL에 파라미터가 없는 경우 시뮬레이션 모드로 처리
         if (!code || !state) {
-          throw new Error('필수 파라미터가 없습니다 (code 또는 state)');
+          console.warn('필수 파라미터 없음, 시뮬레이션 모드로 전환');
+          
+          // URL에서 userId 추출 시도
+          const simulationParams = new URLSearchParams(window.location.search);
+          const userId = simulationParams.get('userId');
+          
+          if (userId) {
+            console.log('시뮬레이션 모드: userId =', userId);
+            await handleSimulationCallback(userId);
+            return;
+          } else {
+            throw new Error('필수 파라미터가 없습니다. LINE 로그인을 다시 시도해주세요.');
+          }
         }
         
         // state 파싱

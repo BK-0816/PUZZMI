@@ -31,7 +31,31 @@ export const LINE_CONFIG = {
       console.log('LINE URL 생성 시작, userId:', userId);
       console.log('Callback URL:', this.CALLBACK_URL);
       
-      // Edge Function이 없거나 실패할 경우를 대비해 직접 URL 생성
+      // 먼저 Edge Function 시도
+      try {
+        const response = await fetch(`${this.FUNCTIONS_URL}/line-auth/generate-url`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({ userId })
+        });
+        
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success && result.loginUrl) {
+            console.log('Edge Function으로 LINE URL 생성 성공:', result.loginUrl);
+            return result.loginUrl;
+          }
+        }
+        
+        console.warn('Edge Function 실패, 직접 URL 생성으로 전환');
+      } catch (edgeError) {
+        console.warn('Edge Function 호출 실패:', edgeError);
+      }
+      
+      // Edge Function 실패 시 직접 URL 생성
       const state = btoa(JSON.stringify({ 
         userId, 
         timestamp: Date.now(),
@@ -43,12 +67,18 @@ export const LINE_CONFIG = {
         client_id: this.CHANNEL_ID,
         redirect_uri: this.CALLBACK_URL,
         state: state,
-        scope: 'profile openid'
+        scope: 'profile openid email'
       });
       
       const lineUrl = `https://access.line.me/oauth2/v2.1/authorize?${params.toString()}`;
       
       console.log('생성된 LINE URL:', lineUrl);
+      console.log('사용된 파라미터:', {
+        client_id: this.CHANNEL_ID,
+        redirect_uri: this.CALLBACK_URL,
+        state: state,
+        scope: 'profile openid email'
+      });
       return lineUrl;
       
     } catch (error) {

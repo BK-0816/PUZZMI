@@ -62,11 +62,12 @@ serve(async (req: Request) => {
         // LINE OAuth URL 생성
         const { userId } = await req.json()
         
-        const callbackUrl = `${url.origin}/line_callback.html`
+        // Netlify 배포 환경에 맞춘 콜백 URL
+        const callbackUrl = 'https://puzzmi.netlify.app/line_callback.html'
         const state = btoa(JSON.stringify({ 
           userId, 
           timestamp: Date.now(),
-          origin: url.origin
+          origin: 'https://puzzmi.netlify.app'
         }))
         
         const params = new URLSearchParams({
@@ -74,13 +75,19 @@ serve(async (req: Request) => {
           client_id: LINE_CHANNEL_ID,
           redirect_uri: callbackUrl,
           state: state,
-          scope: 'profile openid'
+          scope: 'profile openid email'
         })
         
         const lineUrl = `https://access.line.me/oauth2/v2.1/authorize?${params.toString()}`
         
         console.log('생성된 LINE URL:', lineUrl)
         console.log('Callback URL:', callbackUrl)
+        console.log('사용된 파라미터:', {
+          client_id: LINE_CHANNEL_ID,
+          redirect_uri: callbackUrl,
+          state: state,
+          scope: 'profile openid email'
+        })
         
         return new Response(
           JSON.stringify({ 
