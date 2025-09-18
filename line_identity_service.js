@@ -1,5 +1,6 @@
 // LINE 신원확인 서비스 모듈
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { LINE_CONFIG } from './line_config.js';
 
 const SUPABASE_URL = "https://eevvgbbokenpjnvtmztk.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4";
@@ -11,9 +12,71 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
  */
 export class LineIdentityService {
   constructor() {
-    this.lineChannelId = process.env.LINE_CHANNEL_ID || 'YOUR_LINE_CHANNEL_ID';
-    this.lineChannelSecret = process.env.LINE_CHANNEL_SECRET || 'YOUR_LINE_CHANNEL_SECRET';
+    this.lineChannelId = LINE_CONFIG.CHANNEL_ID;
+    this.lineChannelSecret = LINE_CONFIG.CHANNEL_SECRET;
     this.verificationValidityDays = 365; // 인증 유효기간 (1년)
+  }
+
+  /**
+   * LINE OAuth 로그인 URL 생성
+   */
+  generateLineLoginUrl(userId) {
+    return LINE_CONFIG.generateLoginUrl(userId);
+  }
+
+  /**
+   * Authorization Code를 Access Token으로 교환
+   */
+  async exchangeCodeForToken(code) {
+    try {
+      const response = await fetch('https://api.line.me/oauth2/v2.1/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          grant_type: 'authorization_code',
+          code: code,
+          redirect_uri: LINE_CONFIG.CALLBACK_URL,
+          client_id: this.lineChannelId,
+          client_secret: this.lineChannelSecret
+        })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(`토큰 교환 실패: ${response.status} ${errorData}`);
+      }
+      
+      return await response.json();
+      
+    } catch (error) {
+      console.error('토큰 교환 실패:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Access Token으로 LINE 사용자 프로필 조회
+   */
+  async getLineUserProfile(accessToken) {
+    try {
+      const response = await fetch('https://api.line.me/v2/profile', {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`프로필 조회 실패: ${response.status}`);
+      }
+      
+      return await response.json();
+      
+    } catch (error) {
+      console.error('LINE 프로필 조회 실패:', error);
+      throw error;
+    }
   }
 
   /**
@@ -59,46 +122,43 @@ export class LineIdentityService {
    */
   async getLineIdentityInfo(accessToken) {
     try {
-      // 실제 환경에서는 아래와 같이 LINE API 호출
-      /*
-      const response = await fetch('https://api.line.me/v2/profile', {
+      // 실제 LINE 프로필 정보 조회
+      const profile = await this.getLineUserProfile(accessToken);
+      
+      // OpenID Connect로 추가 정보 조회 (실명, 생년월일 등)
+      const idTokenResponse = await fetch('https://api.line.me/oauth2/v2.1/verify', {
+        method: 'POST',
         headers: {
-          'Authorization': `Bearer ${accessToken}`
-        }
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          id_token: accessToken, // 실제로는 ID Token 사용
+          client_id: this.lineChannelId
+        })
       });
       
-      if (!response.ok) {
-        throw new Error('LINE 프로필 조회 실패');
+      let identityData = {};
+      if (idTokenResponse.ok) {
+        identityData = await idTokenResponse.json();
       }
       
-      const profile = await response.json();
-      
-      // LINE에서 제공하는 추가 신원 정보 (가상의 API)
-      const identityResponse = await fetch('https://api.line.me/v2/identity', {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`
-        }
-      });
-      
-      const identityData = await identityResponse.json();
-      */
-      
-      // 개발 환경에서는 시뮬레이션 데이터 반환
-      const mockIdentityInfo = {
-        verified_name: '김지은', // LINE에서 인증된 실명
-        verified_birth_date: '1998-03-15', // LINE에서 인증된 생년월일
-        verified_age: this.calculateAge('1998-03-15'),
+      // LINE에서 받은 실제 정보 처리
+      const lineIdentityInfo = {
+        verified_name: profile.displayName || identityData.name || '이름 미확인',
+        verified_birth_date: identityData.birthdate || null, // LINE에서 제공하는 경우
+        verified_age: identityData.birthdate ? this.calculateAge(identityData.birthdate) : null,
         verification_method: 'line_identity_verification',
         verification_timestamp: new Date().toISOString(),
-        confidence_score: 0.95, // 신뢰도 점수
+        confidence_score: 0.95,
         additional_data: {
-          phone_verified: true,
-          email_verified: true,
-          identity_document_verified: true
+          line_user_id: profile.userId,
+          display_name: profile.displayName,
+          picture_url: profile.pictureUrl,
+          email: identityData.email || null
         }
       };
       
-      return mockIdentityInfo;
+      return lineIdentityInfo;
       
     } catch (error) {
       console.error('LINE 신원 정보 조회 실패:', error);

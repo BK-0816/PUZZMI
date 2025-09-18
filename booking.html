@@ -887,7 +887,8 @@
 
     // LINE 연동 함수
     window.connectLineAccount = function() {
-      const lineLoginUrl = generateLineLoginUrl();
+      import('./line_config.js').then(({ LINE_CONFIG }) => {
+        const lineLoginUrl = LINE_CONFIG.generateLoginUrl(user.id);
       const popup = window.open(lineLoginUrl, 'lineLogin', 'width=500,height=600');
       
       const checkAuth = setInterval(async () => {
@@ -896,14 +897,7 @@
           location.reload(); // 연동 후 페이지 새로고침
         }
       }, 1000);
-    function generateLineLoginUrl() {
-      const clientId = 'YOUR_LINE_CHANNEL_ID';
-      const redirectUri = encodeURIComponent(`${window.location.origin}/line_callback.html`);
-      const state = btoa(JSON.stringify({ userId: user.id, timestamp: Date.now() }));
-      const scope = 'profile openid';
-      
-      return `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}&scope=${scope}`;
-    }
+      });
     };
     // 오늘 날짜를 최소값으로 설정
     const today = new Date().toISOString().split('T')[0];

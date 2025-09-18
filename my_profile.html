@@ -1162,12 +1162,10 @@
 
     // LINE Login URL 생성
     function generateLineLoginUrl() {
-      const clientId = 'YOUR_LINE_CHANNEL_ID'; // LINE Developers Console에서 복사한 실제 Channel ID  
-      const redirectUri = encodeURIComponent(`${window.location.origin}/line_callback.html`);
-      const state = btoa(JSON.stringify({ userId: user.id, timestamp: Date.now() }));
-      const scope = 'profile openid';
-      
-      return `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}&scope=${scope}`;
+      // line_config.js에서 URL 생성
+      import('./line_config.js').then(({ LINE_CONFIG }) => {
+        return LINE_CONFIG.generateLoginUrl(user.id);
+      });
     }
     // 프로필 데이터 로드
     async function loadProfile() {
