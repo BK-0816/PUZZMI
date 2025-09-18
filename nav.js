@@ -2,26 +2,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const SUPABASE_URL = "https://eevvgbbokenpjnvtmztk.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4";
-
-// Supabase 클라이언트 생성 (연결 설정 개선)
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true,
-    flowType: 'pkce'
-  },
-  global: {
-    headers: {
-      'apikey': SUPABASE_ANON_KEY
-    }
-  },
-  realtime: {
-    params: {
-      eventsPerSecond: 10
-    }
-  }
-});
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Export constants for use in other modules
 export { SUPABASE_URL, SUPABASE_ANON_KEY };
@@ -42,94 +23,29 @@ function el(tag, attrs={}, children=[]) {
 
 async function getRoles() {
   let user = null;
-  let retryCount = 0;
-  const maxRetries = 3;
-  
-  while (retryCount < maxRetries) {
-    try {
-      // 연결 상태 확인
-      const { data: { user: authUser }, error } = await Promise.race([
-        supabase.auth.getUser(),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Request timeout')), 10000)
-        )
-      ]);
-      
-      if (error) {
-        // 세션 관련 오류인 경우 재시도
-        if (error.message.includes('session') || error.message.includes('JWT')) {
-          console.log(`Auth session error (attempt ${retryCount + 1}):`, error.message);
-          await supabase.auth.signOut();
-          
-          // 로그아웃 액션이 아닌 경우에만 재시도
-          const isLogoutAction = sessionStorage.getItem('logout_action') === 'true';
-          if (isLogoutAction) {
-            sessionStorage.removeItem('logout_action');
-            return { user: null, isAdmin: false, isMate: false };
-          }
-          
-          retryCount++;
-          if (retryCount < maxRetries) {
-            await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
-            continue;
-          }
-        }
-        throw error;
-      }
-      
-      user = authUser;
-      break; // 성공 시 루프 종료
-      
-    } catch (error) {
-      console.error(`Auth error (attempt ${retryCount + 1}):`, error);
-      retryCount++;
-    
-      if (retryCount >= maxRetries) {
-        // 최종 실패 시 세션 정리
-        try {
-          await supabase.auth.signOut();
-        } catch (signOutError) {
-          console.warn('Sign out failed:', signOutError);
-        }
-        
-        // 로그아웃 액션이 아닌 경우에만 리디렉션
-        const isLogoutAction = sessionStorage.getItem('logout_action') === 'true';
-        if (!isLogoutAction && !window.location.pathname.includes('auth_combo.html')) {
-          console.log('Redirecting to auth page due to persistent auth errors');
-          setTimeout(() => {
-            const currentPath = encodeURIComponent(window.location.pathname + window.location.search);
-            window.location.href = `auth_combo.html?redirect=${currentPath}`;
-          }, 100);
-        }
-        
-        sessionStorage.removeItem('logout_action');
-        return { user: null, isAdmin: false, isMate: false };
-      }
-    
-      // 재시도 전 대기
-      await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
+  try {
+    const { data: { user: authUser }, error } = await supabase.auth.getUser();
+    if (error) {
+      // Handle any authentication error by clearing auth state
+      console.log('Auth error detected, clearing auth state:', error.message);
+      await supabase.auth.signOut();
+      return { user: null, isAdmin: false, isMate: false };
     }
+    user = authUser;
+  } catch (error) {
+    console.error('Auth error:', error);
+    // Clear invalid session and return null user
+    await supabase.auth.signOut();
+    return { user: null, isAdmin: false, isMate: false };
   }
-  
-  // 로그아웃 플래그 정리
-  sessionStorage.removeItem('logout_action');
   
   let isAdmin = false, isMate = false;
   if (user) {
-    try {
-      const [adminResult, mateResult] = await Promise.all([
-        supabase.from('admin_users').select('user_id').eq('user_id', user.id).maybeSingle(),
-        supabase.from('mate_profiles').select('user_id').eq('user_id', user.id).maybeSingle()
-      ]);
-      
-      isAdmin = !!adminResult.data;
-      isMate = !!mateResult.data;
-    } catch (roleError) {
-      console.warn('Role check failed:', roleError);
-      // 역할 확인 실패해도 기본 사용자로 처리
-    }
+    const a = await supabase.from('admin_users').select('user_id').eq('user_id', user.id).maybeSingle();
+    isAdmin = !!a.data;
+    const m = await supabase.from('mate_profiles').select('user_id').eq('user_id', user.id).maybeSingle();
+    isMate = !!m.data;
   }
-  
   return { user, isAdmin, isMate };
 }
 
@@ -354,9 +270,7 @@ export async function renderNavbar(rootId='app-nav') {
   // 로그아웃 버튼
   navRight.appendChild(el('button', { 
     class: 'logout-btn',
-    onclick: async () => {
-      // Mark this as a logout action to prevent redirect
-      sessionStorage.setItem('logout_action', 'true');
+    onclick: async () => { 
       await supabase.auth.signOut(); 
       location.reload(); 
     }

@@ -27,22 +27,12 @@
   </div>
 
   <script type="module">
-    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
     // ====== 환경 ======
     const SUPABASE_URL = 'https://eevvgbbokenpjnvtmztk.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4';
     const EDGE_COMPLETE_URL = `${SUPABASE_URL}/functions/v1/line-auth/complete-auth`;
-    
-    // Supabase 클라이언트 생성 (연결 설정 개선)
-    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: {
-        autoRefreshToken: true,
-        persistSession: true,
-        detectSessionInUrl: true,
-        flowType: 'pkce'
-      }
-    });
 
     function isSameOriginWithOpener() {
       try {
@@ -88,12 +78,12 @@
       }
 
       // 3) same-origin이면 → 팝업 내에서 처리(옵션)
-      let supabaseInstance;
+      let supabase;
       try {
         if (sameOrigin && window.opener && window.opener.supabase) {
-          supabaseInstance = window.opener.supabase;
+          supabase = window.opener.supabase;
         } else {
-          supabaseInstance = supabaseClient;
+          supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         }
       } catch (e) {
         // 예외 발생 시 릴레이로 폴백
@@ -108,7 +98,7 @@
       }
 
       try {
-        const { data: { session } } = await supabaseInstance.auth.getSession();
+        const { data: { session } } = await supabase.auth.getSession();
         if (!session) throw new Error('로그인 세션이 없습니다.');
 
         const resp = await fetch(EDGE_COMPLETE_URL, {

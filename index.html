@@ -129,19 +129,12 @@ async function refreshHeartCount() {
     const from = page * PAGE_SIZE;
     const to   = from + PAGE_SIZE - 1;
 
-    // 재시도 로직 개선
+    // Retry logic for network issues
     let retryCount = 0;
     const maxRetries = 3;
     
     while (retryCount < maxRetries) {
       try {
-        // 연결 상태 먼저 확인
-        const { data: healthCheck } = await supabase
-          .from('mate_profiles')
-          .select('user_id', { count: 'exact', head: true })
-          .limit(1);
-        
-        // 메인 쿼리 실행
         let query = supabase
           .from("mate_profiles")
           .select(`
@@ -153,16 +146,9 @@ async function refreshHeartCount() {
 
         if (ONLY_VERIFIED) query = query.eq("is_verified", true);
 
-        // 타임아웃과 함께 쿼리 실행
-        const { data, error, count } = await Promise.race([
-          query,
-          new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Database query timeout')), 15000)
-          )
-        ]);
+        const { data, error, count } = await query;
 
         if (error) {
-          console.error(`Database error (attempt ${retryCount + 1}):`, error);
           throw error;
         }
 
@@ -180,7 +166,7 @@ async function refreshHeartCount() {
         return; // Success, exit retry loop
         
       } catch (error) {
-        console.error(`loadMates error (attempt ${retryCount + 1}/${maxRetries}):`, error);
+        console.error(`loadMates error (attempt ${retryCount + 1}):`, error);
         retryCount++;
         
         if (retryCount >= maxRetries) {
@@ -188,16 +174,12 @@ async function refreshHeartCount() {
           if (!grid.innerHTML) {
             grid.innerHTML = `
               <div style="padding:16px; text-align:center;">
-                <p style="color: #dc3545; font-weight: 600;">메이트를 불러오지 못했습니다.</p>
+                <p>메이트를 불러오지 못했습니다.</p>
                 <p style="font-size:0.9em; color:#666; margin-top:8px;">
-                  데이터베이스 연결에 문제가 있습니다.<br>
-                  잠시 후 다시 시도하거나 페이지를 새로고침해주세요.
+                  네트워크 연결을 확인하고 페이지를 새로고침해주세요.
                 </p>
                 <button onclick="location.reload()" style="margin-top:12px; padding:8px 16px; background:#667eea; color:white; border:none; border-radius:4px; cursor:pointer;">
                   새로고침
-                </button>
-                <button onclick="loadMates({reset:true})" style="margin-top:8px; margin-left:8px; padding:8px 16px; background:#28a745; color:white; border:none; border-radius:4px; cursor:pointer;">
-                  다시 시도
                 </button>
               </div>
             `;
@@ -207,10 +189,8 @@ async function refreshHeartCount() {
           return;
         }
         
-        // 재시도 전 대기 (지수 백오프)
-        const delay = Math.min(Math.pow(2, retryCount) * 1000, 5000);
-        console.log(`Retrying in ${delay}ms...`);
-        await new Promise(resolve => setTimeout(resolve, delay));
+        // Wait before retry (exponential backoff)
+        await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount) * 1000));
       }
     }
   }
