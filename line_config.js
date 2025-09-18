@@ -1,8 +1,8 @@
 // LINE API 설정 파일
 export const LINE_CONFIG = {
   // LINE Developers Console에서 받은 실제 값들로 교체하세요
-  CHANNEL_ID: 'YOUR_ACTUAL_CHANNEL_ID',  // Basic settings > Channel ID
-  CHANNEL_SECRET: 'YOUR_ACTUAL_CHANNEL_SECRET', // Basic settings > Channel secret
+  CHANNEL_ID: '2008137189',  // Basic settings > Channel ID
+  CHANNEL_SECRET: 'e743b9de9cd4ecc5b1d44f8d4c34d9d3', // Basic settings > Channel secret
   
   // 자동으로 현재 도메인 감지
   get CALLBACK_URL() {
@@ -29,10 +29,10 @@ export const LINE_CONFIG = {
 };
 
 // 개발 환경에서 설정 확인
-if (LINE_CONFIG.CHANNEL_ID === 'YOUR_ACTUAL_CHANNEL_ID') {
+if (LINE_CONFIG.CHANNEL_ID === '2008137189') {
   console.warn('⚠️ LINE_CONFIG: 실제 Channel ID를 설정해주세요!');
 }
 
-if (LINE_CONFIG.CHANNEL_SECRET === 'YOUR_ACTUAL_CHANNEL_SECRET') {
+if (LINE_CONFIG.CHANNEL_SECRET === 'e743b9de9cd4ecc5b1d44f8d4c34d9d3') {
   console.warn('⚠️ LINE_CONFIG: 실제 Channel Secret을 설정해주세요!');
 }
