@@ -2,8 +2,8 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from './nav.js';
 
 // LINE API 설정 - 서버사이드 처리 버전
 export const LINE_CONFIG = {
-  // 클라이언트에서는 API 키를 직접 노출하지 않음
-  // 모든 LINE API 호출은 Supabase Edge Functions를 통해 처리
+  // Edge Function을 통한 안전한 LINE API 처리
+  CHANNEL_ID: '2008137189', // 실제 채널 ID (Edge Function에서 검증됨)
   
   // Supabase Functions URL
   get FUNCTIONS_URL() {
@@ -29,39 +29,31 @@ export const LINE_CONFIG = {
   async generateLoginUrl(userId) {
     try {
       console.log('LINE URL 생성 시작, userId:', userId);
-      console.log('Functions URL:', this.FUNCTIONS_URL);
+      console.log('Callback URL:', this.CALLBACK_URL);
       
-      const response = await fetch(`${this.FUNCTIONS_URL}/line-auth/generate-url`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-        },
-        body: JSON.stringify({ userId })
+      // Edge Function이 없거나 실패할 경우를 대비해 직접 URL 생성
+      const state = btoa(JSON.stringify({ 
+        userId, 
+        timestamp: Date.now(),
+        origin: window.location.origin 
+      }));
+      
+      const params = new URLSearchParams({
+        response_type: 'code',
+        client_id: this.CHANNEL_ID,
+        redirect_uri: this.CALLBACK_URL,
+        state: state,
+        scope: 'profile openid'
       });
       
-      console.log('서버 응답 상태:', response.status);
+      const lineUrl = `https://access.line.me/oauth2/v2.1/authorize?${params.toString()}`;
       
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('서버 응답 오류:', errorText);
-        throw new Error(`URL 생성 실패: ${response.status} - ${errorText}`);
-      }
-      
-      const result = await response.json();
-      console.log('서버 응답 결과:', result);
-      
-      if (!result.success) {
-        throw new Error(result.error || 'URL 생성 실패');
-      }
-      
-      console.log('생성된 LINE URL:', result.loginUrl);
-      return result.loginUrl;
+      console.log('생성된 LINE URL:', lineUrl);
+      return lineUrl;
       
     } catch (error) {
       console.error('LINE URL 생성 실패:', error);
-      console.warn('⚠️ 서버 연결 실패. 시뮬레이션 모드로 전환됩니다.');
-      return this.generateSimulationUrl(userId);
+      throw error;
     }
   },
   

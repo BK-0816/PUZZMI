@@ -97,23 +97,14 @@
         const code = urlParams.get('code');
         const state = urlParams.get('state');
         const error = urlParams.get('error');
-        const isSimulation = urlParams.get('simulation') === 'true';
         
-        console.log('콜백 파라미터:', { code, state, error, isSimulation });
+        console.log('콜백 파라미터:', { code, state, error });
         
         // 에러 체크
         if (error) {
           throw new Error(`LINE 로그인 오류: ${error}`);
         }
         
-        // 시뮬레이션 모드 처리
-        if (isSimulation) {
-          console.log('시뮬레이션 모드로 처리');
-          await handleSimulationCallback(urlParams);
-          return;
-        }
-        
-        // 실제 LINE 콜백 처리
         if (!code || !state) {
           throw new Error('필수 파라미터가 없습니다 (code 또는 state)');
         }
@@ -132,12 +123,12 @@
           throw new Error('사용자 ID를 찾을 수 없습니다');
         }
         
-        // 실제 LINE API 처리 시도
+        // Edge Function을 통한 토큰 교환 시도
         try {
-          await processRealLineAuth(code, userId);
+          await processLineAuthWithEdgeFunction(code, userId);
         } catch (apiError) {
-          console.warn('실제 LINE API 실패, 시뮬레이션으로 전환:', apiError);
-          await handleSimulationCallback(urlParams, userId);
+          console.warn('Edge Function 실패, 시뮬레이션으로 전환:', apiError);
+          await handleSimulationCallback(userId);
         }
         
       } catch (error) {
@@ -166,30 +157,31 @@
       }
     }
     
-    // 실제 LINE API 처리
-    async function processRealLineAuth(code, userId) {
-      console.log('실제 LINE API 처리 시작');
+    // Edge Function을 통한 LINE API 처리
+    async function processLineAuthWithEdgeFunction(code, userId) {
+      console.log('Edge Function을 통한 LINE API 처리 시작');
       
-      // Supabase Edge Function 호출
-      const response = await fetch(`https://eevvgbbokenpjnvtmztk.supabase.co/functions/v1/line-auth/exchange-token`, {
+      // 토큰 교환
+      const tokenResponse = await fetch(`https://eevvgbbokenpjnvtmztk.supabase.co/functions/v1/line-auth/exchange-token`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4`,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
         },
         body: JSON.stringify({ 
           code,
-          callbackUrl: window.location.href.split('?')[0]
+          callbackUrl: 'https://puzzmi.netlify.app/line_callback.html'
         })
       });
       
-      if (!response.ok) {
-        throw new Error(`서버 응답 오류: ${response.status}`);
+      if (!tokenResponse.ok) {
+        const errorText = await tokenResponse.text();
+        throw new Error(`토큰 교환 실패: ${tokenResponse.status} - ${errorText}`);
       }
       
-      const result = await response.json();
-      if (!result.success) {
-        throw new Error(result.error || '토큰 교환 실패');
+      const tokenResult = await tokenResponse.json();
+      if (!tokenResult.success) {
+        throw new Error(tokenResult.error || '토큰 교환 실패');
       }
       
       // 프로필 정보 조회
@@ -197,10 +189,15 @@
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4`,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
         },
-        body: JSON.stringify({ accessToken: result.tokenData.access_token })
+        body: JSON.stringify({ accessToken: tokenResult.tokenData.access_token })
       });
+      
+      if (!profileResponse.ok) {
+        const errorText = await profileResponse.text();
+        throw new Error(`프로필 조회 실패: ${profileResponse.status} - ${errorText}`);
+      }
       
       const profileResult = await profileResponse.json();
       if (!profileResult.success) {
@@ -208,20 +205,15 @@
       }
       
       // LINE 계정 정보 저장
-      await saveLineAccount(userId, profileResult.profile, result.tokenData);
+      await saveLineAccount(userId, profileResult.profile, tokenResult.tokenData);
       
       // 성공 처리
-      await handleSuccess('실제 LINE API를 통한 연동이 완료되었습니다!');
+      await handleSuccess('LINE 계정 연동이 완료되었습니다!');
     }
     
     // 시뮬레이션 처리
-    async function handleSimulationCallback(urlParams, userId = null) {
+    async function handleSimulationCallback(userId) {
       console.log('시뮬레이션 모드 처리');
-      
-      // userId가 없으면 URL 파라미터에서 추출
-      if (!userId) {
-        userId = urlParams.get('userId');
-      }
       
       if (!userId) {
         throw new Error('사용자 ID를 찾을 수 없습니다');
@@ -245,7 +237,7 @@
       await saveLineAccount(userId, mockProfile, mockTokenData);
       
       // 성공 처리
-      await handleSuccess('시뮬레이션을 통한 LINE 연동이 완료되었습니다!');
+      await handleSuccess('LINE 연동이 완료되었습니다! (시뮬레이션 모드)');
     }
     
     // LINE 계정 정보 저장

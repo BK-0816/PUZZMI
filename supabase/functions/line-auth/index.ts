@@ -38,7 +38,23 @@ serve(async (req: Request) => {
     const LINE_CHANNEL_SECRET = Deno.env.get('LINE_CHANNEL_SECRET')
     
     if (!LINE_CHANNEL_ID || !LINE_CHANNEL_SECRET) {
-      throw new Error('LINE API 설정이 없습니다. 환경변수를 확인해주세요.')
+      console.error('LINE API 환경변수 누락:', { 
+        hasChannelId: !!LINE_CHANNEL_ID, 
+        hasChannelSecret: !!LINE_CHANNEL_SECRET 
+      })
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'LINE API 설정이 없습니다. Supabase Secrets에서 LINE_CHANNEL_ID와 LINE_CHANNEL_SECRET을 확인해주세요.' 
+        }),
+        {
+          status: 500,
+          headers: {
+            'Content-Type': 'application/json',
+            ...corsHeaders,
+          },
+        }
+      )
     }
 
     switch (action) {
@@ -50,7 +66,7 @@ serve(async (req: Request) => {
         const state = btoa(JSON.stringify({ 
           userId, 
           timestamp: Date.now(),
-          origin: url.origin 
+          origin: url.origin
         }))
         
         const params = new URLSearchParams({
@@ -58,10 +74,13 @@ serve(async (req: Request) => {
           client_id: LINE_CHANNEL_ID,
           redirect_uri: callbackUrl,
           state: state,
-          scope: 'profile openid email'
+          scope: 'profile openid'
         })
         
         const lineUrl = `https://access.line.me/oauth2/v2.1/authorize?${params.toString()}`
+        
+        console.log('생성된 LINE URL:', lineUrl)
+        console.log('Callback URL:', callbackUrl)
         
         return new Response(
           JSON.stringify({ 
@@ -98,10 +117,20 @@ serve(async (req: Request) => {
         
         if (!tokenResponse.ok) {
           const errorText = await tokenResponse.text()
-          throw new Error(`토큰 교환 실패: ${tokenResponse.status} ${errorText}`)
+          console.error('LINE 토큰 교환 실패:', {
+            status: tokenResponse.status,
+            error: errorText,
+            code: code,
+            callbackUrl: callbackUrl
+          })
+          throw new Error(`토큰 교환 실패: ${tokenResponse.status} - ${errorText}`)
         }
         
         const tokenData: LineTokenResponse = await tokenResponse.json()
+        console.log('토큰 교환 성공:', { 
+          hasAccessToken: !!tokenData.access_token,
+          tokenType: tokenData.token_type 
+        })
         
         return new Response(
           JSON.stringify({ 
