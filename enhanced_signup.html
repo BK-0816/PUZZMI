@@ -1124,11 +1124,10 @@
     };
 
     // LINE Login URL 생성
-    function generateLineLoginUrl() {
+    async function generateLineLoginUrl() {
       // line_config.js에서 URL 생성
-      import('./line_config.js').then(({ LINE_CONFIG }) => {
-        return LINE_CONFIG.generateLoginUrl(userData.userId);
-      });
+      const { LINE_CONFIG } = await import('./line_config.js');
+      return await LINE_CONFIG.generateLoginUrl(userData.userId);
     }
 
     // 페이지 로드 시 로그인 상태 확인

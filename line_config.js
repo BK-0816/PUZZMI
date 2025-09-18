@@ -1,12 +1,12 @@
-// LINE API 설정 파일 - Netlify 환경변수 대응 버전
+// LINE API 설정 - 서버사이드 처리 버전
 export const LINE_CONFIG = {
-  // Netlify에서는 클라이언트 사이드에서 환경변수 직접 접근 불가
-  // 대신 빌드 시점에 주입되거나 런타임에 서버에서 가져와야 함
+  // 클라이언트에서는 API 키를 직접 노출하지 않음
+  // 모든 LINE API 호출은 Supabase Edge Functions를 통해 처리
   
-  // 개발 환경에서는 여기에 직접 설정 (보안 주의!)
-  // 운영 환경에서는 Netlify Functions나 Edge Functions 사용 권장
-  CHANNEL_ID: '2008137189', // 실제 Channel ID로 교체
-  CHANNEL_SECRET: 'e743b9de9cd4ecc5b1d44f8d4c34d9d3', // 실제 Channel Secret으로 교체
+  // Supabase Functions URL
+  get FUNCTIONS_URL() {
+    return `${import.meta.env.VITE_SUPABASE_URL}/functions/v1`;
+  },
   
   // 자동으로 현재 도메인 감지
   get CALLBACK_URL() {
@@ -14,27 +14,35 @@ export const LINE_CONFIG = {
     return `${origin}/line_callback.html`;
   },
   
-  // LINE OAuth URL 생성
-  generateLoginUrl(userId) {
-    // Channel ID 유효성 검사
-    if (!this.CHANNEL_ID || this.CHANNEL_ID === 'YOUR_LINE_CHANNEL_ID_HERE') {
-      console.warn('⚠️ LINE Channel ID가 설정되지 않았습니다. 시뮬레이션 모드로 실행됩니다.');
+  // LINE OAuth URL 생성 (서버에서 처리)
+  async generateLoginUrl(userId) {
+    try {
+      const response = await fetch(`${this.FUNCTIONS_URL}/line-auth/generate-url`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({ userId })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`URL 생성 실패: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      
+      if (!result.success) {
+        throw new Error(result.error || 'URL 생성 실패');
+      }
+      
+      return result.loginUrl;
+      
+    } catch (error) {
+      console.error('LINE URL 생성 실패:', error);
+      console.warn('⚠️ 서버 연결 실패. 시뮬레이션 모드로 전환됩니다.');
       return this.generateSimulationUrl(userId);
     }
-    
-    const params = new URLSearchParams({
-      response_type: 'code',
-      client_id: this.CHANNEL_ID,
-      redirect_uri: this.CALLBACK_URL,
-      state: btoa(JSON.stringify({ 
-        userId: userId, 
-        timestamp: Date.now(),
-        origin: window.location.origin 
-      })),
-      scope: 'profile openid email'
-    });
-    
-    return `https://access.line.me/oauth2/v2.1/authorize?${params.toString()}`;
   },
   
   // 개발용 시뮬레이션 URL
@@ -48,29 +56,32 @@ export const LINE_CONFIG = {
     return `${this.CALLBACK_URL}?${params.toString()}`;
   },
   
-  // 토큰 교환 (실제 환경에서는 서버에서 처리해야 함)
+  // 토큰 교환 (서버에서 처리)
   async exchangeCodeForToken(code) {
     try {
-      const response = await fetch('https://api.line.me/oauth2/v2.1/token', {
+      const response = await fetch(`${this.FUNCTIONS_URL}/line-auth/exchange-token`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
         },
-        body: new URLSearchParams({
-          grant_type: 'authorization_code',
-          code: code,
-          redirect_uri: this.CALLBACK_URL,
-          client_id: this.CHANNEL_ID,
-          client_secret: this.CHANNEL_SECRET
+        body: JSON.stringify({ 
+          code,
+          callbackUrl: this.CALLBACK_URL 
         })
       });
       
       if (!response.ok) {
-        const errorData = await response.text();
-        throw new Error(`토큰 교환 실패: ${response.status} ${errorData}`);
+        throw new Error(`토큰 교환 실패: ${response.status}`);
       }
       
-      return await response.json();
+      const result = await response.json();
+      
+      if (!result.success) {
+        throw new Error(result.error || '토큰 교환 실패');
+      }
+      
+      return result.tokenData;
       
     } catch (error) {
       console.error('토큰 교환 실패:', error);
@@ -85,20 +96,29 @@ export const LINE_CONFIG = {
     }
   },
   
-  // 사용자 프로필 조회
+  // 사용자 프로필 조회 (서버에서 처리)
   async getUserProfile(accessToken) {
     try {
-      const response = await fetch('https://api.line.me/v2/profile', {
+      const response = await fetch(`${this.FUNCTIONS_URL}/line-auth/get-profile`, {
+        method: 'POST',
         headers: {
-          'Authorization': `Bearer ${accessToken}`
-        }
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({ accessToken })
       });
       
       if (!response.ok) {
         throw new Error(`프로필 조회 실패: ${response.status}`);
       }
       
-      return await response.json();
+      const result = await response.json();
+      
+      if (!result.success) {
+        throw new Error(result.error || '프로필 조회 실패');
+      }
+      
+      return result.profile;
       
     } catch (error) {
       console.error('LINE 프로필 조회 실패:', error);
@@ -113,9 +133,9 @@ export const LINE_CONFIG = {
   }
 };
 
-// 보안 경고 표시
+// 보안 정보 표시
 if (typeof window !== 'undefined') {
-  console.warn('🔒 보안 주의: 실제 운영 환경에서는 Channel Secret을 클라이언트에 노출하면 안됩니다!');
-  console.info('💡 권장사항: Netlify Functions나 서버사이드에서 토큰 교환 처리');
-  console.info('📖 보안 가이드: secure_line_setup.html 참조');
+  console.info('🔒 보안 강화: LINE API 키가 서버사이드에서 안전하게 처리됩니다');
+  console.info('🚀 Supabase Edge Functions를 통한 안전한 API 호출');
+  console.info('📖 설정 가이드: secure_line_setup.html 참조');
 }

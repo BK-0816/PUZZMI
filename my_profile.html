@@ -1182,9 +1182,9 @@
     }
 
     // LINE Login URL 생성
-    function generateLineLoginUrl() {
+    async function generateLineLoginUrl() {
       try {
-        return LINE_CONFIG.generateLoginUrl(user.id);
+        return await LINE_CONFIG.generateLoginUrl(user.id);
       } catch (error) {
         console.error('LINE URL 생성 실패:', error);
         return null;

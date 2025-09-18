@@ -886,18 +886,20 @@
     loadMate();
 
     // LINE 연동 함수
-    window.connectLineAccount = function() {
-      import('./line_config.js').then(({ LINE_CONFIG }) => {
-        const lineLoginUrl = LINE_CONFIG.generateLoginUrl(user.id);
-      const popup = window.open(lineLoginUrl, 'lineLogin', 'width=500,height=600');
+    window.connectLineAccount = async function() {
+      const { LINE_CONFIG } = await import('./line_config.js');
+      const lineLoginUrl = await LINE_CONFIG.generateLoginUrl(user.id);
       
-      const checkAuth = setInterval(async () => {
-        if (popup.closed) {
-          clearInterval(checkAuth);
-          location.reload(); // 연동 후 페이지 새로고침
-        }
-      }, 1000);
-      });
+      if (lineLoginUrl) {
+        const popup = window.open(lineLoginUrl, 'lineLogin', 'width=500,height=600');
+      
+        const checkAuth = setInterval(async () => {
+          if (popup && popup.closed) {
+            clearInterval(checkAuth);
+            location.reload(); // 연동 후 페이지 새로고침
+          }
+        }, 1000);
+      }
     };
     // 오늘 날짜를 최소값으로 설정
     const today = new Date().toISOString().split('T')[0];

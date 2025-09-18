@@ -76,6 +76,13 @@
         const code = urlParams.get('code');
         const state = urlParams.get('state');
         const error = urlParams.get('error');
+        const isSimulation = urlParams.get('simulation') === 'true';
+        
+        // 시뮬레이션 모드 체크
+        if (isSimulation) {
+          handleSimulationCallback();
+          return;
+        }
         
         if (error) {
           throw new Error('LINE 로그인이 취소되었습니다.');
@@ -93,18 +100,15 @@
           throw new Error('사용자 정보를 찾을 수 없습니다.');
         }
         
-        // LINE API를 통한 실제 토큰 교환 및 프로필 조회
-        const { lineIdentityService } = await import('./line_identity_service.js');
+        // Supabase Edge Functions를 통한 안전한 LINE API 호출
+        const { LINE_CONFIG } = await import('./line_config.js');
         
         try {
-          // 1. Authorization Code → Access Token 교환
-          const tokenResponse = await lineIdentityService.exchangeCodeForToken(code);
+          // 1. Authorization Code → Access Token 교환 (서버사이드)
+          const tokenData = await LINE_CONFIG.exchangeCodeForToken(code);
           
-          // 2. Access Token으로 사용자 프로필 조회
-          const userProfile = await lineIdentityService.getLineUserProfile(tokenResponse.access_token);
-          
-          // 3. 신원 정보 추출
-          const identityInfo = await lineIdentityService.getLineIdentityInfo(tokenResponse.access_token);
+          // 2. Access Token으로 사용자 프로필 조회 (서버사이드)
+          const userProfile = await LINE_CONFIG.getUserProfile(tokenData.access_token);
           
           // 4. LINE 계정 정보 구성
           const lineAccountData = {
@@ -113,25 +117,31 @@
             line_display_name: userProfile.displayName,
             line_picture_url: userProfile.pictureUrl,
             is_verified: true,
-            access_token: tokenResponse.access_token,
-            refresh_token: tokenResponse.refresh_token || null,
-            token_expires_at: tokenResponse.expires_in ? 
-              new Date(Date.now() + tokenResponse.expires_in * 1000).toISOString() : null
+            access_token: tokenData.access_token,
+            refresh_token: tokenData.refresh_token || null,
+            token_expires_at: tokenData.expires_in ? 
+              new Date(Date.now() + tokenData.expires_in * 1000).toISOString() : null
           };
           
-          // 5. LINE 신원확인 처리
-          const verificationResult = await lineIdentityService.processLineIdentityVerification(
-            userId, 
-            userProfile, 
-            tokenResponse.access_token
-          );
+          // 5. Supabase에 LINE 계정 정보 저장
+          const supabaseUrl = Deno.env.get('SUPABASE_URL');
+          const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY');
           
-          // 6. LINE 계정 정보 저장
-          const { error: lineError } = await supabase
-            .from('user_line_accounts')
-            .upsert(lineAccountData, { onConflict: 'user_id' });
+          const saveResponse = await fetch(`${supabaseUrl}/rest/v1/user_line_accounts`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${supabaseKey}`,
+              'apikey': supabaseKey,
+              'Prefer': 'resolution=merge-duplicates'
+            },
+            body: JSON.stringify(lineAccountData)
+          });
           
-          if (lineError) throw lineError;
+          if (!saveResponse.ok) {
+            const errorText = await saveResponse.text();
+            throw new Error(`LINE 계정 저장 실패: ${saveResponse.status} ${errorText}`);
+          }
           
           // 부모 창에 성공 메시지 전달
           if (window.opener) {
@@ -139,7 +149,7 @@
               type: 'LINE_AUTH_SUCCESS',
               data: {
                 ...lineAccountData,
-                verification: verificationResult
+                serverProcessed: true
               }
             }, window.location.origin);
           }
@@ -148,30 +158,7 @@
           console.warn('실제 LINE API 호출 실패, 시뮬레이션 모드로 전환:', apiError);
           
           // API 호출 실패 시 시뮬레이션 데이터 사용
-          const mockLineData = {
-          user_id: userId,
-          line_user_id: 'U' + Math.random().toString(36).substr(2, 9),
-          line_display_name: '테스트 사용자',
-          line_picture_url: 'https://picsum.photos/200/200',
-          is_verified: true,
-          access_token: 'mock_access_token',
-          token_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30일 후
-          };
-        
-          // 시뮬레이션 데이터로 저장
-          const { error: lineError } = await supabase
-            .from('user_line_accounts')
-            .upsert(mockLineData, { onConflict: 'user_id' });
-        
-          if (lineError) throw lineError;
-        
-          // 부모 창에 성공 메시지 전달
-          if (window.opener) {
-            window.opener.postMessage({
-              type: 'LINE_AUTH_SUCCESS',
-              data: mockLineData
-            }, window.location.origin);
-          }
+          handleSimulationCallback();
         }
         
         // 창 닫기
@@ -235,57 +222,9 @@
     }
 
     // 콜백 처리 시작
-    // URL 파라미터 확인
-    const urlParams = new URLSearchParams(window.location.search);
-    const isSimulation = urlParams.get('simulation') === 'true';
+    processLineCallback();
     
-    if (isSimulation) {
-      // 시뮬레이션 모드
-      handleSimulationCallback();
-    } else {
-      // 실제 LINE API 모드
-      processLineCallback();
-    }
-    
-    // 시뮬레이션 콜백 처리
-    function handleSimulationCallback() {
-      const userId = urlParams.get('userId');
-      
-      if (!userId) {
-        if (window.opener) {
-          window.opener.postMessage({
-            type: 'LINE_AUTH_ERROR',
-            error: '사용자 정보를 찾을 수 없습니다.'
-          }, window.location.origin);
-        }
         window.close();
-        return;
-      }
-      
-      // 시뮬레이션 성공 데이터
-      const mockLineData = {
-        user_id: userId,
-        line_user_id: 'U' + Math.random().toString(36).substr(2, 9),
-        line_display_name: '테스트 사용자',
-        line_picture_url: 'https://picsum.photos/200/200',
-        is_verified: true,
-        access_token: 'mock_access_token',
-        token_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-      };
-      
-      // 부모 창에 성공 메시지 전달
-      if (window.opener) {
-        window.opener.postMessage({
-          type: 'LINE_AUTH_SUCCESS',
-          data: mockLineData,
-          simulation: true
-        }, window.location.origin);
-      }
-      
-      // 창 닫기
-      setTimeout(() => {
-        window.close();
-      }, 1000);
     }
   </script>
 </body>
