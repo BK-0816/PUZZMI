@@ -306,6 +306,57 @@
         </div>
         <div class="row">
           <div class="field">
+            <div class="label">성별</div>
+            <select class="input" id="signup_gender">
+              <option value="">선택 안함</option>
+              <option value="여성">여성</option>
+              <option value="남성">남성</option>
+              <option value="기타">기타</option>
+            </select>
+          </div>
+          <div class="field">
+            <div class="label">전화번호</div>
+            <input class="input" id="signup_phone" type="tel" placeholder="010-1234-5678"/>
+          </div>
+        </div>
+        <div class="row single">
+          <div class="field">
+            <div class="label">국적</div>
+            <select class="input" id="signup_nationality">
+              <option value="">선택 안함</option>
+              <option value="한국">🇰🇷 한국</option>
+              <option value="일본">🇯🇵 일본</option>
+              <option value="중국">🇨🇳 중국</option>
+              <option value="미국">🇺🇸 미국</option>
+              <option value="기타">🌍 기타</option>
+            </select>
+          </div>
+        </div>
+        <div class="row single">
+          <div class="field">
+            <div class="label">사용 가능한 언어 (복수 선택 가능)</div>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap; padding: 12px; background: rgba(102, 126, 234, 0.05); border-radius: 8px;">
+              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="checkbox" value="한국어" class="signup-language"/>
+                <span>🇰🇷 한국어</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="checkbox" value="日本語" class="signup-language"/>
+                <span>🇯🇵 日本語</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="checkbox" value="English" class="signup-language"/>
+                <span>🇺🇸 English</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="checkbox" value="中文" class="signup-language"/>
+                <span>🇨🇳 中文</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="field">
             <div class="label">이메일</div>
             <input class="input" id="signup_email" type="email" required/>
           </div>
@@ -396,6 +447,15 @@
       const full_name = document.getElementById('signup_name').value.trim();
       const ageRaw = document.getElementById('signup_age').value;
       const age = ageRaw ? parseInt(ageRaw, 10) : null;
+      const gender = document.getElementById('signup_gender').value || null;
+      const phone_number = document.getElementById('signup_phone').value.trim() || null;
+      const nationality = document.getElementById('signup_nationality').value || null;
+      
+      // 선택된 언어들 수집
+      const selectedLanguages = Array.from(document.querySelectorAll('.signup-language:checked'))
+        .map(cb => cb.value);
+      const languages = selectedLanguages.length > 0 ? selectedLanguages : null;
+      
       const email = document.getElementById('signup_email').value.trim();
       const password = document.getElementById('signup_password').value;
       
@@ -409,10 +469,25 @@
         error ? ('<div class="error">' + error.message + '</div>') : '<div class="success">가입 완료</div>';
       
       if (data?.user?.id) {
+        // 프로필 완성도 계산
+        let completion = 20; // 기본 20점 (이름, 이메일)
+        if (age) completion += 10;
+        if (gender) completion += 10;
+        if (phone_number) completion += 15;
+        if (nationality) completion += 10;
+        if (languages && languages.length > 0) completion += 15;
+        if (completion > 100) completion = 100;
+        
         await supabase.from('profiles').upsert({
           id: data.user.id,
           full_name,
-          age
+          age,
+          gender,
+          phone_number,
+          nationality,
+          languages,
+          profile_completion: completion,
+          updated_at: new Date().toISOString()
         }, { onConflict: 'id' });
       }
       render();
