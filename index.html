@@ -129,39 +129,70 @@ async function refreshHeartCount() {
     const from = page * PAGE_SIZE;
     const to   = from + PAGE_SIZE - 1;
 
-    let query = supabase
-      .from("mate_profiles")
-      .select(`
-        user_id, bio, hourly_rate, tags, areas, is_verified, rating, photos, primary_photo,
-        profiles:profiles ( id, full_name, age, gender, languages, avatar_url )
-      `, { count: "exact" })
-      .order("rating", { ascending: false })
-      .range(from, to);
+    // Retry logic for network issues
+    let retryCount = 0;
+    const maxRetries = 3;
+    
+    while (retryCount < maxRetries) {
+      try {
+        let query = supabase
+          .from("mate_profiles")
+          .select(`
+            user_id, bio, hourly_rate, tags, areas, is_verified, rating, photos, primary_photo,
+            profiles:profiles ( id, full_name, age, gender, languages, avatar_url )
+          `, { count: "exact" })
+          .order("rating", { ascending: false })
+          .range(from, to);
 
-    if (ONLY_VERIFIED) query = query.eq("is_verified", true);
+        if (ONLY_VERIFIED) query = query.eq("is_verified", true);
 
-    const { data, error, count } = await query;
+        const { data, error, count } = await query;
 
-    if (error) {
-      console.error("loadMates error:", error);
-      if (!grid.innerHTML) {
-        grid.innerHTML = `<p style="padding:16px">메이트를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.</p>`;
+        if (error) {
+          throw error;
+        }
+
+        // Success - process the data
+        (data || []).forEach(renderCard);
+
+        const fetched = (data || []).length;
+        const total   = typeof count === "number" ? count : (from + fetched);
+        hasMore = (from + fetched) < total;
+
+        if (loadMoreBtn) loadMoreBtn.style.display = hasMore ? "inline-block" : "none";
+        if (hasMore) page += 1;
+
+        isLoading = false;
+        return; // Success, exit retry loop
+        
+      } catch (error) {
+        console.error(`loadMates error (attempt ${retryCount + 1}):`, error);
+        retryCount++;
+        
+        if (retryCount >= maxRetries) {
+          // Final failure after all retries
+          if (!grid.innerHTML) {
+            grid.innerHTML = `
+              <div style="padding:16px; text-align:center;">
+                <p>메이트를 불러오지 못했습니다.</p>
+                <p style="font-size:0.9em; color:#666; margin-top:8px;">
+                  네트워크 연결을 확인하고 페이지를 새로고침해주세요.
+                </p>
+                <button onclick="location.reload()" style="margin-top:12px; padding:8px 16px; background:#667eea; color:white; border:none; border-radius:4px; cursor:pointer;">
+                  새로고침
+                </button>
+              </div>
+            `;
+          }
+          loadMoreBtn && (loadMoreBtn.style.display = "none");
+          isLoading = false;
+          return;
+        }
+        
+        // Wait before retry (exponential backoff)
+        await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount) * 1000));
       }
-      loadMoreBtn && (loadMoreBtn.style.display = "none");
-      isLoading = false;
-      return;
     }
-
-    (data || []).forEach(renderCard);
-
-    const fetched = (data || []).length;
-    const total   = typeof count === "number" ? count : (from + fetched);
-    hasMore = (from + fetched) < total;
-
-    if (loadMoreBtn) loadMoreBtn.style.display = hasMore ? "inline-block" : "none";
-    if (hasMore) page += 1;
-
-    isLoading = false;
   }
 
   loadMoreBtn?.addEventListener("click", () => loadMates());
