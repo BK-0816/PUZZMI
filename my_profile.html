@@ -936,6 +936,8 @@
 
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+    import { LINE_CONFIG } from './line_config.js';
+    
     const supabase = createClient(
       "https://eevvgbbokenpjnvtmztk.supabase.co",
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4"
@@ -1057,7 +1059,7 @@
     }
 
     // LINE 연동 함수
-    async function connectLine() {
+    function connectLine() {
       const btn = document.getElementById('connectLineBtn');
       const statusEl = document.getElementById('lineConnectionStatus');
       
@@ -1066,7 +1068,7 @@
       
       try {
         // LINE Login URL 생성
-        const lineLoginUrl = await generateLineLoginUrl();
+        const lineLoginUrl = generateLineLoginUrl();
         
         if (!lineLoginUrl) {
           throw new Error('LINE 로그인 URL 생성에 실패했습니다.');
@@ -1080,44 +1082,12 @@
         }
         
         // 팝업 완료 대기
-        const checkAuth = setInterval(async () => {
+        const checkAuth = setInterval(() => {
           if (popup && popup.closed) {
             clearInterval(checkAuth);
             
-            // 시뮬레이션: LINE 연동 성공
-            const mockLineData = {
-              user_id: user.id,
-              line_user_id: 'U' + Math.random().toString(36).substr(2, 9),
-              line_display_name: fullNameEl.value || '사용자',
-              line_picture_url: 'https://picsum.photos/200/200',
-              is_verified: true,
-              access_token: 'mock_access_token',
-              token_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-            };
-            
-            // LINE 계정 정보 저장
-            const { error: lineError } = await supabase
-              .from('user_line_accounts')
-              .upsert(mockLineData, { onConflict: 'user_id' });
-            
-            if (lineError) throw lineError;
-            
-            // 인증 상태 저장
-            await supabase
-              .from('user_verifications')
-              .upsert({
-                user_id: user.id,
-                verification_type: 'line',
-                is_verified: true,
-                verified_at: new Date().toISOString(),
-                verification_data: {
-                  line_user_id: mockLineData.line_user_id,
-                  display_name: mockLineData.line_display_name
-                }
-              }, { onConflict: 'user_id,verification_type' });
-            
-            showToast('✅ LINE 계정이 성공적으로 연동되었습니다!');
-            await checkLineConnection(); // 상태 새로고침
+            // 비동기 작업을 별도 함수로 분리
+            handleLineConnectionSuccess();
           }
         }, 1000);
         
@@ -1127,6 +1097,49 @@
         
         btn.disabled = false;
         btn.innerHTML = '<i class="fab fa-line"></i> LINE 계정 연동하기';
+      }
+    }
+
+    // LINE 연동 성공 처리 (비동기)
+    async function handleLineConnectionSuccess() {
+      try {
+        // 시뮬레이션: LINE 연동 성공
+        const mockLineData = {
+          user_id: user.id,
+          line_user_id: 'U' + Math.random().toString(36).substr(2, 9),
+          line_display_name: fullNameEl.value || '사용자',
+          line_picture_url: 'https://picsum.photos/200/200',
+          is_verified: true,
+          access_token: 'mock_access_token',
+          token_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+        };
+        
+        // LINE 계정 정보 저장
+        const { error: lineError } = await supabase
+          .from('user_line_accounts')
+          .upsert(mockLineData, { onConflict: 'user_id' });
+        
+        if (lineError) throw lineError;
+        
+        // 인증 상태 저장
+        await supabase
+          .from('user_verifications')
+          .upsert({
+            user_id: user.id,
+            verification_type: 'line',
+            is_verified: true,
+            verified_at: new Date().toISOString(),
+            verification_data: {
+              line_user_id: mockLineData.line_user_id,
+              display_name: mockLineData.line_display_name
+            }
+          }, { onConflict: 'user_id,verification_type' });
+        
+        showToast('✅ LINE 계정이 성공적으로 연동되었습니다!');
+        await checkLineConnection(); // 상태 새로고침
+      } catch (error) {
+        console.error('LINE 연동 처리 실패:', error);
+        showToast('❌ LINE 연동 처리 실패: ' + error.message);
       }
     }
 
@@ -1169,13 +1182,11 @@
     }
 
     // LINE Login URL 생성
-    async function generateLineLoginUrl() {
-      // line_config.js에서 URL 생성
-      const { LINE_CONFIG } = await import('./line_config.js');
+    function generateLineLoginUrl() {
       try {
         return LINE_CONFIG.generateLoginUrl(user.id);
       } catch (error) {
-        console.error('LINE config 로드 실패:', error);
+        console.error('LINE URL 생성 실패:', error);
         return null;
       }
     }
