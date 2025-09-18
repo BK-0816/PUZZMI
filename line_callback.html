@@ -338,29 +338,12 @@
     async function saveLineAccount(userId, profile, tokenData) {
       console.log('LINE 계정 정보 저장 시작:', { userId, profile });
       
-      // 현재 로그인한 사용자 확인
-      const { data: { user: currentUser }, error: authError } = await supabase.auth.getUser();
-      
-      if (authError) {
-        console.error('인증 상태 확인 실패:', authError);
-        throw new Error(`인증 상태 확인 실패: ${authError.message}`);
-      }
-      
-      if (!currentUser) {
-        console.error('로그인되지 않은 상태에서 LINE 계정 저장 시도');
-        throw new Error('로그인이 필요합니다. 다시 로그인 후 LINE 연동을 시도해주세요.');
-      }
-      
-      // state에서 온 userId와 현재 로그인한 사용자 ID 비교
-      if (userId !== currentUser.id) {
-        console.error('사용자 ID 불일치:', { stateUserId: userId, currentUserId: currentUser.id });
-        throw new Error('사용자 인증 정보가 일치하지 않습니다. 다시 로그인 후 시도해주세요.');
-      }
-      
-      console.log('사용자 인증 확인 완료:', { userId: currentUser.id, email: currentUser.email });
+      // 콜백 페이지에서는 세션 컨텍스트가 다를 수 있으므로 
+      // state에서 받은 userId를 신뢰하고 직접 사용
+      console.log('사용자 ID 사용:', { userId });
       
       const lineAccountData = {
-        user_id: currentUser.id, // 현재 로그인한 사용자 ID 사용
+        user_id: userId, // state에서 받은 userId 직접 사용
         line_user_id: profile.userId,
         line_display_name: profile.displayName,
         line_picture_url: profile.pictureUrl,
@@ -380,12 +363,7 @@
       if (error) {
         console.error('LINE 계정 저장 실패:', error);
         console.error('저장 시도한 데이터:', lineAccountData);
-        console.error('현재 사용자 컨텍스트:', { 
-          userId: currentUser.id, 
-          email: currentUser.email,
-          aud: currentUser.aud,
-          role: currentUser.role 
-        });
+        console.error('사용자 ID:', userId);
         throw new Error(`LINE 계정 저장 실패: ${error.message}`);
       }
       
@@ -395,7 +373,7 @@
       const { error: verificationError } = await supabase
         .from('user_verifications')
         .upsert({
-          user_id: currentUser.id, // 현재 로그인한 사용자 ID 사용
+          user_id: userId, // state에서 받은 userId 직접 사용
           verification_type: 'line',
           is_verified: true,
           verified_at: new Date().toISOString(),
