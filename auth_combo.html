@@ -242,6 +242,29 @@
     /* 숨김 상태 */
     .hidden { display: none !important; }
     
+    /* 액션 버튼 그룹 */
+    .action-buttons {
+      display: flex;
+      gap: 16px;
+      margin-top: 32px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .action-buttons .btn {
+      flex: 1;
+      min-width: 140px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+    
+    .action-buttons .btn i {
+      font-size: 1rem;
+    }
+    
     /* 반응형 디자인 */
     @media (max-width: 640px) {
       .page {
@@ -259,6 +282,15 @@
       
       .row:not(.single) {
         flex-direction: column;
+      }
+      
+      .action-buttons {
+        flex-direction: column;
+        gap: 12px;
+      }
+      
+      .action-buttons .btn {
+        width: 100%;
       }
     }
   </style>
@@ -308,8 +340,18 @@
         </div>
       </div>
 
-      <div class="spacer"></div>
-      <button id="logout" class="btn btn-secondary">로그아웃</button>
+      <!-- 액션 버튼들 -->
+      <div class="action-buttons">
+        <a href="index.html" class="btn btn-secondary">
+          <i class="fas fa-home"></i>
+          메인페이지
+        </a>
+        <button id="logout" class="btn btn-secondary">
+          <i class="fas fa-sign-out-alt"></i>
+          로그아웃
+        </button>
+      </div>
+      
       <div id="whoami" class="muted"></div>
     </section>
   </main>
