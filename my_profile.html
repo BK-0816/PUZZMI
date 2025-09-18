@@ -938,475 +938,477 @@
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
     import { LINE_CONFIG } from './line_config.js';
     
-    const supabase = createClient(
-      "https://eevvgbbokenpjnvtmztk.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4"
-    );
+    (async () => {
+      const supabase = createClient(
+        "https://eevvgbbokenpjnvtmztk.supabase.co",
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4"
+      );
 
-    // 로그인 체크
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      const redir = encodeURIComponent('my_profile.html');
-      location.replace(`auth_combo.html?redirect=${redir}`);
-      throw new Error('login required');
-    }
-
-    // DOM 요소들
-    const progressFill = document.getElementById('progressFill');
-    const progressText = document.getElementById('progressText');
-    const accountStatus = document.getElementById('accountStatus');
-
-    // 폼 요소들
-    const fullNameEl = document.getElementById('fullName');
-    const birthDateEl = document.getElementById('birthDate');
-    const genderEl = document.getElementById('gender');
-    const phoneNumberEl = document.getElementById('phoneNumber');
-    const nationalityEl = document.getElementById('nationality');
-    const residenceEl = document.getElementById('residence');
-    const occupationEl = document.getElementById('occupation');
-    const currentEmailEl = document.getElementById('currentEmail');
-
-    // 결과 메시지 요소들
-    const basicInfoResult = document.getElementById('basicInfoResult');
-    const detailInfoResult = document.getElementById('detailInfoResult');
-    const passwordResult = document.getElementById('passwordResult');
-
-    // 프로필 완성도 계산
-    function calculateCompletion(profile) {
-      const fields = [
-        profile.full_name,
-        profile.birth_date,
-        profile.gender,
-        profile.phone_number,
-        profile.nationality,
-        profile.residence,
-        profile.occupation,
-        profile.languages && profile.languages.length > 0,
-        profile.interests && profile.interests.length > 0
-      ];
-      
-      const completed = fields.filter(Boolean).length;
-      return Math.round((completed / fields.length) * 100);
-    }
-
-    // LINE 연동 상태 확인 및 UI 업데이트
-    async function checkLineConnection() {
-      const statusEl = document.getElementById('lineConnectionStatus');
-      const actionsEl = document.getElementById('lineActions');
-      
-      try {
-        const { data: lineAccount, error } = await supabase
-          .from('user_line_accounts')
-          .select('*')
-          .eq('user_id', user.id)
-          .maybeSingle();
-        
-        if (error) throw error;
-        
-        if (lineAccount && lineAccount.is_verified) {
-          // 연동됨
-          statusEl.className = 'help-text line-status-connected';
-          statusEl.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-              <i class="fas fa-check-circle" style="color: #28a745;"></i>
-              <strong>LINE 계정이 연동되어 있습니다</strong>
-            </div>
-            <div style="font-size: 0.9rem;">
-              연동된 계정: ${lineAccount.line_display_name || '사용자'}<br>
-              연동일: ${new Date(lineAccount.connected_at).toLocaleDateString('ko-KR')}
-            </div>
-          `;
-          
-          actionsEl.innerHTML = `
-            <button class="btn btn-danger" id="disconnectLineBtn">
-              <i class="fab fa-line"></i>
-              LINE 연동 해제
-            </button>
-          `;
-          
-          // 연동 해제 이벤트
-          document.getElementById('disconnectLineBtn').addEventListener('click', disconnectLine);
-          
-        } else {
-          // 연동 안됨
-          statusEl.className = 'help-text line-status-disconnected';
-          statusEl.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-              <i class="fas fa-exclamation-triangle" style="color: #ffc107;"></i>
-              <strong>LINE 계정이 연동되지 않았습니다</strong>
-            </div>
-            <div style="font-size: 0.9rem;">
-              예약 확정 및 결제 안내를 받으려면 LINE 연동이 필요합니다.
-            </div>
-          `;
-          
-          actionsEl.innerHTML = `
-            <button class="btn btn-line" id="connectLineBtn">
-              <i class="fab fa-line"></i>
-              LINE 계정 연동하기
-            </button>
-          `;
-          
-          // 연동 이벤트
-          document.getElementById('connectLineBtn').addEventListener('click', connectLine);
-        }
-        
-      } catch (error) {
-        console.error('LINE 연동 상태 확인 실패:', error);
-        statusEl.className = 'help-text error';
-        statusEl.textContent = 'LINE 연동 상태를 확인할 수 없습니다.';
+      // 로그인 체크
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        const redir = encodeURIComponent('my_profile.html');
+        location.replace(`auth_combo.html?redirect=${redir}`);
+        throw new Error('login required');
       }
-    }
 
-    // LINE 연동 함수
-    function connectLine() {
-      const btn = document.getElementById('connectLineBtn');
-      const statusEl = document.getElementById('lineConnectionStatus');
-      
-      btn.disabled = true;
-      btn.innerHTML = '<div class="loading"></div> 연동 중...';
-      
-      try {
-        // LINE Login URL 생성
-        const lineLoginUrl = await generateLineLoginUrl();
+      // DOM 요소들
+      const progressFill = document.getElementById('progressFill');
+      const progressText = document.getElementById('progressText');
+      const accountStatus = document.getElementById('accountStatus');
+
+      // 폼 요소들
+      const fullNameEl = document.getElementById('fullName');
+      const birthDateEl = document.getElementById('birthDate');
+      const genderEl = document.getElementById('gender');
+      const phoneNumberEl = document.getElementById('phoneNumber');
+      const nationalityEl = document.getElementById('nationality');
+      const residenceEl = document.getElementById('residence');
+      const occupationEl = document.getElementById('occupation');
+      const currentEmailEl = document.getElementById('currentEmail');
+
+      // 결과 메시지 요소들
+      const basicInfoResult = document.getElementById('basicInfoResult');
+      const detailInfoResult = document.getElementById('detailInfoResult');
+      const passwordResult = document.getElementById('passwordResult');
+
+      // 프로필 완성도 계산
+      function calculateCompletion(profile) {
+        const fields = [
+          profile.full_name,
+          profile.birth_date,
+          profile.gender,
+          profile.phone_number,
+          profile.nationality,
+          profile.residence,
+          profile.occupation,
+          profile.languages && profile.languages.length > 0,
+          profile.interests && profile.interests.length > 0
+        ];
         
-        if (!lineLoginUrl) {
-          throw new Error('LINE 로그인 URL 생성에 실패했습니다.');
-        }
+        const completed = fields.filter(Boolean).length;
+        return Math.round((completed / fields.length) * 100);
+      }
+
+      // LINE 연동 상태 확인 및 UI 업데이트
+      async function checkLineConnection() {
+        const statusEl = document.getElementById('lineConnectionStatus');
+        const actionsEl = document.getElementById('lineActions');
         
-        console.log('생성된 LINE URL:', lineLoginUrl);
-        
-        // 팝업 열기
-        const popup = window.open(lineLoginUrl, 'lineLogin', 'width=500,height=600,scrollbars=yes,resizable=yes');
-        
-        if (!popup) {
-          throw new Error('팝업이 차단되었습니다. 팝업 차단을 해제하고 다시 시도해주세요.');
-        }
-        
-        // 팝업 완료 대기
-        const checkAuth = setInterval(async () => {
-          if (popup && popup.closed) {
-            clearInterval(checkAuth);
-            console.log('팝업이 닫혔습니다. 연동 상태 확인 중...');
-            // 잠시 대기 후 상태 확인
-            setTimeout(async () => {
-              await checkLineConnection();
-              btn.disabled = false;
-              btn.innerHTML = '<i class="fab fa-line"></i> LINE 계정 연동하기';
-            }, 1000);
+        try {
+          const { data: lineAccount, error } = await supabase
+            .from('user_line_accounts')
+            .select('*')
+            .eq('user_id', user.id)
+            .maybeSingle();
+          
+          if (error) throw error;
+          
+          if (lineAccount && lineAccount.is_verified) {
+            // 연동됨
+            statusEl.className = 'help-text line-status-connected';
+            statusEl.innerHTML = `
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                <i class="fas fa-check-circle" style="color: #28a745;"></i>
+                <strong>LINE 계정이 연동되어 있습니다</strong>
+              </div>
+              <div style="font-size: 0.9rem;">
+                연동된 계정: ${lineAccount.line_display_name || '사용자'}<br>
+                연동일: ${new Date(lineAccount.connected_at).toLocaleDateString('ko-KR')}
+              </div>
+            `;
+            
+            actionsEl.innerHTML = `
+              <button class="btn btn-danger" id="disconnectLineBtn">
+                <i class="fab fa-line"></i>
+                LINE 연동 해제
+              </button>
+            `;
+            
+            // 연동 해제 이벤트
+            document.getElementById('disconnectLineBtn').addEventListener('click', disconnectLine);
+            
+          } else {
+            // 연동 안됨
+            statusEl.className = 'help-text line-status-disconnected';
+            statusEl.innerHTML = `
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                <i class="fas fa-exclamation-triangle" style="color: #ffc107;"></i>
+                <strong>LINE 계정이 연동되지 않았습니다</strong>
+              </div>
+              <div style="font-size: 0.9rem;">
+                예약 확정 및 결제 안내를 받으려면 LINE 연동이 필요합니다.
+              </div>
+            `;
+            
+            actionsEl.innerHTML = `
+              <button class="btn btn-line" id="connectLineBtn">
+                <i class="fab fa-line"></i>
+                LINE 계정 연동하기
+              </button>
+            `;
+            
+            // 연동 이벤트
+            document.getElementById('connectLineBtn').addEventListener('click', connectLine);
           }
-        }, 1000);
-        
-        // 메시지 리스너 추가 (콜백에서 오는 메시지 처리)
-        const messageHandler = (event) => {
-          if (event.data && event.data.type === 'LINE_AUTH_SUCCESS') {
-            console.log('LINE 연동 성공 메시지 받음:', event.data);
-            showToast('✅ LINE 계정이 성공적으로 연동되었습니다!');
-            window.removeEventListener('message', messageHandler);
-          } else if (event.data && event.data.type === 'LINE_AUTH_ERROR') {
-            console.error('LINE 연동 실패 메시지 받음:', event.data);
-            showToast('❌ LINE 연동 실패: ' + event.data.error);
-            window.removeEventListener('message', messageHandler);
-          }
-        };
-        
-        window.addEventListener('message', messageHandler);
-        
-      } catch (error) {
-        console.error('LINE 연동 오류:', error);
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fab fa-line"></i> LINE 계정 연동하기';
-        showToast('❌ LINE 연동 오류: ' + error.message);
-      }
-    }
-
-    // LINE 연동 해제 함수
-    async function disconnectLine() {
-      if (!confirm('정말로 LINE 연동을 해제하시겠습니까?\n\n연동을 해제하면 예약 관련 알림을 받을 수 없습니다.')) {
-        return;
-      }
-      
-      const btn = document.getElementById('disconnectLineBtn');
-      btn.disabled = true;
-      btn.innerHTML = '<div class="loading"></div> 해제 중...';
-      
-      try {
-        // LINE 계정 정보 삭제
-        const { error: lineError } = await supabase
-          .from('user_line_accounts')
-          .delete()
-          .eq('user_id', user.id);
-        
-        if (lineError) throw lineError;
-        
-        // 인증 상태 삭제
-        await supabase
-          .from('user_verifications')
-          .delete()
-          .eq('user_id', user.id)
-          .eq('verification_type', 'line');
-        
-        showToast('💔 LINE 연동이 해제되었습니다');
-        await checkLineConnection(); // 상태 새로고침
-        
-      } catch (error) {
-        console.error('LINE 연동 해제 실패:', error);
-        showToast('❌ LINE 연동 해제 실패: ' + error.message);
-        
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fab fa-line"></i> LINE 연동 해제';
-      }
-    }
-
-    // LINE Login URL 생성
-    async function generateLineLoginUrl() {
-      try {
-        return await LINE_CONFIG.generateLoginUrl(user.id);
-      } catch (error) {
-        console.error('LINE URL 생성 실패:', error);
-        return null;
-      }
-    }
-    // 프로필 데이터 로드
-    async function loadProfile() {
-      try {
-        const { data: profile, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-
-        if (error) throw error;
-
-        // 기본 정보 채우기
-        fullNameEl.value = profile.full_name || '';
-        birthDateEl.value = profile.birth_date || '';
-        genderEl.value = profile.gender || '';
-        phoneNumberEl.value = profile.phone_number || '';
-        nationalityEl.value = profile.nationality || '';
-        residenceEl.value = profile.residence || '';
-        occupationEl.value = profile.occupation || '';
-        currentEmailEl.value = user.email || '';
-
-        // 언어 체크박스
-        const languages = Array.isArray(profile.languages) ? profile.languages : [];
-        document.querySelectorAll('#languageGroup input[type="checkbox"]').forEach(cb => {
-          cb.checked = languages.includes(cb.value);
-        });
-
-        // 관심사 체크박스
-        const interests = Array.isArray(profile.interests) ? profile.interests : [];
-        document.querySelectorAll('#interestsGroup input[type="checkbox"]').forEach(cb => {
-          cb.checked = interests.includes(cb.value);
-        });
-
-        // 프로필 완성도 업데이트
-        const completion = calculateCompletion(profile);
-        progressFill.style.width = completion + '%';
-        progressText.textContent = completion + '% 완성';
-
-        // 계정 상태 업데이트
-        const statusIcon = accountStatus.querySelector('.status-icon');
-        const statusText = accountStatus.querySelector('.status-text');
-        
-        if (profile.account_status === 'active') {
-          statusIcon.className = 'status-icon status-active';
-          statusIcon.textContent = '✓';
-          statusText.textContent = '계정 활성화됨';
-        } else {
-          statusIcon.className = 'status-icon status-pending';
-          statusIcon.textContent = '⏳';
-          statusText.textContent = '계정 검토 중';
+          
+        } catch (error) {
+          console.error('LINE 연동 상태 확인 실패:', error);
+          statusEl.className = 'help-text error';
+          statusEl.textContent = 'LINE 연동 상태를 확인할 수 없습니다.';
         }
-
-      } catch (error) {
-        console.error('프로필 로드 실패:', error);
-        basicInfoResult.innerHTML = `<div class="error">❌ 프로필 로드 실패: ${error.message}</div>`;
       }
-    }
 
-    // 기본 정보 저장
-    document.getElementById('basicInfoForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const submitBtn = e.target.querySelector('button[type="submit"]');
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = '<div class="loading"></div> 저장 중...';
-      
-      try {
-        // 생년월일에서 나이 계산
-        let age = null;
-        if (birthDateEl.value) {
-          const today = new Date();
-          const birthDate = new Date(birthDateEl.value);
-          age = today.getFullYear() - birthDate.getFullYear();
-          const monthDiff = today.getMonth() - birthDate.getMonth();
-          if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-            age--;
+      // LINE 연동 함수
+      async function connectLine() {
+        const btn = document.getElementById('connectLineBtn');
+        const statusEl = document.getElementById('lineConnectionStatus');
+        
+        btn.disabled = true;
+        btn.innerHTML = '<div class="loading"></div> 연동 중...';
+        
+        try {
+          // LINE Login URL 생성
+          const lineLoginUrl = await generateLineLoginUrl();
+          
+          if (!lineLoginUrl) {
+            throw new Error('LINE 로그인 URL 생성에 실패했습니다.');
           }
+          
+          console.log('생성된 LINE URL:', lineLoginUrl);
+          
+          // 팝업 열기
+          const popup = window.open(lineLoginUrl, 'lineLogin', 'width=500,height=600,scrollbars=yes,resizable=yes');
+          
+          if (!popup) {
+            throw new Error('팝업이 차단되었습니다. 팝업 차단을 해제하고 다시 시도해주세요.');
+          }
+          
+          // 팝업 완료 대기
+          const checkAuth = setInterval(async () => {
+            if (popup && popup.closed) {
+              clearInterval(checkAuth);
+              console.log('팝업이 닫혔습니다. 연동 상태 확인 중...');
+              // 잠시 대기 후 상태 확인
+              setTimeout(async () => {
+                await checkLineConnection();
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fab fa-line"></i> LINE 계정 연동하기';
+              }, 1000);
+            }
+          }, 1000);
+          
+          // 메시지 리스너 추가 (콜백에서 오는 메시지 처리)
+          const messageHandler = (event) => {
+            if (event.data && event.data.type === 'LINE_AUTH_SUCCESS') {
+              console.log('LINE 연동 성공 메시지 받음:', event.data);
+              showToast('✅ LINE 계정이 성공적으로 연동되었습니다!');
+              window.removeEventListener('message', messageHandler);
+            } else if (event.data && event.data.type === 'LINE_AUTH_ERROR') {
+              console.error('LINE 연동 실패 메시지 받음:', event.data);
+              showToast('❌ LINE 연동 실패: ' + event.data.error);
+              window.removeEventListener('message', messageHandler);
+            }
+          };
+          
+          window.addEventListener('message', messageHandler);
+          
+        } catch (error) {
+          console.error('LINE 연동 오류:', error);
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fab fa-line"></i> LINE 계정 연동하기';
+          showToast('❌ LINE 연동 오류: ' + error.message);
         }
-
-        const updateData = {
-          full_name: fullNameEl.value.trim() || null,
-          birth_date: birthDateEl.value || null,
-          age: age,
-          gender: genderEl.value || null,
-          phone_number: phoneNumberEl.value.trim() || null,
-          updated_at: new Date().toISOString()
-        };
-
-        const { error } = await supabase
-          .from('profiles')
-          .update(updateData)
-          .eq('id', user.id);
-
-        if (error) throw error;
-
-        basicInfoResult.innerHTML = '<div class="success">✅ 기본정보가 저장되었습니다!</div>';
-        await loadProfile(); // 완성도 업데이트
-
-      } catch (error) {
-        console.error('기본정보 저장 실패:', error);
-        basicInfoResult.innerHTML = `<div class="error">❌ 저장 실패: ${error.message}</div>`;
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '💾 기본정보 저장';
       }
-    });
 
-    // 상세 정보 저장
-    document.getElementById('detailInfoForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const submitBtn = e.target.querySelector('button[type="submit"]');
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = '<div class="loading"></div> 저장 중...';
-      
-      try {
-        // 선택된 언어들 수집
-        const selectedLanguages = Array.from(document.querySelectorAll('#languageGroup input[type="checkbox"]:checked'))
-          .map(cb => cb.value);
-
-        // 선택된 관심사들 수집
-        const selectedInterests = Array.from(document.querySelectorAll('#interestsGroup input[type="checkbox"]:checked'))
-          .map(cb => cb.value);
-
-        const updateData = {
-          nationality: nationalityEl.value || null,
-          residence: residenceEl.value.trim() || null,
-          occupation: occupationEl.value.trim() || null,
-          languages: selectedLanguages.length > 0 ? selectedLanguages : null,
-          interests: selectedInterests.length > 0 ? selectedInterests : null,
-          updated_at: new Date().toISOString()
-        };
-
-        const { error } = await supabase
-          .from('profiles')
-          .update(updateData)
-          .eq('id', user.id);
-
-        if (error) throw error;
-
-        detailInfoResult.innerHTML = '<div class="success">✅ 상세정보가 저장되었습니다!</div>';
-        await loadProfile(); // 완성도 업데이트
-
-      } catch (error) {
-        console.error('상세정보 저장 실패:', error);
-        detailInfoResult.innerHTML = `<div class="error">❌ 저장 실패: ${error.message}</div>`;
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '🚀 상세정보 저장';
-      }
-    });
-
-    // 비밀번호 변경
-    document.getElementById('passwordForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const newPassword = document.getElementById('newPassword').value;
-      const confirmPassword = document.getElementById('confirmPassword').value;
-      const submitBtn = e.target.querySelector('button[type="submit"]');
-      
-      if (newPassword !== confirmPassword) {
-        passwordResult.innerHTML = '<div class="error">❌ 비밀번호가 일치하지 않습니다.</div>';
-        return;
-      }
-      
-      if (newPassword.length < 8) {
-        passwordResult.innerHTML = '<div class="error">❌ 비밀번호는 8자 이상이어야 합니다.</div>';
-        return;
-      }
-      
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = '<div class="loading"></div> 변경 중...';
-      
-      try {
-        const { error } = await supabase.auth.updateUser({
-          password: newPassword
-        });
-
-        if (error) throw error;
-
-        passwordResult.innerHTML = '<div class="success">✅ 비밀번호가 변경되었습니다!</div>';
-        document.getElementById('newPassword').value = '';
-        document.getElementById('confirmPassword').value = '';
-
-      } catch (error) {
-        console.error('비밀번호 변경 실패:', error);
-        passwordResult.innerHTML = `<div class="error">❌ 변경 실패: ${error.message}</div>`;
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '🔒 비밀번호 변경';
-      }
-    });
-
-    // 계정 삭제 확인
-    window.confirmAccountDeletion = function() {
-      const confirmText = '정말로 계정을 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없으며, 모든 데이터가 영구적으로 삭제됩니다.\n\n계속하려면 "삭제"를 입력해주세요.';
-      const userInput = prompt(confirmText);
-      
-      if (userInput === '삭제') {
-        deleteAccount();
-      } else if (userInput !== null) {
-        alert('입력이 올바르지 않습니다. 계정 삭제가 취소되었습니다.');
-      }
-    };
-
-    // 계정 삭제 실행
-    async function deleteAccount() {
-      try {
-        // 관련 데이터 삭제는 CASCADE로 자동 처리됨
-        const { error } = await supabase.auth.admin.deleteUser(user.id);
+      // LINE 연동 해제 함수
+      async function disconnectLine() {
+        if (!confirm('정말로 LINE 연동을 해제하시겠습니까?\n\n연동을 해제하면 예약 관련 알림을 받을 수 없습니다.')) {
+          return;
+        }
         
-        if (error) throw error;
+        const btn = document.getElementById('disconnectLineBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<div class="loading"></div> 해제 중...';
         
-        alert('계정이 삭제되었습니다. 메인 페이지로 이동합니다.');
-        location.href = 'index.html';
-        
-      } catch (error) {
-        console.error('계정 삭제 실패:', error);
-        alert('계정 삭제 실패: ' + error.message);
+        try {
+          // LINE 계정 정보 삭제
+          const { error: lineError } = await supabase
+            .from('user_line_accounts')
+            .delete()
+            .eq('user_id', user.id);
+          
+          if (lineError) throw lineError;
+          
+          // 인증 상태 삭제
+          await supabase
+            .from('user_verifications')
+            .delete()
+            .eq('user_id', user.id)
+            .eq('verification_type', 'line');
+          
+          showToast('💔 LINE 연동이 해제되었습니다');
+          await checkLineConnection(); // 상태 새로고침
+          
+        } catch (error) {
+          console.error('LINE 연동 해제 실패:', error);
+          showToast('❌ LINE 연동 해제 실패: ' + error.message);
+          
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fab fa-line"></i> LINE 연동 해제';
+        }
       }
-    }
 
-    // 토스트 메시지
-    function showToast(message) {
-      const toast = document.createElement('div');
-      toast.style.cssText = `
-        position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white; padding: 12px 24px; border-radius: 12px;
-        z-index: 9999; font-weight: 600; box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
-        animation: slideDown 0.3s ease;
-      `;
-      toast.textContent = message;
-      document.body.appendChild(toast);
-      setTimeout(() => toast.remove(), 3000);
-    }
+      // LINE Login URL 생성
+      async function generateLineLoginUrl() {
+        try {
+          return await LINE_CONFIG.generateLoginUrl(user.id);
+        } catch (error) {
+          console.error('LINE URL 생성 실패:', error);
+          return null;
+        }
+      }
+      // 프로필 데이터 로드
+      async function loadProfile() {
+        try {
+          const { data: profile, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single();
 
-    // 초기 로드
-    await loadProfile();
-    await checkLineConnection();
+          if (error) throw error;
+
+          // 기본 정보 채우기
+          fullNameEl.value = profile.full_name || '';
+          birthDateEl.value = profile.birth_date || '';
+          genderEl.value = profile.gender || '';
+          phoneNumberEl.value = profile.phone_number || '';
+          nationalityEl.value = profile.nationality || '';
+          residenceEl.value = profile.residence || '';
+          occupationEl.value = profile.occupation || '';
+          currentEmailEl.value = user.email || '';
+
+          // 언어 체크박스
+          const languages = Array.isArray(profile.languages) ? profile.languages : [];
+          document.querySelectorAll('#languageGroup input[type="checkbox"]').forEach(cb => {
+            cb.checked = languages.includes(cb.value);
+          });
+
+          // 관심사 체크박스
+          const interests = Array.isArray(profile.interests) ? profile.interests : [];
+          document.querySelectorAll('#interestsGroup input[type="checkbox"]').forEach(cb => {
+            cb.checked = interests.includes(cb.value);
+          });
+
+          // 프로필 완성도 업데이트
+          const completion = calculateCompletion(profile);
+          progressFill.style.width = completion + '%';
+          progressText.textContent = completion + '% 완성';
+
+          // 계정 상태 업데이트
+          const statusIcon = accountStatus.querySelector('.status-icon');
+          const statusText = accountStatus.querySelector('.status-text');
+          
+          if (profile.account_status === 'active') {
+            statusIcon.className = 'status-icon status-active';
+            statusIcon.textContent = '✓';
+            statusText.textContent = '계정 활성화됨';
+          } else {
+            statusIcon.className = 'status-icon status-pending';
+            statusIcon.textContent = '⏳';
+            statusText.textContent = '계정 검토 중';
+          }
+
+        } catch (error) {
+          console.error('프로필 로드 실패:', error);
+          basicInfoResult.innerHTML = `<div class="error">❌ 프로필 로드 실패: ${error.message}</div>`;
+        }
+      }
+
+      // 기본 정보 저장
+      document.getElementById('basicInfoForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<div class="loading"></div> 저장 중...';
+        
+        try {
+          // 생년월일에서 나이 계산
+          let age = null;
+          if (birthDateEl.value) {
+            const today = new Date();
+            const birthDate = new Date(birthDateEl.value);
+            age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+              age--;
+            }
+          }
+
+          const updateData = {
+            full_name: fullNameEl.value.trim() || null,
+            birth_date: birthDateEl.value || null,
+            age: age,
+            gender: genderEl.value || null,
+            phone_number: phoneNumberEl.value.trim() || null,
+            updated_at: new Date().toISOString()
+          };
+
+          const { error } = await supabase
+            .from('profiles')
+            .update(updateData)
+            .eq('id', user.id);
+
+          if (error) throw error;
+
+          basicInfoResult.innerHTML = '<div class="success">✅ 기본정보가 저장되었습니다!</div>';
+          await loadProfile(); // 완성도 업데이트
+
+        } catch (error) {
+          console.error('기본정보 저장 실패:', error);
+          basicInfoResult.innerHTML = `<div class="error">❌ 저장 실패: ${error.message}</div>`;
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '💾 기본정보 저장';
+        }
+      });
+
+      // 상세 정보 저장
+      document.getElementById('detailInfoForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<div class="loading"></div> 저장 중...';
+        
+        try {
+          // 선택된 언어들 수집
+          const selectedLanguages = Array.from(document.querySelectorAll('#languageGroup input[type="checkbox"]:checked'))
+            .map(cb => cb.value);
+
+          // 선택된 관심사들 수집
+          const selectedInterests = Array.from(document.querySelectorAll('#interestsGroup input[type="checkbox"]:checked'))
+            .map(cb => cb.value);
+
+          const updateData = {
+            nationality: nationalityEl.value || null,
+            residence: residenceEl.value.trim() || null,
+            occupation: occupationEl.value.trim() || null,
+            languages: selectedLanguages.length > 0 ? selectedLanguages : null,
+            interests: selectedInterests.length > 0 ? selectedInterests : null,
+            updated_at: new Date().toISOString()
+          };
+
+          const { error } = await supabase
+            .from('profiles')
+            .update(updateData)
+            .eq('id', user.id);
+
+          if (error) throw error;
+
+          detailInfoResult.innerHTML = '<div class="success">✅ 상세정보가 저장되었습니다!</div>';
+          await loadProfile(); // 완성도 업데이트
+
+        } catch (error) {
+          console.error('상세정보 저장 실패:', error);
+          detailInfoResult.innerHTML = `<div class="error">❌ 저장 실패: ${error.message}</div>`;
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '🚀 상세정보 저장';
+        }
+      });
+
+      // 비밀번호 변경
+      document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        
+        if (newPassword !== confirmPassword) {
+          passwordResult.innerHTML = '<div class="error">❌ 비밀번호가 일치하지 않습니다.</div>';
+          return;
+        }
+        
+        if (newPassword.length < 8) {
+          passwordResult.innerHTML = '<div class="error">❌ 비밀번호는 8자 이상이어야 합니다.</div>';
+          return;
+        }
+        
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<div class="loading"></div> 변경 중...';
+        
+        try {
+          const { error } = await supabase.auth.updateUser({
+            password: newPassword
+          });
+
+          if (error) throw error;
+
+          passwordResult.innerHTML = '<div class="success">✅ 비밀번호가 변경되었습니다!</div>';
+          document.getElementById('newPassword').value = '';
+          document.getElementById('confirmPassword').value = '';
+
+        } catch (error) {
+          console.error('비밀번호 변경 실패:', error);
+          passwordResult.innerHTML = `<div class="error">❌ 변경 실패: ${error.message}</div>`;
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '🔒 비밀번호 변경';
+        }
+      });
+
+      // 계정 삭제 확인
+      window.confirmAccountDeletion = function() {
+        const confirmText = '정말로 계정을 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없으며, 모든 데이터가 영구적으로 삭제됩니다.\n\n계속하려면 "삭제"를 입력해주세요.';
+        const userInput = prompt(confirmText);
+        
+        if (userInput === '삭제') {
+          deleteAccount();
+        } else if (userInput !== null) {
+          alert('입력이 올바르지 않습니다. 계정 삭제가 취소되었습니다.');
+        }
+      };
+
+      // 계정 삭제 실행
+      async function deleteAccount() {
+        try {
+          // 관련 데이터 삭제는 CASCADE로 자동 처리됨
+          const { error } = await supabase.auth.admin.deleteUser(user.id);
+          
+          if (error) throw error;
+          
+          alert('계정이 삭제되었습니다. 메인 페이지로 이동합니다.');
+          location.href = 'index.html';
+          
+        } catch (error) {
+          console.error('계정 삭제 실패:', error);
+          alert('계정 삭제 실패: ' + error.message);
+        }
+      }
+
+      // 토스트 메시지
+      function showToast(message) {
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+          position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white; padding: 12px 24px; border-radius: 12px;
+          z-index: 9999; font-weight: 600; box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+          animation: slideDown 0.3s ease;
+        `;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+      }
+
+      // 초기 로드
+      await loadProfile();
+      await checkLineConnection();
+    })();
   </script>
 </body>
 </html>
