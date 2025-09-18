@@ -36,8 +36,25 @@ Deno.serve(async (req: Request) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
     
     // LINE API 설정 (환경변수에서 가져오기)
-    const LINE_CHANNEL_ID = Deno.env.get('LINE_CHANNEL_ID') || '2008137189'
-    const LINE_CHANNEL_SECRET = Deno.env.get('LINE_CHANNEL_SECRET') || 'e743b9de9cd4ecc5b1d44f8d4c34d9d3'
+    const LINE_CHANNEL_ID = Deno.env.get('LINE_CHANNEL_ID')
+    const LINE_CHANNEL_SECRET = Deno.env.get('LINE_CHANNEL_SECRET')
+    
+    if (!LINE_CHANNEL_ID || !LINE_CHANNEL_SECRET) {
+      console.error('LINE API 환경변수가 설정되지 않았습니다:', {
+        hasChannelId: !!LINE_CHANNEL_ID,
+        hasChannelSecret: !!LINE_CHANNEL_SECRET
+      })
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'LINE API 설정이 완료되지 않았습니다. 관리자에게 문의하세요.' 
+        }),
+        { 
+          status: 500, 
+          headers: { 'Content-Type': 'application/json', ...corsHeaders } 
+        }
+      )
+    }
     
     console.log('LINE API 설정 확인:', {
       channelId: LINE_CHANNEL_ID,
