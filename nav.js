@@ -233,6 +233,10 @@ export async function renderNavbar(rootId='app-nav') {
         el('i', { class: 'fas fa-users', style: 'margin-right: 8px; color: #764ba2;' }),
         el('span', {}, '메이트 관리')
       ]),
+      el('a', { class: 'dropdown-item', href: 'admin_identity_verification.html' }, [
+        el('i', { class: 'fas fa-id-card', style: 'margin-right: 8px; color: #f093fb;' }),
+        el('span', {}, '신원확인 관리')
+      ]),
       el('a', { class: 'dropdown-item', href: 'qna.html' }, [
         el('i', { class: 'fas fa-question-circle', style: 'margin-right: 8px; color: #f093fb;' }),
         el('span', {}, 'Q&A 관리')

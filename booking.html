@@ -749,6 +749,24 @@
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       
+      // 나이 제한 확인
+      try {
+        const { checkAgeRestrictionForBooking } = await import('./line_identity_service.js');
+        await checkAgeRestrictionForBooking(user.id);
+      } catch (ageError) {
+        result.innerHTML = `
+          <div class="result-message result-error">
+            <div style="font-size: 2rem; margin-bottom: 12px;">🔞</div>
+            <div style="font-size: 1.2rem; font-weight: 800; margin-bottom: 8px;">예약 제한</div>
+            <div style="font-size: 0.95rem; margin-bottom: 16px;">${ageError.message}</div>
+            <a href="my_profile.html" style="color: #667eea; text-decoration: none; font-weight: 600;">
+              프로필에서 신원확인하기 →
+            </a>
+          </div>
+        `;
+        return;
+      }
+      
       // LINE 연동 확인
       const { data: lineAccount, error: lineError } = await supabase
         .from('user_line_accounts')

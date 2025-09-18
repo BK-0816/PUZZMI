@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PUZZMI - 신원확인 관리</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="pages.css"/>
+  <link rel="stylesheet" href="pages-theme.css"/>
+  <link rel="stylesheet" href="nav.css"/>
+  <script type="module" src="nav.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <style>
+    body.bg-cream { 
+      background: var(--bg-cream); 
+      background-repeat: no-repeat; 
+      background-size: cover; 
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+    
+    /* 메인 컨테이너 */
+    .admin-wrap { 
+      max-width: 1400px; 
+      margin: 32px auto; 
+      padding: 0 20px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    /* 페이지 헤더 */
+    .page-header {
+      background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
+      backdrop-filter: blur(25px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 28px;
+      padding: 40px;
+      margin-bottom: 32px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.04);
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+    }
+    
+    .page-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 20%, #f093fb 40%, #f5576c 60%, #4facfe 80%, #00f2fe 100%);
+      animation: shimmer 4s ease-in-out infinite;
+    }
+    
+    .page-header h2 {
+      font-size: 2.8rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 16px 0;
+      letter-spacing: -0.03em;
+    }
+    
+    /* 통계 대시보드 */
+    .stats-dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+    
+    .stat-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 20px;
+      padding: 24px;
+      text-align: center;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      opacity: 0.8;
+    }
+    
+    .stat-card:nth-child(1)::before { background: linear-gradient(90deg, #28a745 0%, #20c997 100%); }
+    .stat-card:nth-child(2)::before { background: linear-gradient(90deg, #ffc107 0%, #fd7e14 100%); }
+    .stat-card:nth-child(3)::before { background: linear-gradient(90deg, #dc3545 0%, #e83e8c 100%); }
+    .stat-card:nth-child(4)::before { background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); }
+    .stat-card:nth-child(5)::before { background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%); }
+    
+    .stat-card:hover {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+    }
+    
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+    
+    .stat-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    /* 사용자 테이블 */
+    .users-section {
+      background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .section-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 24px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .section-title::before {
+      content: '';
+      width: 4px;
+      height: 28px;
+      background: linear-gradient(135deg, #667eea 0%, #f093fb 100%);
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    
+    /* 필터 툴바 */
+    .filter-toolbar {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.05) 100%);
+      border: 2px solid rgba(102, 126, 234, 0.15);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 24px;
+      backdrop-filter: blur(10px);
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    
+    .filter-select {
+      padding: 12px 16px;
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(8px);
+      cursor: pointer;
+      min-width: 160px;
+    }
+    
+    .filter-select:focus {
+      outline: none;
+      border-color: rgba(102, 126, 234, 0.5);
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    /* 테이블 */
+    .table-container {
+      background: rgba(255,255,255,0.8);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+      border: 1px solid rgba(255,255,255,0.6);
+    }
+    
+    .table { 
+      width: 100%; 
+      border-collapse: collapse; 
+      background: transparent;
+    }
+    
+    .table th {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.05) 100%);
+      color: var(--text-primary);
+      padding: 16px 12px;
+      font-weight: 800;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+      text-align: center;
+    }
+    
+    .table td {
+      padding: 14px 12px;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      font-size: 0.9rem;
+      font-weight: 500;
+      vertical-align: middle;
+      text-align: center;
+    }
+    
+    .table tr:hover {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.03) 0%, rgba(240, 147, 251, 0.02) 100%);
+    }
+    
+    /* 인증 배지 */
+    .verification-badge {
+      padding: 6px 12px;
+      border-radius: 16px;
+      font-weight: 700;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border: 2px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      min-width: 80px;
+      justify-content: center;
+    }
+    
+    .verification-verified {
+      background: linear-gradient(135deg, #d1e7dd 0%, #a3e4d7 100%);
+      color: #0f5132;
+      border-color: rgba(25, 135, 84, 0.3);
+    }
+    
+    .verification-unverified {
+      background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+      color: #856404;
+      border-color: rgba(255, 193, 7, 0.3);
+    }
+    
+    .verification-expired {
+      background: linear-gradient(135deg, #f8d7da 0%, #f1948a 100%);
+      color: #721c24;
+      border-color: rgba(220, 53, 69, 0.3);
+    }
+    
+    .verification-enhanced {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    }
+    
+    /* 액션 버튼 */
+    .btn {
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      letter-spacing: 0.3px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .btn-verify {
+      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    }
+    
+    .btn-verify:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 6px 16px rgba(40, 167, 69, 0.4);
+    }
+    
+    .btn-revoke {
+      background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+    }
+    
+    .btn-revoke:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 6px 16px rgba(220, 53, 69, 0.4);
+    }
+    
+    /* 상세 정보 모달 */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .modal.show {
+      display: flex;
+    }
+    
+    .modal-content {
+      background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 24px;
+      padding: 40px;
+      max-width: 600px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: relative;
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid rgba(102, 126, 234, 0.1);
+    }
+    
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0;
+    }
+    
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-secondary);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+    
+    .modal-close:hover {
+      background: rgba(220, 53, 69, 0.1);
+      color: #dc3545;
+      transform: scale(1.1);
+    }
+    
+    .info-grid {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px 20px;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    
+    .info-label {
+      font-weight: 700;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .info-value {
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+    
+    .info-highlight {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 700;
+    }
+    
+    /* 반응형 */
+    @media (max-width: 1024px) {
+      .admin-wrap {
+        padding: 0 16px;
+        margin: 24px auto;
+      }
+      
+      .stats-dashboard {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 16px;
+      }
+      
+      .filter-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .page-header h2 {
+        font-size: 2.2rem;
+      }
+      
+      .table-container {
+        overflow-x: auto;
+      }
+      
+      .modal-content {
+        padding: 24px;
+        margin: 10px;
+      }
+      
+      .info-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+    }
+  </style>
+</head>
+<body class="bg-cream">
+  <div id="app-nav"></div>
+  
+  <main class="admin-wrap">
+    <!-- 페이지 헤더 -->
+    <section class="page-header">
+      <h2>🔐 신원확인 관리</h2>
+      <p class="page-subtitle">LINE 연동을 통한 실명인증 및 나이 검증 현황을 관리하세요</p>
+      <div id="adminGuard" class="error" style="display:none; margin-top: 16px;"></div>
+    </section>
+
+    <!-- 통계 대시보드 -->
+    <section class="stats-dashboard">
+      <div class="stat-card">
+        <div class="stat-number" id="statVerified">0</div>
+        <div class="stat-label">✅ 인증 완료</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="statUnverified">0</div>
+        <div class="stat-label">⏳ 미인증</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="statMinors">0</div>
+        <div class="stat-label">🔞 미성년자</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="statLineConnected">0</div>
+        <div class="stat-label">💬 LINE 연동</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="statAgeVerified">0</div>
+        <div class="stat-label">🎂 나이 인증</div>
+      </div>
+    </section>
+
+    <!-- 사용자 목록 -->
+    <section class="users-section">
+      <h3 class="section-title">👥 사용자 신원확인 현황</h3>
+      
+      <!-- 필터 툴바 -->
+      <div class="filter-toolbar">
+        <select class="filter-select" id="verificationFilter">
+          <option value="">🔍 인증 상태: 전체</option>
+          <option value="verified">✅ 인증 완료</option>
+          <option value="unverified">⏳ 미인증</option>
+          <option value="expired">⏰ 인증 만료</option>
+        </select>
+        
+        <select class="filter-select" id="ageFilter">
+          <option value="">🎂 나이: 전체</option>
+          <option value="minor">🔞 미성년자 (18세 미만)</option>
+          <option value="adult">👤 성인 (18세 이상)</option>
+          <option value="age_verified">✅ 나이 인증됨</option>
+          <option value="age_unverified">⚠️ 나이 미인증</option>
+        </select>
+        
+        <select class="filter-select" id="lineFilter">
+          <option value="">💬 LINE: 전체</option>
+          <option value="connected">✅ 연동됨</option>
+          <option value="disconnected">❌ 미연동</option>
+        </select>
+        
+        <button class="btn btn-verify" id="refreshBtn">
+          <i class="fas fa-sync-alt"></i>
+          새로고침
+        </button>
+      </div>
+      
+      <div class="table-container">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>👤 사용자</th>
+              <th>📧 이메일</th>
+              <th>🎂 나이</th>
+              <th>🔐 실명인증</th>
+              <th>🎂 나이인증</th>
+              <th>💬 LINE연동</th>
+              <th>📅 인증일</th>
+              <th>🛠️ 관리</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody">
+            <tr><td colspan="8" style="text-align: center; padding: 40px; color: var(--text-secondary);">데이터를 불러오는 중...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- 상세 정보 모달 -->
+  <div class="modal" id="detailModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">사용자 상세 정보</h3>
+        <button class="modal-close" onclick="closeModal()">×</button>
+      </div>
+      <div id="modalContent">
+        <!-- 동적으로 채워집니다 -->
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+    const SUPABASE_URL = "https://eevvgbbokenpjnvtmztk.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4";
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // 관리자 권한 확인
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      document.getElementById('adminGuard').textContent = "로그인이 필요합니다.";
+      document.getElementById('adminGuard').style.display = 'block';
+      setTimeout(() => location.href = 'auth_combo.html', 1000);
+      throw new Error('login required');
+    }
+    
+    const { data: isAdminRow } = await supabase.from('admin_users').select('user_id').eq('user_id', user.id).maybeSingle();
+    if (!isAdminRow) {
+      document.getElementById('adminGuard').textContent = "관리자만 접근할 수 있습니다.";
+      document.getElementById('adminGuard').style.display = 'block';
+      throw new Error('admin required');
+    }
+
+    // DOM 요소들
+    const statVerified = document.getElementById('statVerified');
+    const statUnverified = document.getElementById('statUnverified');
+    const statMinors = document.getElementById('statMinors');
+    const statLineConnected = document.getElementById('statLineConnected');
+    const statAgeVerified = document.getElementById('statAgeVerified');
+    const usersTableBody = document.getElementById('usersTableBody');
+    const detailModal = document.getElementById('detailModal');
+    const modalContent = document.getElementById('modalContent');
+
+    // 필터 요소들
+    const verificationFilter = document.getElementById('verificationFilter');
+    const ageFilter = document.getElementById('ageFilter');
+    const lineFilter = document.getElementById('lineFilter');
+    const refreshBtn = document.getElementById('refreshBtn');
+
+    let allUsers = [];
+    let filteredUsers = [];
+
+    // 데이터 로드
+    async function loadData() {
+      try {
+        // 사용자 프로필과 LINE 연동 정보 조회
+        const { data: users, error } = await supabase
+          .from('profiles')
+          .select(`
+            id, full_name, age, birth_date, gender, nationality, 
+            identity_verified, age_verified, verification_source, verification_level,
+            created_at, updated_at,
+            users!inner(email),
+            user_line_accounts(line_user_id, line_display_name, is_verified, connected_at),
+            line_identity_verifications(verified_name, verified_age, verified_birth_date, verification_level, verified_at, expires_at)
+          `)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        allUsers = users || [];
+        updateStats();
+        applyFilters();
+
+      } catch (error) {
+        console.error('데이터 로드 실패:', error);
+        usersTableBody.innerHTML = `<tr><td colspan="8" class="error">❌ 데이터 로드 실패: ${error.message}</td></tr>`;
+      }
+    }
+
+    // 통계 업데이트
+    function updateStats() {
+      const stats = {
+        verified: 0,
+        unverified: 0,
+        minors: 0,
+        lineConnected: 0,
+        ageVerified: 0
+      };
+
+      allUsers.forEach(user => {
+        // 실명 인증 상태
+        if (user.identity_verified) {
+          stats.verified++;
+        } else {
+          stats.unverified++;
+        }
+
+        // 미성년자 체크
+        if (user.age && user.age < 18) {
+          stats.minors++;
+        }
+
+        // LINE 연동 상태
+        if (user.user_line_accounts && user.user_line_accounts.length > 0) {
+          stats.lineConnected++;
+        }
+
+        // 나이 인증 상태
+        if (user.age_verified) {
+          stats.ageVerified++;
+        }
+      });
+
+      statVerified.textContent = stats.verified;
+      statUnverified.textContent = stats.unverified;
+      statMinors.textContent = stats.minors;
+      statLineConnected.textContent = stats.lineConnected;
+      statAgeVerified.textContent = stats.ageVerified;
+    }
+
+    // 필터 적용
+    function applyFilters() {
+      const verificationValue = verificationFilter.value;
+      const ageValue = ageFilter.value;
+      const lineValue = lineFilter.value;
+
+      filteredUsers = allUsers.filter(user => {
+        // 인증 상태 필터
+        if (verificationValue === 'verified' && !user.identity_verified) return false;
+        if (verificationValue === 'unverified' && user.identity_verified) return false;
+        if (verificationValue === 'expired') {
+          const lineVerification = user.line_identity_verifications?.[0];
+          if (!lineVerification || new Date(lineVerification.expires_at) > new Date()) return false;
+        }
+
+        // 나이 필터
+        if (ageValue === 'minor' && (!user.age || user.age >= 18)) return false;
+        if (ageValue === 'adult' && (!user.age || user.age < 18)) return false;
+        if (ageValue === 'age_verified' && !user.age_verified) return false;
+        if (ageValue === 'age_unverified' && user.age_verified) return false;
+
+        // LINE 연동 필터
+        if (lineValue === 'connected' && (!user.user_line_accounts || user.user_line_accounts.length === 0)) return false;
+        if (lineValue === 'disconnected' && user.user_line_accounts && user.user_line_accounts.length > 0) return false;
+
+        return true;
+      });
+
+      renderUsers();
+    }
+
+    // 사용자 목록 렌더링
+    function renderUsers() {
+      if (!filteredUsers.length) {
+        usersTableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 40px; color: var(--text-secondary);">조건에 맞는 사용자가 없습니다.</td></tr>`;
+        return;
+      }
+
+      usersTableBody.innerHTML = filteredUsers.map(user => {
+        const email = user.users?.email || '이메일 없음';
+        const name = user.full_name || '이름 미기재';
+        const age = user.age || '미기재';
+        const lineAccount = user.user_line_accounts?.[0];
+        const lineVerification = user.line_identity_verifications?.[0];
+        
+        // 인증 상태 결정
+        let identityStatus = 'unverified';
+        let ageStatus = 'unverified';
+        let lineStatus = 'disconnected';
+        
+        if (user.identity_verified) {
+          identityStatus = 'verified';
+        }
+        
+        if (user.age_verified) {
+          ageStatus = 'verified';
+        }
+        
+        if (lineAccount && lineAccount.is_verified) {
+          lineStatus = 'connected';
+          
+          // 인증 만료 체크
+          if (lineVerification && new Date(lineVerification.expires_at) < new Date()) {
+            identityStatus = 'expired';
+          }
+        }
+        
+        const verifiedAt = lineVerification?.verified_at ? 
+          new Date(lineVerification.verified_at).toLocaleDateString('ko-KR') : '-';
+
+        return `
+          <tr>
+            <td>${name}</td>
+            <td>${email}</td>
+            <td>${age}${user.age && user.age < 18 ? ' 🔞' : ''}</td>
+            <td><span class="verification-badge verification-${identityStatus}">${getVerificationText(identityStatus)}</span></td>
+            <td><span class="verification-badge verification-${ageStatus}">${getVerificationText(ageStatus)}</span></td>
+            <td><span class="verification-badge verification-${lineStatus === 'connected' ? 'verified' : 'unverified'}">${lineStatus === 'connected' ? '✅ 연동됨' : '❌ 미연동'}</span></td>
+            <td>${verifiedAt}</td>
+            <td>
+              <button class="btn btn-verify" onclick="showUserDetail('${user.id}')">
+                <i class="fas fa-eye"></i>
+                상세보기
+              </button>
+              ${user.identity_verified ? 
+                `<button class="btn btn-revoke" onclick="revokeVerification('${user.id}')">
+                  <i class="fas fa-times"></i>
+                  인증해제
+                </button>` : 
+                `<button class="btn btn-verify" onclick="manualVerify('${user.id}')">
+                  <i class="fas fa-check"></i>
+                  수동인증
+                </button>`
+              }
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function getVerificationText(status) {
+      switch (status) {
+        case 'verified': return '✅ 인증됨';
+        case 'unverified': return '⏳ 미인증';
+        case 'expired': return '⏰ 만료됨';
+        default: return '❓ 알 수 없음';
+      }
+    }
+
+    // 사용자 상세 정보 모달
+    window.showUserDetail = async function(userId) {
+      try {
+        const user = allUsers.find(u => u.id === userId);
+        if (!user) return;
+
+        const lineAccount = user.user_line_accounts?.[0];
+        const lineVerification = user.line_identity_verifications?.[0];
+        
+        modalContent.innerHTML = `
+          <div class="info-grid">
+            <span class="info-label">👤 이름</span>
+            <span class="info-value">${user.full_name || '미기재'}</span>
+            
+            <span class="info-label">📧 이메일</span>
+            <span class="info-value">${user.users?.email || '미기재'}</span>
+            
+            <span class="info-label">🎂 나이</span>
+            <span class="info-value ${user.age && user.age < 18 ? 'info-highlight' : ''}">${user.age || '미기재'}${user.age && user.age < 18 ? '세 (미성년자)' : '세'}</span>
+            
+            <span class="info-label">🌍 국적</span>
+            <span class="info-value">${user.nationality || '미기재'}</span>
+            
+            <span class="info-label">🔐 실명인증</span>
+            <span class="info-value ${user.identity_verified ? 'info-highlight' : ''}">${user.identity_verified ? '✅ 인증됨' : '❌ 미인증'}</span>
+            
+            <span class="info-label">🎂 나이인증</span>
+            <span class="info-value ${user.age_verified ? 'info-highlight' : ''}">${user.age_verified ? '✅ 인증됨' : '❌ 미인증'}</span>
+            
+            <span class="info-label">📱 인증방법</span>
+            <span class="info-value">${user.verification_source || '없음'}</span>
+          </div>
+          
+          ${lineAccount ? `
+            <div style="background: linear-gradient(135deg, rgba(0, 195, 0, 0.05) 0%, rgba(0, 185, 0, 0.03) 100%); border: 2px solid rgba(0, 195, 0, 0.2); border-radius: 12px; padding: 20px; margin: 20px 0;">
+              <h4 style="margin: 0 0 16px 0; color: #00C300; display: flex; align-items: center; gap: 8px;">
+                <i class="fab fa-line"></i>
+                LINE 연동 정보
+              </h4>
+              <div class="info-grid">
+                <span class="info-label">LINE ID</span>
+                <span class="info-value">${lineAccount.line_user_id}</span>
+                
+                <span class="info-label">표시명</span>
+                <span class="info-value">${lineAccount.line_display_name || '미기재'}</span>
+                
+                <span class="info-label">연동일</span>
+                <span class="info-value">${new Date(lineAccount.connected_at).toLocaleDateString('ko-KR')}</span>
+                
+                ${lineVerification ? `
+                  <span class="info-label">인증된 이름</span>
+                  <span class="info-value info-highlight">${lineVerification.verified_name}</span>
+                  
+                  <span class="info-label">인증된 나이</span>
+                  <span class="info-value info-highlight">${lineVerification.verified_age}세</span>
+                  
+                  <span class="info-label">인증 레벨</span>
+                  <span class="info-value">${lineVerification.verification_level}</span>
+                  
+                  <span class="info-label">인증 만료</span>
+                  <span class="info-value">${new Date(lineVerification.expires_at).toLocaleDateString('ko-KR')}</span>
+                ` : ''}
+              </div>
+            </div>
+          ` : `
+            <div style="background: linear-gradient(135deg, rgba(255, 193, 7, 0.05) 0%, rgba(255, 193, 7, 0.03) 100%); border: 2px solid rgba(255, 193, 7, 0.2); border-radius: 12px; padding: 20px; margin: 20px 0; text-align: center;">
+              <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #ffc107; margin-bottom: 12px;"></i>
+              <p style="margin: 0; color: var(--text-secondary);">LINE 계정이 연동되지 않았습니다.</p>
+            </div>
+          `}
+        `;
+        
+        detailModal.classList.add('show');
+      } catch (error) {
+        console.error('상세 정보 로드 실패:', error);
+        alert('상세 정보를 불러올 수 없습니다: ' + error.message);
+      }
+    };
+
+    // 모달 닫기
+    window.closeModal = function() {
+      detailModal.classList.remove('show');
+    };
+
+    // 수동 인증
+    window.manualVerify = async function(userId) {
+      if (!confirm('이 사용자를 수동으로 인증 처리하시겠습니까?')) return;
+      
+      try {
+        const { error } = await supabase
+          .from('profiles')
+          .update({
+            identity_verified: true,
+            verification_source: 'manual',
+            verification_level: 'basic',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', userId);
+        
+        if (error) throw error;
+        
+        toast('✅ 수동 인증이 완료되었습니다!');
+        await loadData();
+        
+      } catch (error) {
+        console.error('수동 인증 실패:', error);
+        toast('❌ 수동 인증 실패: ' + error.message);
+      }
+    };
+
+    // 인증 해제
+    window.revokeVerification = async function(userId) {
+      if (!confirm('이 사용자의 인증을 해제하시겠습니까?\n\nLINE 연동 정보도 함께 삭제됩니다.')) return;
+      
+      try {
+        // LINE 인증 정보 삭제
+        await supabase
+          .from('line_identity_verifications')
+          .delete()
+          .eq('user_id', userId);
+        
+        // 프로필 인증 상태 해제
+        const { error } = await supabase
+          .from('profiles')
+          .update({
+            identity_verified: false,
+            age_verified: false,
+            verification_source: null,
+            verification_level: 'none',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', userId);
+        
+        if (error) throw error;
+        
+        toast('❌ 인증이 해제되었습니다!');
+        await loadData();
+        
+      } catch (error) {
+        console.error('인증 해제 실패:', error);
+        toast('❌ 인증 해제 실패: ' + error.message);
+      }
+    };
+
+    // 토스트 메시지
+    function toast(message) {
+      const toastEl = document.createElement('div');
+      toastEl.style.cssText = `
+        position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white; padding: 12px 24px; border-radius: 12px;
+        z-index: 9999; font-weight: 600; box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+        animation: slideDown 0.3s ease;
+      `;
+      toastEl.textContent = message;
+      document.body.appendChild(toastEl);
+      setTimeout(() => toastEl.remove(), 3000);
+    }
+
+    // 이벤트 리스너
+    verificationFilter.addEventListener('change', applyFilters);
+    ageFilter.addEventListener('change', applyFilters);
+    lineFilter.addEventListener('change', applyFilters);
+    refreshBtn.addEventListener('click', loadData);
+
+    // 모달 외부 클릭 시 닫기
+    detailModal.addEventListener('click', (e) => {
+      if (e.target === detailModal) {
+        closeModal();
+      }
+    });
+
+    // 초기 로드
+    await loadData();
+  </script>
+</body>
+</html>
