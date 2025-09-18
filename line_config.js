@@ -28,6 +28,9 @@ export const LINE_CONFIG = {
   // LINE OAuth URL 생성 (서버에서 처리)
   async generateLoginUrl(userId) {
     try {
+      console.log('LINE URL 생성 시작, userId:', userId);
+      console.log('Functions URL:', this.FUNCTIONS_URL);
+      
       const response = await fetch(`${this.FUNCTIONS_URL}/line-auth/generate-url`, {
         method: 'POST',
         headers: {
@@ -37,16 +40,22 @@ export const LINE_CONFIG = {
         body: JSON.stringify({ userId })
       });
       
+      console.log('서버 응답 상태:', response.status);
+      
       if (!response.ok) {
-        throw new Error(`URL 생성 실패: ${response.status}`);
+        const errorText = await response.text();
+        console.error('서버 응답 오류:', errorText);
+        throw new Error(`URL 생성 실패: ${response.status} - ${errorText}`);
       }
       
       const result = await response.json();
+      console.log('서버 응답 결과:', result);
       
       if (!result.success) {
         throw new Error(result.error || 'URL 생성 실패');
       }
       
+      console.log('생성된 LINE URL:', result.loginUrl);
       return result.loginUrl;
       
     } catch (error) {
@@ -58,13 +67,16 @@ export const LINE_CONFIG = {
   
   // 개발용 시뮬레이션 URL
   generateSimulationUrl(userId) {
+    console.log('시뮬레이션 URL 생성, userId:', userId);
     const params = new URLSearchParams({
       simulation: 'true',
       userId: userId,
       timestamp: Date.now()
     });
     
-    return `${this.CALLBACK_URL}?${params.toString()}`;
+    const simulationUrl = `${this.CALLBACK_URL}?${params.toString()}`;
+    console.log('시뮬레이션 URL:', simulationUrl);
+    return simulationUrl;
   },
   
   // 토큰 교환 (서버에서 처리)

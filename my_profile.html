@@ -1066,87 +1066,57 @@
       btn.disabled = true;
       btn.innerHTML = '<div class="loading"></div> 연동 중...';
       
-      // 즉시 빈 팝업 창을 열어서 브라우저 차단 방지
-      const popup = window.open('about:blank', 'lineLogin', 'width=500,height=600');
-      
-      if (!popup) {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fab fa-line"></i> LINE 계정 연동하기';
-        showToast('❌ 팝업이 차단되었습니다. 팝업 차단을 해제하고 다시 시도해주세요.');
-        return;
-      }
-      
       try {
-        // 비동기적으로 LINE Login URL 생성
-        generateLineLoginUrl().then(lineLoginUrl => {
-          if (!lineLoginUrl) {
-            popup.close();
-            throw new Error('LINE 로그인 URL 생성에 실패했습니다.');
-          }
-          
-          // 이미 열린 팝업을 LINE 로그인 URL로 리다이렉트
-          popup.location.href = lineLoginUrl;
-        }).catch(error => {
-          popup.close();
-          btn.disabled = false;
-          btn.innerHTML = '<i class="fab fa-line"></i> LINE 계정 연동하기';
-          showToast('❌ LINE 연동 오류: ' + error.message);
-        });
+        // LINE Login URL 생성
+        const lineLoginUrl = await generateLineLoginUrl();
+        
+        if (!lineLoginUrl) {
+          throw new Error('LINE 로그인 URL 생성에 실패했습니다.');
+        }
+        
+        console.log('생성된 LINE URL:', lineLoginUrl);
+        
+        // 팝업 열기
+        const popup = window.open(lineLoginUrl, 'lineLogin', 'width=500,height=600,scrollbars=yes,resizable=yes');
+        
+        if (!popup) {
+          throw new Error('팝업이 차단되었습니다. 팝업 차단을 해제하고 다시 시도해주세요.');
+        }
         
         // 팝업 완료 대기
-        const checkAuth = setInterval(() => {
+        const checkAuth = setInterval(async () => {
           if (popup && popup.closed) {
             clearInterval(checkAuth);
-            
-            // 비동기 작업을 별도 함수로 분리
-            handleLineConnectionSuccess();
+            console.log('팝업이 닫혔습니다. 연동 상태 확인 중...');
+            // 잠시 대기 후 상태 확인
+            setTimeout(async () => {
+              await checkLineConnection();
+              btn.disabled = false;
+              btn.innerHTML = '<i class="fab fa-line"></i> LINE 계정 연동하기';
+            }, 1000);
           }
         }, 1000);
         
-      } catch (error) {
-      }
-    }
-
-    // LINE 연동 성공 처리 (비동기)
-    async function handleLineConnectionSuccess() {
-      try {
-        // 시뮬레이션: LINE 연동 성공
-        const mockLineData = {
-          user_id: user.id,
-          line_user_id: 'U' + Math.random().toString(36).substr(2, 9),
-          line_display_name: fullNameEl.value || '사용자',
-          line_picture_url: 'https://picsum.photos/200/200',
-          is_verified: true,
-          access_token: 'mock_access_token',
-          token_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+        // 메시지 리스너 추가 (콜백에서 오는 메시지 처리)
+        const messageHandler = (event) => {
+          if (event.data && event.data.type === 'LINE_AUTH_SUCCESS') {
+            console.log('LINE 연동 성공 메시지 받음:', event.data);
+            showToast('✅ LINE 계정이 성공적으로 연동되었습니다!');
+            window.removeEventListener('message', messageHandler);
+          } else if (event.data && event.data.type === 'LINE_AUTH_ERROR') {
+            console.error('LINE 연동 실패 메시지 받음:', event.data);
+            showToast('❌ LINE 연동 실패: ' + event.data.error);
+            window.removeEventListener('message', messageHandler);
+          }
         };
         
-        // LINE 계정 정보 저장
-        const { error: lineError } = await supabase
-          .from('user_line_accounts')
-          .upsert(mockLineData, { onConflict: 'user_id' });
+        window.addEventListener('message', messageHandler);
         
-        if (lineError) throw lineError;
-        
-        // 인증 상태 저장
-        await supabase
-          .from('user_verifications')
-          .upsert({
-            user_id: user.id,
-            verification_type: 'line',
-            is_verified: true,
-            verified_at: new Date().toISOString(),
-            verification_data: {
-              line_user_id: mockLineData.line_user_id,
-              display_name: mockLineData.line_display_name
-            }
-          }, { onConflict: 'user_id,verification_type' });
-        
-        showToast('✅ LINE 계정이 성공적으로 연동되었습니다!');
-        await checkLineConnection(); // 상태 새로고침
       } catch (error) {
-        console.error('LINE 연동 처리 실패:', error);
-        showToast('❌ LINE 연동 처리 실패: ' + error.message);
+        console.error('LINE 연동 오류:', error);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fab fa-line"></i> LINE 계정 연동하기';
+        showToast('❌ LINE 연동 오류: ' + error.message);
       }
     }
 
