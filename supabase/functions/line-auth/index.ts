@@ -36,50 +36,13 @@ Deno.serve(async (req: Request) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
     
     // LINE API 설정 (환경변수에서 가져오기)
-    const LINE_CHANNEL_ID = Deno.env.get('LINE_CHANNEL_ID')
-    const LINE_CHANNEL_SECRET = Deno.env.get('LINE_CHANNEL_SECRET')
+    const LINE_CHANNEL_ID = Deno.env.get('LINE_CHANNEL_ID') || '2008137189'
+    const LINE_CHANNEL_SECRET = Deno.env.get('LINE_CHANNEL_SECRET') || 'e743b9de9cd4ecc5b1d44f8d4c34d9d3'
     
-    // 환경변수 확인
-    if (!LINE_CHANNEL_ID || !LINE_CHANNEL_SECRET) {
-      console.error('LINE API 환경변수 누락:', { 
-        hasChannelId: !!LINE_CHANNEL_ID, 
-        hasChannelSecret: !!LINE_CHANNEL_SECRET 
-      })
-      
-      // 개발 환경에서는 시뮬레이션 모드로 처리
-      const isDevelopment = !LINE_CHANNEL_ID || LINE_CHANNEL_ID === 'YOUR_LINE_CHANNEL_ID_HERE'
-      
-      if (isDevelopment) {
-        console.log('개발 환경 감지 - 시뮬레이션 모드 활성화')
-        return new Response(
-          JSON.stringify({ 
-            success: true, 
-            simulation: true,
-            message: 'LINE API 키가 설정되지 않아 시뮬레이션 모드로 실행됩니다.'
-          }),
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              ...corsHeaders,
-            },
-          }
-        )
-      }
-      
-      return new Response(
-        JSON.stringify({ 
-          success: false, 
-          error: 'LINE API 설정이 없습니다. 관리자에게 문의해주세요.' 
-        }),
-        {
-          status: 500,
-          headers: {
-            'Content-Type': 'application/json',
-            ...corsHeaders,
-          },
-        }
-      )
-    }
+    console.log('LINE API 설정 확인:', {
+      channelId: LINE_CHANNEL_ID,
+      hasSecret: !!LINE_CHANNEL_SECRET
+    })
     
     // Authorization 헤더에서 JWT 토큰 추출
     const authHeader = req.headers.get('Authorization')

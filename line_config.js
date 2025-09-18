@@ -47,10 +47,6 @@ export const LINE_CONFIG = {
       const result = await response.json();
       
       if (!result.success) {
-        if (result.simulation) {
-          console.log('🔄 시뮬레이션 모드 활성화');
-          return this.generateSimulationUrl(userId);
-        }
         throw new Error(result.error || 'LINE URL 생성 실패');
       }
       
@@ -59,8 +55,7 @@ export const LINE_CONFIG = {
       
     } catch (error) {
       console.error('LINE URL 생성 실패:', error);
-      console.log('🔄 시뮬레이션 모드로 전환');
-      return this.generateSimulationUrl(userId);
+      throw error;
     }
   },
   

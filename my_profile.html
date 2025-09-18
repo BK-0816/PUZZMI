@@ -1072,14 +1072,48 @@
       btn.innerHTML = '<div class="loading"></div> 연동 중...';
       
       try {
-        // 시뮬레이션 모드로 직접 처리 (Edge Function 우회)
-        console.log('🎭 시뮬레이션 모드로 LINE 연동 처리');
+        // 실제 LINE OAuth URL 생성
+        console.log('🔗 실제 LINE OAuth URL 생성 시작');
         
-        const simulationUrl = generateSimulationUrl(user.id);
-        console.log('시뮬레이션 URL:', simulationUrl);
+        // Edge Function을 통한 LINE URL 생성
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          throw new Error('로그인 세션이 없습니다. 다시 로그인해주세요.');
+        }
         
-        // 팝업을 시뮬레이션 URL로 리다이렉트
-        popup.location.href = simulationUrl;
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/line-auth/generate-url`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+            'Origin': window.location.origin,
+            'Referer': window.location.href
+          },
+          body: JSON.stringify({ 
+            requestOrigin: window.location.origin
+          })
+        });
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Edge Function 호출 실패:', {
+            status: response.status,
+            error: errorText
+          });
+          throw new Error(`Edge Function 호출 실패: ${response.status} - ${errorText}`);
+        }
+        
+        const result = await response.json();
+        
+        if (!result.success) {
+          throw new Error(result.error || 'LINE URL 생성 실패');
+        }
+        
+        const lineUrl = result.loginUrl;
+        console.log('✅ 실제 LINE URL 생성 성공:', lineUrl);
+        
+        // 팝업을 실제 LINE OAuth URL로 리다이렉트
+        popup.location.href = lineUrl;
         
         // 팝업 완료 대기
         const checkAuth = setInterval(async () => {
