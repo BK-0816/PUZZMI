@@ -749,6 +749,28 @@
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       
+      // LINE 연동 확인
+      const { data: lineAccount, error: lineError } = await supabase
+        .from('user_line_accounts')
+        .select('is_verified')
+        .eq('user_id', user.id)
+        .eq('is_verified', true)
+        .maybeSingle();
+      
+      if (lineError || !lineAccount) {
+        result.innerHTML = `
+          <div class="result-message result-error">
+            <div style="font-size: 2rem; margin-bottom: 12px;">💬</div>
+            <div style="font-size: 1.2rem; font-weight: 800; margin-bottom: 8px;">LINE 계정 연동이 필요합니다</div>
+            <div style="font-size: 0.95rem; margin-bottom: 16px;">예약을 위해서는 LINE 계정 연동이 필수입니다.</div>
+            <a href="enhanced_signup.html" style="color: #667eea; text-decoration: none; font-weight: 600;">
+              LINE 연동하러 가기 →
+            </a>
+          </div>
+        `;
+        return;
+      }
+      
       // 토스페이먼츠 초기화 확인
       if (!tossPayments) {
         result.innerHTML = `
@@ -845,6 +867,26 @@
     // 초기화
     loadMate();
 
+    // LINE 연동 함수
+    window.connectLineAccount = function() {
+      const lineLoginUrl = generateLineLoginUrl();
+      const popup = window.open(lineLoginUrl, 'lineLogin', 'width=500,height=600');
+      
+      const checkAuth = setInterval(async () => {
+        if (popup.closed) {
+          clearInterval(checkAuth);
+          location.reload(); // 연동 후 페이지 새로고침
+        }
+      }, 1000);
+    function generateLineLoginUrl() {
+      const clientId = 'YOUR_LINE_CHANNEL_ID';
+      const redirectUri = encodeURIComponent(`${window.location.origin}/line_callback.html`);
+      const state = btoa(JSON.stringify({ userId: user.id, timestamp: Date.now() }));
+      const scope = 'profile openid';
+      
+      return `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}&scope=${scope}`;
+    }
+    };
     // 오늘 날짜를 최소값으로 설정
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('date').setAttribute('min', today);

@@ -649,6 +649,17 @@
       box-shadow: 0 6px 16px rgba(79, 172, 254, 0.4);
     }
     
+    .btn-verify {
+      background: linear-gradient(135deg, #ffd700 0%, #ffb347 100%);
+      color: #333;
+      box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+    }
+    
+    .btn-verify:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 6px 16px rgba(255, 215, 0, 0.4);
+    }
+    
     /* 입력 필드 */
     .input {
       padding: 12px 16px;
@@ -1707,6 +1718,9 @@
                     ${status === 'confirmed' ? '✅' : status === 'completed' ? '🎉' : status === 'declined' ? '❌' : '🚫'}
                   </button>
                 `).join('')}
+                <button class="btn btn-verify" data-action="send-payment" data-id="${booking.id}" style="font-size: 0.7rem; padding: 4px 8px;">
+                  <span>💳</span>
+                </button>
               </div>
             </td>
           </tr>
@@ -1719,6 +1733,11 @@
           btn.getAttribute('data-id'),
           btn.getAttribute('data-status')
         ));
+      });
+
+      // 결제 요청 버튼 이벤트
+      bookingsTable.querySelectorAll('[data-action="send-payment"]').forEach(btn => {
+        btn.addEventListener('click', () => sendPaymentRequest(btn.getAttribute('data-id')));
       });
     }
 
@@ -1779,6 +1798,28 @@
         console.error('상태 변경 실패:', error);
         toast('❌ 상태 변경 실패: ' + error.message);
         addLog('error', `예약 상태 변경 실패: ${error.message}`);
+      }
+    }
+
+    // 결제 요청 발송
+    async function sendPaymentRequest(bookingId) {
+      try {
+        const reason = prompt('결제 요청을 발송하시겠습니까?\n\n추가 메시지가 있다면 입력해주세요:');
+        if (reason === null) return; // 취소
+        
+        // LINE 결제 서비스 동적 import
+        const { sendPaymentRequestToCustomer } = await import('./line_payment_service.js');
+        
+        const result = await sendPaymentRequestToCustomer(bookingId);
+        
+        if (result.success) {
+          toast('💳 결제 요청이 고객의 LINE으로 발송되었습니다!');
+          await loadBookings(); // 목록 새로고침
+        }
+        
+      } catch (error) {
+        console.error('결제 요청 발송 실패:', error);
+        toast('❌ 결제 요청 발송 실패: ' + error.message);
       }
     }
 

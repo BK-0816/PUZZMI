@@ -272,6 +272,7 @@
       <div class="tabs">
         <button class="tab active" data-tab="login">로그인</button>
         <button class="tab" data-tab="signup">회원가입</button>
+        <button class="tab" data-tab="enhanced">상세 회원가입</button>
         <button class="tab" data-tab="magic">매직링크</button>
       </div>
 
@@ -317,6 +318,24 @@
         <div id="signup_result"></div>
       </form>
 
+      <!-- 상세 회원가입 안내 -->
+      <div id="enhancedPanel" data-panel="enhanced" class="stack-16" style="display:none;">
+        <div style="text-align: center; padding: 40px 20px;">
+          <div style="font-size: 3rem; margin-bottom: 20px;">✨</div>
+          <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            더 나은 서비스를 위한 상세 회원가입
+          </h3>
+          <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 24px;">
+            LINE 연동과 함께 더 안전하고 편리한<br>
+            PUZZMI 서비스를 이용해보세요!
+          </p>
+          <a href="enhanced_signup.html" class="btn btn-primary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+            <i class="fas fa-user-plus"></i>
+            상세 회원가입 시작하기
+          </a>
+        </div>
+      </div>
+
       <!-- 매직링크 폼 -->
       <form id="magicForm" data-panel="magic" class="stack-16">
         <div class="field">
@@ -343,9 +362,11 @@
     // ===== Tabs =====
     const tabs = document.querySelectorAll('.tab');
     const panels = document.querySelectorAll('form[data-panel]');
+    const enhancedPanel = document.getElementById('enhancedPanel');
     
     function show(name) {
       panels.forEach(p => p.style.display = p.getAttribute('data-panel') === name ? 'block' : 'none');
+      enhancedPanel.style.display = name === 'enhanced' ? 'block' : 'none';
       tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === name));
     }
     
