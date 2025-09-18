@@ -1175,19 +1175,23 @@ body {
         gap: 24px;
         flex-wrap: wrap;
         padding: 0 20px;
-}
-
-.business-info p {
-    margin: 0;
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-    line-height: 1.4;
-}
-
-.business-info p:first-child {
-    font-weight: 600;
-    color: var(--text-primary);
-}
+    }
+    
+    .business-info {
+        flex: 1;
+    }
+    
+    .business-info p {
+        margin: 0;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+    
+    .business-info p:first-child {
+        font-weight: 600;
+        color: var(--text-primary);
+    }
 
     .footer-legal {
         display: flex;
