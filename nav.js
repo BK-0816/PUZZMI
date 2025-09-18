@@ -22,7 +22,26 @@ function el(tag, attrs={}, children=[]) {
 }
 
 async function getRoles() {
-  const { data: { user } } = await supabase.auth.getUser();
+  let user = null;
+  try {
+    const { data: { user: authUser }, error } = await supabase.auth.getUser();
+    if (error) {
+      // Check if the error is related to invalid session
+      if (error.message && error.message.includes('Session from session_id claim in JWT does not exist')) {
+        console.log('Invalid session detected, clearing auth state');
+        await supabase.auth.signOut();
+        return { user: null, isAdmin: false, isMate: false };
+      }
+      throw error;
+    }
+    user = authUser;
+  } catch (error) {
+    console.error('Auth error:', error);
+    // Clear invalid session and return null user
+    await supabase.auth.signOut();
+    return { user: null, isAdmin: false, isMate: false };
+  }
+  
   let isAdmin = false, isMate = false;
   if (user) {
     const a = await supabase.from('admin_users').select('user_id').eq('user_id', user.id).maybeSingle();
