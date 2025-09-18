@@ -46,7 +46,7 @@ async function getRoles() {
   const maxRetries = 3;
   
   while (retryCount < maxRetries) {
-  try {
+    try {
       // 연결 상태 확인
       const { data: { user: authUser }, error } = await Promise.race([
         supabase.auth.getUser(),
@@ -55,7 +55,7 @@ async function getRoles() {
         )
       ]);
       
-    if (error) {
+      if (error) {
         // 세션 관련 오류인 경우 재시도
         if (error.message.includes('session') || error.message.includes('JWT')) {
           console.log(`Auth session error (attempt ${retryCount + 1}):`, error.message);
@@ -80,9 +80,7 @@ async function getRoles() {
       user = authUser;
       break; // 성공 시 루프 종료
       
-    }
-    user = authUser;
-  } catch (error) {
+    } catch (error) {
       console.error(`Auth error (attempt ${retryCount + 1}):`, error);
       retryCount++;
     
@@ -106,11 +104,11 @@ async function getRoles() {
         
         sessionStorage.removeItem('logout_action');
         return { user: null, isAdmin: false, isMate: false };
-    }
+      }
     
       // 재시도 전 대기
       await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
-  }
+    }
   }
   
   // 로그아웃 플래그 정리
