@@ -996,51 +996,33 @@
         if (error) throw error;
         
         if (data.user) {
-          // 2. 확장된 profiles 스키마에 맞춰 프로필 정보 저장
-          // 기존 profiles 스키마에 맞춰 저장 (확장 컬럼들은 제외)
-          const basicProfileData = {
+          // 2. profiles 테이블에 모든 정보 저장
+          const profileData = {
             id: data.user.id,
             full_name: userData.fullName,
             age: userData.age,
             gender: userData.gender,
             languages: userData.languages,
+            phone_number: userData.phoneNumber,
+            nationality: userData.nationality,
+            residence: userData.residence,
+            occupation: userData.occupation,
+            interests: userData.interests,
+            self_introduction: userData.selfIntroduction,
+            profile_completion: 85,
             avatar_url: null
           };
           
-          const { data: profileResult, error: profileError } = await supabase
+          const { error: profileError } = await supabase
             .from('profiles')
-            .upsert(basicProfileData, { 
+            .upsert(profileData, { 
               onConflict: 'id',
               ignoreDuplicates: false 
-            })
-            .select();
+            });
           
           if (profileError) {
             console.error('프로필 저장 오류:', profileError);
             throw new Error(`프로필 저장 실패: ${profileError.message}`);
-          }
-          
-          // 3. 추가 정보는 사용자 메타데이터에 저장
-          try {
-            // 확장 정보를 auth.users의 user_metadata에 저장
-            const { error: metaError } = await supabase.auth.updateUser({
-              data: {
-                phone_number: userData.phoneNumber,
-                nationality: userData.nationality,
-                residence: userData.residence,
-                occupation: userData.occupation,
-                interests: userData.interests || [],
-                self_introduction: userData.selfIntroduction,
-                profile_completion: 85,
-                signup_completed_at: new Date().toISOString()
-              }
-            });
-            
-            if (metaError) {
-              console.warn('메타데이터 저장 실패:', metaError);
-            }
-          } catch (notifError) {
-            console.warn('추가 정보 저장 실패:', notifError);
           }
           
           userData.userId = data.user.id;
