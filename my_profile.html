@@ -689,18 +689,6 @@
     <section class="section-card">
       <h3 class="section-title">👤 기본 정보</h3>
       
-      <!-- 아바타 업로드 -->
-      <div class="avatar-section">
-        <div class="avatar-container">
-          <img id="avatarImage" class="avatar-image" src="https://picsum.photos/seed/user/120/120" alt="프로필 사진"/>
-          <label class="avatar-upload-btn" for="avatarInput">
-            📷
-          </label>
-          <input type="file" id="avatarInput" class="avatar-upload-input" accept="image/*"/>
-        </div>
-        <div class="help-text">프로필 사진을 업로드하세요 (선택사항)</div>
-      </div>
-      
       <form id="basicInfoForm" class="form-grid">
         <div class="form-row">
           <div class="form-field">
@@ -826,14 +814,6 @@
           </div>
         </div>
         
-        <div class="form-row single">
-          <div class="form-field">
-            <label class="form-label" for="selfIntroduction">자기소개</label>
-            <textarea class="form-textarea" id="selfIntroduction" placeholder="안녕하세요! 저는..."></textarea>
-            <div class="help-text">메이트에게 자신을 소개해보세요</div>
-          </div>
-        </div>
-        
         <div class="action-group">
           <button class="btn btn-primary" type="submit">🚀 상세정보 저장</button>
           <div id="detailInfoResult"></div>
@@ -912,8 +892,6 @@
     }
 
     // DOM 요소들
-    const avatarImage = document.getElementById('avatarImage');
-    const avatarInput = document.getElementById('avatarInput');
     const progressFill = document.getElementById('progressFill');
     const progressText = document.getElementById('progressText');
     const accountStatus = document.getElementById('accountStatus');
@@ -926,7 +904,6 @@
     const nationalityEl = document.getElementById('nationality');
     const residenceEl = document.getElementById('residence');
     const occupationEl = document.getElementById('occupation');
-    const selfIntroductionEl = document.getElementById('selfIntroduction');
     const currentEmailEl = document.getElementById('currentEmail');
 
     // 결과 메시지 요소들
@@ -945,9 +922,7 @@
         profile.residence,
         profile.occupation,
         profile.languages && profile.languages.length > 0,
-        profile.interests && profile.interests.length > 0,
-        profile.self_introduction,
-        profile.avatar_url
+        profile.interests && profile.interests.length > 0
       ];
       
       const completed = fields.filter(Boolean).length;
@@ -973,13 +948,7 @@
         nationalityEl.value = profile.nationality || '';
         residenceEl.value = profile.residence || '';
         occupationEl.value = profile.occupation || '';
-        selfIntroductionEl.value = profile.self_introduction || '';
         currentEmailEl.value = user.email || '';
-
-        // 아바타 이미지
-        if (profile.avatar_url) {
-          avatarImage.src = profile.avatar_url;
-        }
 
         // 언어 체크박스
         const languages = Array.isArray(profile.languages) ? profile.languages : [];
@@ -1017,52 +986,6 @@
         basicInfoResult.innerHTML = `<div class="error">❌ 프로필 로드 실패: ${error.message}</div>`;
       }
     }
-
-    // 아바타 업로드
-    avatarInput.addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      if (!file.type.startsWith('image/')) {
-        alert('이미지 파일만 업로드 가능합니다.');
-        return;
-      }
-
-      if (file.size > 5 * 1024 * 1024) {
-        alert('5MB 이하의 이미지만 업로드 가능합니다.');
-        return;
-      }
-
-      try {
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${user.id}/avatar.${fileExt}`;
-
-        const { error: uploadError } = await supabase.storage
-          .from('avatars')
-          .upload(fileName, file, { upsert: true });
-
-        if (uploadError) throw uploadError;
-
-        const { data: { publicUrl } } = supabase.storage
-          .from('avatars')
-          .getPublicUrl(fileName);
-
-        // 프로필에 아바타 URL 저장
-        const { error: updateError } = await supabase
-          .from('profiles')
-          .update({ avatar_url: publicUrl })
-          .eq('id', user.id);
-
-        if (updateError) throw updateError;
-
-        avatarImage.src = publicUrl;
-        showToast('✅ 프로필 사진이 업데이트되었습니다!');
-
-      } catch (error) {
-        console.error('아바타 업로드 실패:', error);
-        showToast('❌ 아바타 업로드 실패: ' + error.message);
-      }
-    });
 
     // 기본 정보 저장
     document.getElementById('basicInfoForm').addEventListener('submit', async (e) => {
@@ -1136,7 +1059,6 @@
           occupation: occupationEl.value.trim() || null,
           languages: selectedLanguages.length > 0 ? selectedLanguages : null,
           interests: selectedInterests.length > 0 ? selectedInterests : null,
-          self_introduction: selfIntroductionEl.value.trim() || null,
           updated_at: new Date().toISOString()
         };
 
