@@ -4,335 +4,130 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>LINE 연동 처리 중...</title>
-  <link rel="stylesheet" href="styles.css"/>
   <style>
     body {
-      background: var(--bg-cream);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      margin: 0;
-      font-family: 'Noto Sans KR', sans-serif;
+      background: #faf7f2;
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; margin: 0; font-family: 'Noto Sans KR', sans-serif;
     }
-
-    .callback-container {
-      background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255,255,255,0.3);
-      border-radius: 24px;
-      padding: 60px 40px;
-      text-align: center;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.1);
-      max-width: 500px;
-      width: 90%;
-    }
-
-    .loading-icon {
-      font-size: 4rem;
-      margin-bottom: 24px;
-      animation: spin 2s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .loading-text {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 16px;
-    }
-
-    .loading-subtext {
-      color: var(--text-secondary);
-      font-size: 1rem;
-      line-height: 1.6;
-    }
-
-    .error-container {
-      background: linear-gradient(135deg, #fadbd8 0%, #f1948a 100%);
-      color: #922b21;
-      padding: 20px;
-      border-radius: 16px;
-      border: 2px solid rgba(220, 53, 69, 0.3);
-      margin-top: 20px;
-    }
-
-    .success-container {
-      background: linear-gradient(135deg, #d1f2eb 0%, #a3e4d7 100%);
-      color: #0e6b47;
-      padding: 20px;
-      border-radius: 16px;
-      border: 2px solid rgba(25, 135, 84, 0.3);
-      margin-top: 20px;
-    }
+    .callback-container { background: #fff; border-radius: 20px; padding: 40px 28px; width: 92%; max-width: 520px; box-shadow: 0 18px 50px rgba(0,0,0,.08); text-align: center; }
+    .loading-icon { font-size: 3rem; margin-bottom: 18px; }
+    .title { font-size: 1.4rem; font-weight: 800; margin-bottom: 10px; }
+    .desc { color: #555; line-height: 1.6; }
+    .error { background: #fde2e0; color: #8a1c15; border: 1px solid #f3b1ab; padding: 12px; border-radius: 12px; margin-top: 16px; font-size: .95rem; }
+    .success { background: #def7f0; color: #0a6147; border: 1px solid #a5e3d2; padding: 12px; border-radius: 12px; margin-top: 16px; font-size: .95rem; }
   </style>
 </head>
 <body>
   <div class="callback-container">
     <div class="loading-icon">💬</div>
-    <div class="loading-text">LINE 연동 처리 중...</div>
-    <div class="loading-subtext">
-      잠시만 기다려주세요.<br>
-      LINE 계정 연동을 완료하고 있습니다.
-    </div>
-    <div id="status"></div>
+    <div class="title">LINE 연동 처리 중...</div>
+    <div class="desc">잠시만 기다려주세요. LINE 계정 연동을 완료하고 있습니다.</div>
+    <div id="status" style="margin-top:12px;"></div>
   </div>
 
-  <!-- ✅ 동적 import 대신 정적 ESM import로 고정 -->
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-    // ===== 설정 (필요시 .env 등으로 분리) =====
-    const SUPABASE_URL = "https://eevvgbbokenpjnvtmztk.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFlvXnEwQPZah1mQzwiyG2Y4";
+    // ====== 환경 ======
+    const SUPABASE_URL = 'https://eevvgbbokenpjnvtmztk.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4';
     const EDGE_COMPLETE_URL = `${SUPABASE_URL}/functions/v1/line-auth/complete-auth`;
+
+    function isSameOriginWithOpener() {
+      try {
+        if (!window.opener) return false;
+        return window.opener.location.origin === window.location.origin;
+      } catch {
+        return false; // cross-origin인 경우 예외
+      }
+    }
 
     async function processLineCallback() {
       const statusEl = document.getElementById('status');
 
-      try {
-        // ===== Supabase 인스턴스 확보 (부모창 공유 → 새로 생성) =====
-        let supabase;
-        try {
-          if (window.opener && window.opener.supabase) {
-            console.log('✅ 부모 창에서 Supabase 인스턴스 공유');
-            supabase = window.opener.supabase;
-          } else {
-            console.log('⚠️ 부모 창 세션 없음, 새 인스턴스 생성(정적 import 사용)');
-            supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-          }
-        } catch (e) {
-          console.error('Supabase 인스턴스 생성 실패:', e);
-          throw new Error('인증 시스템 초기화 실패');
-        }
-
-        // ===== URL 파라미터 파싱 =====
-        const urlParams = new URLSearchParams(window.location.search);
-        console.log('=== LINE 콜백 URL 분석 ===');
-        console.log('전체 URL:', window.location.href);
-
-        const code = urlParams.get('code');
-        const state = urlParams.get('state');
-        const error = urlParams.get('error');
-        const errorDescription = urlParams.get('error_description');
-        const simulation = urlParams.get('simulation');
-        const success = urlParams.get('success');
-
-        console.log('콜백 파라미터:', { code, state, error, errorDescription, simulation, success });
-
-        // ===== 시뮬레이션 모드 처리 =====
-        if (simulation === 'true' && success === 'true') {
-          console.log('🎭 시뮬레이션 모드 감지');
-          const { data: { user } } = await supabase.auth.getUser();
-          if (user) {
-            await handleSimulationCallback(user.id, supabase);
-            return;
-          } else {
-            throw new Error('시뮬레이션 처리를 위해 로그인이 필요합니다.');
-          }
-        }
-
-        // ===== LINE 에러 케이스 (개발 상태 등) =====
-        if (error) {
-          if (
-            error === 'access_denied' ||
-            (errorDescription && (
-              errorDescription.includes('developer role') ||
-              errorDescription.includes('redirect_uri')
-            ))
-          ) {
-            console.warn('LINE 채널이 개발 상태입니다. 시뮬레이션 모드로 전환합니다.');
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) {
-              await handleSimulationCallback(user.id, supabase);
-              return;
-            } else {
-              throw new Error('시뮬레이션 처리를 위해 로그인이 필요합니다.');
-            }
-          } else {
-            const errorMsg = errorDescription ? `${error}: ${errorDescription}` : error;
-            throw new Error(`LINE 로그인 오류: ${errorMsg}`);
-          }
-        }
-
-        // ===== 정상 인증 코드 확인 =====
-        if (!code) {
-          throw new Error('Authorization code가 없습니다. LINE 로그인을 다시 시도해주세요.');
-        }
-
-        // ===== Edge Function으로 최종 인증 처리 =====
-        try {
-          await processLineAuthWithEdgeFunction(code, state, supabase);
-        } catch (apiError) {
-          console.error('Edge Function 실패:', apiError);
-          const { data: { user } } = await supabase.auth.getUser();
-          if (user) {
-            console.warn('시뮬레이션 모드로 전환');
-            await handleSimulationCallback(user.id, supabase);
-          } else {
-            throw new Error('인증 처리를 위해 로그인이 필요합니다.');
-          }
-        }
-
-      } catch (error) {
-        console.error('LINE 콜백 처리 실패:', error);
-
-        // UI 표시
-        statusEl.innerHTML = `
-          <div class="error-container">
-            <h3>❌ LINE 연동 처리 중 오류</h3>
-            <p>${error.message}</p>
-            <div style="font-size: 0.9rem; margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.1); border-radius: 8px;">
-              <strong>해결 방법:</strong><br>
-              • LINE 채널이 개발 상태인 경우: 시뮬레이션 모드로 자동 전환됩니다<br>
-              • 다른 오류인 경우: 페이지를 새로고침하고 다시 시도해주세요
-            </div>
-            <button onclick="window.close()" style="margin-top: 12px; padding: 8px 16px; background: #dc3545; color: white; border: none; border-radius: 8px; cursor: pointer;">
-              창 닫기
-            </button>
-          </div>
-        `;
-
-        // 부모창에 에러 전달
-        if (window.opener) {
-          window.opener.postMessage({ type: 'LINE_AUTH_ERROR', error: error.message }, '*');
-        }
-
-        // 자동 닫기
-        setTimeout(() => window.close(), 5000);
-      }
-    }
-
-    // ===== Edge Function을 통한 완전한 LINE 인증 처리 =====
-    async function processLineAuthWithEdgeFunction(code, state, supabase) {
-      console.log('🔐 Edge Function을 통한 완전한 LINE 인증 처리 시작');
-
-      // ✅ 오타 수정된 구조분해: 괄호/중괄호 주의
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        throw new Error('로그인 세션이 없습니다.');
-      }
-
-      console.log('✅ 콜백에서 세션 확인됨:', session.user.id);
-
-      const response = await fetch(EDGE_COMPLETE_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({ code, state }),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Edge Function 실패:', errorText);
-        throw new Error(`LINE 인증 처리 실패: ${response.status} - ${errorText}`);
-      }
-
-      const result = await response.json();
-      if (!result.success) {
-        throw new Error(result.error || 'LINE 인증 처리 실패');
-      }
-
-      console.log('✅ Edge Function으로 LINE 인증 완료!');
-      await handleSuccess(result.message || 'LINE 계정 연동이 완료되었습니다!');
-    }
-
-    // ===== 시뮬레이션 처리 =====
-    async function handleSimulationCallback(userId, supabase) {
-      console.log('🎭 시뮬레이션 모드 처리');
-      console.log('✅ 시뮬레이션 사용자 ID:', userId);
-
-      const statusEl = document.getElementById('status');
-      statusEl.innerHTML = `
-        <div class="success-container">
-          <h3>🔄 개발 채널 시뮬레이션</h3>
-          <p>LINE 채널이 개발 상태이므로 시뮬레이션으로 연동을 완료합니다...</p>
-        </div>
-      `;
-
-      const mockProfile = {
-        userId: 'U' + Math.random().toString(36).substr(2, 9),
-        displayName: 'PUZZMI 사용자',
-        pictureUrl: 'https://picsum.photos/200/200'
-      };
-
-      const mockTokenData = {
-        access_token: 'mock_access_token_' + Date.now(),
-        token_type: 'Bearer',
-        expires_in: 2592000,
-        refresh_token: 'mock_refresh_token_' + Date.now()
-      };
-
-      const lineAccountData = {
-        user_id: userId,
-        line_user_id: mockProfile.userId,
-        line_display_name: mockProfile.displayName,
-        line_picture_url: mockProfile.pictureUrl,
-        is_verified: true,
-        access_token: mockTokenData.access_token,
-        refresh_token: mockTokenData.refresh_token || null,
-        token_expires_at: mockTokenData.expires_in
-          ? new Date(Date.now() + mockTokenData.expires_in * 1000).toISOString()
-          : null
-      };
-
-      const { error } = await supabase
-        .from('user_line_accounts')
-        .upsert(lineAccountData, { onConflict: 'user_id' });
+      // 1) URL 파라미터 파싱
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+      const state = urlParams.get('state');
+      const error = urlParams.get('error');
+      const errorDescription = urlParams.get('error_description');
 
       if (error) {
-        console.error('LINE 계정 저장 실패:', error);
-        throw new Error(`LINE 계정 저장 실패: ${error.message}`);
+        if (window.opener) {
+          window.opener.postMessage({ type: 'LINE_AUTH_ERROR', error: errorDescription || error }, '*');
+        }
+        statusEl.innerHTML = `<div class="error">❌ ${errorDescription || error}</div>`;
+        setTimeout(()=> window.close(), 900);
+        return;
       }
 
-      await supabase
-        .from('user_verifications')
-        .upsert({
-          user_id: userId,
-          verification_type: 'line',
-          is_verified: true,
-          verified_at: new Date().toISOString(),
-          verification_data: {
-            line_user_id: mockProfile.userId,
-            display_name: mockProfile.displayName
-          }
-        }, { onConflict: 'user_id,verification_type' });
-
-      await handleSuccess('LINE 연동이 완료되었습니다! (시뮬레이션 모드)');
-    }
-
-    // ===== 성공 처리 공통 =====
-    async function handleSuccess(message) {
-      const statusEl = document.getElementById('status');
-
-      statusEl.innerHTML = `
-        <div class="success-container">
-          <h3>✅ 연동 성공!</h3>
-          <p>${message}</p>
-          <p style="font-size: 0.9rem; margin-top: 12px;">잠시 후 창이 자동으로 닫힙니다...</p>
-        </div>
-      `;
-
-      // 부모 창에 성공 메시지 전달
-      if (window.opener) {
-        window.opener.postMessage({ type: 'LINE_AUTH_SUCCESS', message }, '*');
+      if (!code) {
+        statusEl.innerHTML = `<div class="error">❌ Authorization code가 없습니다.</div>`;
+        setTimeout(()=> window.close(), 900);
+        return;
       }
 
-      setTimeout(() => {
-        window.close();
-      }, 2000);
+      // 2) cross-origin이면 → 메인창으로 code/state 전달 후 종료 (권장 경로)
+      const sameOrigin = isSameOriginWithOpener();
+      if (!sameOrigin && window.opener) {
+        window.opener.postMessage({ type: 'LINE_AUTH_CODE', code, state }, '*');
+        statusEl.innerHTML = `<div class="success">🔁 메인 창으로 인증 코드를 전달했습니다.</div>`;
+        setTimeout(()=> window.close(), 500);
+        return;
+      }
+
+      // 3) same-origin이면 → 팝업 내에서 처리(옵션)
+      let supabase;
+      try {
+        if (sameOrigin && window.opener && window.opener.supabase) {
+          supabase = window.opener.supabase;
+        } else {
+          supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
+      } catch (e) {
+        // 예외 발생 시 릴레이로 폴백
+        if (window.opener) {
+          window.opener.postMessage({ type: 'LINE_AUTH_CODE', code, state }, '*');
+          statusEl.innerHTML = `<div class="success">🔁 메인 창으로 인증 코드를 전달했습니다.</div>`;
+          setTimeout(()=> window.close(), 500);
+          return;
+        }
+        statusEl.innerHTML = `<div class="error">❌ 인증 시스템 초기화 실패</div>`;
+        return;
+      }
+
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) throw new Error('로그인 세션이 없습니다.');
+
+        const resp = await fetch(EDGE_COMPLETE_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ code, state })
+        });
+        if (!resp.ok) throw new Error(await resp.text());
+        const result = await resp.json();
+        if (!result.success) throw new Error(result.error || 'LINE 인증 처리 실패');
+
+        if (window.opener) {
+          window.opener.postMessage({ type: 'LINE_AUTH_SUCCESS', message: result.message || '연동 완료' }, '*');
+        }
+        statusEl.innerHTML = `<div class="success">✅ 연동 성공! 잠시 후 창이 닫힙니다.</div>`;
+        setTimeout(()=> window.close(), 600);
+      } catch (e) {
+        if (window.opener) {
+          window.opener.postMessage({ type: 'LINE_AUTH_ERROR', error: String(e.message || e) }, '*');
+        }
+        statusEl.innerHTML = `<div class="error">❌ ${String(e.message || e)}</div>`;
+        setTimeout(()=> window.close(), 1200);
+      }
     }
 
-    // ===== 콜백 처리 시작 =====
-    (async () => {
-      await processLineCallback();
-    })();
+    (async () => { await processLineCallback(); })();
   </script>
 </body>
 </html>
