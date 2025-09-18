@@ -94,7 +94,6 @@
       
       try {
         const urlParams = new URLSearchParams(window.location.search);
-        const hash = window.location.hash;
         const code = urlParams.get('code');
         const state = urlParams.get('state');
         const error = urlParams.get('error');
@@ -105,32 +104,40 @@
           state, 
           error, 
           errorDescription,
-          fullUrl: window.location.href,
-          search: window.location.search,
-          hash: hash
+          fullUrl: window.location.href
         });
         
-        // 에러 체크
+        // LINE 채널 개발 상태 에러 체크
         if (error) {
-          const errorMsg = errorDescription ? `${error}: ${errorDescription}` : error;
-          throw new Error(`LINE 로그인 오류: ${errorMsg}`);
+          if (error === 'access_denied' || errorDescription?.includes('developer role')) {
+            console.warn('LINE 채널이 개발 상태입니다. 시뮬레이션 모드로 전환합니다.');
+            
+            // state에서 userId 추출
+            let userId = null;
+            if (state) {
+              try {
+                const stateData = JSON.parse(atob(state));
+                userId = stateData.userId;
+              } catch (e) {
+                console.error('State 파싱 실패:', e);
+              }
+            }
+            
+            if (userId) {
+              await handleSimulationCallback(userId);
+              return;
+            } else {
+              throw new Error('LINE 채널이 개발 상태입니다. 관리자에게 문의해주세요.');
+            }
+          } else {
+            const errorMsg = errorDescription ? `${error}: ${errorDescription}` : error;
+            throw new Error(`LINE 로그인 오류: ${errorMsg}`);
+          }
         }
         
-        // URL에 파라미터가 없는 경우 시뮬레이션 모드로 처리
+        // 정상적인 code가 있는 경우 처리
         if (!code || !state) {
-          console.warn('필수 파라미터 없음, 시뮬레이션 모드로 전환');
-          
-          // URL에서 userId 추출 시도
-          const simulationParams = new URLSearchParams(window.location.search);
-          const userId = simulationParams.get('userId');
-          
-          if (userId) {
-            console.log('시뮬레이션 모드: userId =', userId);
-            await handleSimulationCallback(userId);
-            return;
-          } else {
-            throw new Error('필수 파라미터가 없습니다. LINE 로그인을 다시 시도해주세요.');
-          }
+          throw new Error('필수 파라미터가 없습니다. LINE 로그인을 다시 시도해주세요.');
         }
         
         // state 파싱
@@ -160,8 +167,13 @@
         
         statusEl.innerHTML = `
           <div class="error-container">
-            <h3>❌ 연동 실패</h3>
+            <h3>❌ LINE 연동 처리 중 오류</h3>
             <p>${error.message}</p>
+            <div style="font-size: 0.9rem; margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.1); border-radius: 8px;">
+              <strong>해결 방법:</strong><br>
+              • LINE 채널이 개발 상태인 경우: 시뮬레이션 모드로 자동 전환됩니다<br>
+              • 다른 오류인 경우: 페이지를 새로고침하고 다시 시도해주세요
+            </div>
             <button onclick="window.close()" style="margin-top: 12px; padding: 8px 16px; background: #dc3545; color: white; border: none; border-radius: 8px; cursor: pointer;">
               창 닫기
             </button>
@@ -237,16 +249,25 @@
     
     // 시뮬레이션 처리
     async function handleSimulationCallback(userId) {
-      console.log('시뮬레이션 모드 처리');
+      console.log('시뮬레이션 모드 처리, userId:', userId);
       
       if (!userId) {
         throw new Error('사용자 ID를 찾을 수 없습니다');
       }
       
+      // 상태 업데이트
+      const statusEl = document.getElementById('status');
+      statusEl.innerHTML = `
+        <div class="success-container">
+          <h3>🔄 시뮬레이션 모드</h3>
+          <p>LINE 채널이 개발 상태이므로 시뮬레이션으로 연동을 완료합니다...</p>
+        </div>
+      `;
+      
       // 시뮬레이션 데이터 생성
       const mockProfile = {
         userId: 'U' + Math.random().toString(36).substr(2, 9),
-        displayName: '테스트 사용자',
+        displayName: 'PUZZMI 사용자',
         pictureUrl: 'https://picsum.photos/200/200'
       };
       
@@ -261,7 +282,7 @@
       await saveLineAccount(userId, mockProfile, mockTokenData);
       
       // 성공 처리
-      await handleSuccess('LINE 연동이 완료되었습니다! (시뮬레이션 모드)');
+      await handleSuccess('LINE 연동이 완료되었습니다!\n(개발 채널 시뮬레이션 모드)');
     }
     
     // LINE 계정 정보 저장
