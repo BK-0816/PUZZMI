@@ -522,17 +522,18 @@
     }
     
     .policy-section.expanded .policy-content {
-      max-height: 2000px;
-      padding: 32px;
+      max-height: 1200px;
+      padding: 24px;
+      overflow-y: auto;
     }
     
     /* 핵심 환불 규정 하이라이트 */
     .policy-highlight {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-      margin-bottom: 32px;
-      padding: 24px;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding: 16px;
       background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(240, 147, 251, 0.03) 100%);
       border-radius: 16px;
       border: 2px solid rgba(102, 126, 234, 0.15);
@@ -543,7 +544,7 @@
       flex-direction: column;
       align-items: center;
       text-align: center;
-      padding: 20px;
+      padding: 16px;
       background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
       border-radius: 16px;
       border: 1px solid rgba(255,255,255,0.4);
@@ -557,17 +558,17 @@
     }
     
     .highlight-icon {
-      font-size: 2.5rem;
-      margin-bottom: 12px;
+      font-size: 2rem;
+      margin-bottom: 8px;
       filter: grayscale(0.2);
     }
     
     .highlight-text strong {
       display: block;
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 800;
       color: var(--text-primary);
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -575,7 +576,7 @@
     }
     
     .highlight-text span {
-      font-size: 1rem;
+      font-size: 0.9rem;
       font-weight: 600;
       color: var(--text-secondary);
     }
@@ -583,25 +584,25 @@
     /* 상세 정책 */
     .policy-details {
       display: grid;
-      gap: 24px;
+      gap: 16px;
     }
     
     .policy-section-item {
       background: linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.6) 100%);
       border: 1px solid rgba(102, 126, 234, 0.1);
       border-radius: 16px;
-      padding: 24px;
+      padding: 16px;
       backdrop-filter: blur(6px);
     }
     
     .policy-section-item h5 {
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       font-weight: 800;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      margin: 0 0 16px 0;
+      margin: 0 0 12px 0;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -611,16 +612,17 @@
     .policy-section-item ul {
       margin: 0;
       padding-left: 20px;
-      line-height: 1.7;
+      line-height: 1.5;
       color: var(--text-primary);
+      font-size: 0.95rem;
     }
     
     .policy-section-item li {
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
     
     .policy-section-item ul ul {
-      margin-top: 8px;
+      margin-top: 6px;
       padding-left: 16px;
     }
     
@@ -655,21 +657,22 @@
       background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(240, 147, 251, 0.05) 100%);
       border: 2px solid rgba(102, 126, 234, 0.2);
       border-radius: 12px;
-      padding: 20px;
-      margin-top: 20px;
+      padding: 16px;
+      margin-top: 16px;
     }
     
     .policy-contact h5 {
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 800;
       color: #667eea;
-      margin: 0 0 12px 0;
+      margin: 0 0 8px 0;
     }
     
     .policy-contact p {
       margin: 0;
-      line-height: 1.6;
+      line-height: 1.4;
       color: var(--text-primary);
+      font-size: 0.95rem;
     }
     
     /* 동의 체크박스 */
