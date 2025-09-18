@@ -14,13 +14,13 @@ export const LINE_CONFIG = {
   get CALLBACK_URL() {
     // 개발 환경과 운영 환경 자동 감지
     const origin = window.location.origin;
-    const isLocalhost = origin.includes('localhost') || origin.includes('127.0.0.1');
+    const isLocalhost = origin.includes('localhost') || origin.includes('127.0.0.1') || origin.includes('bolt.new');
     
     if (isLocalhost) {
       // 개발 환경: localhost 사용
       return `${origin}/line_callback.html`;
     } else {
-      // 운영 환경: 실제 도메인 사용
+      // 운영 환경: Netlify 도메인 사용 (https://puzzmi.netlify.app)
       return `${origin}/line_callback.html`;
     }
   },
