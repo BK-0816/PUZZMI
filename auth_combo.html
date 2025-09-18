@@ -290,13 +290,13 @@
       }
       
       .action-buttons .btn {
-        width: 100%;
       }
     }
   </style>
 </head>
 <body class="bg-cream">
   <main class="page">
+        margin: 0 auto;
     <section class="card">
       <h2>로그인 / 회원가입</h2>
       <div class="muted">PUZZMI와 함께 특별한 여행을 시작하세요! ✨</div>
@@ -346,10 +346,6 @@
           <i class="fas fa-home"></i>
           메인페이지
         </a>
-        <button id="logout" class="btn btn-secondary">
-          <i class="fas fa-sign-out-alt"></i>
-          로그아웃
-        </button>
       </div>
       
       <div id="whoami" class="muted"></div>
@@ -395,10 +391,6 @@
     };
 
     // ===== LOGOUT =====
-    document.getElementById('logout').onclick = async () => {
-      await supabase.auth.signOut();
-      render();
-    };
 
     async function render() {
       const { data: { user } } = await supabase.auth.getUser();
