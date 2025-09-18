@@ -405,6 +405,23 @@
         width: 180px;
         height: 180px;
       }
+      
+      .policy-highlight {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      
+      .highlight-item {
+        flex-direction: row;
+        text-align: left;
+        padding: 16px;
+      }
+      
+      .highlight-icon {
+        font-size: 2rem;
+        margin-bottom: 0;
+        margin-right: 16px;
+      }
     }
     
     /* 로딩 애니메이션 */
@@ -448,6 +465,298 @@
     @keyframes float {
       0%, 100% { transform: translateY(0px); }
       50% { transform: translateY(-20px); }
+    }
+    
+    /* 환불정책 섹션 */
+    .policy-section {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(240, 147, 251, 0.05) 100%);
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 20px;
+      margin: 32px 0;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.1);
+    }
+    
+    .policy-header {
+      padding: 20px 24px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+      border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+    }
+    
+    .policy-header:hover {
+      background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 100%);
+    }
+    
+    .policy-title {
+      font-size: 1.3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    
+    .policy-toggle {
+      transition: transform 0.3s ease;
+      color: #667eea;
+    }
+    
+    .policy-section.expanded .policy-toggle {
+      transform: rotate(180deg);
+    }
+    
+    .policy-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s ease, padding 0.3s ease;
+      background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
+    }
+    
+    .policy-section.expanded .policy-content {
+      max-height: 2000px;
+      padding: 32px;
+    }
+    
+    /* 핵심 환불 규정 하이라이트 */
+    .policy-highlight {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+      padding: 24px;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(240, 147, 251, 0.03) 100%);
+      border-radius: 16px;
+      border: 2px solid rgba(102, 126, 234, 0.15);
+    }
+    
+    .highlight-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.4);
+      transition: all 0.3s ease;
+      backdrop-filter: blur(8px);
+    }
+    
+    .highlight-item:hover {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 12px 32px rgba(102, 126, 234, 0.15);
+    }
+    
+    .highlight-icon {
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+      filter: grayscale(0.2);
+    }
+    
+    .highlight-text strong {
+      display: block;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .highlight-text span {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    
+    /* 상세 정책 */
+    .policy-details {
+      display: grid;
+      gap: 24px;
+    }
+    
+    .policy-section-item {
+      background: linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.6) 100%);
+      border: 1px solid rgba(102, 126, 234, 0.1);
+      border-radius: 16px;
+      padding: 24px;
+      backdrop-filter: blur(6px);
+    }
+    
+    .policy-section-item h5 {
+      font-size: 1.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .policy-section-item ol,
+    .policy-section-item ul {
+      margin: 0;
+      padding-left: 20px;
+      line-height: 1.7;
+      color: var(--text-primary);
+    }
+    
+    .policy-section-item li {
+      margin-bottom: 8px;
+    }
+    
+    .policy-section-item ul ul {
+      margin-top: 8px;
+      padding-left: 16px;
+    }
+    
+    .text-success {
+      color: #28a745;
+      font-weight: 700;
+      background: linear-gradient(135deg, #d1f2eb 0%, #a3e4d7 100%);
+      padding: 2px 8px;
+      border-radius: 8px;
+      border: 1px solid rgba(25, 135, 84, 0.2);
+    }
+    
+    .text-warning {
+      color: #856404;
+      font-weight: 700;
+      background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+      padding: 2px 8px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 193, 7, 0.3);
+    }
+    
+    .text-danger {
+      color: #721c24;
+      font-weight: 700;
+      background: linear-gradient(135deg, #f8d7da 0%, #f1948a 100%);
+      padding: 2px 8px;
+      border-radius: 8px;
+      border: 1px solid rgba(220, 53, 69, 0.3);
+    }
+    
+    .policy-contact {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(240, 147, 251, 0.05) 100%);
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+    
+    .policy-contact h5 {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #667eea;
+      margin: 0 0 12px 0;
+    }
+    
+    .policy-contact p {
+      margin: 0;
+      line-height: 1.6;
+      color: var(--text-primary);
+    }
+    
+    /* 동의 체크박스 */
+    .agreement-section {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(240, 147, 251, 0.05) 100%);
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 20px;
+      padding: 24px;
+      margin: 24px 0;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.1);
+    }
+    
+    .agreement-checkbox {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+    
+    .agreement-checkbox input[type="checkbox"] {
+      display: none;
+    }
+    
+    .checkmark {
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(102, 126, 234, 0.3);
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+      position: relative;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+      margin-top: 2px;
+      backdrop-filter: blur(6px);
+    }
+    
+    .agreement-checkbox:hover .checkmark {
+      border-color: rgba(102, 126, 234, 0.5);
+      background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 100%);
+      transform: scale(1.05);
+    }
+    
+    .agreement-checkbox input[type="checkbox"]:checked + .checkmark {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-color: transparent;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .agreement-checkbox input[type="checkbox"]:checked + .checkmark::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-weight: 800;
+      font-size: 16px;
+    }
+    
+    .agreement-text {
+      flex: 1;
+    }
+    
+    .required-mark {
+      color: #f5576c;
+      font-weight: 800;
+      font-size: 1.2rem;
+      margin-left: 4px;
+    }
+    
+    /* 제출 버튼 비활성화 상태 */
+    .submit-btn:disabled {
+      background: linear-gradient(135deg, rgba(200, 200, 200, 0.8) 0%, rgba(180, 180, 180, 0.6) 100%);
+      color: rgba(255, 255, 255, 0.7);
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .submit-btn:disabled:hover {
+      transform: none !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
     }
   </style>
 </head>
@@ -561,6 +870,126 @@
               <label class="form-label" for="notes">💭 특별한 요청사항</label>
               <textarea class="form-textarea" id="notes" placeholder="가고 싶은 카페나 음식점, 선호하는 지역, 관심사, 기타 요청사항을 자유롭게 적어주세요. 메이트가 더 맞춤형 경험을 준비할 수 있어요! ✨"></textarea>
             </div>
+          </div>
+          
+          <!-- 환불정책 섹션 -->
+          <div class="policy-section">
+            <div class="policy-header" onclick="togglePolicy()">
+              <h4 class="policy-title">
+                <i class="fas fa-shield-alt"></i>
+                PUZZMI 환불·취소 정책
+                <i class="fas fa-chevron-down policy-toggle"></i>
+              </h4>
+            </div>
+            
+            <div class="policy-content">
+              <!-- 핵심 환불 규정 -->
+              <div class="policy-highlight">
+                <div class="highlight-item">
+                  <div class="highlight-icon">⏰</div>
+                  <div class="highlight-text">
+                    <strong>24시간 전까지</strong><br>
+                    <span>전액 환불</span>
+                  </div>
+                </div>
+                <div class="highlight-item">
+                  <div class="highlight-icon">🕐</div>
+                  <div class="highlight-text">
+                    <strong>24~4시간 전</strong><br>
+                    <span>50% 환불</span>
+                  </div>
+                </div>
+                <div class="highlight-item">
+                  <div class="highlight-icon">❌</div>
+                  <div class="highlight-text">
+                    <strong>4시간 이내/당일</strong><br>
+                    <span>환불 불가</span>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- 상세 정책 -->
+              <div class="policy-details">
+                <div class="policy-section-item">
+                  <h5>📋 예약·결제 진행 과정</h5>
+                  <ol>
+                    <li>고객님이 날짜와 시간을 선택</li>
+                    <li>관리자가 일정 확인 후, 메이트와 스케줄 조정</li>
+                    <li>시간이 맞으면 예약 확정</li>
+                    <li>결제 요청을 LINE으로 발송 (링크 유효시간: 일반 12시간 / 긴급 예약 2시간)</li>
+                  </ol>
+                </div>
+                
+                <div class="policy-section-item">
+                  <h5>💳 취소·환불 정책 (고객 사유)</h5>
+                  <ul>
+                    <li><strong>예약확정 전(Pending):</strong> 자유 취소 (결제 전이므로 환불 없음)</li>
+                    <li><strong>예약확정 후 ~ 결제 전:</strong> 자유 취소 가능</li>
+                    <li><strong>결제 후:</strong>
+                      <ul>
+                        <li>이용 24시간 전까지: <span class="text-success">전액 환불</span></li>
+                        <li>이용 24~4시간 전: <span class="text-warning">50% 환불</span></li>
+                        <li>이용 4시간 이내/당일 취소, 노쇼: <span class="text-danger">환불 불가</span></li>
+                        <li>이용 중 개인 사유로 조기 종료: 환불 불가</li>
+                      </ul>
+                    </li>
+                  </ul>
+                </div>
+                
+                <div class="policy-section-item">
+                  <h5>🛠️ PUZZMI/메이트 문제 시 보상</h5>
+                  <ul>
+                    <li><strong>메이트 지각 15분 초과:</strong> 지연분 시간 연장 또는 지연분 금액 환불</li>
+                    <li><strong>메이트 노쇼·중도 이탈·중대한 서비스 문제:</strong> 전액 환불 또는 다른 메이트로 교체</li>
+                  </ul>
+                </div>
+                
+                <div class="policy-section-item">
+                  <h5>🌦️ 날씨·안전 관련</h5>
+                  <ul>
+                    <li><strong>기상특보/안전 위험:</strong> 1회 무료 변경 또는 전액 환불</li>
+                    <li><strong>일반적인 비/흐림:</strong> 실내 코스로 변경 제안</li>
+                  </ul>
+                </div>
+                
+                <div class="policy-section-item">
+                  <h5>📅 일정 변경</h5>
+                  <ul>
+                    <li><strong>결제 후 ~ 이용 12시간 전:</strong> 1회 무료 변경</li>
+                    <li><strong>이용 12시간 이내:</strong> 취소·환불 규정 적용</li>
+                  </ul>
+                </div>
+                
+                <div class="policy-section-item">
+                  <h5>💰 환불 방법·기간</h5>
+                  <ul>
+                    <li>원결제 수단으로 환불 (영업일 기준 3~10일)</li>
+                    <li>해외 결제 시 환율 변동·수수료로 차액 발생 가능</li>
+                    <li>현장 비용(교통비, 입장료, 식음료)은 환불 대상 제외</li>
+                  </ul>
+                </div>
+                
+                <div class="policy-contact">
+                  <h5>📞 문의</h5>
+                  <p>
+                    <strong>LINE:</strong> 채널 메시지<br>
+                    <strong>이메일:</strong> puzzmi0721@gmail.com
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 동의 체크박스 -->
+          <div class="agreement-section">
+            <label class="agreement-checkbox">
+              <input type="checkbox" id="policyAgreement" required>
+              <span class="checkmark"></span>
+              <span class="agreement-text">
+                위 환불·취소 정책을 확인했으며, 이에 동의합니다.
+                <span class="required-mark">*</span>
+              </span>
+            </label>
           </div>
           
           <button class="submit-btn" type="submit" id="submitBtn">
@@ -904,6 +1333,17 @@
     // 오늘 날짜를 최소값으로 설정
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('date').setAttribute('min', today);
+    
+    // 동의 체크박스 상태에 따른 버튼 활성화
+    const policyAgreement = document.getElementById('policyAgreement');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    // 초기 상태: 버튼 비활성화
+    submitBtn.disabled = true;
+    
+    policyAgreement.addEventListener('change', function() {
+      submitBtn.disabled = !this.checked;
+    });
     
     // 정책 토글 함수
     window.togglePolicy = function() {
