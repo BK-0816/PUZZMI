@@ -29,6 +29,16 @@ async function getRoles() {
       // Handle any authentication error by clearing auth state
       console.log('Auth error detected, clearing auth state:', error.message);
       await supabase.auth.signOut();
+      
+      // Redirect to auth page after signOut to prevent further invalid requests
+      // Only redirect if not already on auth page
+      if (!window.location.pathname.includes('auth_combo.html')) {
+        setTimeout(() => {
+          const currentPath = encodeURIComponent(window.location.pathname + window.location.search);
+          window.location.href = `auth_combo.html?redirect=${currentPath}`;
+        }, 100); // Small delay to allow signOut to complete
+      }
+      
       return { user: null, isAdmin: false, isMate: false };
     }
     user = authUser;
@@ -36,6 +46,16 @@ async function getRoles() {
     console.error('Auth error:', error);
     // Clear invalid session and return null user
     await supabase.auth.signOut();
+    
+    // Redirect to auth page after signOut to prevent further invalid requests
+    // Only redirect if not already on auth page
+    if (!window.location.pathname.includes('auth_combo.html')) {
+      setTimeout(() => {
+        const currentPath = encodeURIComponent(window.location.pathname + window.location.search);
+        window.location.href = `auth_combo.html?redirect=${currentPath}`;
+      }, 100); // Small delay to allow signOut to complete
+    }
+    
     return { user: null, isAdmin: false, isMate: false };
   }
   
