@@ -354,7 +354,6 @@
         </a>
       </div>
       
-      <div id="whoami" class="muted"></div>
     </section>
   </main>
 
@@ -400,8 +399,6 @@
 
     async function render() {
       const { data: { user } } = await supabase.auth.getUser();
-      document.getElementById('whoami').textContent = 
-        user ? ('로그인됨: ' + (user.email || user.id)) : '로그인되지 않음';
     }
 
     render();
