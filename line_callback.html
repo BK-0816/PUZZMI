@@ -359,54 +359,6 @@
       const { data: { user } } = await supabase.auth.getUser();
       return user?.id || null;
     }
-      
-      const lineAccountData = {
-        user_id: userId, // state에서 받은 userId 직접 사용
-        line_user_id: profile.userId,
-        line_display_name: profile.displayName,
-        line_picture_url: profile.pictureUrl,
-        is_verified: true,
-        access_token: tokenData.access_token,
-        refresh_token: tokenData.refresh_token || null,
-        token_expires_at: tokenData.expires_in ? 
-          new Date(Date.now() + tokenData.expires_in * 1000).toISOString() : null
-      };
-      
-      console.log('저장할 LINE 계정 데이터:', lineAccountData);
-      
-      const { error } = await supabase
-        .from('user_line_accounts')
-        .upsert(lineAccountData, { onConflict: 'user_id' });
-      
-      if (error) {
-        console.error('LINE 계정 저장 실패:', error);
-        console.error('저장 시도한 데이터:', lineAccountData);
-        console.error('사용자 ID:', userId);
-        throw new Error(`LINE 계정 저장 실패: ${error.message}`);
-      }
-      
-      console.log('LINE 계정 저장 성공!');
-      
-      // 인증 상태도 저장
-      const { error: verificationError } = await supabase
-        .from('user_verifications')
-        .upsert({
-          user_id: userId, // state에서 받은 userId 직접 사용
-          verification_type: 'line',
-          is_verified: true,
-          verified_at: new Date().toISOString(),
-          verification_data: {
-            line_user_id: profile.userId,
-            display_name: profile.displayName
-          }
-        }, { onConflict: 'user_id,verification_type' });
-      
-      if (verificationError) {
-        console.warn('인증 상태 저장 실패 (무시됨):', verificationError);
-      } else {
-        console.log('인증 상태 저장 성공!');
-      }
-    }
     
     // 성공 처리
     async function handleSuccess(message) {
