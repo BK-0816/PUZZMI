@@ -599,7 +599,7 @@
     // 데이터 로드
     async function loadData() {
       try {
-        // 사용자 프로필 조회
+        // 1. 사용자 프로필 조회
         const { data: profiles, error: profilesError } = await supabase
           .from('profiles')
           .select(`
@@ -611,29 +611,29 @@
 
         if (profilesError) throw profilesError;
 
-        // LINE 계정 정보 조회
+        // 2. LINE 계정 정보 조회 (별도 쿼리)
         const { data: lineAccounts, error: lineError } = await supabase
           .from('user_line_accounts')
           .select('user_id, line_user_id, line_display_name, is_verified, connected_at');
 
         if (lineError) throw lineError;
 
-        // LINE 신원확인 정보 조회
+        // 3. LINE 신원확인 정보 조회 (별도 쿼리)
         const { data: lineVerifications, error: verificationError } = await supabase
           .from('line_identity_verifications')
           .select('user_id, verified_name, verified_age, verified_birth_date, verification_level, verified_at, expires_at');
 
         if (verificationError) throw verificationError;
 
-        // 데이터 병합
+        // 4. 데이터 병합 (JavaScript에서 수동으로 조인)
         allUsers = (profiles || []).map(profile => {
           const lineAccount = (lineAccounts || []).find(acc => acc.user_id === profile.id);
           const lineVerification = (lineVerifications || []).find(ver => ver.user_id === profile.id);
           
           return {
             ...profile,
-            user_line_accounts: lineAccount ? [lineAccount] : [],
-            line_identity_verifications: lineVerification ? [lineVerification] : []
+            lineAccount: lineAccount || null,
+            lineVerification: lineVerification || null
           };
         });
         
@@ -670,7 +670,7 @@
         }
 
         // LINE 연동 상태
-        if (user.user_line_accounts && user.user_line_accounts.length > 0) {
+        if (user.lineAccount) {
           stats.lineConnected++;
         }
 
@@ -709,8 +709,8 @@
         if (ageValue === 'age_unverified' && user.age_verified) return false;
 
         // LINE 연동 필터
-        if (lineValue === 'connected' && (!user.user_line_accounts || user.user_line_accounts.length === 0)) return false;
-        if (lineValue === 'disconnected' && user.user_line_accounts && user.user_line_accounts.length > 0) return false;
+        if (lineValue === 'connected' && !user.lineAccount) return false;
+        if (lineValue === 'disconnected' && user.lineAccount) return false;
 
         return true;
       });
@@ -730,8 +730,8 @@
         const email = '이메일 정보 필요시 별도 조회';
         const name = user.full_name || '이름 미기재';
         const age = user.age || '미기재';
-        const lineAccount = user.user_line_accounts?.[0];
-        const lineVerification = user.line_identity_verifications?.[0];
+        const lineAccount = user.lineAccount;
+        const lineVerification = user.lineVerification;
         
         // 인증 상태 결정
         let identityStatus = 'unverified';
@@ -803,8 +803,8 @@
         const user = allUsers.find(u => u.id === userId);
         if (!user) return;
 
-        const lineAccount = user.user_line_accounts?.[0];
-        const lineVerification = user.line_identity_verifications?.[0];
+        const lineAccount = user.lineAccount;
+        const lineVerification = user.lineVerification;
         
         modalContent.innerHTML = `
           <div class="info-grid">

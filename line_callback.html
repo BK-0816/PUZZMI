@@ -101,6 +101,72 @@
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) throw new Error('로그인 세션이 없습니다.');
 
+        // 시뮬레이션 모드 체크
+        const urlParams = new URLSearchParams(window.location.search);
+        const isSimulation = urlParams.get('simulation') === 'true';
+        
+        if (isSimulation) {
+          // 시뮬레이션 모드: 가짜 LINE 데이터로 연동 처리
+          const userId = urlParams.get('userId');
+          const mockLineData = {
+            line_user_id: 'U' + Math.random().toString(36).substr(2, 9),
+            line_display_name: '시뮬레이션 사용자',
+            line_picture_url: 'https://picsum.photos/200/200',
+            is_verified: true,
+            access_token: 'mock_access_token',
+            connected_at: new Date().toISOString()
+          };
+          
+          // LINE 계정 정보 저장
+          const { error: lineError } = await supabase
+            .from('user_line_accounts')
+            .upsert({
+              user_id: userId,
+              ...mockLineData
+            }, { onConflict: 'user_id' });
+          
+          if (lineError) throw lineError;
+          
+          // 신원확인 정보 저장
+          const { error: verificationError } = await supabase
+            .from('line_identity_verifications')
+            .upsert({
+              user_id: userId,
+              line_user_id: mockLineData.line_user_id,
+              verified_name: mockLineData.line_display_name,
+              verified_age: 25, // 시뮬레이션 나이
+              verification_level: 'basic',
+              verified_at: new Date().toISOString(),
+              expires_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+              verification_data: {
+                simulation: true,
+                line_display_name: mockLineData.line_display_name,
+                verification_method: 'simulation'
+              }
+            }, { onConflict: 'user_id' });
+          
+          if (verificationError) throw verificationError;
+          
+          // 프로필 인증 상태 업데이트
+          await supabase
+            .from('profiles')
+            .update({
+              identity_verified: true,
+              verification_source: 'line',
+              verification_level: 'basic',
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', userId);
+          
+          if (window.opener) {
+            window.opener.postMessage({ type: 'LINE_AUTH_SUCCESS', message: '시뮬레이션 연동 완료' }, '*');
+          }
+          statusEl.innerHTML = `<div class="success">✅ 시뮬레이션 연동 성공! 잠시 후 창이 닫힙니다.</div>`;
+          setTimeout(()=> window.close(), 600);
+          return;
+        }
+        
+        // 실제 LINE API 처리
         const resp = await fetch(EDGE_COMPLETE_URL, {
           method: 'POST',
           headers: {
