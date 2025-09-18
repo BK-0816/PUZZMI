@@ -108,18 +108,130 @@
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) throw new Error('로그인 세션이 없습니다.');
 
+        // 시뮬레이션 모드 체크
+        const urlParams = new URLSearchParams(window.location.search);
+        const isSimulation = urlParams.get('simulation') === 'true';
+        
+        if (isSimulation) {
+          // 시뮬레이션 모드: 가짜 LINE 데이터로 연동 처리
+          const userId = urlParams.get('userId');
+          const mockLineData = {
+            line_user_id: 'U' + Math.random().toString(36).substr(2, 9),
+            line_display_name: '시뮬레이션 사용자',
+            line_picture_url: 'https://picsum.photos/200/200',
+            is_verified: true,
+            access_token: 'mock_access_token',
+            connected_at: new Date().toISOString()
+          };
+          
+          // LINE 계정 정보 저장
+          const { error: lineError } = await supabase
+            .from('user_line_accounts')
+            .upsert({
+              user_id: userId,
+              ...mockLineData
+            }, { onConflict: 'user_id' });
+          
+          if (lineError) throw lineError;
+          
+          // 신원확인 정보 저장
+          const { error: verificationError } = await supabase
+        
+        if (!userId) {
+          statusEl.innerHTML = `<div class="error">❌ 사용자 ID가 없습니다.</div>`;
+          setTimeout(()=> window.close(), 1200);
+          return;
+        }
+        
+            .from('line_identity_verifications')
+            .upsert({
+              user_id: userId,
+              line_user_id: mockLineData.line_user_id,
+              verified_name: mockLineData.line_display_name,
+              verified_age: 25, // 시뮬레이션 나이
+              verification_level: 'basic',
+              verified_at: new Date().toISOString(),
+              expires_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+        console.log('시뮬레이션 데이터 저장 시작:', { userId, mockLineData });
+        
+              verification_data: {
+                simulation: true,
+                line_display_name: mockLineData.line_display_name,
+                verification_method: 'simulation'
+              }
+            }, { onConflict: 'user_id' });
+          
+          if (verificationError) throw verificationError;
+        if (lineError) {
+          console.error('LINE 계정 저장 실패:', lineError);
+          throw lineError;
+        }
+        
+        console.log('LINE 계정 정보 저장 성공');
+          // 프로필 인증 상태 업데이트
+          await supabase
+            .from('profiles')
+            .update({
+              identity_verified: true,
+              verification_source: 'line',
+              verification_level: 'basic',
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', userId);
+          
+          if (window.opener) {
+            window.opener.postMessage({ type: 'LINE_AUTH_SUCCESS', message: '시뮬레이션 연동 완료' }, '*');
+          }
+          statusEl.innerHTML = `<div class="success">✅ 시뮬레이션 연동 성공! 잠시 후 창이 닫힙니다.</div>`;
+          setTimeout(()=> window.close(), 600);
+          return;
+        }
+        
+        if (verificationError) {
+          console.error('신원확인 정보 저장 실패:', verificationError);
+          throw verificationError;
+        }
+        
+        console.log('신원확인 정보 저장 성공');
         const resp = await fetch(EDGE_COMPLETE_URL, {
           method: 'POST',
-          headers: {
+        const { error: profileError } = await supabase
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${session.access_token}`,
           },
+            age_verified: true,
           body: JSON.stringify({ code, state })
         });
         if (!resp.ok) throw new Error(await resp.text());
         const result = await resp.json();
         if (!result.success) throw new Error(result.error || 'LINE 인증 처리 실패');
 
+        if (profileError) {
+          console.error('프로필 업데이트 실패:', profileError);
+          throw profileError;
+        }
+        
+        console.log('프로필 인증 상태 업데이트 성공');
+        
+        // 사용자 인증 상태 저장
+        const { error: userVerificationError } = await supabase
+          .from('user_verifications')
+          .upsert({
+            user_id: userId,
+            verification_type: 'line',
+            is_verified: true,
+            verified_at: new Date().toISOString(),
+            verification_data: {
+              simulation: true,
+              line_user_id: mockLineData.line_user_id,
+              display_name: mockLineData.line_display_name
+            }
+          }, { onConflict: 'user_id,verification_type' });
+        
+        if (userVerificationError) {
+          console.warn('사용자 인증 상태 저장 실패 (무시):', userVerificationError);
+        }
+        
         if (window.opener) {
           window.opener.postMessage({ type: 'LINE_AUTH_SUCCESS', message: result.message || '연동 완료' }, '*');
         }

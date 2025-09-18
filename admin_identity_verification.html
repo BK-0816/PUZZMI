@@ -599,22 +599,44 @@
     // 데이터 로드
     async function loadData() {
       try {
-        // 사용자 프로필과 LINE 연동 정보 조회
-        const { data: users, error } = await supabase
+        // 1. 사용자 프로필 조회
+        const { data: profiles, error: profilesError } = await supabase
           .from('profiles')
           .select(`
             id, full_name, age, birth_date, gender, nationality, 
             identity_verified, age_verified, verification_source, verification_level,
-            created_at, updated_at,
-            users!inner(email),
-            user_line_accounts(line_user_id, line_display_name, is_verified, connected_at),
-            line_identity_verifications(verified_name, verified_age, verified_birth_date, verification_level, verified_at, expires_at)
+            created_at, updated_at
           `)
           .order('created_at', { ascending: false });
 
-        if (error) throw error;
+        if (profilesError) throw profilesError;
 
-        allUsers = users || [];
+        // 2. LINE 계정 정보 조회 (별도 쿼리)
+        const { data: lineAccounts, error: lineError } = await supabase
+          .from('user_line_accounts')
+          .select('user_id, line_user_id, line_display_name, is_verified, connected_at');
+
+        if (lineError) throw lineError;
+
+        // 3. LINE 신원확인 정보 조회 (별도 쿼리)
+        const { data: lineVerifications, error: verificationError } = await supabase
+          .from('line_identity_verifications')
+          .select('user_id, verified_name, verified_age, verified_birth_date, verification_level, verified_at, expires_at');
+
+        if (verificationError) throw verificationError;
+
+        // 4. 데이터 병합 (JavaScript에서 수동으로 조인)
+        allUsers = (profiles || []).map(profile => {
+          const lineAccount = (lineAccounts || []).find(acc => acc.user_id === profile.id);
+          const lineVerification = (lineVerifications || []).find(ver => ver.user_id === profile.id);
+          
+          return {
+            ...profile,
+            lineAccount: lineAccount || null,
+            lineVerification: lineVerification || null
+          };
+        });
+        
         updateStats();
         applyFilters();
 
@@ -648,7 +670,7 @@
         }
 
         // LINE 연동 상태
-        if (user.user_line_accounts && user.user_line_accounts.length > 0) {
+        if (user.lineAccount) {
           stats.lineConnected++;
         }
 
@@ -687,8 +709,8 @@
         if (ageValue === 'age_unverified' && user.age_verified) return false;
 
         // LINE 연동 필터
-        if (lineValue === 'connected' && (!user.user_line_accounts || user.user_line_accounts.length === 0)) return false;
-        if (lineValue === 'disconnected' && user.user_line_accounts && user.user_line_accounts.length > 0) return false;
+        if (lineValue === 'connected' && !user.lineAccount) return false;
+        if (lineValue === 'disconnected' && user.lineAccount) return false;
 
         return true;
       });
@@ -704,11 +726,12 @@
       }
 
       usersTableBody.innerHTML = filteredUsers.map(user => {
-        const email = user.users?.email || '이메일 없음';
+        // auth.users에서 이메일 정보를 별도로 가져와야 함
+        const email = '이메일 정보 필요시 별도 조회';
         const name = user.full_name || '이름 미기재';
         const age = user.age || '미기재';
-        const lineAccount = user.user_line_accounts?.[0];
-        const lineVerification = user.line_identity_verifications?.[0];
+        const lineAccount = user.lineAccount;
+        const lineVerification = user.lineVerification;
         
         // 인증 상태 결정
         let identityStatus = 'unverified';
@@ -780,8 +803,8 @@
         const user = allUsers.find(u => u.id === userId);
         if (!user) return;
 
-        const lineAccount = user.user_line_accounts?.[0];
-        const lineVerification = user.line_identity_verifications?.[0];
+        const lineAccount = user.lineAccount;
+        const lineVerification = user.lineVerification;
         
         modalContent.innerHTML = `
           <div class="info-grid">

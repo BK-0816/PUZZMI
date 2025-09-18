@@ -47,36 +47,15 @@ export const LINE_CONFIG = {
       const result = await response.json();
       
       if (!result.success) {
-        if (result.simulation) {
-          console.log('🔄 시뮬레이션 모드 활성화');
-          return this.generateSimulationUrl(userId);
-        }
         throw new Error(result.error || 'LINE URL 생성 실패');
       }
       
       console.log('✅ Edge Function으로 LINE URL 생성 성공');
       return result.loginUrl;
       
-    } catch (error) {
-      console.error('LINE URL 생성 실패:', error);
-      console.log('🔄 시뮬레이션 모드로 전환');
-      return this.generateSimulationUrl(userId);
+      // Edge Function 호출 실패 시 에러 표시
+      throw error;
     }
-  },
-  
-  // 개발용 시뮬레이션 URL
-  generateSimulationUrl(userId) {
-    console.log('🎭 시뮬레이션 URL 생성');
-    const params = new URLSearchParams({
-      simulation: 'true',
-      userId: userId,
-      timestamp: Date.now(),
-      success: 'true'
-    });
-    
-    const simulationUrl = `${window.location.origin}/line_callback.html?${params.toString()}`;
-    console.log('시뮬레이션 URL:', simulationUrl);
-    return simulationUrl;
   },
   
   // LINE 인증 완료 처리 (서버에서 처리)
