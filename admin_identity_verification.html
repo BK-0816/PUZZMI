@@ -599,21 +599,44 @@
     // 데이터 로드
     async function loadData() {
       try {
-        // 사용자 프로필과 LINE 연동 정보 조회
-        const { data: users, error } = await supabase
+        // 사용자 프로필 조회
+        const { data: profiles, error: profilesError } = await supabase
           .from('profiles')
           .select(`
             id, full_name, age, birth_date, gender, nationality, 
             identity_verified, age_verified, verification_source, verification_level,
-            created_at, updated_at,
-            user_line_accounts(line_user_id, line_display_name, is_verified, connected_at),
-            line_identity_verifications(verified_name, verified_age, verified_birth_date, verification_level, verified_at, expires_at)
+            created_at, updated_at
           `)
           .order('created_at', { ascending: false });
 
-        if (error) throw error;
+        if (profilesError) throw profilesError;
 
-        allUsers = users || [];
+        // LINE 계정 정보 조회
+        const { data: lineAccounts, error: lineError } = await supabase
+          .from('user_line_accounts')
+          .select('user_id, line_user_id, line_display_name, is_verified, connected_at');
+
+        if (lineError) throw lineError;
+
+        // LINE 신원확인 정보 조회
+        const { data: lineVerifications, error: verificationError } = await supabase
+          .from('line_identity_verifications')
+          .select('user_id, verified_name, verified_age, verified_birth_date, verification_level, verified_at, expires_at');
+
+        if (verificationError) throw verificationError;
+
+        // 데이터 병합
+        allUsers = (profiles || []).map(profile => {
+          const lineAccount = (lineAccounts || []).find(acc => acc.user_id === profile.id);
+          const lineVerification = (lineVerifications || []).find(ver => ver.user_id === profile.id);
+          
+          return {
+            ...profile,
+            user_line_accounts: lineAccount ? [lineAccount] : [],
+            line_identity_verifications: lineVerification ? [lineVerification] : []
+          };
+        });
+        
         updateStats();
         applyFilters();
 
