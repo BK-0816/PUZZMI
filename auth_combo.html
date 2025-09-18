@@ -272,8 +272,6 @@
       <div class="tabs">
         <button class="tab active" data-tab="login">로그인</button>
         <button class="tab" data-tab="signup">회원가입</button>
-        <button class="tab" data-tab="enhanced">상세 회원가입</button>
-        <button class="tab" data-tab="magic">매직링크</button>
       </div>
 
       <!-- 로그인 폼 -->
@@ -292,110 +290,23 @@
         <div id="login_result"></div>
       </form>
 
-      <!-- 회원가입 폼 -->
-      <form id="signupForm" data-panel="signup" class="stack-16">
-        <div class="row">
-          <div class="field">
-            <div class="label">이름</div>
-            <input class="input" id="signup_name" required/>
-          </div>
-          <div class="field">
-            <div class="label">나이</div>
-            <input class="input" id="signup_age" type="number"/>
-          </div>
-        </div>
-        <div class="row">
-          <div class="field">
-            <div class="label">성별</div>
-            <select class="input" id="signup_gender">
-              <option value="">선택 안함</option>
-              <option value="여성">여성</option>
-              <option value="남성">남성</option>
-              <option value="기타">기타</option>
-            </select>
-          </div>
-          <div class="field">
-            <div class="label">전화번호</div>
-            <input class="input" id="signup_phone" type="tel" placeholder="010-1234-5678"/>
-          </div>
-        </div>
-        <div class="row single">
-          <div class="field">
-            <div class="label">국적</div>
-            <select class="input" id="signup_nationality">
-              <option value="">선택 안함</option>
-              <option value="한국">🇰🇷 한국</option>
-              <option value="일본">🇯🇵 일본</option>
-              <option value="중국">🇨🇳 중국</option>
-              <option value="미국">🇺🇸 미국</option>
-              <option value="기타">🌍 기타</option>
-            </select>
-          </div>
-        </div>
-        <div class="row single">
-          <div class="field">
-            <div class="label">사용 가능한 언어 (복수 선택 가능)</div>
-            <div style="display: flex; gap: 12px; flex-wrap: wrap; padding: 12px; background: rgba(102, 126, 234, 0.05); border-radius: 8px;">
-              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                <input type="checkbox" value="한국어" class="signup-language"/>
-                <span>🇰🇷 한국어</span>
-              </label>
-              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                <input type="checkbox" value="日本語" class="signup-language"/>
-                <span>🇯🇵 日本語</span>
-              </label>
-              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                <input type="checkbox" value="English" class="signup-language"/>
-                <span>🇺🇸 English</span>
-              </label>
-              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                <input type="checkbox" value="中文" class="signup-language"/>
-                <span>🇨🇳 中文</span>
-              </label>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="field">
-            <div class="label">이메일</div>
-            <input class="input" id="signup_email" type="email" required/>
-          </div>
-          <div class="field">
-            <div class="label">비밀번호</div>
-            <input class="input" id="signup_password" type="password" minlength="6" required/>
-          </div>
-        </div>
-        <button class="btn btn-primary" type="submit">회원가입</button>
-        <div id="signup_result"></div>
-      </form>
-
-      <!-- 상세 회원가입 안내 -->
-      <div id="enhancedPanel" data-panel="enhanced" class="stack-16" style="display:none;">
+      <!-- 회원가입 안내 (상세 회원가입으로 리디렉션) -->
+      <div id="signupPanel" data-panel="signup" class="stack-16" style="display:none;">
         <div style="text-align: center; padding: 40px 20px;">
           <div style="font-size: 3rem; margin-bottom: 20px;">✨</div>
-          <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-            더 나은 서비스를 위한 상세 회원가입
+          <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+            PUZZMI 회원가입
           </h3>
           <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 24px;">
-            LINE 연동과 함께 더 안전하고 편리한<br>
+            안전하고 편리한 서비스 이용을 위해<br>
             PUZZMI 서비스를 이용해보세요!
           </p>
           <a href="enhanced_signup.html" class="btn btn-primary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
             <i class="fas fa-user-plus"></i>
-            상세 회원가입 시작하기
+            회원가입 시작하기
           </a>
         </div>
       </div>
-
-      <!-- 매직링크 폼 -->
-      <form id="magicForm" data-panel="magic" class="stack-16">
-        <div class="field">
-          <div class="label">이메일</div>
-          <input class="input" id="magic_email" type="email" required/>
-        </div>
-        <button class="btn btn-primary" type="submit">로그인 링크 보내기</button>
-        <div id="magic_result"></div>
-      </form>
 
       <div class="spacer"></div>
       <button id="logout" class="btn btn-secondary">로그아웃</button>
@@ -413,11 +324,11 @@
     // ===== Tabs =====
     const tabs = document.querySelectorAll('.tab');
     const panels = document.querySelectorAll('form[data-panel]');
-    const enhancedPanel = document.getElementById('enhancedPanel');
+    const signupPanel = document.getElementById('signupPanel');
     
     function show(name) {
       panels.forEach(p => p.style.display = p.getAttribute('data-panel') === name ? 'block' : 'none');
-      enhancedPanel.style.display = name === 'enhanced' ? 'block' : 'none';
+      signupPanel.style.display = name === 'signup' ? 'block' : 'none';
       tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === name));
     }
     
@@ -439,70 +350,6 @@
         error ? ('<div class="error">' + error.message + '</div>') : '<div class="success">로그인 성공</div>';
       if (!error) setTimeout(() => location.href = getRedirect(), 600);
       render();
-    };
-
-    // ===== SIGNUP =====
-    document.getElementById('signupForm').onsubmit = async (e) => {
-      e.preventDefault();
-      const full_name = document.getElementById('signup_name').value.trim();
-      const ageRaw = document.getElementById('signup_age').value;
-      const age = ageRaw ? parseInt(ageRaw, 10) : null;
-      const gender = document.getElementById('signup_gender').value || null;
-      const phone_number = document.getElementById('signup_phone').value.trim() || null;
-      const nationality = document.getElementById('signup_nationality').value || null;
-      
-      // 선택된 언어들 수집
-      const selectedLanguages = Array.from(document.querySelectorAll('.signup-language:checked'))
-        .map(cb => cb.value);
-      const languages = selectedLanguages.length > 0 ? selectedLanguages : null;
-      
-      const email = document.getElementById('signup_email').value.trim();
-      const password = document.getElementById('signup_password').value;
-      
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { data: { full_name } }
-      });
-      
-      document.getElementById('signup_result').innerHTML = 
-        error ? ('<div class="error">' + error.message + '</div>') : '<div class="success">가입 완료</div>';
-      
-      if (data?.user?.id) {
-        // 프로필 완성도 계산
-        let completion = 20; // 기본 20점 (이름, 이메일)
-        if (age) completion += 10;
-        if (gender) completion += 10;
-        if (phone_number) completion += 15;
-        if (nationality) completion += 10;
-        if (languages && languages.length > 0) completion += 15;
-        if (completion > 100) completion = 100;
-        
-        await supabase.from('profiles').upsert({
-          id: data.user.id,
-          full_name,
-          age,
-          gender,
-          phone_number,
-          nationality,
-          languages,
-          profile_completion: completion,
-          updated_at: new Date().toISOString()
-        }, { onConflict: 'id' });
-      }
-      render();
-    };
-
-    // ===== MAGIC LINK =====
-    document.getElementById('magicForm').onsubmit = async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('magic_email').value.trim();
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: { emailRedirectTo: location.origin + '/' + getRedirect() }
-      });
-      document.getElementById('magic_result').innerHTML = 
-        error ? ('<div class="error">' + error.message + '</div>') : '<div class="success">보냈습니다</div>';
     };
 
     // ===== LOGOUT =====
