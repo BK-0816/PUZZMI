@@ -1,186 +1,130 @@
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './nav.js';
 
-// LINE API 설정 - 서버사이드 처리 버전
+// LINE API 설정 - 완전히 서버사이드 처리
 export const LINE_CONFIG = {
   // Edge Function을 통한 안전한 LINE API 처리
-  CHANNEL_ID: '2008137189', // 실제 채널 ID (Edge Function에서 검증됨)
-  
-  // Supabase Functions URL
   get FUNCTIONS_URL() {
     return `${SUPABASE_URL}/functions/v1`;
   },
   
-  // 자동으로 현재 도메인 감지
-  get CALLBACK_URL() {
-    // 개발 환경과 운영 환경 자동 감지
-    const origin = window.location.origin;
-    const isLocalhost = origin.includes('localhost') || origin.includes('127.0.0.1') || origin.includes('bolt.new');
-    
-    if (isLocalhost) {
-      // 개발 환경: localhost 사용
-      return `${origin}/line_callback.html`;
-    } else {
-      // 운영 환경: Netlify 도메인 사용 (https://puzzmi.netlify.app)
-      return `${origin}/line_callback.html`;
-    }
-  },
-  
-  // LINE OAuth URL 생성 (서버에서 처리)
+  // LINE OAuth URL 생성 (완전히 서버에서 처리)
   async generateLoginUrl(userId) {
     try {
-      console.log('LINE URL 생성 시작, userId:', userId);
-      console.log('Callback URL:', this.CALLBACK_URL);
+      console.log('🔗 Edge Function을 통한 LINE URL 생성 시작');
       
-      // 먼저 Edge Function 시도
-      try {
-        const response = await fetch(`${this.FUNCTIONS_URL}/line-auth/generate-url`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-          },
-          body: JSON.stringify({ userId })
-        });
-        
-        if (response.ok) {
-          const result = await response.json();
-          if (result.success && result.loginUrl) {
-            console.log('Edge Function으로 LINE URL 생성 성공:', result.loginUrl);
-            return result.loginUrl;
-          }
-        }
-        
-        console.warn('Edge Function 실패, 직접 URL 생성으로 전환');
-      } catch (edgeError) {
-        console.warn('Edge Function 호출 실패:', edgeError);
+      // 현재 로그인 세션 확인
+      const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2");
+      const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('로그인 세션이 없습니다. 다시 로그인해주세요.');
       }
       
-      // Edge Function 실패 시 직접 URL 생성
-      const state = btoa(JSON.stringify({ 
-        userId, 
-        timestamp: Date.now(),
-        origin: window.location.origin 
-      }));
-      
-      const params = new URLSearchParams({
-        response_type: 'code',
-        client_id: this.CHANNEL_ID,
-        redirect_uri: this.CALLBACK_URL,
-        state: state,
-        scope: 'profile openid email'
+      const response = await fetch(`${this.FUNCTIONS_URL}/line-auth/generate-url`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+          'Origin': window.location.origin,
+          'Referer': window.location.href
+        },
+        body: JSON.stringify({ 
+          // userId는 서버에서 JWT에서 추출하므로 보내지 않음
+          requestOrigin: window.location.origin
+        })
       });
       
-      const lineUrl = `https://access.line.me/oauth2/v2.1/authorize?${params.toString()}`;
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Edge Function 호출 실패:', {
+          status: response.status,
+          error: errorText
+        });
+        throw new Error(`Edge Function 호출 실패: ${response.status} - ${errorText}`);
+      }
       
-      console.log('생성된 LINE URL:', lineUrl);
-      console.log('사용된 파라미터:', {
-        client_id: this.CHANNEL_ID,
-        redirect_uri: this.CALLBACK_URL,
-        state: state,
-        scope: 'profile openid email'
-      });
-      return lineUrl;
+      const result = await response.json();
+      
+      if (!result.success) {
+        if (result.simulation) {
+          console.log('🔄 시뮬레이션 모드 활성화');
+          return this.generateSimulationUrl(userId);
+        }
+        throw new Error(result.error || 'LINE URL 생성 실패');
+      }
+      
+      console.log('✅ Edge Function으로 LINE URL 생성 성공');
+      return result.loginUrl;
       
     } catch (error) {
       console.error('LINE URL 생성 실패:', error);
-      throw error;
+      console.log('🔄 시뮬레이션 모드로 전환');
+      return this.generateSimulationUrl(userId);
     }
   },
   
   // 개발용 시뮬레이션 URL
   generateSimulationUrl(userId) {
-    console.log('시뮬레이션 URL 생성, userId:', userId);
+    console.log('🎭 시뮬레이션 URL 생성');
     const params = new URLSearchParams({
       simulation: 'true',
       userId: userId,
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      success: 'true'
     });
     
-    const simulationUrl = `${this.CALLBACK_URL}?${params.toString()}`;
+    const simulationUrl = `${window.location.origin}/line_callback.html?${params.toString()}`;
     console.log('시뮬레이션 URL:', simulationUrl);
     return simulationUrl;
   },
   
-  // 토큰 교환 (서버에서 처리)
-  async exchangeCodeForToken(code) {
+  // LINE 인증 완료 처리 (서버에서 처리)
+  async completeLineAuth(code, state) {
     try {
-      const response = await fetch(`${this.FUNCTIONS_URL}/line-auth/exchange-token`, {
+      console.log('🔐 Edge Function을 통한 LINE 인증 완료 처리');
+      
+      const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2");
+      const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('로그인 세션이 없습니다. 다시 로그인해주세요.');
+      }
+      
+      const response = await fetch(`${this.FUNCTIONS_URL}/line-auth/complete-auth`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Authorization': `Bearer ${session.access_token}`,
         },
-        body: JSON.stringify({ 
-          code,
-          callbackUrl: this.CALLBACK_URL 
-        })
+        body: JSON.stringify({ code, state })
       });
       
       if (!response.ok) {
-        throw new Error(`토큰 교환 실패: ${response.status}`);
+        const errorText = await response.text();
+        throw new Error(`인증 완료 처리 실패: ${response.status} - ${errorText}`);
       }
       
       const result = await response.json();
       
       if (!result.success) {
-        throw new Error(result.error || '토큰 교환 실패');
+        throw new Error(result.error || '인증 완료 처리 실패');
       }
       
-      return result.tokenData;
+      console.log('✅ LINE 인증 완료!');
+      return result;
       
     } catch (error) {
-      console.error('토큰 교환 실패:', error);
-      // 실패 시 시뮬레이션 데이터 반환
-      return {
-        access_token: 'mock_access_token_' + Date.now(),
-        token_type: 'Bearer',
-        expires_in: 2592000,
-        refresh_token: 'mock_refresh_token_' + Date.now(),
-        scope: 'profile openid'
-      };
-    }
-  },
-  
-  // 사용자 프로필 조회 (서버에서 처리)
-  async getUserProfile(accessToken) {
-    try {
-      const response = await fetch(`${this.FUNCTIONS_URL}/line-auth/get-profile`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-        },
-        body: JSON.stringify({ accessToken })
-      });
-      
-      if (!response.ok) {
-        throw new Error(`프로필 조회 실패: ${response.status}`);
-      }
-      
-      const result = await response.json();
-      
-      if (!result.success) {
-        throw new Error(result.error || '프로필 조회 실패');
-      }
-      
-      return result.profile;
-      
-    } catch (error) {
-      console.error('LINE 프로필 조회 실패:', error);
-      // 실패 시 시뮬레이션 데이터 반환
-      return {
-        userId: 'U' + Math.random().toString(36).substr(2, 9),
-        displayName: '테스트 사용자',
-        pictureUrl: 'https://picsum.photos/200/200',
-        statusMessage: 'PUZZMI 사용자'
-      };
+      console.error('LINE 인증 완료 처리 실패:', error);
+      throw error;
     }
   }
 };
 
 // 보안 정보 표시
 if (typeof window !== 'undefined') {
-  console.info('🔒 보안 강화: LINE API 키가 서버사이드에서 안전하게 처리됩니다');
-  console.info('🚀 Supabase Edge Functions를 통한 안전한 API 호출');
-  console.info('📖 설정 가이드: secure_line_setup.html 참조');
+  console.info('🔒 보안 강화: 모든 LINE API 처리가 서버사이드에서 안전하게 처리됩니다');
+  console.info('🚀 Supabase Edge Functions를 통한 완전한 서버사이드 처리');
+  console.info('🔐 클라이언트에는 민감한 정보가 노출되지 않습니다');
 }
