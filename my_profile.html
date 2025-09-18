@@ -1064,6 +1064,14 @@
         const btn = document.getElementById('connectLineBtn');
         const statusEl = document.getElementById('lineConnectionStatus');
         
+        // 사용자 클릭과 동시에 즉시 팝업 열기 (브라우저 차단 방지)
+        const popup = window.open('about:blank', 'lineLogin', 'width=500,height=600,scrollbars=yes,resizable=yes');
+        
+        if (!popup) {
+          showToast('❌ 팝업이 차단되었습니다. 팝업 차단을 해제하고 다시 시도해주세요.');
+          return;
+        }
+        
         btn.disabled = true;
         btn.innerHTML = '<div class="loading"></div> 연동 중...';
         
@@ -1072,17 +1080,14 @@
           const lineLoginUrl = await generateLineLoginUrl();
           
           if (!lineLoginUrl) {
+            popup.close();
             throw new Error('LINE 로그인 URL 생성에 실패했습니다.');
           }
           
           console.log('생성된 LINE URL:', lineLoginUrl);
           
-          // 팝업 열기
-          const popup = window.open(lineLoginUrl, 'lineLogin', 'width=500,height=600,scrollbars=yes,resizable=yes');
-          
-          if (!popup) {
-            throw new Error('팝업이 차단되었습니다. 팝업 차단을 해제하고 다시 시도해주세요.');
-          }
+          // 이미 열린 팝업을 LINE URL로 리다이렉트
+          popup.location.href = lineLoginUrl;
           
           // 팝업 완료 대기
           const checkAuth = setInterval(async () => {
@@ -1115,6 +1120,9 @@
           
         } catch (error) {
           console.error('LINE 연동 오류:', error);
+          if (popup && !popup.closed) {
+            popup.close();
+          }
           btn.disabled = false;
           btn.innerHTML = '<i class="fab fa-line"></i> LINE 계정 연동하기';
           showToast('❌ LINE 연동 오류: ' + error.message);
