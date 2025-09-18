@@ -377,7 +377,9 @@
     }
     
     // 콜백 처리 시작
-    processLineCallback();
+    (async () => {
+      await processLineCallback();
+    })();
   </script>
 </body>
 </html>
