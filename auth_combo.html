@@ -267,8 +267,16 @@
     
     /* 로그인 버튼 크기 통일 */
     .btn-primary {
-      min-width: 200px;
+      width: 100%;
       justify-content: center;
+    }
+    
+    /* 액션 버튼들과 로그인 버튼 너비 통일 */
+    .action-buttons .btn,
+    .btn-primary {
+      width: 100%;
+      max-width: 280px;
+      margin: 0 auto;
     }
     
     /* 반응형 디자인 */
@@ -296,7 +304,8 @@
       }
       
       .action-buttons .btn {
-        min-width: 160px;
+        width: 100%;
+        max-width: 240px;
       }
     }
   </style>
