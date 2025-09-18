@@ -606,7 +606,6 @@
             id, full_name, age, birth_date, gender, nationality, 
             identity_verified, age_verified, verification_source, verification_level,
             created_at, updated_at,
-            users!inner(email),
             user_line_accounts(line_user_id, line_display_name, is_verified, connected_at),
             line_identity_verifications(verified_name, verified_age, verified_birth_date, verification_level, verified_at, expires_at)
           `)
@@ -704,7 +703,8 @@
       }
 
       usersTableBody.innerHTML = filteredUsers.map(user => {
-        const email = user.users?.email || '이메일 없음';
+        // auth.users에서 이메일 정보를 별도로 가져와야 함
+        const email = '이메일 정보 필요시 별도 조회';
         const name = user.full_name || '이름 미기재';
         const age = user.age || '미기재';
         const lineAccount = user.user_line_accounts?.[0];
