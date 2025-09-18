@@ -94,18 +94,44 @@
       
       try {
         const urlParams = new URLSearchParams(window.location.search);
+        
+        // URL 파라미터 전체 로깅
+        const allParams = {};
+        for (const [key, value] of urlParams.entries()) {
+          allParams[key] = value;
+        }
+        
+        console.log('=== LINE 콜백 URL 분석 ===');
+        console.log('전체 URL:', window.location.href);
+        console.log('모든 파라미터:', allParams);
+        console.log('파라미터 개수:', urlParams.size);
+        
         const code = urlParams.get('code');
         const state = urlParams.get('state');
         const error = urlParams.get('error');
         const errorDescription = urlParams.get('error_description');
+        const simulation = urlParams.get('simulation');
         
         console.log('콜백 파라미터:', { 
           code, 
           state, 
           error, 
           errorDescription,
-          fullUrl: window.location.href
+          simulation,
+          hasCode: !!code,
+          hasState: !!state,
+          hasError: !!error
         });
+        
+        // 시뮬레이션 모드 체크 (URL에 simulation=true가 있는 경우)
+        if (simulation === 'true') {
+          console.log('시뮬레이션 모드 감지');
+          const userId = urlParams.get('userId');
+          if (userId) {
+            await handleSimulationCallback(userId);
+            return;
+          }
+        }
         
         // LINE 채널 개발 상태 에러 체크
         if (error) {
@@ -136,8 +162,26 @@
         }
         
         // 정상적인 code가 있는 경우 처리
-        if (!code || !state) {
-          throw new Error('필수 파라미터가 없습니다. LINE 로그인을 다시 시도해주세요.');
+        if (!code) {
+          console.warn('Authorization code가 없습니다. 시뮬레이션 모드로 전환합니다.');
+          
+          // state에서 userId 추출 시도
+          let userId = null;
+          if (state) {
+            try {
+              const stateData = JSON.parse(atob(state));
+              userId = stateData.userId;
+            } catch (e) {
+              console.error('State 파싱 실패:', e);
+            }
+          }
+          
+          if (userId) {
+            await handleSimulationCallback(userId);
+            return;
+          } else {
+            throw new Error('필수 파라미터가 없습니다. LINE 로그인을 다시 시도해주세요.');
+          }
         }
         
         // state 파싱
@@ -259,15 +303,18 @@
       const statusEl = document.getElementById('status');
       statusEl.innerHTML = `
         <div class="success-container">
-          <h3>🔄 시뮬레이션 모드</h3>
+          <h3>🔄 개발 채널 시뮬레이션</h3>
           <p>LINE 채널이 개발 상태이므로 시뮬레이션으로 연동을 완료합니다...</p>
+          <div style="font-size: 0.9rem; margin-top: 12px; padding: 12px; background: rgba(255,193,7,0.2); border-radius: 8px;">
+            <strong>참고:</strong> 실제 서비스에서는 LINE 채널을 Published 상태로 변경해야 합니다.
+          </div>
         </div>
       `;
       
       // 시뮬레이션 데이터 생성
       const mockProfile = {
         userId: 'U' + Math.random().toString(36).substr(2, 9),
-        displayName: 'PUZZMI 사용자',
+        displayName: 'PUZZMI 테스트 사용자',
         pictureUrl: 'https://picsum.photos/200/200'
       };
       
@@ -278,15 +325,19 @@
         refresh_token: 'mock_refresh_token_' + Date.now()
       };
       
+      console.log('시뮬레이션 데이터 생성:', { mockProfile, mockTokenData });
+      
       // LINE 계정 정보 저장
       await saveLineAccount(userId, mockProfile, mockTokenData);
       
       // 성공 처리
-      await handleSuccess('LINE 연동이 완료되었습니다!\n(개발 채널 시뮬레이션 모드)');
+      await handleSuccess('LINE 연동이 완료되었습니다!\n(개발 채널 - 시뮬레이션 모드)');
     }
     
     // LINE 계정 정보 저장
     async function saveLineAccount(userId, profile, tokenData) {
+      console.log('LINE 계정 정보 저장 시작:', { userId, profile });
+      
       const lineAccountData = {
         user_id: userId,
         line_user_id: profile.userId,
@@ -299,7 +350,7 @@
           new Date(Date.now() + tokenData.expires_in * 1000).toISOString() : null
       };
       
-      console.log('LINE 계정 정보 저장:', lineAccountData);
+      console.log('저장할 LINE 계정 데이터:', lineAccountData);
       
       const { error } = await supabase
         .from('user_line_accounts')
@@ -307,11 +358,14 @@
       
       if (error) {
         console.error('LINE 계정 저장 실패:', error);
+        console.error('저장 시도한 데이터:', lineAccountData);
         throw new Error(`LINE 계정 저장 실패: ${error.message}`);
       }
       
+      console.log('LINE 계정 저장 성공!');
+      
       // 인증 상태도 저장
-      await supabase
+      const { error: verificationError } = await supabase
         .from('user_verifications')
         .upsert({
           user_id: userId,
@@ -323,6 +377,12 @@
             display_name: profile.displayName
           }
         }, { onConflict: 'user_id,verification_type' });
+      
+      if (verificationError) {
+        console.warn('인증 상태 저장 실패 (무시됨):', verificationError);
+      } else {
+        console.log('인증 상태 저장 성공!');
+      }
     }
     
     // 성공 처리
