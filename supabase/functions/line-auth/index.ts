@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -30,6 +31,31 @@ serve(async (req: Request) => {
   }
 
   try {
+    // Supabase 클라이언트 초기화
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    const supabase = createClient(supabaseUrl, supabaseServiceKey)
+    
+    // Authorization 헤더에서 JWT 토큰 추출
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return new Response(
+        JSON.stringify({ success: false, error: '인증이 필요합니다' }),
+        { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      )
+    }
+    
+    const token = authHeader.replace('Bearer ', '')
+    
+    // JWT 토큰으로 사용자 인증
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ success: false, error: '유효하지 않은 인증 토큰입니다' }),
+        { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      )
+    }
+    
     const url = new URL(req.url)
     const action = url.pathname.split('/').pop()
 
@@ -60,7 +86,8 @@ serve(async (req: Request) => {
     switch (action) {
       case 'generate-url': {
         // LINE OAuth URL 생성
-        const { userId } = await req.json()
+        // 클라이언트에서 받은 userId는 무시하고 인증된 사용자 ID 사용
+        const userId = user.id
         
         // Netlify 배포 환경에 맞춘 콜백 URL
         const callbackUrl = 'https://puzzmi.netlify.app/line_callback.html'
@@ -106,7 +133,22 @@ serve(async (req: Request) => {
 
       case 'exchange-token': {
         // Authorization Code를 Access Token으로 교환
-        const { code, callbackUrl } = await req.json()
+        const { code, state } = await req.json()
+        
+        // state에서 userId 추출하여 현재 인증된 사용자와 비교
+        let stateData
+        try {
+          stateData = JSON.parse(atob(state))
+        } catch (e) {
+          throw new Error('잘못된 state 파라미터입니다')
+        }
+        
+        // 보안 검증: state의 userId와 현재 인증된 사용자 ID가 일치해야 함
+        if (stateData.userId !== user.id) {
+          throw new Error('사용자 인증 정보가 일치하지 않습니다')
+        }
+        
+        const callbackUrl = 'https://puzzmi.netlify.app/line_callback.html'
         
         const tokenResponse = await fetch('https://api.line.me/oauth2/v2.1/token', {
           method: 'POST',
@@ -174,6 +216,53 @@ serve(async (req: Request) => {
             success: true, 
             profile: profileData 
           }),
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              ...corsHeaders,
+            },
+          }
+        )
+      }
+
+      case 'save-account': {
+        // LINE 계정 정보 저장 (서버에서 안전하게 처리)
+        const { profile, tokenData } = await req.json()
+        
+        const lineAccountData = {
+          user_id: user.id, // 서버에서 인증된 사용자 ID 사용
+          line_user_id: profile.userId,
+          line_display_name: profile.displayName,
+          line_picture_url: profile.pictureUrl,
+          is_verified: true,
+          access_token: tokenData.access_token,
+          refresh_token: tokenData.refresh_token || null,
+          token_expires_at: tokenData.expires_in ? 
+            new Date(Date.now() + tokenData.expires_in * 1000).toISOString() : null
+        }
+        
+        const { error: saveError } = await supabase
+          .from('user_line_accounts')
+          .upsert(lineAccountData, { onConflict: 'user_id' })
+        
+        if (saveError) throw saveError
+        
+        // 인증 상태도 저장
+        await supabase
+          .from('user_verifications')
+          .upsert({
+            user_id: user.id,
+            verification_type: 'line',
+            is_verified: true,
+            verified_at: new Date().toISOString(),
+            verification_data: {
+              line_user_id: profile.userId,
+              display_name: profile.displayName
+            }
+          }, { onConflict: 'user_id,verification_type' })
+        
+        return new Response(
+          JSON.stringify({ success: true, message: 'LINE 계정이 저장되었습니다' }),
           {
             headers: {
               'Content-Type': 'application/json',
