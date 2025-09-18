@@ -403,6 +403,48 @@
       box-shadow: 0 12px 28px rgba(240, 147, 251, 0.4);
     }
     
+    /* LINE 연동 관련 스타일 */
+    .btn-line {
+      background: linear-gradient(135deg, #00C300 0%, #00B900 100%);
+      color: white;
+      box-shadow: 0 8px 20px rgba(0, 195, 0, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .btn-line:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 12px 28px rgba(0, 195, 0, 0.4);
+    }
+    
+    .btn-line:disabled {
+      opacity: 0.6;
+      transform: none;
+      cursor: not-allowed;
+    }
+    
+    .line-connection-section {
+      background: linear-gradient(135deg, rgba(0, 195, 0, 0.05) 0%, rgba(0, 185, 0, 0.03) 100%);
+      border: 2px solid rgba(0, 195, 0, 0.2);
+      border-radius: 16px;
+      padding: 24px;
+      backdrop-filter: blur(8px);
+    }
+    
+    .line-status-connected {
+      background: linear-gradient(135deg, #d1f2eb 0%, #a3e4d7 100%);
+      color: #0e6b47;
+      border-color: rgba(25, 135, 84, 0.3);
+    }
+    
+    .line-status-disconnected {
+      background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+      color: #856404;
+      border-color: rgba(255, 193, 7, 0.3);
+    }
+    
     /* 액션 그룹 */
     .action-group {
       display: flex;
@@ -825,6 +867,22 @@
     <section class="section-card">
       <h3 class="section-title">🔐 계정 관리</h3>
       
+      <!-- LINE 연동 관리 -->
+      <div class="line-connection-section" style="margin-bottom: 32px;">
+        <h4 style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+          <i class="fab fa-line" style="color: #00C300;"></i>
+          LINE 계정 연동
+        </h4>
+        
+        <div id="lineConnectionStatus" class="help-text" style="margin-bottom: 16px;">
+          연동 상태를 확인하는 중...
+        </div>
+        
+        <div class="action-group" id="lineActions">
+          <!-- 버튼들이 동적으로 추가됩니다 -->
+        </div>
+      </div>
+      
       <!-- 이메일 변경 -->
       <form id="emailForm" class="form-grid">
         <div class="form-row single">
@@ -929,6 +987,188 @@
       return Math.round((completed / fields.length) * 100);
     }
 
+    // LINE 연동 상태 확인 및 UI 업데이트
+    async function checkLineConnection() {
+      const statusEl = document.getElementById('lineConnectionStatus');
+      const actionsEl = document.getElementById('lineActions');
+      
+      try {
+        const { data: lineAccount, error } = await supabase
+          .from('user_line_accounts')
+          .select('*')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        
+        if (error) throw error;
+        
+        if (lineAccount && lineAccount.is_verified) {
+          // 연동됨
+          statusEl.className = 'help-text line-status-connected';
+          statusEl.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              <i class="fas fa-check-circle" style="color: #28a745;"></i>
+              <strong>LINE 계정이 연동되어 있습니다</strong>
+            </div>
+            <div style="font-size: 0.9rem;">
+              연동된 계정: ${lineAccount.line_display_name || '사용자'}<br>
+              연동일: ${new Date(lineAccount.connected_at).toLocaleDateString('ko-KR')}
+            </div>
+          `;
+          
+          actionsEl.innerHTML = `
+            <button class="btn btn-danger" id="disconnectLineBtn">
+              <i class="fab fa-line"></i>
+              LINE 연동 해제
+            </button>
+          `;
+          
+          // 연동 해제 이벤트
+          document.getElementById('disconnectLineBtn').addEventListener('click', disconnectLine);
+          
+        } else {
+          // 연동 안됨
+          statusEl.className = 'help-text line-status-disconnected';
+          statusEl.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              <i class="fas fa-exclamation-triangle" style="color: #ffc107;"></i>
+              <strong>LINE 계정이 연동되지 않았습니다</strong>
+            </div>
+            <div style="font-size: 0.9rem;">
+              예약 확정 및 결제 안내를 받으려면 LINE 연동이 필요합니다.
+            </div>
+          `;
+          
+          actionsEl.innerHTML = `
+            <button class="btn btn-line" id="connectLineBtn">
+              <i class="fab fa-line"></i>
+              LINE 계정 연동하기
+            </button>
+          `;
+          
+          // 연동 이벤트
+          document.getElementById('connectLineBtn').addEventListener('click', connectLine);
+        }
+        
+      } catch (error) {
+        console.error('LINE 연동 상태 확인 실패:', error);
+        statusEl.className = 'help-text error';
+        statusEl.textContent = 'LINE 연동 상태를 확인할 수 없습니다.';
+      }
+    }
+
+    // LINE 연동 함수
+    async function connectLine() {
+      const btn = document.getElementById('connectLineBtn');
+      const statusEl = document.getElementById('lineConnectionStatus');
+      
+      btn.disabled = true;
+      btn.innerHTML = '<div class="loading"></div> 연동 중...';
+      
+      try {
+        // LINE Login URL 생성
+        const lineLoginUrl = generateLineLoginUrl();
+        
+        // 새 창에서 LINE 로그인 진행
+        const popup = window.open(lineLoginUrl, 'lineLogin', 'width=500,height=600');
+        
+        // 팝업 완료 대기
+        const checkAuth = setInterval(async () => {
+          if (popup.closed) {
+            clearInterval(checkAuth);
+            
+            // 시뮬레이션: LINE 연동 성공
+            const mockLineData = {
+              user_id: user.id,
+              line_user_id: 'U' + Math.random().toString(36).substr(2, 9),
+              line_display_name: fullNameEl.value || '사용자',
+              line_picture_url: 'https://picsum.photos/200/200',
+              is_verified: true,
+              access_token: 'mock_access_token',
+              token_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+            };
+            
+            // LINE 계정 정보 저장
+            const { error: lineError } = await supabase
+              .from('user_line_accounts')
+              .upsert(mockLineData, { onConflict: 'user_id' });
+            
+            if (lineError) throw lineError;
+            
+            // 인증 상태 저장
+            await supabase
+              .from('user_verifications')
+              .upsert({
+                user_id: user.id,
+                verification_type: 'line',
+                is_verified: true,
+                verified_at: new Date().toISOString(),
+                verification_data: {
+                  line_user_id: mockLineData.line_user_id,
+                  display_name: mockLineData.line_display_name
+                }
+              }, { onConflict: 'user_id,verification_type' });
+            
+            showToast('✅ LINE 계정이 성공적으로 연동되었습니다!');
+            await checkLineConnection(); // 상태 새로고침
+          }
+        }, 1000);
+        
+      } catch (error) {
+        console.error('LINE 연동 오류:', error);
+        showToast('❌ LINE 연동 오류: ' + error.message);
+        
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fab fa-line"></i> LINE 계정 연동하기';
+      }
+    }
+
+    // LINE 연동 해제 함수
+    async function disconnectLine() {
+      if (!confirm('정말로 LINE 연동을 해제하시겠습니까?\n\n연동을 해제하면 예약 관련 알림을 받을 수 없습니다.')) {
+        return;
+      }
+      
+      const btn = document.getElementById('disconnectLineBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<div class="loading"></div> 해제 중...';
+      
+      try {
+        // LINE 계정 정보 삭제
+        const { error: lineError } = await supabase
+          .from('user_line_accounts')
+          .delete()
+          .eq('user_id', user.id);
+        
+        if (lineError) throw lineError;
+        
+        // 인증 상태 삭제
+        await supabase
+          .from('user_verifications')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('verification_type', 'line');
+        
+        showToast('💔 LINE 연동이 해제되었습니다');
+        await checkLineConnection(); // 상태 새로고침
+        
+      } catch (error) {
+        console.error('LINE 연동 해제 실패:', error);
+        showToast('❌ LINE 연동 해제 실패: ' + error.message);
+        
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fab fa-line"></i> LINE 연동 해제';
+      }
+    }
+
+    // LINE Login URL 생성
+    function generateLineLoginUrl() {
+      const clientId = 'YOUR_LINE_CHANNEL_ID'; // 실제 환경에서 설정
+      const redirectUri = encodeURIComponent(`${window.location.origin}/line_callback.html`);
+      const state = btoa(JSON.stringify({ userId: user.id, timestamp: Date.now() }));
+      const scope = 'profile openid';
+      
+      return `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}&scope=${scope}`;
+    }
     // 프로필 데이터 로드
     async function loadProfile() {
       try {
@@ -1168,6 +1408,7 @@
 
     // 초기 로드
     await loadProfile();
+    await checkLineConnection();
   </script>
 </body>
 </html>
