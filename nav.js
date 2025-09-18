@@ -30,14 +30,18 @@ async function getRoles() {
       console.log('Auth error detected, clearing auth state:', error.message);
       await supabase.auth.signOut();
       
-      // Redirect to auth page after signOut to prevent further invalid requests
-      // Only redirect if not already on auth page
-      if (!window.location.pathname.includes('auth_combo.html')) {
+      // Don't redirect after logout - just return null user state
+      // Only redirect if this is an unexpected auth error (not a logout)
+      const isLogoutAction = sessionStorage.getItem('logout_action') === 'true';
+      if (!isLogoutAction && !window.location.pathname.includes('auth_combo.html')) {
         setTimeout(() => {
           const currentPath = encodeURIComponent(window.location.pathname + window.location.search);
           window.location.href = `auth_combo.html?redirect=${currentPath}`;
-        }, 100); // Small delay to allow signOut to complete
+        }, 100);
       }
+      
+      // Clear logout flag
+      sessionStorage.removeItem('logout_action');
       
       return { user: null, isAdmin: false, isMate: false };
     }
@@ -47,14 +51,16 @@ async function getRoles() {
     // Clear invalid session and return null user
     await supabase.auth.signOut();
     
-    // Redirect to auth page after signOut to prevent further invalid requests
-    // Only redirect if not already on auth page
-    if (!window.location.pathname.includes('auth_combo.html')) {
+    // Don't redirect after logout - just return null user state
+    const isLogoutAction = sessionStorage.getItem('logout_action') === 'true';
+    if (!isLogoutAction && !window.location.pathname.includes('auth_combo.html')) {
       setTimeout(() => {
         const currentPath = encodeURIComponent(window.location.pathname + window.location.search);
         window.location.href = `auth_combo.html?redirect=${currentPath}`;
-      }, 100); // Small delay to allow signOut to complete
+      }, 100);
     }
+    
+    sessionStorage.removeItem('logout_action');
     
     return { user: null, isAdmin: false, isMate: false };
   }
@@ -290,7 +296,9 @@ export async function renderNavbar(rootId='app-nav') {
   // 로그아웃 버튼
   navRight.appendChild(el('button', { 
     class: 'logout-btn',
-    onclick: async () => { 
+    onclick: async () => {
+      // Mark this as a logout action to prevent redirect
+      sessionStorage.setItem('logout_action', 'true');
       await supabase.auth.signOut(); 
       location.reload(); 
     }
