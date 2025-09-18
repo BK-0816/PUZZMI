@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LINE API 보안 설정 가이드 - PUZZMI</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="pages.css"/>
+  <link rel="stylesheet" href="pages-theme.css"/>
+  <style>
+    body.bg-cream { 
+      background: var(--bg-cream); 
+      background-repeat: no-repeat; 
+      background-size: cover; 
+      min-height: 100vh;
+    }
+    
+    .guide-container {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    
+    .warning-header {
+      background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%);
+      color: white;
+      padding: 40px;
+      border-radius: 20px;
+      text-align: center;
+      margin-bottom: 32px;
+      box-shadow: 0 20px 60px rgba(220, 53, 69, 0.3);
+    }
+    
+    .warning-header h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin: 0 0 16px 0;
+    }
+    
+    .step-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 20px;
+      padding: 32px;
+      margin-bottom: 24px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.06);
+    }
+    
+    .step-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .code-block {
+      background: #1a1a1a;
+      color: #f8f8f2;
+      padding: 20px;
+      border-radius: 12px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      overflow-x: auto;
+      margin: 16px 0;
+      border: 2px solid rgba(102, 126, 234, 0.2);
+    }
+    
+    .danger-box {
+      background: linear-gradient(135deg, #f8d7da 0%, #f1948a 100%);
+      border: 2px solid rgba(220, 53, 69, 0.3);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    
+    .success-box {
+      background: linear-gradient(135deg, #d1f2eb 0%, #a3e4d7 100%);
+      border: 2px solid rgba(25, 135, 84, 0.3);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    
+    .info-box {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.05) 100%);
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body class="bg-cream">
+  <div class="guide-container">
+    <!-- 경고 헤더 -->
+    <section class="warning-header">
+      <h1>🚨 보안 경고: API 키 노출 감지</h1>
+      <p>GitGuardian이 LINE API 키 노출을 감지했습니다. 즉시 보안 조치가 필요합니다!</p>
+    </section>
+
+    <!-- 즉시 해야 할 조치 -->
+    <section class="step-card">
+      <h2 class="step-title">
+        <span style="background: #dc3545; color: white; padding: 8px 12px; border-radius: 8px;">🚨 즉시</span>
+        LINE Developers Console에서 키 재발급
+      </h2>
+      
+      <div class="danger-box">
+        <h4 style="color: #721c24; margin: 0 0 12px 0;">⚠️ 노출된 키는 즉시 무효화하세요!</h4>
+        <p style="margin: 0; color: #721c24;">
+          현재 노출된 Channel Secret은 보안상 위험하므로 새로운 키로 교체해야 합니다.
+        </p>
+      </div>
+      
+      <ol style="line-height: 1.8;">
+        <li><strong>LINE Developers Console</strong> 접속</li>
+        <li><strong>해당 채널 선택</strong> → Basic settings</li>
+        <li><strong>Channel secret 재발급</strong> (Reset 버튼 클릭)</li>
+        <li><strong>새로운 Secret 복사</strong></li>
+      </ol>
+    </section>
+
+    <!-- 안전한 설정 방법 -->
+    <section class="step-card">
+      <h2 class="step-title">
+        <span style="background: #28a745; color: white; padding: 8px 12px; border-radius: 8px;">✅ 해결</span>
+        안전한 API 키 관리 방법
+      </h2>
+      
+      <h3 style="color: #667eea; margin: 24px 0 16px 0;">🔒 현재 프로젝트 보안 상태</h3>
+      <div class="success-box">
+        <h4 style="color: #0f5132; margin: 0 0 12px 0;">✅ 이미 보안 조치 완료!</h4>
+        <p style="margin: 0; color: #0f5132;">
+          방금 업데이트된 코드에서는 실제 API 키가 하드코딩되지 않도록 수정되었습니다.
+        </p>
+      </div>
+      
+      <h4 style="color: #667eea;">📝 line_config.js 파일 확인</h4>
+      <div class="code-block">
+// ✅ 안전한 방식 (현재 적용됨)
+export const LINE_CONFIG = {
+  CHANNEL_ID: process.env.LINE_CHANNEL_ID || 'YOUR_LINE_CHANNEL_ID_HERE',
+  CHANNEL_SECRET: process.env.LINE_CHANNEL_SECRET || 'YOUR_LINE_CHANNEL_SECRET_HERE',
+  // ...
+};
+
+// ❌ 위험한 방식 (절대 금지!)
+// CHANNEL_ID: '2008137189',
+// CHANNEL_SECRET: 'e743b9de9cd4ecc5b1d44f8d4c34d9d3',</div>
+    </section>
+
+    <!-- 환경변수 설정 -->
+    <section class="step-card">
+      <h2 class="step-title">
+        <span style="background: #667eea; color: white; padding: 8px 12px; border-radius: 8px;">🔧 설정</span>
+        Netlify 환경변수 설정
+      </h2>
+      
+      <h3 style="color: #667eea;">🌐 Netlify Dashboard에서 설정</h3>
+      <ol style="line-height: 1.8;">
+        <li><strong>Netlify Dashboard</strong> → 해당 사이트 선택</li>
+        <li><strong>Site settings</strong> → <strong>Environment variables</strong></li>
+        <li><strong>Add variable</strong> 클릭하여 다음 추가:</li>
+      </ol>
+      
+      <div class="code-block">
+# Netlify 환경변수 설정
+Key: LINE_CHANNEL_ID
+Value: [새로 발급받은 Channel ID]
+
+Key: LINE_CHANNEL_SECRET  
+Value: [새로 발급받은 Channel Secret]</div>
+      
+      <div class="info-box">
+        <h4 style="color: #667eea; margin: 0 0 12px 0;">💡 환경변수 장점</h4>
+        <ul style="margin: 0; color: var(--text-primary);">
+          <li>코드에 민감한 정보 노출 방지</li>
+          <li>GitHub 등 공개 저장소에 안전하게 업로드 가능</li>
+          <li>환경별로 다른 키 사용 가능 (개발/운영)</li>
+          <li>키 변경 시 코드 수정 없이 환경변수만 업데이트</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 추가 보안 조치 -->
+    <section class="step-card">
+      <h2 class="step-title">
+        <span style="background: #ffc107; color: #000; padding: 8px 12px; border-radius: 8px;">🛡️ 추가</span>
+        추가 보안 조치
+      </h2>
+      
+      <h3 style="color: #667eea;">🔍 GitGuardian 알림 해결</h3>
+      <ol style="line-height: 1.8;">
+        <li><strong>GitHub Repository</strong>에서 노출된 커밋 확인</li>
+        <li><strong>Git history 정리</strong> (필요시)</li>
+        <li><strong>GitGuardian에 해결 보고</strong></li>
+        <li><strong>새로운 키로 테스트</strong> 진행</li>
+      </ol>
+      
+      <h3 style="color: #667eea;">🔐 장기적 보안 강화</h3>
+      <ul style="line-height: 1.8;">
+        <li><strong>정기적 키 갱신</strong> (3-6개월마다)</li>
+        <li><strong>IP 제한 설정</strong> (LINE Console에서)</li>
+        <li><strong>도메인 제한</strong> 엄격하게 관리</li>
+        <li><strong>모니터링 설정</strong> (비정상 접근 감지)</li>
+      </ul>
+    </section>
+
+    <!-- 현재 상태 확인 -->
+    <section class="step-card">
+      <h2 class="step-title">
+        <span style="background: #17a2b8; color: white; padding: 8px 12px; border-radius: 8px;">📊 확인</span>
+        현재 보안 상태
+      </h2>
+      
+      <div class="success-box">
+        <h4 style="color: #0f5132; margin: 0 0 12px 0;">✅ 완료된 보안 조치</h4>
+        <ul style="margin: 0; color: #0f5132;">
+          <li>하드코딩된 API 키 제거 완료</li>
+          <li>환경변수 기반 설정으로 변경</li>
+          <li>시뮬레이션 모드 대체 구현</li>
+          <li>개발자 콘솔 경고 메시지 추가</li>
+        </ul>
+      </div>
+      
+      <div class="info-box">
+        <h4 style="color: #667eea; margin: 0 0 12px 0;">🔄 다음 단계</h4>
+        <ol style="margin: 0; color: var(--text-primary);">
+          <li>LINE Developers Console에서 새 Secret 발급</li>
+          <li>Netlify 환경변수에 새 키 설정</li>
+          <li>사이트 재배포</li>
+          <li>LINE 연동 기능 테스트</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- 테스트 링크 -->
+    <section class="step-card">
+      <h2 class="step-title">
+        <span style="background: #6f42c1; color: white; padding: 8px 12px; border-radius: 8px;">🧪 테스트</span>
+        기능 테스트
+      </h2>
+      
+      <div style="display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;">
+        <a href="my_profile.html" class="btn btn-primary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+          <i class="fas fa-user"></i>
+          내 정보에서 LINE 연동 테스트
+        </a>
+        
+        <a href="enhanced_signup.html" class="btn btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+          <i class="fas fa-user-plus"></i>
+          회원가입에서 LINE 연동 테스트
+        </a>
+        
+        <a href="check_migration.html" class="btn btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+          <i class="fas fa-check-circle"></i>
+          시스템 상태 확인
+        </a>
+      </div>
+    </section>
+  </div>
+
+  <style>
+    .btn {
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-secondary {
+      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+      color: var(--text-primary);
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      backdrop-filter: blur(8px);
+    }
+    
+    .btn-secondary:hover {
+      background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 100%);
+      transform: translateY(-2px);
+      border-color: rgba(102, 126, 234, 0.4);
+    }
+  </style>
+</body>
+</html>

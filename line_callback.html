@@ -235,7 +235,58 @@
     }
 
     // 콜백 처리 시작
-    processLineCallback();
+    // URL 파라미터 확인
+    const urlParams = new URLSearchParams(window.location.search);
+    const isSimulation = urlParams.get('simulation') === 'true';
+    
+    if (isSimulation) {
+      // 시뮬레이션 모드
+      handleSimulationCallback();
+    } else {
+      // 실제 LINE API 모드
+      processLineCallback();
+    }
+    
+    // 시뮬레이션 콜백 처리
+    function handleSimulationCallback() {
+      const userId = urlParams.get('userId');
+      
+      if (!userId) {
+        if (window.opener) {
+          window.opener.postMessage({
+            type: 'LINE_AUTH_ERROR',
+            error: '사용자 정보를 찾을 수 없습니다.'
+          }, window.location.origin);
+        }
+        window.close();
+        return;
+      }
+      
+      // 시뮬레이션 성공 데이터
+      const mockLineData = {
+        user_id: userId,
+        line_user_id: 'U' + Math.random().toString(36).substr(2, 9),
+        line_display_name: '테스트 사용자',
+        line_picture_url: 'https://picsum.photos/200/200',
+        is_verified: true,
+        access_token: 'mock_access_token',
+        token_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+      };
+      
+      // 부모 창에 성공 메시지 전달
+      if (window.opener) {
+        window.opener.postMessage({
+          type: 'LINE_AUTH_SUCCESS',
+          data: mockLineData,
+          simulation: true
+        }, window.location.origin);
+      }
+      
+      // 창 닫기
+      setTimeout(() => {
+        window.close();
+      }, 1000);
+    }
   </script>
 </body>
 </html>
