@@ -4,6 +4,9 @@ const SUPABASE_URL = "https://eevvgbbokenpjnvtmztk.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4";
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+// Export constants for use in other modules
+export { SUPABASE_URL, SUPABASE_ANON_KEY };
+
 function el(tag, attrs={}, children=[]) {
   const e = document.createElement(tag);
   Object.entries(attrs).forEach(([k,v]) => {
