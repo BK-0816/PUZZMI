@@ -1,424 +1,382 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+// supabase/functions/line-auth/index.ts
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+// ===== CORS =====
+const ALLOWED_ORIGINS = [
+  'https://puzzmi.com',
+  'https://www.puzzmi.com',
+  'https://puzzmi.netlify.app',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+];
+
+function corsHeaders(origin: string) {
+  const allowOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : 'https://puzzmi.com';
+  return {
+    'Access-Control-Allow-Origin': allowOrigin,
+    'Vary': 'Origin',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers':
+      'Content-Type, Authorization, x-client-info, apikey',
+    'Access-Control-Max-Age': '86400',
+  };
 }
 
-interface LineTokenResponse {
-  access_token: string
-  token_type: string
-  expires_in: number
-  refresh_token?: string
-  scope: string
-}
+Deno.serve(async (req) => {
+  const origin = req.headers.get('origin') ?? '';
+  const CORS = corsHeaders(origin);
 
-interface LineProfileResponse {
-  userId: string
-  displayName: string
-  pictureUrl?: string
-  statusMessage?: string
-}
-
-serve(async (req: Request) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, {
-      status: 200,
-      headers: corsHeaders,
-    })
+  // Preflight
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { status: 200, headers: CORS });
   }
 
   try {
-    // Supabase 클라이언트 초기화
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    const supabase = createClient(supabaseUrl, supabaseServiceKey)
-    
-    // LINE API 설정 (환경변수에서 가져오기)
-    const LINE_CHANNEL_ID = Deno.env.get('LINE_CHANNEL_ID')
-    const LINE_CHANNEL_SECRET = Deno.env.get('LINE_CHANNEL_SECRET')
-    
-    // 환경변수 확인
-    if (!LINE_CHANNEL_ID || !LINE_CHANNEL_SECRET) {
-      console.error('LINE API 환경변수 누락:', { 
-        hasChannelId: !!LINE_CHANNEL_ID, 
-        hasChannelSecret: !!LINE_CHANNEL_SECRET 
-      })
-      
-      // 개발 환경에서는 시뮬레이션 모드로 처리
-      const isDevelopment = !LINE_CHANNEL_ID || LINE_CHANNEL_ID === 'YOUR_LINE_CHANNEL_ID_HERE'
-      
-      if (isDevelopment) {
-        console.log('개발 환경 감지 - 시뮬레이션 모드 활성화')
-        return new Response(
-          JSON.stringify({ 
-            success: true, 
-            simulation: true,
-            message: 'LINE API 키가 설정되지 않아 시뮬레이션 모드로 실행됩니다.'
-          }),
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              ...corsHeaders,
-            },
-          }
-        )
-      }
-      
-      return new Response(
-        JSON.stringify({ 
-          success: false, 
-          error: 'LINE API 설정이 없습니다. 관리자에게 문의해주세요.' 
-        }),
-        {
-          status: 500,
-          headers: {
-            'Content-Type': 'application/json',
-            ...corsHeaders,
-          },
-        }
-      )
-    }
-    
-    // Authorization 헤더에서 JWT 토큰 추출
-    const authHeader = req.headers.get('Authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return new Response(
-        JSON.stringify({ success: false, error: '인증이 필요합니다' }),
-        { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
-      )
-    }
-    
-    const token = authHeader.replace('Bearer ', '')
-    
-    // JWT 토큰으로 사용자 인증
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
-    if (authError || !user) {
-      return new Response(
-        JSON.stringify({ success: false, error: '유효하지 않은 인증 토큰입니다' }),
-        { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
-      )
-    }
-    
-    const url = new URL(req.url)
-    const action = url.pathname.split('/').pop()
+    // Supabase (Service role)
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // 현재 배포 환경에 따른 콜백 URL 결정
-    const getCallbackUrl = () => {
-      const referer = req.headers.get('referer') || req.headers.get('origin')
-      console.log('Referer 헤더:', referer)
-      
-      // 환경별 콜백 URL 매핑
-      if (referer?.includes('bolt.new')) {
-        return `${referer.split('/').slice(0, 3).join('/')}/line_callback.html`
-      } else if (referer?.includes('netlify.app')) {
-        return 'https://puzzmi.netlify.app/line_callback.html'
-      } else if (referer?.includes('localhost')) {
-        return 'http://localhost:3000/line_callback.html'
-      } else {
-        // 기본값 (운영 환경)
-        return 'https://puzzmi.netlify.app/line_callback.html'
-      }
+    // LINE env
+    const LINE_CHANNEL_ID = Deno.env.get('LINE_CHANNEL_ID');
+    const LINE_CHANNEL_SECRET = Deno.env.get('LINE_CHANNEL_SECRET');
+    if (!LINE_CHANNEL_ID || !LINE_CHANNEL_SECRET) {
+      return json({ success: false, error: 'LINE API 설정 누락' }, 500, CORS);
     }
+
+    // Auth (함수 내부에서 직접 검증)
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return json({ success: false, error: '인증 필요' }, 401, CORS);
+    }
+    const token = authHeader.slice('Bearer '.length);
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    if (authError || !user) {
+      return json({ success: false, error: '유효하지 않은 토큰' }, 401, CORS);
+    }
+
+    // 액션 라우팅
+    const url = new URL(req.url);
+    const action = url.pathname.split('/').pop();
+
+    // 콜백 URL 결정
+    const getCallbackUrl = () => {
+      const ref = req.headers.get('referer') || req.headers.get('origin') || '';
+      if (ref.includes('bolt.new')) {
+        return `${ref.split('/').slice(0, 3).join('/')}/line_callback.html`;
+      } else if (ref.includes('puzzmi.com')) {
+        return 'https://puzzmi.com/line_callback.html';
+      } else if (ref.includes('netlify.app')) {
+        return 'https://puzzmi.netlify.app/line_callback.html';
+      } else if (ref.includes('localhost')) {
+        return 'http://localhost:3000/line_callback.html';
+      }
+      // 기본값
+      return 'https://puzzmi.com/line_callback.html';
+    };
 
     switch (action) {
       case 'generate-url': {
-        // LINE OAuth URL 생성
-        const userId = user.id // 서버에서 인증된 사용자 ID 사용
-        const callbackUrl = getCallbackUrl()
-        
-        console.log('LINE URL 생성:', {
+        const userId = user.id;
+        const callbackUrl = getCallbackUrl();
+
+        const state = btoa(JSON.stringify({
           userId,
-          callbackUrl,
-          channelId: LINE_CHANNEL_ID
-        })
-        
-        const state = btoa(JSON.stringify({ 
-          userId, 
           timestamp: Date.now(),
-          origin: req.headers.get('origin') || 'unknown'
-        }))
-        
+          origin: req.headers.get('origin') || 'unknown',
+        }));
+
         const params = new URLSearchParams({
           response_type: 'code',
           client_id: LINE_CHANNEL_ID,
           redirect_uri: callbackUrl,
-          state: state,
-          scope: 'profile openid email'
-        })
-        
-        const lineUrl = `https://access.line.me/oauth2/v2.1/authorize?${params.toString()}`
-        
-        console.log('생성된 LINE URL:', lineUrl)
-        
-        return new Response(
-          JSON.stringify({ 
-            success: true, 
-            loginUrl: lineUrl,
-            callbackUrl,
-            channelId: LINE_CHANNEL_ID
-          }),
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              ...corsHeaders,
-            },
-          }
-        )
+          state,
+          scope: 'openid profile email', // id_token 받으려면 openid 포함
+          prompt: 'consent',
+          ui_locales: 'ko',
+          bot_prompt: 'aggressive',
+        });
+
+        const loginUrl = `https://access.line.me/oauth2/v2.1/authorize?${params}`;
+        return json({ success: true, loginUrl, callbackUrl, channelId: LINE_CHANNEL_ID }, 200, CORS);
       }
 
       case 'exchange-token': {
-        // Authorization Code를 Access Token으로 교환
-        const { code, state } = await req.json()
-        
-        console.log('토큰 교환 시작:', { code: !!code, state: !!state })
-        
-        // state 검증
-        let stateData
+        const { code, state } = await req.json();
+        let stateData: any;
         try {
-          stateData = JSON.parse(atob(state))
-          console.log('State 데이터:', stateData)
-        } catch (e) {
-          throw new Error('잘못된 state 파라미터입니다')
+          stateData = JSON.parse(atob(state));
+        } catch {
+          return json({ success: false, error: '잘못된 state' }, 400, CORS);
         }
-        
-        // 보안 검증: state의 userId와 현재 인증된 사용자 ID가 일치해야 함
         if (stateData.userId !== user.id) {
-          console.error('사용자 ID 불일치:', {
-            stateUserId: stateData.userId,
-            authUserId: user.id
-          })
-          throw new Error('사용자 인증 정보가 일치하지 않습니다')
+          return json({ success: false, error: '사용자 불일치' }, 403, CORS);
         }
-        
-        const callbackUrl = getCallbackUrl()
-        
-        console.log('토큰 교환 요청:', {
-          callbackUrl,
-          channelId: LINE_CHANNEL_ID,
-          hasSecret: !!LINE_CHANNEL_SECRET
-        })
-        
-        const tokenResponse = await fetch('https://api.line.me/oauth2/v2.1/token', {
+
+        const callbackUrl = getCallbackUrl();
+        const tokenResp = await fetch('https://api.line.me/oauth2/v2.1/token', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: new URLSearchParams({
             grant_type: 'authorization_code',
-            code: code,
+            code,
             redirect_uri: callbackUrl,
             client_id: LINE_CHANNEL_ID,
-            client_secret: LINE_CHANNEL_SECRET
-          })
-        })
-        
-        if (!tokenResponse.ok) {
-          const errorText = await tokenResponse.text()
-          console.error('LINE 토큰 교환 실패:', {
-            status: tokenResponse.status,
-            error: errorText,
-            callbackUrl: callbackUrl
-          })
-          throw new Error(`토큰 교환 실패: ${tokenResponse.status} - ${errorText}`)
-        }
-        
-        const tokenData: LineTokenResponse = await tokenResponse.json()
-        console.log('토큰 교환 성공')
-        
-        return new Response(
-          JSON.stringify({ 
-            success: true, 
-            tokenData 
+            client_secret: LINE_CHANNEL_SECRET,
           }),
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              ...corsHeaders,
-            },
-          }
-        )
+        });
+        if (!tokenResp.ok) {
+          return json({ success: false, error: await tokenResp.text() }, tokenResp.status, CORS);
+        }
+        const tokenData = await tokenResp.json();
+        return json({ success: true, tokenData }, 200, CORS);
       }
 
       case 'get-profile': {
-        // Access Token으로 사용자 프로필 조회
-        const { accessToken } = await req.json()
-        
-        console.log('LINE 프로필 조회 시작')
-        
-        const profileResponse = await fetch('https://api.line.me/v2/profile', {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`
-          }
-        })
-        
-        if (!profileResponse.ok) {
-          const errorText = await profileResponse.text()
-          console.error('LINE 프로필 조회 실패:', {
-            status: profileResponse.status,
-            error: errorText
-          })
-          throw new Error(`프로필 조회 실패: ${profileResponse.status} - ${errorText}`)
+        const { accessToken } = await req.json();
+        const profileResp = await fetch('https://api.line.me/v2/profile', {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        if (!profileResp.ok) {
+          return json({ success: false, error: await profileResp.text() }, profileResp.status, CORS);
         }
-        
-        const profileData: LineProfileResponse = await profileResponse.json()
-        console.log('LINE 프로필 조회 성공:', {
-          userId: profileData.userId,
-          displayName: profileData.displayName
-        })
-        
-        return new Response(
-          JSON.stringify({ 
-            success: true, 
-            profile: profileData 
-          }),
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              ...corsHeaders,
-            },
-          }
-        )
+        const profile = await profileResp.json();
+        return json({ success: true, profile }, 200, CORS);
       }
 
       case 'complete-auth': {
-        // LINE 인증 완료 처리 (서버에서 안전하게)
-        const { code, state } = await req.json()
-        
-        console.log('LINE 인증 완료 처리 시작')
-        
-        // 1. 토큰 교환
-        const callbackUrl = getCallbackUrl()
-        
-        const tokenResponse = await fetch('https://api.line.me/oauth2/v2.1/token', {
+        const { code, state } = await req.json();
+
+        // (선택) state 다시 검증
+        try {
+          const s = JSON.parse(atob(state));
+          if (s.userId !== user.id) {
+            return json({ success: false, error: '사용자 불일치' }, 403, CORS);
+          }
+        } catch {
+          // state 없이도 진행 가능하도록 완화하려면 무시
+        }
+
+        const callbackUrl = getCallbackUrl();
+
+        // 1) code → token 교환
+        const tokenResp = await fetch('https://api.line.me/oauth2/v2.1/token', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: new URLSearchParams({
             grant_type: 'authorization_code',
-            code: code,
+            code,
             redirect_uri: callbackUrl,
             client_id: LINE_CHANNEL_ID,
-            client_secret: LINE_CHANNEL_SECRET
-          })
-        })
-        
-        if (!tokenResponse.ok) {
-          const errorText = await tokenResponse.text()
-          throw new Error(`토큰 교환 실패: ${tokenResponse.status} - ${errorText}`)
+            client_secret: LINE_CHANNEL_SECRET,
+          }),
+        });
+        if (!tokenResp.ok) {
+          return json({ success: false, error: await tokenResp.text() }, tokenResp.status, CORS);
         }
-        
-        const tokenData: LineTokenResponse = await tokenResponse.json()
-        
-        // 2. 프로필 조회
-        const profileResponse = await fetch('https://api.line.me/v2/profile', {
-          headers: {
-            'Authorization': `Bearer ${tokenData.access_token}`
+        const tokenData: any = await tokenResp.json();
+
+        // 2) 프로필 조회 (access_token)
+        const profileResp = await fetch('https://api.line.me/v2/profile', {
+          headers: { Authorization: `Bearer ${tokenData.access_token}` },
+        });
+        if (!profileResp.ok) {
+          return json({ success: false, error: await profileResp.text() }, profileResp.status, CORS);
+        }
+        const profileData = await profileResp.json();
+
+        // 3) 기존 프로필 불러오기
+        const { data: userProfile, error: profileError } = await supabase
+          .from('profiles')
+          .select('full_name, age, birth_date')
+          .eq('id', user.id)
+          .single();
+        if (profileError) {
+          return json({ success: false, error: `프로필 조회 실패: ${profileError.message}` }, 400, CORS);
+        }
+
+        // 4) 신원 검증
+        const lineDisplayName = profileData.displayName || '';
+        const userFullName = userProfile.full_name || '';
+        const nameMatch = compareNames(lineDisplayName, userFullName);
+
+        // 5) (선택) id_token 검증으로 추가 정보 시도
+        let verifiedBirthDate = userProfile.birth_date || null;
+        let verifiedAge = userProfile.age || null;
+        try {
+          if (tokenData.id_token) {
+            const verifyResp = await fetch('https://api.line.me/oauth2/v2.1/verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              body: new URLSearchParams({
+                id_token: tokenData.id_token,   // ★ access_token 말고 id_token!
+                client_id: LINE_CHANNEL_ID,
+              }),
+            });
+            if (verifyResp.ok) {
+              const idt = await verifyResp.json();
+              if (idt.birthdate) {
+                verifiedBirthDate = idt.birthdate;
+                verifiedAge = calculateAge(idt.birthdate);
+              }
+              if (idt.name) {
+                // 이름 재검증
+                if (!nameMatch && compareNames(idt.name, userFullName)) {
+                  // 필요시 nameMatch를 승격할 수 있음
+                }
+              }
+            }
           }
-        })
-        
-        if (!profileResponse.ok) {
-          throw new Error(`프로필 조회 실패: ${profileResponse.status}`)
+        } catch (_) {
+          // 무시하고 진행
         }
-        
-        const profileData: LineProfileResponse = await profileResponse.json()
-        
-        // 3. 서버에서 안전하게 LINE 계정 정보 저장
+
+        // match 판단
+        let ageMatch = false;
+        if (userProfile.age && verifiedAge) {
+          ageMatch = Math.abs(userProfile.age - verifiedAge) <= 1;
+        }
+        let birthDateMatch = false;
+        if (userProfile.birth_date && verifiedBirthDate) {
+          birthDateMatch = userProfile.birth_date === verifiedBirthDate;
+        }
+
+        // 인증 레벨 산정 (정리본)
+        let verificationLevel: 'basic' | 'enhanced' | 'premium' = 'basic';
+        if (nameMatch && ageMatch && birthDateMatch) {
+          verificationLevel = 'premium';
+        } else if ((nameMatch && ageMatch) || (nameMatch && birthDateMatch)) {
+          verificationLevel = 'enhanced';
+        } else {
+          verificationLevel = nameMatch || ageMatch ? 'basic' : 'basic';
+        }
+
+        // 6) LINE 계정 저장
         const lineAccountData = {
-          user_id: user.id, // 서버에서 인증된 사용자 ID 사용
+          user_id: user.id,
           line_user_id: profileData.userId,
           line_display_name: profileData.displayName,
           line_picture_url: profileData.pictureUrl || null,
           is_verified: true,
           access_token: tokenData.access_token,
           refresh_token: tokenData.refresh_token || null,
-          token_expires_at: tokenData.expires_in ? 
-            new Date(Date.now() + tokenData.expires_in * 1000).toISOString() : null
-        }
-        
-        console.log('LINE 계정 저장 시도:', {
-          userId: user.id,
-          lineUserId: profileData.userId,
-          displayName: profileData.displayName
-        })
-        
+          token_expires_at: tokenData.expires_in
+            ? new Date(Date.now() + tokenData.expires_in * 1000).toISOString()
+            : null,
+        };
         const { error: saveError } = await supabase
           .from('user_line_accounts')
-          .upsert(lineAccountData, { onConflict: 'user_id' })
-        
+          .upsert(lineAccountData, { onConflict: 'user_id' });
         if (saveError) {
-          console.error('LINE 계정 저장 실패:', saveError)
-          throw new Error(`LINE 계정 저장 실패: ${saveError.message}`)
+          return json({ success: false, error: `LINE 계정 저장 실패: ${saveError.message}` }, 400, CORS);
         }
-        
-        // 4. 인증 상태도 저장
-        await supabase
-          .from('user_verifications')
+
+        // 7) 신원확인 기록
+        const { error: verificationError } = await supabase
+          .from('line_identity_verifications')
           .upsert({
             user_id: user.id,
-            verification_type: 'line',
-            is_verified: true,
+            line_user_id: profileData.userId,
+            verified_name: lineDisplayName || profileData.displayName,
+            verified_age: verifiedAge,
+            verified_birth_date: verifiedBirthDate,
+            verification_level: verificationLevel,
             verified_at: new Date().toISOString(),
+            expires_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
             verification_data: {
-              line_user_id: profileData.userId,
-              display_name: profileData.displayName
-            }
-          }, { onConflict: 'user_id,verification_type' })
-        
-        console.log('LINE 연동 완료!')
-        
-        return new Response(
-          JSON.stringify({ 
-            success: true, 
-            message: 'LINE 계정 연동이 완료되었습니다',
-            profile: {
-              displayName: profileData.displayName,
-              pictureUrl: profileData.pictureUrl
-            }
-          }),
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              ...corsHeaders,
+              line_display_name: profileData.displayName,
+              line_picture_url: profileData.pictureUrl,
+              name_match: nameMatch,
+              age_match: ageMatch,
+              birth_date_match: birthDateMatch,
             },
-          }
-        )
+          }, { onConflict: 'user_id' });
+        if (verificationError) {
+          return json({ success: false, error: `신원확인 저장 실패: ${verificationError.message}` }, 400, CORS);
+        }
+
+        // 8) 프로필 플래그 업데이트
+        const { error: updateErr } = await supabase
+          .from('profiles')
+          .update({
+            identity_verified: true,
+            age_verified: !!ageMatch,
+            verification_source: 'line',
+            verification_level: verificationLevel,
+            updated_at: new Date().toISOString(),
+            ...(nameMatch && profileData.displayName && !userProfile.full_name
+              ? { full_name: profileData.displayName }
+              : {}),
+          })
+          .eq('id', user.id);
+        if (updateErr) {
+          return json({ success: false, error: `프로필 업데이트 실패: ${updateErr.message}` }, 400, CORS);
+        }
+
+        return json({
+          success: true,
+          message: `LINE 계정 연동 완료 (레벨: ${verificationLevel})`,
+          profile: {
+            displayName: profileData.displayName,
+            pictureUrl: profileData.pictureUrl,
+            verificationLevel,
+            nameMatch,
+            ageMatch,
+            birthDateMatch,
+            verifiedAge: verifiedAge,
+            verifiedBirthDate: verifiedBirthDate,
+          },
+        }, 200, CORS);
       }
 
       default:
-        return new Response(
-          JSON.stringify({ 
-            success: false, 
-            error: '지원하지 않는 액션입니다.' 
-          }),
-          {
-            status: 400,
-            headers: {
-              'Content-Type': 'application/json',
-              ...corsHeaders,
-            },
-          }
-        )
+        return json({ success: false, error: '지원하지 않는 액션' }, 400, CORS);
     }
-
-  } catch (error) {
-    console.error('LINE Auth Error:', error)
-    
-    return new Response(
-      JSON.stringify({ 
-        success: false, 
-        error: error.message 
-      }),
-      {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-          ...corsHeaders,
-        },
-      }
-    )
+  } catch (error: any) {
+    console.error('LINE Auth Error:', error);
+    return json({ success: false, error: String(error?.message ?? error) }, 500, corsHeaders('*'));
   }
-})
+});
+
+// ===== helpers =====
+function json(body: unknown, status = 200, headers?: Record<string, string>) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { 'Content-Type': 'application/json', ...(headers ?? {}) },
+  });
+}
+
+function compareNames(lineName?: string, profileName?: string) {
+  if (!lineName || !profileName) return false;
+  const a = lineName.replace(/\s+/g, '');
+  const b = profileName.replace(/\s+/g, '');
+  if (a === b) return true;
+  if (a.includes(b) || b.includes(a)) return true;
+  return levenshteinDistance(a, b) <= 1;
+}
+
+function levenshteinDistance(str1: string, str2: string) {
+  const m: number[][] = Array.from({ length: str2.length + 1 }, () => Array(str1.length + 1).fill(0));
+  for (let i = 0; i <= str2.length; i++) m[i][0] = i;
+  for (let j = 0; j <= str1.length; j++) m[0][j] = j;
+  for (let i = 1; i <= str2.length; i++) {
+    for (let j = 1; j <= str1.length; j++) {
+      m[i][j] = Math.min(
+        m[i - 1][j] + 1,
+        m[i][j - 1] + 1,
+        m[i - 1][j - 1] + (str2[i - 1] === str1[j - 1] ? 0 : 1),
+      );
+    }
+  }
+  return m[str2.length][str1.length];
+}
+
+function calculateAge(birthDate: string) {
+  const today = new Date();
+  const birth = new Date(birthDate);
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) age--;
+  return age;
+}

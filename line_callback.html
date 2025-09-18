@@ -5,17 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>LINE 연동 처리 중...</title>
   <style>
+    :root { --bg: #faf7f2; --text: #333; }
     body {
-      background: #faf7f2;
+      background: var(--bg);
       display: flex; align-items: center; justify-content: center;
-      min-height: 100vh; margin: 0; font-family: 'Noto Sans KR', sans-serif;
+      min-height: 100vh; margin: 0; font-family: 'Noto Sans KR', system-ui, sans-serif;
     }
-    .callback-container { background: #fff; border-radius: 20px; padding: 40px 28px; width: 92%; max-width: 520px; box-shadow: 0 18px 50px rgba(0,0,0,.08); text-align: center; }
+    .callback-container {
+      background: #fff; border-radius: 20px; padding: 40px 28px;
+      width: 92%; max-width: 520px; box-shadow: 0 18px 50px rgba(0,0,0,.08); text-align: center;
+    }
     .loading-icon { font-size: 3rem; margin-bottom: 18px; }
-    .title { font-size: 1.4rem; font-weight: 800; margin-bottom: 10px; }
+    .title { font-size: 1.4rem; font-weight: 800; margin-bottom: 10px; color: var(--text); }
     .desc { color: #555; line-height: 1.6; }
-    .error { background: #fde2e0; color: #8a1c15; border: 1px solid #f3b1ab; padding: 12px; border-radius: 12px; margin-top: 16px; font-size: .95rem; }
-    .success { background: #def7f0; color: #0a6147; border: 1px solid #a5e3d2; padding: 12px; border-radius: 12px; margin-top: 16px; font-size: .95rem; }
+    .error, .success {
+      padding: 12px; border-radius: 12px; margin-top: 16px; font-size: .95rem; text-align: left;
+    }
+    .error { background: #fde2e0; color: #8a1c15; border: 1px solid #f3b1ab; }
+    .success { background: #def7f0; color: #0a6147; border: 1px solid #a5e3d2; }
   </style>
 </head>
 <body>
@@ -29,7 +36,7 @@
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-    // ====== 환경 ======
+    // ===== 환경 =====
     const SUPABASE_URL = 'https://eevvgbbokenpjnvtmztk.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4';
     const EDGE_COMPLETE_URL = `${SUPABASE_URL}/functions/v1/line-auth/complete-auth`;
@@ -38,46 +45,46 @@
       try {
         if (!window.opener) return false;
         return window.opener.location.origin === window.location.origin;
-      } catch {
-        return false; // cross-origin인 경우 예외
+      } catch (e) {
+        return false; // cross-origin 이면 접근 불가 → false
       }
     }
 
     async function processLineCallback() {
       const statusEl = document.getElementById('status');
 
-      // 1) URL 파라미터 파싱
+      // 1) URL 파라미터
       const urlParams = new URLSearchParams(window.location.search);
-      const code = urlParams.get('code');
+      const code  = urlParams.get('code');
       const state = urlParams.get('state');
-      const error = urlParams.get('error');
-      const errorDescription = urlParams.get('error_description');
+      const err   = urlParams.get('error');
+      const errDesc = urlParams.get('error_description');
 
-      if (error) {
+      if (err) {
         if (window.opener) {
-          window.opener.postMessage({ type: 'LINE_AUTH_ERROR', error: errorDescription || error }, '*');
+          window.opener.postMessage({ type: 'LINE_AUTH_ERROR', error: errDesc || err }, '*');
         }
-        statusEl.innerHTML = `<div class="error">❌ ${errorDescription || error}</div>`;
-        setTimeout(()=> window.close(), 900);
+        statusEl.innerHTML = `<div class="error">❌ ${errDesc || err}</div>`;
+        setTimeout(() => window.close(), 900);
         return;
       }
 
       if (!code) {
         statusEl.innerHTML = `<div class="error">❌ Authorization code가 없습니다.</div>`;
-        setTimeout(()=> window.close(), 900);
+        setTimeout(() => window.close(), 900);
         return;
       }
 
-      // 2) cross-origin이면 → 메인창으로 code/state 전달 후 종료 (권장 경로)
+      // 2) cross-origin 이면 메인 창으로 code/state 릴레이 후 종료 (권장 경로)
       const sameOrigin = isSameOriginWithOpener();
       if (!sameOrigin && window.opener) {
         window.opener.postMessage({ type: 'LINE_AUTH_CODE', code, state }, '*');
         statusEl.innerHTML = `<div class="success">🔁 메인 창으로 인증 코드를 전달했습니다.</div>`;
-        setTimeout(()=> window.close(), 500);
+        setTimeout(() => window.close(), 500);
         return;
       }
 
-      // 3) same-origin이면 → 팝업 내에서 처리(옵션)
+      // 3) same-origin 이면 팝업에서 직접 처리 (옵션)
       let supabase;
       try {
         if (sameOrigin && window.opener && window.opener.supabase) {
@@ -86,11 +93,11 @@
           supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         }
       } catch (e) {
-        // 예외 발생 시 릴레이로 폴백
+        // 예외 시 릴레이로 폴백
         if (window.opener) {
           window.opener.postMessage({ type: 'LINE_AUTH_CODE', code, state }, '*');
           statusEl.innerHTML = `<div class="success">🔁 메인 창으로 인증 코드를 전달했습니다.</div>`;
-          setTimeout(()=> window.close(), 500);
+          setTimeout(() => window.close(), 500);
           return;
         }
         statusEl.innerHTML = `<div class="error">❌ 인증 시스템 초기화 실패</div>`;
@@ -117,13 +124,13 @@
           window.opener.postMessage({ type: 'LINE_AUTH_SUCCESS', message: result.message || '연동 완료' }, '*');
         }
         statusEl.innerHTML = `<div class="success">✅ 연동 성공! 잠시 후 창이 닫힙니다.</div>`;
-        setTimeout(()=> window.close(), 600);
+        setTimeout(() => window.close(), 600);
       } catch (e) {
         if (window.opener) {
-          window.opener.postMessage({ type: 'LINE_AUTH_ERROR', error: String(e.message || e) }, '*');
+          window.opener.postMessage({ type: 'LINE_AUTH_ERROR', error: String(e && e.message ? e.message : e) }, '*');
         }
-        statusEl.innerHTML = `<div class="error">❌ ${String(e.message || e)}</div>`;
-        setTimeout(()=> window.close(), 1200);
+        statusEl.innerHTML = `<div class="error">❌ ${String(e && e.message ? e.message : e)}</div>`;
+        setTimeout(() => window.close(), 1200);
       }
     }
 
