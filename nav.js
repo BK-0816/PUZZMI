@@ -5,7 +5,7 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Export constants for use in other modules
-export { SUPABASE_URL, SUPABASE_ANON_KEY };
+export { SUPABASE_ANON_KEY, SUPABASE_URL };
 
 function el(tag, attrs={}, children=[]) {
   const e = document.createElement(tag);
@@ -110,11 +110,11 @@ export async function renderNavbar(rootId='app-nav') {
 
   // 공통 메뉴 항목들
   const commonMenus = [
-    { href: 'index.html#home', text: '홈' },
-    { href: 'index.html#about', text: '서비스 소개' },
-    { href: 'index.html#how-it-works', text: '이용방법' },
-    { href: 'index.html#friends', text: '메이트 예약' },
-    { href: 'index.html#reviews', text: '후기' },
+    { href: 'index.html#home', text: 'ホーム' },
+    { href: 'index.html#about', text: 'サービス紹介' },
+    { href: 'index.html#how-it-works', text: 'ご利用流れ' },
+    { href: 'index.html#friends', text: 'メイト予約' },
+    { href: 'index.html#reviews', text: '口コミ' },
     { href: 'index.html#contact', text: 'FAQ' }
   ];
 
@@ -134,7 +134,7 @@ export async function renderNavbar(rootId='app-nav') {
     navRight.appendChild(el('a', { 
       class: 'nav-link', 
       href: 'auth_combo.html?redirect=' + _redir 
-    }, '로그인'));
+    }, 'ログイン'));
     return;
   }
 
@@ -274,7 +274,7 @@ export async function renderNavbar(rootId='app-nav') {
       await supabase.auth.signOut(); 
       location.reload(); 
     }
-  }, '로그아웃'));
+  }, 'ログアウト'));
 
   // 드롭다운 외부 클릭 처리 설정
   setupDropdownClose();
