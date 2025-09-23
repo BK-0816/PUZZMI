@@ -108,12 +108,12 @@ async function refreshHeartCount() {
           ${langs.map(l => `<span class="language">${l}</span>`).join("")}
         </div>
         <div class="friend-price">
-          <span class="price">${priceJpy}</span><span class="duration">/시간</span>
+          <span class="price">${priceJpy}</span><span class="duration">/時間</span>
         </div>
         <div style="margin-top:10px; display:flex; gap:8px;">
-          <a class="cta-btn" data-requires-auth="true" href="mate_like.html?mate_id=${row.user_id}">프로필 보기</a>
-          <a class="cta-btn"          data-requires-auth="true" href="booking.html?mate_id=${row.user_id}">예약하기</a>
-          <a class="cta-btn" data-fav-mate="${row.user_id}">찜하기</a>
+          <a class="cta-btn" data-requires-auth="true" href="mate_like.html?mate_id=${row.user_id}">プロフィールを見る</a>
+          <a class="cta-btn"          data-requires-auth="true" href="booking.html?mate_id=${row.user_id}">予約する</a>
+          <a class="cta-btn" data-fav-mate="${row.user_id}">お気に入り</a>
         </div>
       </div>
     `;
