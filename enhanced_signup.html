@@ -993,13 +993,23 @@
             data: {
               full_name: userData.fullName,
               signup_step: 'completed'
-            }
+            },
+            emailRedirectTo: `${window.location.origin}/email_verified.html`
           }
         });
         
         if (error) throw error;
         
-        if (data.user) {
+        if (data.user && !data.user.email_confirmed_at) {
+          // 이메일 인증 대기 상태
+          resultEl.innerHTML = '<div class="success">✅ 계정이 생성되었습니다! 이메일을 확인하여 인증을 완료해주세요.</div>';
+          
+          setTimeout(() => {
+            // 이메일 인증 대기 페이지로 이동
+            location.href = `email_verification_pending.html?email=${encodeURIComponent(email)}`;
+          }, 2000);
+          
+        } else if (data.user && data.user.email_confirmed_at) {
           // 2. profiles 테이블에 모든 정보 저장
           const profileData = {
             id: data.user.id,
@@ -1037,6 +1047,8 @@
           setTimeout(() => {
             goToStep(4);
           }, 1000);
+        } else {
+          throw new Error('계정 생성에 실패했습니다.');
         }
         
       } catch (error) {

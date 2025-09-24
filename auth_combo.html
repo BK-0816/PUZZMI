@@ -400,10 +400,36 @@
       e.preventDefault();
       const email = document.getElementById('login_email').value.trim();
       const password = document.getElementById('login_password').value;
+      
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<div class="loading"></div> 로그인 중...';
+      
       const { error } = await supabase.auth.signInWithPassword({ email, password });
-      document.getElementById('login_result').innerHTML = 
-        error ? ('<div class="error">' + error.message + '</div>') : '<div class="success">로그인 성공</div>';
-      if (!error) setTimeout(() => location.href = getRedirect(), 600);
+      
+      if (error) {
+        document.getElementById('login_result').innerHTML = '<div class="error">' + error.message + '</div>';
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '로그인';
+      } else {
+        // 이메일 인증 상태 확인
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user && !user.email_confirmed_at) {
+          // 이메일 미인증 사용자
+          document.getElementById('login_result').innerHTML = '<div class="error">이메일 인증이 필요합니다. 인증 메일을 확인해주세요.</div>';
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '로그인';
+          
+          setTimeout(() => {
+            location.href = `email_verification_pending.html?email=${encodeURIComponent(user.email)}`;
+          }, 2000);
+        } else {
+          // 인증 완료된 사용자
+          document.getElementById('login_result').innerHTML = '<div class="success">로그인 성공</div>';
+          setTimeout(() => location.href = getRedirect(), 600);
+        }
+      }
       render();
     };
 
