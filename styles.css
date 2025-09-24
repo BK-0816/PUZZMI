@@ -572,6 +572,40 @@ a:hover {
 
 /* 히어로 배경 텍스트 */
 .hero-bg::after {
+  content: attr(data-text);
+  position: absolute;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(10px);
+  color: white;
+  padding: 16px 32px;
+  border-radius: 20px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.2);
+  letter-spacing: 0.5px;
+  z-index: 2;
+}
+
+@media (max-width: 768px) {
+  .hero-bg::after {
+    bottom: 60px;
+    font-size: 1rem;
+    padding: 12px 24px;
+    border-radius: 16px;
+    white-space: normal;
+    max-width: 280px;
+    line-height: 1.4;
+  }
+}
+
+/* 히어로 배경 텍스트 */
+.hero-bg::after {
   content: '';
   position: absolute;
   bottom: 60px;
