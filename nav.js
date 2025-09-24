@@ -100,9 +100,18 @@ export async function renderNavbar(rootId='app-nav') {
   const root = document.getElementById(rootId) || document.body.insertBefore(document.createElement('div'), document.body.firstChild);
   root.id = rootId;
   root.className = 'app-nav';
-  
+
   const wrap = el('div', { class: 'wrap' });
   root.appendChild(wrap);
+
+  const mobileToggle = el('button', {
+    class: 'mobile-toggle',
+    type: 'button',
+    'aria-label': '메뉴 열기',
+    'aria-expanded': 'false'
+  });
+  ['bar', 'bar', 'bar'].forEach(() => mobileToggle.appendChild(el('span', { class: 'bar' })));
+  wrap.appendChild(mobileToggle);
 
   // 왼쪽 메뉴 (공통 네비게이션)
   const navLeft = el('div', { class: 'nav-left' });
@@ -125,6 +134,38 @@ export async function renderNavbar(rootId='app-nav') {
   // 오른쪽 메뉴
   const navRight = el('div', { class: 'nav-right' });
   wrap.appendChild(navRight);
+
+  const overlay = el('div', { class: 'nav-overlay' });
+  root.appendChild(overlay);
+
+  const setMobileMenuState = (open) => {
+    root.classList.toggle('nav-open', open);
+    mobileToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    document.body.classList.toggle('nav-menu-open', open);
+  };
+
+  const toggleMobileMenu = () => {
+    setMobileMenuState(!root.classList.contains('nav-open'));
+  };
+
+  mobileToggle.addEventListener('click', toggleMobileMenu);
+  overlay.addEventListener('click', () => setMobileMenuState(false));
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 900) {
+      setMobileMenuState(false);
+    }
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      setMobileMenuState(false);
+    }
+  });
+  root.addEventListener('click', (event) => {
+    if (window.innerWidth > 900) return;
+    if (event.target.closest('.nav-link, .dropdown-item, .logout-btn, .notification-icon')) {
+      setMobileMenuState(false);
+    }
+  });
 
   const { user, isAdmin, isMate } = await getRoles();
 
