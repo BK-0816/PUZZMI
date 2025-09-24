@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>내 정보 - PUZZMI</title>
+  <title>私の情報 - PUZZMI</title>
   <link rel="stylesheet" href="styles.css"/>
   <link rel="stylesheet" href="pages.css"/>
   <link rel="stylesheet" href="pages-theme.css"/>
@@ -708,59 +708,57 @@
   <main class="profile-wrap">
     <!-- 페이지 헤더 -->
     <section class="page-header">
-      <h2>내 정보</h2>
-      <p class="page-subtitle">프로필 정보를 수정하고 계정을 관리하세요</p>
+      <h2>私の情報</h2>
+      <p class="page-subtitle">プロフィール情報を修正してアカウントを管理してください</p>
     </section>
 
     <!-- 프로필 완성도 -->
     <section class="completion-card">
-      <div class="completion-title">프로필 완성도</div>
+      <div class="completion-title">プロフィール完成度</div>
       <div class="progress-bar">
         <div class="progress-fill" id="progressFill" style="width: 0%"></div>
       </div>
-      <div class="progress-text" id="progressText">0% 완성</div>
+      <div class="progress-text" id="progressText">0% 完成</div>
     </section>
 
     <!-- 계정 상태 -->
     <section class="account-status" id="accountStatus">
       <div class="status-icon status-active">✓</div>
-      <div class="status-text">계정 활성화됨</div>
+      <div class="status-text">アカウント有効化</div>
     </section>
 
     <!-- 기본 정보 섹션 -->
     <section class="section-card">
-      <h3 class="section-title">👤 기본 정보</h3>
+      <h3 class="section-title">👤 基本情報</h3>
       
       <form id="basicInfoForm" class="form-grid">
         <div class="form-row">
           <div class="form-field">
-            <label class="form-label" for="fullName">이름</label>
-            <input class="form-input" type="text" id="fullName" placeholder="김지은"/>
+            <label class="form-label" for="fullName">名前</label>
+            <input class="form-input" type="text" id="fullName" placeholder="Yuki Tanaka"/>
           </div>
           <div class="form-field">
-            <label class="form-label" for="birthDate">생년월일</label>
+            <label class="form-label" for="birthDate">生年月日</label>
             <input class="form-input" type="date" id="birthDate"/>
           </div>
         </div>
         
         <div class="form-row">
           <div class="form-field">
-            <label class="form-label" for="gender">성별</label>
+            <label class="form-label" for="gender">性別</label>
             <select class="form-select" id="gender">
-              <option value="">선택 안함</option>
-              <option value="여성">여성</option>
-              <option value="남성">남성</option>
-              <option value="기타">기타/비공개</option>
+              <option value="여성">女性</option>
+              <option value="남성">男性</option>
             </select>
           </div>
           <div class="form-field">
-            <label class="form-label" for="phoneNumber">전화번호</label>
-            <input class="form-input" type="tel" id="phoneNumber" placeholder="010-1234-5678"/>
+            <label class="form-label" for="phoneNumber">電話番号</label>
+            <input class="form-input" type="tel" id="phoneNumber" placeholder="080-0000-0000"/>
           </div>
         </div>
         
         <div class="action-group">
-          <button class="btn btn-primary" type="submit">💾 기본정보 저장</button>
+          <button class="btn btn-primary" type="submit">💾 基本情報保存</button>
           <div id="basicInfoResult"></div>
         </div>
       </form>
@@ -768,21 +766,18 @@
 
     <!-- 상세 정보 섹션 -->
     <section class="section-card">
-      <h3 class="section-title">🌍 상세 정보</h3>
+      <h3 class="section-title">🌍 詳細情報</h3>
       <form id="detailInfoForm" class="form-grid">
         <div class="form-row">
           <div class="form-field">
-            <label class="form-label" for="nationality">국적</label>
+            <label class="form-label" for="nationality">国籍</label>
             <select class="form-select" id="nationality">
-              <option value="">선택해주세요</option>
-              <option value="한국">🇰🇷 한국</option>
-              <option value="일본">🇯🇵 일본</option>
-              <option value="중국">🇨🇳 중국</option>
-              <option value="미국">🇺🇸 미국</option>
-              <option value="영국">🇬🇧 영국</option>
-              <option value="프랑스">🇫🇷 프랑스</option>
-              <option value="독일">🇩🇪 독일</option>
-              <option value="기타">🌍 기타</option>
+              <option value="">選択してください</option>
+              <option value="한국">🇰🇷 韓国</option>
+              <option value="일본">🇯🇵 日本</option>
+              <option value="중국">🇨🇳 中国</option>
+              <option value="미국">🇺🇸 アメリカ</option>
+
             </select>
           </div>
           <div class="form-field">
@@ -819,45 +814,45 @@
                 <span class="checkbox-label">🇨🇳 中文</span>
               </label>
             </div>
-            <div class="help-text">메이트와 소통 가능한 언어를 선택해주세요</div>
+            <div class="help-text">メイトとコミュニケーション可能な言語を選択してください</div>
           </div>
         </div>
         
         <div class="form-row single">
           <div class="form-field">
-            <label class="form-label">관심사</label>
+            <label class="form-label">関心事</label>
             <div class="checkbox-group" id="interestsGroup">
               <label class="checkbox-item">
                 <input type="checkbox" value="맛집 탐방"/>
-                <span class="checkbox-label">🍽️ 맛집 탐방</span>
+                <span class="checkbox-label">🍽️ グルメ探訪</span>
               </label>
               <label class="checkbox-item">
                 <input type="checkbox" value="카페 투어"/>
-                <span class="checkbox-label">☕ 카페 투어</span>
+                <span class="checkbox-label">☕ カフェツアー</span>
               </label>
               <label class="checkbox-item">
                 <input type="checkbox" value="쇼핑"/>
-                <span class="checkbox-label">🛍️ 쇼핑</span>
+                <span class="checkbox-label">🛍️ ショッピング</span>
               </label>
               <label class="checkbox-item">
                 <input type="checkbox" value="문화 체험"/>
-                <span class="checkbox-label">🎭 문화 체험</span>
+                <span class="checkbox-label">🎭 文化体験</span>
               </label>
               <label class="checkbox-item">
                 <input type="checkbox" value="야경 투어"/>
-                <span class="checkbox-label">🌃 야경 투어</span>
+                <span class="checkbox-label">🌃 夜景ツアー</span>
               </label>
               <label class="checkbox-item">
                 <input type="checkbox" value="K-POP"/>
                 <span class="checkbox-label">🎵 K-POP</span>
               </label>
             </div>
-            <div class="help-text">관심 있는 활동을 선택해주세요</div>
+            <div class="help-text">関心のある活動を選択してください</div>
           </div>
         </div>
         
         <div class="action-group">
-          <button class="btn btn-primary" type="submit">🚀 상세정보 저장</button>
+          <button class="btn btn-primary" type="submit">🚀 詳細情報保存</button>
           <div id="detailInfoResult"></div>
         </div>
       </form>
@@ -865,17 +860,18 @@
 
     <!-- 계정 관리 섹션 -->
     <section class="section-card">
-      <h3 class="section-title">🔐 계정 관리</h3>
+      <h3 class="section-title">🔐 アカウント管理</h3>
       
       <!-- LINE 연동 관리 -->
       <div class="line-connection-section" style="margin-bottom: 32px;">
         <h4 style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
           <i class="fab fa-line" style="color: #00C300;"></i>
-          LINE 계정 연동
+          LINEアカウント連動
+
         </h4>
         
         <div id="lineConnectionStatus" class="help-text" style="margin-bottom: 16px;">
-          연동 상태를 확인하는 중...
+          連動状態を確認中...
         </div>
         
         <div class="action-group" id="lineActions">
@@ -887,7 +883,7 @@
       <form id="emailForm" class="form-grid">
         <div class="form-row single">
           <div class="form-field">
-            <label class="form-label" for="currentEmail">현재 이메일</label>
+            <label class="form-label" for="currentEmail">現在のEメール</label>
             <input class="form-input" type="email" id="currentEmail" readonly style="background: rgba(0,0,0,0.05); cursor: not-allowed;"/>
           </div>
         </div>
