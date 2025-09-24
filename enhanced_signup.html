@@ -696,7 +696,7 @@
           
           <!-- 이메일 인증 버튼 -->
           <button type="button" class="btn btn-primary" id="sendVerificationBtn">
-            📧 이메일 인증번호 받기
+            📧 계정 생성 및 이메일 인증
           </button>
           
           <div id="formResult"></div>
@@ -705,8 +705,8 @@
         <!-- 이메일 인증 섹션 -->
         <div class="email-verification-section" id="emailVerificationSection">
           <div class="verification-header">
-            <h4>📧 이메일 인증</h4>
-            <p>입력하신 이메일로 인증번호를 발송했습니다. 6자리 인증번호를 입력해주세요.</p>
+            <h4>📧 이메일 인증번호 입력</h4>
+            <p>입력하신 이메일로 6자리 인증번호를 발송했습니다. 인증번호를 입력해주세요.</p>
           </div>
           
           <div class="verification-email-display" id="verificationEmailDisplay"></div>
@@ -730,8 +730,8 @@
         </div>
 
         <!-- 최종 가입 완료 버튼 -->
-        <button type="button" class="btn btn-primary hidden" id="completeSignupBtn" style="width: 100%; margin-top: 24px;">
-          🎉 회원가입 완료하기
+        <button type="button" class="btn btn-primary hidden" id="completeSignupBtn" style="width: 100%; margin-top: 24px; font-size: 1.2rem; padding: 20px;">
+          🎉 PUZZMI 회원가입 완료하기
         </button>
       </div>
 
@@ -788,6 +788,8 @@
 
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+    import { emailVerificationService } from './email_verification_service.js';
+    
     const supabase = createClient(
       "https://eevvgbbokenpjnvtmztk.supabase.co",
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4"
@@ -811,6 +813,7 @@
 
     // 이메일 인증번호 발송
     sendVerificationBtn.addEventListener('click', async () => {
+      // 폼 데이터 수집 및 검증
       // 폼 유효성 검사
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
@@ -824,6 +827,7 @@
       const selectedLanguages = Array.from(document.querySelectorAll('#languageGroup input:checked'))
         .map(cb => cb.value);
       
+      // 유효성 검사
       if (!email || !password || !fullName || !birthDate || !gender || !phoneNumber || !nationality) {
         formResult.innerHTML = '<div class="error">❌ 모든 필수 항목을 입력해주세요.</div>';
         return;
@@ -836,6 +840,13 @@
       
       if (password.length < 8) {
         formResult.innerHTML = '<div class="error">❌ 비밀번호는 8자 이상이어야 합니다.</div>';
+        return;
+      }
+      
+      // 이메일 형식 검증
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        formResult.innerHTML = '<div class="error">❌ 올바른 이메일 형식을 입력해주세요.</div>';
         return;
       }
       
@@ -853,6 +864,18 @@
         return;
       }
       
+      // 이메일 중복 확인
+      try {
+        const isDuplicate = await emailVerificationService.checkEmailDuplicate(email);
+        if (isDuplicate) {
+          formResult.innerHTML = '<div class="error">❌ 이미 가입된 이메일입니다. 로그인을 시도해주세요.</div>';
+          return;
+        }
+      } catch (error) {
+        console.warn('이메일 중복 확인 실패:', error);
+        // 중복 확인 실패 시에도 계속 진행
+      }
+      
       // 사용자 데이터 저장
       userData = {
         email,
@@ -868,41 +891,22 @@
       };
       
       sendVerificationBtn.disabled = true;
-      sendVerificationBtn.innerHTML = '<div class="loading"></div> 인증번호 발송 중...';
+      sendVerificationBtn.innerHTML = '<div class="loading"></div> 이메일 인증번호 발송 중...';
       
       try {
-        // 개발 환경에서는 시뮬레이션
-        if (window.location.hostname === 'localhost' || window.location.hostname.includes('bolt.new')) {
-          // 시뮬레이션: 인증번호 발송
-          console.log('📧 이메일 인증번호 발송 시뮬레이션');
-          console.log('📧 이메일:', email);
-          console.log('🔢 인증번호: 123456 (테스트용)');
-          
-          verificationId = 'simulation_' + Date.now();
-          showEmailVerificationSection(email);
-          formResult.innerHTML = '<div class="success">✅ 인증번호를 발송했습니다! (개발환경: 123456 입력)</div>';
-        } else {
-          // 실제 환경: Supabase OTP 발송
-          const { data, error } = await supabase.auth.signInWithOtp({
-            email: email,
-            options: {
-              shouldCreateUser: false // 아직 계정 생성하지 않음
-            }
-          });
-          
-          if (error) throw error;
-          
-          verificationId = data.session?.access_token || 'real_verification';
-          showEmailVerificationSection(email);
-          formResult.innerHTML = '<div class="success">✅ 인증번호를 발송했습니다! 이메일을 확인해주세요.</div>';
-        }
+        // 6자리 인증번호 발송
+        const result = await emailVerificationService.sendVerificationCode(email);
+        verificationId = result.verificationId;
+        
+        showEmailVerificationSection(email);
+        formResult.innerHTML = '<div class="success">✅ 6자리 인증번호를 이메일로 발송했습니다!</div>';
         
       } catch (error) {
         console.error('인증번호 발송 실패:', error);
         formResult.innerHTML = `<div class="error">❌ 인증번호 발송 실패: ${error.message}</div>`;
       } finally {
         sendVerificationBtn.disabled = false;
-        sendVerificationBtn.innerHTML = '📧 이메일 인증번호 받기';
+        sendVerificationBtn.innerHTML = '📧 계정 생성 및 이메일 인증';
       }
     });
 
@@ -920,6 +924,7 @@
     // 인증번호 확인
     verifyCodeBtn.addEventListener('click', async () => {
       const code = document.getElementById('verificationCode').value.trim();
+      const email = userData.email;
       
       if (!code || code.length !== 6) {
         verificationResult.innerHTML = '<div class="error">❌ 6자리 인증번호를 입력해주세요.</div>';
@@ -930,37 +935,19 @@
       verifyCodeBtn.innerHTML = '<div class="loading"></div> 인증 중...';
       
       try {
-        // 개발 환경 시뮬레이션
-        if (window.location.hostname === 'localhost' || window.location.hostname.includes('bolt.new')) {
-          if (code === '123456' || code === '000000') {
-            isEmailVerified = true;
-            verificationResult.innerHTML = '<div class="success">✅ 이메일 인증이 완료되었습니다!</div>';
-            
-            // 최종 가입 완료 버튼 표시
-            completeSignupBtn.classList.remove('hidden');
-            emailVerificationSection.style.opacity = '0.7';
-            
-            setTimeout(() => {
-              completeSignupBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 500);
-          } else {
-            throw new Error('잘못된 인증번호입니다. (테스트: 123456)');
-          }
-        } else {
-          // 실제 환경: Supabase OTP 검증
-          const { data, error } = await supabase.auth.verifyOtp({
-            email: userData.email,
-            token: code,
-            type: 'email'
-          });
-          
-          if (error) throw error;
-          
-          isEmailVerified = true;
-          verificationResult.innerHTML = '<div class="success">✅ 이메일 인증이 완료되었습니다!</div>';
-          completeSignupBtn.classList.remove('hidden');
-          emailVerificationSection.style.opacity = '0.7';
-        }
+        // 인증번호 확인
+        await emailVerificationService.verifyCode(email, code);
+        
+        isEmailVerified = true;
+        verificationResult.innerHTML = '<div class="success">✅ 이메일 인증이 완료되었습니다!</div>';
+        
+        // 최종 가입 완료 버튼 표시
+        completeSignupBtn.classList.remove('hidden');
+        emailVerificationSection.style.opacity = '0.7';
+        
+        setTimeout(() => {
+          completeSignupBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 500);
         
       } catch (error) {
         console.error('인증 실패:', error);
@@ -973,26 +960,14 @@
 
     // 인증번호 재발송
     resendCodeBtn.addEventListener('click', async () => {
+      const email = userData.email;
+      
       resendCodeBtn.disabled = true;
       resendCodeBtn.innerHTML = '<div class="loading"></div> 재발송 중...';
       
       try {
-        if (window.location.hostname === 'localhost' || window.location.hostname.includes('bolt.new')) {
-          // 시뮬레이션
-          verificationResult.innerHTML = '<div class="success">✅ 인증번호를 재발송했습니다! (테스트: 123456)</div>';
-        } else {
-          // 실제 재발송
-          const { error } = await supabase.auth.signInWithOtp({
-            email: userData.email,
-            options: {
-              shouldCreateUser: false
-            }
-          });
-          
-          if (error) throw error;
-          
-          verificationResult.innerHTML = '<div class="success">✅ 인증번호를 재발송했습니다!</div>';
-        }
+        await emailVerificationService.sendVerificationCode(email);
+        verificationResult.innerHTML = '<div class="success">✅ 새로운 6자리 인증번호를 발송했습니다!</div>';
         
       } catch (error) {
         verificationResult.innerHTML = `<div class="error">❌ 재발송 실패: ${error.message}</div>`;
@@ -1013,20 +988,27 @@
       completeSignupBtn.innerHTML = '<div class="loading"></div> 회원가입 처리 중...';
       
       try {
-        // 1. Supabase 계정 생성
+        // 1. Supabase 계정 생성 (이메일 인증 없이)
         const { data, error } = await supabase.auth.signUp({
           email: userData.email,
           password: userData.password,
           options: {
             data: {
               full_name: userData.fullName,
-              signup_step: 'completed'
+              signup_step: 'completed',
+              email_verified: true // 우리가 직접 인증했음을 표시
             },
-            emailRedirectTo: `${window.location.origin}/email_verified.html`
+            emailRedirectTo: `${window.location.origin}/email_verified.html`,
+            // 이메일 확인 비활성화 (우리가 직접 처리했으므로)
+            shouldCreateUser: true
           }
         });
         
         if (error) throw error;
+        
+        if (!data.user) {
+          throw new Error('계정 생성에 실패했습니다.');
+        }
         
         // 2. 프로필 생성
         const profileData = {
@@ -1057,16 +1039,26 @@
         
         userData.userId = data.user.id;
         
-        // 3. 완료 섹션 표시
+        // 3. 이메일 인증 기록 업데이트
+        await supabase
+          .from('email_verifications')
+          .update({ 
+            verified: true,
+            verified_at: new Date().toISOString()
+          })
+          .eq('email', userData.email)
+          .eq('verified', true); // 이미 인증된 것만 업데이트
+        
+        // 4. 완료 섹션 표시
         signupForm.style.display = 'none';
         completionSection.classList.add('show');
         
       } catch (error) {
         console.error('회원가입 실패:', error);
-        alert(`회원가입 실패: ${error.message}`);
+        formResult.innerHTML = `<div class="error">❌ 회원가입 실패: ${error.message}</div>`;
       } finally {
         completeSignupBtn.disabled = false;
-        completeSignupBtn.innerHTML = '🎉 회원가입 완료하기';
+        completeSignupBtn.innerHTML = '🎉 PUZZMI 회원가입 완료하기';
       }
     });
 
