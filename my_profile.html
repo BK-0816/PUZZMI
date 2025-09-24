@@ -1236,7 +1236,7 @@
         // 프로필 완성도 업데이트
         const completion = calculateCompletion(profile);
         progressFill.style.width = completion + '%';
-        progressText.textContent = completion + '% 완성';
+        progressText.textContent = completion + '% 完成';
 
         // 계정 상태 업데이트
         const statusIcon = accountStatus.querySelector('.status-icon');
@@ -1245,16 +1245,16 @@
         if (profile.account_status === 'active') {
           statusIcon.className = 'status-icon status-active';
           statusIcon.textContent = '✓';
-          statusText.textContent = '계정 활성화됨';
+          statusText.textContent = 'アカウント有効化';
         } else {
           statusIcon.className = 'status-icon status-pending';
           statusIcon.textContent = '⏳';
-          statusText.textContent = '계정 검토 중';
+          statusText.textContent = 'アカウント検討中';
         }
 
       } catch (error) {
         console.error('프로필 로드 실패:', error);
-        basicInfoResult.innerHTML = `<div class="error">❌ 프로필 로드 실패: ${error.message}</div>`;
+        basicInfoResult.innerHTML = `<div class="error">❌ プロファイルロード失敗: ${error.message}</div>`;
       }
     }
 
@@ -1264,7 +1264,7 @@
       
       const submitBtn = e.target.querySelector('button[type="submit"]');
       submitBtn.disabled = true;
-      submitBtn.innerHTML = '<div class="loading"></div> 저장 중...';
+      submitBtn.innerHTML = '<div class="loading"></div> 貯蔵中...';
       
       try {
         // 생년월일에서 나이 계산
@@ -1295,15 +1295,15 @@
 
         if (error) throw error;
 
-        basicInfoResult.innerHTML = '<div class="success">✅ 기본정보가 저장되었습니다!</div>';
+        basicInfoResult.innerHTML = '<div class="success">✅ 基本情報が保存されました！</div>';
         await loadProfile(); // 완성도 업데이트
 
       } catch (error) {
         console.error('기본정보 저장 실패:', error);
-        basicInfoResult.innerHTML = `<div class="error">❌ 저장 실패: ${error.message}</div>`;
+        basicInfoResult.innerHTML = `<div class="error">❌ 貯蔵失敗: ${error.message}</div>`;
       } finally {
         submitBtn.disabled = false;
-        submitBtn.innerHTML = '💾 기본정보 저장';
+        submitBtn.innerHTML = '💾 基本情報保存';
       }
     });
 
@@ -1313,7 +1313,7 @@
       
       const submitBtn = e.target.querySelector('button[type="submit"]');
       submitBtn.disabled = true;
-      submitBtn.innerHTML = '<div class="loading"></div> 저장 중...';
+      submitBtn.innerHTML = '<div class="loading"></div> 貯蔵中...';
       
       try {
         // 선택된 언어들 수집
@@ -1340,7 +1340,7 @@
 
         if (error) throw error;
 
-        detailInfoResult.innerHTML = '<div class="success">✅ 상세정보가 저장되었습니다!</div>';
+        detailInfoResult.innerHTML = '<div class="success">✅ 詳細情報が保存されました！</div>';
         await loadProfile(); // 완성도 업데이트
 
       } catch (error) {
@@ -1348,7 +1348,7 @@
         detailInfoResult.innerHTML = `<div class="error">❌ 저장 실패: ${error.message}</div>`;
       } finally {
         submitBtn.disabled = false;
-        submitBtn.innerHTML = '🚀 상세정보 저장';
+        submitBtn.innerHTML = '🚀 詳細情報保存';
       }
     });
 
@@ -1361,17 +1361,17 @@
       const submitBtn = e.target.querySelector('button[type="submit"]');
       
       if (newPassword !== confirmPassword) {
-        passwordResult.innerHTML = '<div class="error">❌ 비밀번호가 일치하지 않습니다.</div>';
+        passwordResult.innerHTML = '<div class="error">❌ パスワードが一致しません。</div>';
         return;
       }
       
       if (newPassword.length < 8) {
-        passwordResult.innerHTML = '<div class="error">❌ 비밀번호는 8자 이상이어야 합니다.</div>';
+        passwordResult.innerHTML = '<div class="error">❌ パスワードは 8 文字以上である必要があります。</div>';
         return;
       }
       
       submitBtn.disabled = true;
-      submitBtn.innerHTML = '<div class="loading"></div> 변경 중...';
+      submitBtn.innerHTML = '<div class="loading"></div> 変更中...';
       
       try {
         const { error } = await supabase.auth.updateUser({
@@ -1380,28 +1380,28 @@
 
         if (error) throw error;
 
-        passwordResult.innerHTML = '<div class="success">✅ 비밀번호가 변경되었습니다!</div>';
+        passwordResult.innerHTML = '<div class="success">✅ パスワードが変更されました！</div>';
         document.getElementById('newPassword').value = '';
         document.getElementById('confirmPassword').value = '';
 
       } catch (error) {
         console.error('비밀번호 변경 실패:', error);
-        passwordResult.innerHTML = `<div class="error">❌ 변경 실패: ${error.message}</div>`;
+        passwordResult.innerHTML = `<div class="error">❌ 変更失敗: ${error.message}</div>`;
       } finally {
         submitBtn.disabled = false;
-        submitBtn.innerHTML = '🔒 비밀번호 변경';
+        submitBtn.innerHTML = '🔒 パスワード変更';
       }
     });
 
     // 계정 삭제 확인
     window.confirmAccountDeletion = function() {
-      const confirmText = '정말로 계정을 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없으며, 모든 데이터가 영구적으로 삭제됩니다.\n\n계속하려면 "삭제"를 입력해주세요.';
+      const confirmText = '本当にアカウントを削除しますか？\n\nこのタスクは元に戻すことはできず、すべてのデータが永久に削除されます。\n\n続行するには、"削除"を入力してください。';
       const userInput = prompt(confirmText);
       
-      if (userInput === '삭제') {
+      if (userInput === '削除') {
         deleteAccount();
       } else if (userInput !== null) {
-        alert('입력이 올바르지 않습니다. 계정 삭제가 취소되었습니다.');
+        alert('入力が正しくありません。 アカウントの削除がキャンセルされました。');
       }
     };
 
@@ -1411,11 +1411,11 @@
         // 이 호출은 anon 키로는 실패합니다. Edge Function(서비스 롤 키)로 감싸서 서버에서 수행하세요.
         const { error } = await supabase.auth.admin.deleteUser(user.id);
         if (error) throw error;
-        alert('계정이 삭제되었습니다. 메인 페이지로 이동합니다.');
+        alert('アカウントが削除されました。 メインページに移動します。');
         location.href = 'index.html';
       } catch (error) {
         console.error('계정 삭제 실패:', error);
-        alert('계정 삭제 실패: ' + error.message);
+        alert('アカウント削除失敗: ' + error.message);
       }
     }
 
