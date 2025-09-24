@@ -371,7 +371,7 @@ function initializeSwipeCards() {
             
             currentX = e.touches[0].clientX;
             const diffX = currentX - startX;
-            const currentSlide = parseInt(container.dataset.currentSlide || '0');
+            const currentSlide = getCurrentSlide(container.id);
             
             // 현재 슬라이드 위치에서 드래그 거리만큼 이동
             const currentTranslate = -(currentSlide * 100);
@@ -400,7 +400,7 @@ function initializeSwipeCards() {
                 }
             } else {
                 // 임계값 미달 - 원래 위치로 복귀
-                const currentSlide = parseInt(container.dataset.currentSlide || '0');
+                const currentSlide = getCurrentSlide(container.id);
                 goToSlide(container.id, currentSlide);
             }
         }, { passive: true });
@@ -421,7 +421,7 @@ function initializeSwipeCards() {
             
             currentX = e.clientX;
             const diffX = currentX - startX;
-            const currentSlide = parseInt(container.dataset.currentSlide || '0');
+            const currentSlide = getCurrentSlide(container.id);
             
             const currentTranslate = -(currentSlide * 100);
             const dragPercent = (diffX / container.offsetWidth) * 100;
@@ -446,7 +446,7 @@ function initializeSwipeCards() {
                     changeSlide(container.id, 1);
                 }
             } else {
-                const currentSlide = parseInt(container.dataset.currentSlide || '0');
+                const currentSlide = getCurrentSlide(container.id);
                 goToSlide(container.id, currentSlide);
             }
         });
@@ -456,7 +456,7 @@ function initializeSwipeCards() {
                 isMouseDown = false;
                 wrapper.style.transition = 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
                 wrapper.style.cursor = 'grab';
-                const currentSlide = parseInt(container.dataset.currentSlide || '0');
+                const currentSlide = getCurrentSlide(container.id);
                 goToSlide(container.id, currentSlide);
             }
         });
@@ -470,13 +470,24 @@ function initializeSwipeCards() {
     startAutoSlide();
 }
 
+// 현재 활성 슬라이드 인덱스 가져오기
+function getCurrentSlide(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return 0;
+    
+    const activeSlide = container.querySelector('.swipe-slide.active');
+    const slides = container.querySelectorAll('.swipe-slide');
+    
+    return Array.from(slides).indexOf(activeSlide);
+}
+
 // 슬라이드 변경 함수
 function changeSlide(containerId, direction) {
     const container = document.getElementById(containerId);
     if (!container) return;
     
     const slides = container.querySelectorAll('.swipe-slide');
-    const currentIndex = parseInt(container.dataset.currentSlide || '0');
+    const currentIndex = getCurrentSlide(containerId);
     let newIndex = currentIndex + direction;
     
     // 순환 처리
@@ -500,13 +511,12 @@ function goToSlide(containerId, index) {
     
     if (!wrapper || !slides.length) return;
     
-    // 인덱스 범위 체크
-    if (index < 0) index = slides.length - 1;
-    if (index >= slides.length) index = 0;
+    // 슬라이드 위치 계산
+    const slideWidth = container.offsetWidth;
+    const translateX = -(index * slideWidth);
     
-    // 퍼센트 기반으로 슬라이드 이동
-    const translateX = -(index * 100);
-    wrapper.style.transform = `translateX(${translateX}%)`;
+    // 슬라이드 이동
+    wrapper.style.transform = `translateX(${translateX}px)`;
     
     // 활성 상태 업데이트
     slides.forEach((slide, i) => {
@@ -516,9 +526,6 @@ function goToSlide(containerId, index) {
     indicators.forEach((indicator, i) => {
         indicator.classList.toggle('active', i === index);
     });
-    
-    // 현재 슬라이드 인덱스 저장
-    container.dataset.currentSlide = index.toString();
 }
 
 // 자동 슬라이드 (8초마다)
