@@ -346,6 +346,10 @@ export async function renderNavbar(rootId='app-nav') {
   
   // 모바일 메뉴 생성
   createMobileMenu(root, commonMenus, user, isAdmin, isMate, navRight);
+  
+  // 모바일 메뉴를 네비게이션 컨테이너 바로 아래에 배치
+  root.style.position = 'relative';
+  
   // 드롭다운 외부 클릭 처리 설정
   setupDropdownClose();
 }
@@ -361,11 +365,7 @@ function createMobileMenu(root, commonMenus, user, isAdmin, isMate, navRight) {
     el('div', { class: 'nav-brand' }, [
       el('img', { src: 'puzzmi_original.png', alt: 'PUZZMI 로고' }),
       el('span', {}, 'PUZZMI')
-    ]),
-    el('button', { 
-      class: 'mobile-menu-close',
-      onclick: closeMobileMenu
-    }, '×')
+    ])
   ]);
   
   mobileMenuContent.appendChild(mobileMenuHeader);
@@ -375,7 +375,7 @@ function createMobileMenu(root, commonMenus, user, isAdmin, isMate, navRight) {
   
   // 공통 메뉴
   const commonSection = el('div', { class: 'mobile-menu-section' }, [
-    el('div', { class: 'mobile-menu-section-title' }, 'メニュー')
+    el('div', { class: 'mobile-menu-section-title' }, '🏠 メインメニュー')
   ]);
   
   commonMenus.forEach(menu => {
@@ -394,7 +394,7 @@ function createMobileMenu(root, commonMenus, user, isAdmin, isMate, navRight) {
   // 사용자별 메뉴
   if (user) {
     const userSection = el('div', { class: 'mobile-menu-section' }, [
-      el('div', { class: 'mobile-menu-section-title' }, 'マイページ')
+      el('div', { class: 'mobile-menu-section-title' }, '👤 マイページ')
     ]);
     
     if (!isAdmin && !isMate) {
@@ -437,8 +437,12 @@ function createMobileMenu(root, commonMenus, user, isAdmin, isMate, navRight) {
     }
     
     if (isMate) {
+      const mateSection = el('div', { class: 'mobile-menu-section' }, [
+        el('div', { class: 'mobile-menu-section-title' }, '👨‍💼 메이트 메뉴')
+      ]);
+      
       // 메이트 메뉴
-      userSection.appendChild(el('a', { 
+      mateSection.appendChild(el('a', { 
         class: 'mobile-menu-link', 
         href: `mate_like.html?mate_id=${user.id}`,
         onclick: closeMobileMenu
@@ -447,7 +451,7 @@ function createMobileMenu(root, commonMenus, user, isAdmin, isMate, navRight) {
         el('span', {}, '내 프로필')
       ]));
       
-      userSection.appendChild(el('a', { 
+      mateSection.appendChild(el('a', { 
         class: 'mobile-menu-link', 
         href: 'mate_dashboard.html',
         onclick: closeMobileMenu
@@ -456,7 +460,7 @@ function createMobileMenu(root, commonMenus, user, isAdmin, isMate, navRight) {
         el('span', {}, '메이트 대시보드')
       ]));
       
-      userSection.appendChild(el('a', { 
+      mateSection.appendChild(el('a', { 
         class: 'mobile-menu-link', 
         href: 'notification.html',
         onclick: closeMobileMenu
@@ -464,11 +468,17 @@ function createMobileMenu(root, commonMenus, user, isAdmin, isMate, navRight) {
         el('i', { class: 'fas fa-calendar-alt' }),
         el('span', {}, '메이트 알림함')
       ]));
+      
+      mobileMenuNav.appendChild(mateSection);
     }
     
     if (isAdmin) {
+      const adminSection = el('div', { class: 'mobile-menu-section' }, [
+        el('div', { class: 'mobile-menu-section-title' }, '⚙️ 관리자 메뉴')
+      ]);
+      
       // 관리자 메뉴
-      userSection.appendChild(el('a', { 
+      adminSection.appendChild(el('a', { 
         class: 'mobile-menu-link', 
         href: 'admin_plus.html',
         onclick: closeMobileMenu
@@ -477,7 +487,7 @@ function createMobileMenu(root, commonMenus, user, isAdmin, isMate, navRight) {
         el('span', {}, '관리자')
       ]));
       
-      userSection.appendChild(el('a', { 
+      adminSection.appendChild(el('a', { 
         class: 'mobile-menu-link', 
         href: 'admin_mates.html',
         onclick: closeMobileMenu
@@ -486,7 +496,7 @@ function createMobileMenu(root, commonMenus, user, isAdmin, isMate, navRight) {
         el('span', {}, '메이트 관리')
       ]));
       
-      userSection.appendChild(el('a', { 
+      adminSection.appendChild(el('a', { 
         class: 'mobile-menu-link', 
         href: 'admin_identity_verification.html',
         onclick: closeMobileMenu
@@ -495,7 +505,7 @@ function createMobileMenu(root, commonMenus, user, isAdmin, isMate, navRight) {
         el('span', {}, '신원확인 관리')
       ]));
       
-      userSection.appendChild(el('a', { 
+      adminSection.appendChild(el('a', { 
         class: 'mobile-menu-link', 
         href: 'qna.html',
         onclick: closeMobileMenu
@@ -503,12 +513,17 @@ function createMobileMenu(root, commonMenus, user, isAdmin, isMate, navRight) {
         el('i', { class: 'fas fa-question-circle' }),
         el('span', {}, 'Q&A 관리')
       ]));
+      
+      mobileMenuNav.appendChild(adminSection);
     }
     
     mobileMenuNav.appendChild(userSection);
     
     // 로그아웃 버튼
-    const logoutSection = el('div', { class: 'mobile-menu-section' });
+    const logoutSection = el('div', { class: 'mobile-menu-section' }, [
+      el('div', { class: 'mobile-menu-section-title' }, '🚪 계정')
+    ]);
+    
     logoutSection.appendChild(el('button', { 
       class: 'mobile-menu-link logout-btn',
       onclick: async () => { 
@@ -525,13 +540,6 @@ function createMobileMenu(root, commonMenus, user, isAdmin, isMate, navRight) {
   
   mobileMenuContent.appendChild(mobileMenuNav);
   mobileMenu.appendChild(mobileMenuContent);
-  
-  // 오버레이 클릭 시 메뉴 닫기
-  mobileMenu.addEventListener('click', (e) => {
-    if (e.target === mobileMenu) {
-      closeMobileMenu();
-    }
-  });
   
   root.appendChild(mobileMenu);
 }
