@@ -802,23 +802,25 @@
     <!-- 페이지 헤더 -->
     <section class="page-header">
       <h2 id="qnaTitle">1:1 문의</h2>
-      <p class="page-subtitle">궁금한 점이나 문의사항을 남겨주세요. 빠르게 답변드리겠습니다.</p>
-      <div id="requireLogin" class="error" style="display:none">로그인이 필요합니다. 로그인 페이지로 이동합니다…</div>
+      <p class="page-subtitle">ご不明な点やお問い合わせを残してください。 迅速にお答えします。</p>
+      <div id="requireLogin" class="error" style="display:none">ログインが必要です。 ログインページに移動します。</div>
     </section>
 
     <!-- 새 문의 작성 섹션 (일반 사용자용) -->
     <section class="section-card" id="newInquirySection" style="display:none">
-      <h3 class="section-title">✍️ 새 문의 작성</h3>
+      <h3 class="section-title">✍️ 新文の作成</h3>
       <form id="formNew" class="form-grid">
         <div class="form-field">
-          <label class="form-label" for="title">📝 제목</label>
-          <input class="form-input" id="title" required placeholder="예: 예약 변경 문의"/>
+          <label class="form-label" for="title">📝 題目</label>
+          <input class="form-input" id="title" required placeholder="ex: 予約変更のお問い合わせ"/>
         </div>
         <div class="form-field">
-          <label class="form-label" for="content">💬 내용</label>
-          <textarea class="form-textarea" id="content" required placeholder="문의 내용을 자세히 적어주세요. 구체적으로 작성해주시면 더 정확한 답변을 드릴 수 있습니다."></textarea>
+          <label class="form-label" for="content">💬 内容</label>
+          <textarea class="form-textarea" id="content" required placeholder="お問い合わせの内容を詳しく書いてください。 具体的に作成していただければ、より正確な回答を差し上げることができます。
+
+"></textarea>
         </div>
-        <button class="btn btn-primary" type="submit">📤 문의 등록</button>
+        <button class="btn btn-primary" type="submit">📤 問合せ登録</button>
         <div id="newResult"></div>
       </form>
     </section>
