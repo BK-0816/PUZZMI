@@ -654,25 +654,25 @@
     <section class="signup-card">
       <!-- 헤더 -->
       <div class="signup-header">
-        <h1 class="signup-title">PUZZMI 회원가입</h1>
-        <p class="signup-subtitle">특별한 여행을 위한 첫 걸음을 시작해보세요</p>
+        <h1 class="signup-title">PUZZMI 会員登録</h1>
+        <p class="signup-subtitle">特別な旅行のための第一歩を始めてみてください！</p>
       </div>
 
       <!-- 단계 표시 -->
       <div class="step-indicator">
         <div class="step active" id="step1">
           <i class="fas fa-user"></i>
-          <span>기본정보</span>
+          <span>基本情報</span>
         </div>
         <div class="step-arrow">→</div>
         <div class="step inactive" id="step2">
           <i class="fas fa-envelope"></i>
-          <span>이메일 인증</span>
+          <span>Eメール認証</span>
         </div>
         <div class="step-arrow">→</div>
         <div class="step inactive" id="step3">
           <i class="fas fa-check-circle"></i>
-          <span>가입완료</span>
+          <span>登録完了</span>
         </div>
       </div>
 
@@ -682,27 +682,26 @@
           <!-- 기본정보 -->
           <div class="form-row">
             <div class="form-field">
-              <label class="form-label required" for="fullName">이름</label>
+              <label class="form-label required" for="fullName">名前</label>
               <input class="form-input" type="text" id="fullName" required placeholder="김지은"/>
             </div>
             <div class="form-field">
-              <label class="form-label required" for="birthDate">생년월일</label>
+              <label class="form-label required" for="birthDate">生年月日</label>
               <input class="form-input" type="date" id="birthDate" required/>
             </div>
           </div>
           
           <div class="form-row">
             <div class="form-field">
-              <label class="form-label required" for="gender">성별</label>
+              <label class="form-label required" for="gender">性別</label>
               <select class="form-select" id="gender" required>
-                <option value="">선택해주세요</option>
-                <option value="여성">여성</option>
-                <option value="남성">남성</option>
-                <option value="기타">기타/비공개</option>
+                <option value="">選択してください</option>
+                <option value="여성">女性</option>
+                <option value="남성">男性</option>
               </select>
             </div>
             <div class="form-field">
-              <label class="form-label required" for="phoneNumber">전화번호</label>
+              <label class="form-label required" for="phoneNumber">電話番号</label>
               <input class="form-input" type="tel" id="phoneNumber" required placeholder="010-1234-5678"/>
             </div>
           </div>
@@ -711,15 +710,11 @@
             <div class="form-field">
               <label class="form-label required" for="nationality">국적</label>
               <select class="form-select" id="nationality" required>
-                <option value="">선택해주세요</option>
-                <option value="한국">🇰🇷 한국</option>
-                <option value="일본">🇯🇵 일본</option>
-                <option value="중국">🇨🇳 중국</option>
-                <option value="미국">🇺🇸 미국</option>
-                <option value="영국">🇬🇧 영국</option>
-                <option value="프랑스">🇫🇷 프랑스</option>
-                <option value="독일">🇩🇪 독일</option>
-                <option value="기타">🌍 기타</option>
+                <option value="">選択してください</option>
+                <option value="한국">🇰🇷 韓国</option>
+                <option value="일본">🇯🇵 日本</option>
+                <option value="중국">🇨🇳 中国</option>
+                <option value="미국">🇺🇸 アメリカ</option>
               </select>
             </div>
             <div class="form-field">
@@ -750,7 +745,7 @@
                   <span>🇨🇳 中文</span>
                 </label>
               </div>
-              <div class="help-text">메이트와 소통 가능한 언어를 선택해주세요 (최소 1개)</div>
+              <div class="help-text">メイトとコミュニケーション可能な言語を選択してください(最低1つ)</div>
             </div>
           </div>
           
@@ -759,18 +754,18 @@
             <div class="form-field">
               <label class="form-label required" for="email">이메일</label>
               <input class="form-input" type="email" id="email" required placeholder="example@email.com"/>
-              <div class="help-text">로그인 시 사용할 이메일 주소입니다</div>
+              <div class="help-text">ログイン時に使用するメールアドレスです</div>
             </div>
             <div class="form-field">
               <label class="form-label required" for="password">비밀번호</label>
               <input class="form-input" type="password" id="password" required minlength="8" placeholder="8자 이상 입력"/>
-              <div class="help-text">8자 이상의 안전한 비밀번호를 설정해주세요</div>
+              <div class="help-text">8文字以上の安全なパスワードを設定してください</div>
             </div>
           </div>
           
           <!-- 회원가입 버튼 -->
           <button type="submit" class="btn btn-primary" id="signupBtn">
-            📧 계정 생성 및 이메일 인증
+            📧 アカウント作成とEメール認証
           </button>
           
           <div id="signupResult"></div>
@@ -779,24 +774,24 @@
         <!-- 이메일 인증 섹션 -->
         <div class="email-verification-section" id="emailVerificationSection">
           <div class="verification-header">
-            <h4>📧 이메일 인증번호 입력</h4>
-            <p>입력하신 이메일로 6자리 인증번호를 발송했습니다. 인증번호를 입력해주세요.</p>
+            <h4>📧 Eメール認証番号入力</h4>
+            <p>入力されたメールアドレスに6桁の認証番号を送信しました。 認証番号を入力してください。</p>
           </div>
           
           <div class="verification-email-display" id="verificationEmailDisplay"></div>
           
           <div class="form-field">
-            <label class="form-label required" for="verificationCode">인증번호 (6자리)</label>
+            <label class="form-label required" for="verificationCode">認証番号 (6桁)</label>
             <input class="form-input verification-code-input" type="text" id="verificationCode" maxlength="6" placeholder="123456"/>
-            <div class="help-text">이메일로 받은 6자리 인증번호를 입력해주세요 (10분 유효)</div>
+            <div class="help-text">メールで受け取った6桁の認証番号を入力してください。(10分有効)</div>
           </div>
           
           <div class="verification-actions">
             <button type="button" class="btn btn-primary" id="verifyCodeBtn">
-              ✅ 인증번호 확인
+              ✅ 認証番号確認
             </button>
             <button type="button" class="btn btn-secondary" id="resendCodeBtn">
-              📧 인증번호 재발송
+              📧 認証番号再送信
             </button>
           </div>
           
@@ -807,28 +802,28 @@
       <!-- 완료 섹션 -->
       <div class="completion-section" id="completionSection">
         <div class="completion-icon">🎉</div>
-        <h2 class="completion-title">회원가입 완료!</h2>
+        <h2 class="completion-title">会員登録完了！</h2>
         <p class="completion-message">
-          PUZZMI에 오신 것을 환영합니다!<br>
-          이제 메이트들을 둘러보고 특별한 여행을 계획해보세요.
+          PUZZMIへようこそ！<br>
+          それではメイトたちを見回して特別な旅行を計画してみてください。
         </p>
         
         <!-- LINE 연동 안내 (선택사항) -->
         <div class="line-connect-section">
           <div class="line-icon">💬</div>
-          <h3 class="line-title">LINE 계정 연동 (선택사항)</h3>
+          <h3 class="line-title">LINEアカウント連動(オプション)</h3>
           <p class="line-description">
-            예약 확정 및 결제 안내를 받으려면 LINE 계정 연동이 필요합니다.<br>
-            지금 연동하거나 나중에 예약 시 연동할 수 있어요!
+            予約確定および決済案内を受けるには、LINEアカウントの連動が必要です。<br>
+            今連動するか、後で予約時に連動できます！
           </p>
           
           <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 24px;">
             <button class="btn btn-line" id="lineConnectBtn">
               <i class="fab fa-line"></i>
-              지금 LINE 연동하기
+              今LINE連動する
             </button>
             <button class="btn btn-secondary" onclick="skipLineConnection()">
-              나중에 연동하기
+              後で連動する
             </button>
           </div>
           
@@ -837,19 +832,19 @@
         
         <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 32px;">
           <a href="index.html" class="btn btn-primary">
-            🏠 홈으로 가기
+            🏠 ホームに行く
           </a>
           <a href="index.html#friends" class="btn btn-secondary">
-            👥 메이트 둘러보기
+            👥 メイト見学
           </a>
         </div>
       </div>
 
       <!-- 로그인 링크 -->
       <div style="text-align: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(102, 126, 234, 0.2);">
-        <p style="color: var(--text-secondary); margin-bottom: 16px;">이미 계정이 있으신가요?</p>
+        <p style="color: var(--text-secondary); margin-bottom: 16px;">すでにアカウントをお持ちですか？</p>
         <a href="auth_combo.html" style="color: #667eea; text-decoration: none; font-weight: 600; padding: 8px 16px; border-radius: 8px; background: rgba(102, 126, 234, 0.1); transition: all 0.3s ease;">
-          로그인하기 →
+          ログインする →
         </a>
       </div>
     </section>
@@ -917,24 +912,24 @@
       
       // 유효성 검사
       if (!email || !password || !fullName || !birthDate || !gender || !phoneNumber || !nationality) {
-        signupResult.innerHTML = '<div class="error">❌ 모든 필수 항목을 입력해주세요.</div>';
+        signupResult.innerHTML = '<div class="error">❌ すべての必須項目を入力してください。</div>';
         return;
       }
       
       if (selectedLanguages.length === 0) {
-        signupResult.innerHTML = '<div class="error">❌ 최소 1개 이상의 언어를 선택해주세요.</div>';
+        signupResult.innerHTML = '<div class="error">❌少なくとも 1 つの言語を選択してください。</div>';
         return;
       }
       
       if (password.length < 8) {
-        signupResult.innerHTML = '<div class="error">❌ 비밀번호는 8자 이상이어야 합니다.</div>';
+        signupResult.innerHTML = '<div class="error">❌ パスワードは 8 文字以上である必要があります。</div>';
         return;
       }
       
       // 이메일 형식 검증
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
-        signupResult.innerHTML = '<div class="error">❌ 올바른 이메일 형식을 입력해주세요.</div>';
+        signupResult.innerHTML = '<div class="error">❌ 有効なメール形式を入力してください。</div>';
         return;
       }
       
@@ -948,7 +943,7 @@
       }
       
       if (age < 16) {
-        signupResult.innerHTML = '<div class="error">❌ 16세 이상만 가입 가능합니다.</div>';
+        signupResult.innerHTML = '<div class="error">❌ 16歳以上のみ加入可能です。</div>';
         return;
       }
       
@@ -968,7 +963,7 @@
       
       const submitBtn = document.getElementById('signupBtn');
       submitBtn.disabled = true;
-      submitBtn.innerHTML = '<div class="loading"></div> 이메일 인증번호 발송 중...';
+      submitBtn.innerHTML = '<div class="loading"></div> Eメール認証番号送信中...';
       
       try {
         // 서버에서 6자리 OTP 생성 및 이메일 발송
@@ -1013,14 +1008,14 @@
         // 2단계로 이동
         updateSteps(2);
         showEmailVerificationSection(email);
-        signupResult.innerHTML = '<div class="success">✅ 인증번호가 이메일로 발송되었습니다! 메일함을 확인해주세요.</div>';
+        signupResult.innerHTML = '<div class="success">✅ 認証番号がメールで送信されました！ メールボックスを確認してください。</div>';
         
       } catch (error) {
         console.error('인증번호 발송 실패:', error);
-        signupResult.innerHTML = `<div class="error">❌ 인증번호 발송 실패: ${error.message}</div>`;
+        signupResult.innerHTML = `<div class="error">❌ 認証番号の送信に失敗: ${error.message}</div>`;
       } finally {
         submitBtn.disabled = false;
-        submitBtn.innerHTML = '📧 계정 생성 및 이메일 인증';
+        submitBtn.innerHTML = '📧 アカウント作成とEメール認証';
       }
     });
 
@@ -1040,12 +1035,12 @@
       const code = document.getElementById('verificationCode').value.trim();
       
       if (!code || code.length !== 6) {
-        verificationResult.innerHTML = '<div class="error">❌ 6자리 인증번호를 입력해주세요.</div>';
+        verificationResult.innerHTML = '<div class="error">❌ 6桁の認証番号を入力してください。</div>';
         return;
       }
       
       verifyCodeBtn.disabled = true;
-      verifyCodeBtn.innerHTML = '<div class="loading"></div> 인증 중...';
+      verifyCodeBtn.innerHTML = '<div class="loading"></div> 認証中...';
       
       try {
         // 서버에서 인증번호 검증
@@ -1064,12 +1059,12 @@
         
         if (!response.ok) {
           const errorText = await response.text();
-          throw new Error(`인증 실패: ${response.status} - ${errorText}`);
+          throw new Error(`認証失敗: ${response.status} - ${errorText}`);
         }
         
         const result = await response.json();
         if (!result.success) {
-          throw new Error(result.error || '인증번호가 올바르지 않습니다.');
+          throw new Error(result.error || '認証番号が正しくありません。');
         }
         
         // 인증 성공 - 즉시 회원가입 완료 처리
@@ -1077,17 +1072,17 @@
         
       } catch (error) {
         console.error('인증 실패:', error);
-        verificationResult.innerHTML = `<div class="error">❌ 인증 실패: ${error.message}</div>`;
+        verificationResult.innerHTML = `<div class="error">❌ 認証失敗: ${error.message}</div>`;
       } finally {
         verifyCodeBtn.disabled = false;
-        verifyCodeBtn.innerHTML = '✅ 인증번호 확인';
+        verifyCodeBtn.innerHTML = '✅ 認証番号確認';
       }
     });
 
     // 인증번호 재발송
     resendCodeBtn.addEventListener('click', async () => {
       resendCodeBtn.disabled = true;
-      resendCodeBtn.innerHTML = '<div class="loading"></div> 재발송 중...';
+      resendCodeBtn.innerHTML = '<div class="loading"></div> 再送中...';
       
       try {
         console.log('📧 인증번호 재발송 요청:', userData.email);
@@ -1116,17 +1111,17 @@
         console.log('📧 재발송 결과:', result);
         
         if (!result.success) {
-          throw new Error(result.error || '재발송 실패');
+          throw new Error(result.error || '再送失敗');
         }
         
-        verificationResult.innerHTML = '<div class="success">✅ 새로운 인증번호가 이메일로 발송되었습니다!</div>';
+        verificationResult.innerHTML = '<div class="success">✅ 新しい認証番号がメールで送信されました！</div>';
         
       } catch (error) {
         console.error('📧 재발송 오류:', error);
         verificationResult.innerHTML = `<div class="error">❌ 재발송 실패: ${error.message}</div>`;
       } finally {
         resendCodeBtn.disabled = false;
-        resendCodeBtn.innerHTML = '📧 인증번호 재발송';
+        resendCodeBtn.innerHTML = '📧 認証番号再送信';
       }
     });
 
@@ -1186,7 +1181,7 @@
         signupFormSection.style.display = 'none';
         completionSection.classList.add('show');
         
-        verificationResult.innerHTML = '<div class="success">✅ 회원가입이 완료되었습니다!</div>';
+        verificationResult.innerHTML = '<div class="success">✅会員登録が完了しました！</div>';
         
         // 성공 후 잠시 대기하여 사용자가 메시지를 볼 수 있도록 함
         setTimeout(() => {
@@ -1197,7 +1192,7 @@
         
       } catch (error) {
         console.error('회원가입 완료 실패:', error);
-        verificationResult.innerHTML = `<div class="error">❌ 회원가입 실패: ${error.message}</div>`;
+        verificationResult.innerHTML = `<div class="error">❌ 会員登録失敗: ${error.message}</div>`;
       }
     }
 
@@ -1206,8 +1201,8 @@
         setTimeout(() => {
           verifyCodeBtn.click();
         }, 500);
-      }
-    });
+      
+    
 
     // LINE 연동 (선택사항)
     document.getElementById('lineConnectBtn').addEventListener('click', async () => {
@@ -1218,13 +1213,13 @@
       const popup = window.open('about:blank', 'lineLogin', 'width=500,height=600,scrollbars=yes,resizable=yes');
       
       if (!popup) {
-        statusEl.innerHTML = '<div class="error">❌ 팝업이 차단되었습니다. 팝업 차단을 해제하고 다시 시도해주세요.</div>';
+        statusEl.innerHTML = '<div class="error">❌ ポップアップがブロックされました。 ポップアップブロックを解除して、もう一度お試しください。</div>';
         statusEl.style.display = 'block';
         return;
       }
       
       btn.disabled = true;
-      btn.innerHTML = '<div class="loading"></div> LINE 연동 중...';
+      btn.innerHTML = '<div class="loading"></div> LINE連動中...';
       
       try {
         // 실제 LINE OAuth URL 생성
@@ -1238,12 +1233,12 @@
         const checkAuth = setInterval(async () => {
           if (popup && popup.closed) {
             clearInterval(checkAuth);
-            console.log('팝업이 닫혔습니다. 연동 상태 확인 중...');
+            console.log('ポップアップが閉じました。 連動状態確認中...');
             // 잠시 대기 후 상태 확인
             setTimeout(async () => {
               await checkLineConnectionStatus();
               btn.disabled = false;
-              btn.innerHTML = '<i class="fab fa-line"></i> LINE 계정 연동하기';
+              btn.innerHTML = '<i class="fab fa-line"></i> LINEアカウントを連動させる';
             }, 1000);
           }
         }, 1000);
@@ -1255,7 +1250,7 @@
 
           if (data.type === 'LINE_AUTH_SUCCESS') {
             console.log('LINE 연동 성공 메시지 받음:', data);
-            statusEl.innerHTML = '<div class="success">✅ LINE 계정이 성공적으로 연동되었습니다!</div>';
+            statusEl.innerHTML = '<div class="success">✅ LINEアカウントが正常に連動されました！</div>';
             statusEl.style.display = 'block';
             btn.innerHTML = '<i class="fab fa-line"></i> 연동 완료';
             btn.disabled = true;
@@ -1267,7 +1262,7 @@
           
           if (data.type === 'LINE_AUTH_ERROR') {
             console.error('LINE 연동 실패 메시지 받음:', data);
-            statusEl.innerHTML = `<div class="error">❌ LINE 연동 실패: ${data.error}</div>`;
+            statusEl.innerHTML = `<div class="error">❌ LINE連動失敗: ${data.error}</div>`;
             statusEl.style.display = 'block';
             if (popup && !popup.closed) popup.close();
             window.removeEventListener('message', messageHandler);
@@ -1282,11 +1277,11 @@
         if (popup && !popup.closed) {
           popup.close();
         }
-        statusEl.innerHTML = `<div class="error">❌ LINE 연동 오류: ${error.message}</div>`;
+        statusEl.innerHTML = `<div class="error">❌ LINE LINE連動エラー: ${error.message}</div>`;
         statusEl.style.display = 'block';
         
         btn.disabled = false;
-        btn.innerHTML = '<i class="fab fa-line"></i> LINE 계정 연동하기';
+        btn.innerHTML = '<i class="fab fa-line"></i> LINEアカウントを連動させる';
       }
     });
 
@@ -1302,7 +1297,7 @@
         
         if (!error && lineAccount) {
           const statusEl = document.getElementById('lineStatus');
-          statusEl.innerHTML = `<div class="success">✅ LINE 계정 연동 완료: ${lineAccount.line_display_name}</div>`;
+          statusEl.innerHTML = `<div class="success">✅ LINEアカウント連動完了: ${lineAccount.line_display_name}</div>`;
           statusEl.style.display = 'block';
         }
       } catch (error) {
@@ -1312,7 +1307,7 @@
 
     // LINE 연동 건너뛰기
     window.skipLineConnection = function() {
-      if (confirm('LINE 연동을 건너뛰시겠습니까?\n\n예약 시 결제 안내를 받으려면 나중에 연동이 필요합니다.')) {
+      if (confirm('LINE連動をスキップしますか？\n\n予約時に決済案内を受けるためには後で連動が必要です。')) {
         location.href = 'index.html';
       }
     };
