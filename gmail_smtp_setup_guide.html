@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gmail SMTP 설정 가이드 - PUZZMI</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="pages.css"/>
+  <link rel="stylesheet" href="pages-theme.css"/>
+  <style>
+    body.bg-cream { 
+      background: var(--bg-cream); 
+      background-repeat: no-repeat; 
+      background-size: cover; 
+      min-height: 100vh;
+    }
+    
+    .guide-container {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    
+    .guide-header {
+      background: linear-gradient(135deg, #dc3545 0%, #ffc107 100%);
+      color: white;
+      padding: 40px;
+      border-radius: 20px;
+      text-align: center;
+      margin-bottom: 32px;
+      box-shadow: 0 20px 60px rgba(220, 53, 69, 0.3);
+    }
+    
+    .guide-header h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin: 0 0 16px 0;
+    }
+    
+    .step-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 20px;
+      padding: 32px;
+      margin-bottom: 24px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.06);
+    }
+    
+    .step-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .code-block {
+      background: #1a1a1a;
+      color: #f8f8f2;
+      padding: 20px;
+      border-radius: 12px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      overflow-x: auto;
+      margin: 16px 0;
+      border: 2px solid rgba(102, 126, 234, 0.2);
+    }
+    
+    .warning-box {
+      background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+      border: 2px solid rgba(255, 193, 7, 0.3);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    
+    .success-box {
+      background: linear-gradient(135deg, #d1f2eb 0%, #a3e4d7 100%);
+      border: 2px solid rgba(25, 135, 84, 0.3);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    
+    .info-box {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.05) 100%);
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body class="bg-cream">
+  <div class="guide-container">
+    <!-- 경고 헤더 -->
+    <section class="guide-header">
+      <h1>🚨 Gmail SMTP 인증 오류 해결</h1>
+      <p>"Not authorized to send emails from gmail.com" 오류를 해결하는 방법입니다</p>
+    </section>
+
+    <!-- Gmail 2단계 인증 설정 -->
+    <section class="step-card">
+      <h2 class="step-title">
+        <span style="background: #dc3545; color: white; padding: 8px 12px; border-radius: 8px;">1단계</span>
+        Gmail 2단계 인증 활성화
+      </h2>
+      
+      <div class="warning-box">
+        <h4 style="color: #856404; margin: 0 0 12px 0;">⚠️ 필수 조건</h4>
+        <p style="margin: 0; color: #856404;">
+          Gmail SMTP를 사용하려면 반드시 2단계 인증이 활성화되어 있어야 합니다.
+        </p>
+      </div>
+      
+      <ol style="line-height: 1.8;">
+        <li><strong>Google 계정 관리</strong> 페이지 접속 (myaccount.google.com)</li>
+        <li><strong>보안</strong> 탭 클릭</li>
+        <li><strong>2단계 인증</strong> 활성화</li>
+        <li>휴대폰 번호 또는 인증 앱 설정</li>
+      </ol>
+    </section>
+
+    <!-- 앱 비밀번호 생성 -->
+    <section class="step-card">
+      <h2 class="step-title">
+        <span style="background: #ffc107; color: #000; padding: 8px 12px; border-radius: 8px;">2단계</span>
+        Gmail 앱 비밀번호 생성
+      </h2>
+      
+      <ol style="line-height: 1.8;">
+        <li><strong>Google 계정 관리</strong> → <strong>보안</strong> 탭</li>
+        <li><strong>앱 비밀번호</strong> 클릭 (2단계 인증 활성화 후 나타남)</li>
+        <li><strong>앱 선택</strong>: "메일"</li>
+        <li><strong>기기 선택</strong>: "기타(맞춤 이름)" → "PUZZMI SMTP" 입력</li>
+        <li><strong>생성된 16자리 비밀번호 복사</strong> (공백 제거)</li>
+      </ol>
+      
+      <div class="info-box">
+        <h4 style="color: #667eea; margin: 0 0 12px 0;">💡 앱 비밀번호 예시</h4>
+        <div class="code-block">
+# 생성된 앱 비밀번호 (예시)
+abcd efgh ijkl mnop
+
+# 실제 사용할 때는 공백 제거
+abcdefghijklmnop
+        </div>
+      </div>
+    </section>
+
+    <!-- Supabase SMTP 설정 -->
+    <section class="step-card">
+      <h2 class="step-title">
+        <span style="background: #28a745; color: white; padding: 8px 12px; border-radius: 8px;">3단계</span>
+        Supabase SMTP 설정
+      </h2>
+      
+      <ol style="line-height: 1.8;">
+        <li><strong>Supabase Dashboard</strong> 접속</li>
+        <li><strong>Settings</strong> → <strong>Authentication</strong> 클릭</li>
+        <li><strong>SMTP Settings</strong> 섹션에서 다음 정보 입력:</li>
+      </ol>
+      
+      <div class="code-block">
+# Gmail SMTP 설정
+SMTP Host: smtp.gmail.com
+SMTP Port: 587
+SMTP User: puzzmi0721@gmail.com
+SMTP Pass: [위에서 생성한 16자리 앱 비밀번호]
+SMTP Admin Email: puzzmi0721@gmail.com
+SMTP Sender Name: PUZZMI
+      </div>
+      
+      <div class="success-box">
+        <h4 style="color: #0f5132; margin: 0 0 12px 0;">✅ 설정 완료 후</h4>
+        <ul style="margin: 0; color: #0f5132;">
+          <li><strong>Test SMTP</strong> 버튼으로 설정 검증</li>
+          <li>테스트 이메일이 정상 발송되는지 확인</li>
+          <li>스팸함도 확인해보세요</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 대안 SMTP 서비스 -->
+    <section class="step-card">
+      <h2 class="step-title">
+        <span style="background: #667eea; color: white; padding: 8px 12px; border-radius: 8px;">대안</span>
+        전문 SMTP 서비스 사용
+      </h2>
+      
+      <p>Gmail SMTP 설정이 복잡하다면 전문 이메일 서비스를 사용하는 것을 권장합니다:</p>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 20px 0;">
+        <div style="background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.2); border-radius: 12px; padding: 16px; text-align: center;">
+          <h4 style="color: #667eea; margin: 0 0 8px 0;">SendGrid</h4>
+          <p style="margin: 0; font-size: 0.9rem;">월 100통 무료</p>
+        </div>
+        <div style="background: rgba(240, 147, 251, 0.1); border: 2px solid rgba(240, 147, 251, 0.2); border-radius: 12px; padding: 16px; text-align: center;">
+          <h4 style="color: #f093fb; margin: 0 0 8px 0;">Mailgun</h4>
+          <p style="margin: 0; font-size: 0.9rem;">월 5,000통 무료</p>
+        </div>
+        <div style="background: rgba(79, 172, 254, 0.1); border: 2px solid rgba(79, 172, 254, 0.2); border-radius: 12px; padding: 16px; text-align: center;">
+          <h4 style="color: #4facfe; margin: 0 0 8px 0;">AWS SES</h4>
+          <p style="margin: 0; font-size: 0.9rem;">월 62,000통 무료</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 문제 해결 체크리스트 -->
+    <section class="step-card">
+      <h2 class="step-title">
+        <span style="background: #6f42c1; color: white; padding: 8px 12px; border-radius: 8px;">체크</span>
+        문제 해결 체크리스트
+      </h2>
+      
+      <div style="display: grid; gap: 12px;">
+        <label style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255,255,255,0.8); border-radius: 8px; cursor: pointer;">
+          <input type="checkbox" style="width: 20px; height: 20px;">
+          <span>Gmail 계정에서 2단계 인증 활성화 완료</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255,255,255,0.8); border-radius: 8px; cursor: pointer;">
+          <input type="checkbox" style="width: 20px; height: 20px;">
+          <span>앱 비밀번호 생성 및 복사 완료</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255,255,255,0.8); border-radius: 8px; cursor: pointer;">
+          <input type="checkbox" style="width: 20px; height: 20px;">
+          <span>Supabase SMTP 설정에 앱 비밀번호 입력 완료</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255,255,255,0.8); border-radius: 8px; cursor: pointer;">
+          <input type="checkbox" style="width: 20px; height: 20px;">
+          <span>Supabase에서 Test SMTP 성공 확인</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255,255,255,0.8); border-radius: 8px; cursor: pointer;">
+          <input type="checkbox" style="width: 20px; height: 20px;">
+          <span>Edge Function 재배포 완료</span>
+        </label>
+      </div>
+    </section>
+
+    <!-- 즉시 테스트 -->
+    <section class="step-card">
+      <h2 class="step-title">
+        <span style="background: #17a2b8; color: white; padding: 8px 12px; border-radius: 8px;">테스트</span>
+        즉시 테스트하기
+      </h2>
+      
+      <div style="text-align: center;">
+        <a href="check_email_system.html" class="btn btn-primary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px; padding: 16px 32px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px; font-weight: 700; box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);">
+          <i class="fas fa-bug"></i>
+          이메일 시스템 디버깅
+        </a>
+        
+        <a href="enhanced_signup.html" class="btn btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px; padding: 16px 32px; background: rgba(255,255,255,0.9); color: var(--text-primary); border: 2px solid rgba(102, 126, 234, 0.2); border-radius: 12px; font-weight: 700; margin-left: 16px;">
+          <i class="fas fa-user-plus"></i>
+          회원가입 테스트
+        </a>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

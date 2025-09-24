@@ -991,6 +991,22 @@
         
         const result = await response.json();
         if (!result.success) {
+          // 디버그 정보가 있으면 표시 (개발용)
+          if (result.debug && result.debug.otpGenerated) {
+            signupResult.innerHTML = `
+              <div class="error">
+                ❌ SMTP 설정 오류: ${result.error}<br>
+                <div style="margin-top: 12px; padding: 12px; background: rgba(255,255,255,0.8); border-radius: 8px; font-size: 0.9rem;">
+                  <strong>해결방법:</strong><br>
+                  1. <a href="gmail_smtp_setup_guide.html" target="_blank" style="color: #667eea;">Gmail SMTP 설정 가이드</a> 확인<br>
+                  2. Gmail 앱 비밀번호 생성 및 설정<br>
+                  3. Supabase Dashboard에서 SMTP 설정 완료
+                </div>
+              </div>
+            `;
+            return;
+          }
+          
           throw new Error(result.error || '이메일 발송 실패');
         }
         
@@ -1100,22 +1116,13 @@
         console.log('📧 재발송 결과:', result);
         
         if (!result.success) {
-          // 디버그 정보가 있으면 표시
-          if (result.debug && result.debug.otp) {
-            verificationResult.innerHTML = `
-              <div class="error">
-                ❌ 재발송 실패: ${result.error}<br>
-                <strong>개발용 인증번호: ${result.debug.otp}</strong>
-              </div>
-            `;
-            return;
-          }
           throw new Error(result.error || '재발송 실패');
         }
         
         verificationResult.innerHTML = '<div class="success">✅ 새로운 인증번호가 이메일로 발송되었습니다!</div>';
         
       } catch (error) {
+        console.error('📧 재발송 오류:', error);
         verificationResult.innerHTML = `<div class="error">❌ 재발송 실패: ${error.message}</div>`;
       } finally {
         resendCodeBtn.disabled = false;
