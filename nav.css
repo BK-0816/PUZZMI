@@ -445,6 +445,24 @@
 
 .mobile-menu.active {
   transform: translateY(0);
+  visibility: visible;
+}
+
+/* 모바일 메뉴가 열릴 때 다른 요소들 숨기기 */
+.mobile-menu.active ~ * {
+  filter: blur(2px);
+  pointer-events: none;
+}
+
+/* 모바일 메뉴가 열릴 때 네비게이션 요소들 숨기기 */
+.mobile-menu-btn.active ~ .nav-right > *:not(.mobile-menu-btn) {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.mobile-menu-btn.active ~ .nav-left {
+  opacity: 0.3;
+  pointer-events: none;
 }
 
 .mobile-menu-content {
