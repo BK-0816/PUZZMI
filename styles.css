@@ -1646,27 +1646,35 @@ section:not(:first-child)::before {
 /* ===== 스와이프 카드 시스템 ===== */
 .swipe-container {
   position: relative;
-  margin: 32px 0;
+  max-width: 900px;
   max-width: 800px;
   margin: 0 auto;
   overflow: hidden;
-  border-radius: 24px;
+  border-radius: 28px;
   box-shadow: 0 16px 40px rgba(0,0,0,0.06);
   background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
   backdrop-filter: blur(10px);
-  max-width: 100%;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.1), 0 12px 32px rgba(0,0,0,0.06);
+  min-height: 400px;
 }
 
 .swipe-wrapper {
   display: flex;
   transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   width: 100%;
+  height: 100%;
   height: auto;
 }
 
 .swipe-slide {
   flex: 0 0 100%;
   width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
   padding: 16px;
   transition: opacity 0.5s ease;
   display: flex;
@@ -1681,7 +1689,7 @@ section:not(:first-child)::before {
 /* About 카드 스타일 */
 .about-card {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1.8fr;
   gap: 40px;
   align-items: center;
   padding: 40px;
@@ -1700,9 +1708,11 @@ section:not(:first-child)::before {
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;
+  padding: 24px;
   background: linear-gradient(90deg, #667eea 0%, #764ba2 33%, #f093fb 66%, #f5576c 100%);
-  opacity: 0.8;
+  min-height: 320px;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .about-card-image {
@@ -1716,22 +1726,23 @@ section:not(:first-child)::before {
 }
 
 .about-card-image:hover {
-  transform: translateY(-8px) scale(1.02);
+  border-radius: 24px;
   box-shadow: 0 24px 60px rgba(0,0,0,0.2);
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
 }
 
 .about-card-image img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  object-position: center;
-  transition: transform 0.3s ease;
-  background: rgba(248, 249, 250, 0.5);
+  height: 220px;
+  object-fit: cover;
   border-radius: 16px;
+  border-radius: 20px;
 }
 
 .about-card-image:hover img {
-  transform: scale(1.02);
+  transform: scale(1.03);
 }
 
 .about-card-content {
@@ -1739,13 +1750,13 @@ section:not(:first-child)::before {
 }
 
 .about-card-content h3 {
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   font-weight: 800;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  margin-bottom: 20px;
+  margin: 0 0 20px 0;
   line-height: 1.3;
   letter-spacing: -0.02em;
 }
@@ -1832,7 +1843,7 @@ section:not(:first-child)::before {
   line-height: 1.3;
   letter-spacing: -0.02em;
 }
-  font-size: 1rem;
+  font-size: 1.1rem;
 .safety-card-content p {
   font-size: 1.1rem;
   line-height: 1.7;
@@ -1844,7 +1855,7 @@ section:not(:first-child)::before {
 /* 네비게이션 버튼 */
 .swipe-nav {
   position: absolute;
-  top: 50%;
+  grid-template-columns: 1fr 1.8fr;
   transform: translateY(-50%);
   width: 50px;
   width: 44px;
@@ -2087,28 +2098,89 @@ section:not(:first-child)::before {
   
   .swipe-slide {
     padding: 8px;
-  }
+    padding: 24px 20px;
+    gap: 20px;
+    min-height: 280px;
   
   .about-card,
   .safety-card {
     padding: 16px;
-    gap: 12px;
-    border-radius: 12px;
+    max-width: 260px;
+  }
+  
+  .about-card-image img,
+  .safety-card-image img {
+    height: 160px;
+    aspect-ratio: 3/2;
+  }
+  
+  .about-card-content h3,
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+  }
+  
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  
+  .swipe-nav {
+    width: 44px;
+    height: 44px;
+    font-size: 0.9rem;
+  }
+  
+  .swipe-prev {
+    left: 12px;
+  }
+  
+  .swipe-next {
+    right: 12px;
+  }
+  
+  .swipe-indicators {
+    bottom: 16px;
+  }
+  
+  .indicator {
+    width: 10px;
+    height: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .swipe-container {
+    min-height: 300px;
+  }
+  
+  .about-card,
+  .safety-card {
+    padding: 20px 16px;
+    gap: 16px;
+    min-height: 260px;
+  }
+  
+  .about-card-image,
+  .safety-card-image {
+    max-width: 240px;
   }
   
   .about-card-image img,
   .safety-card-image img {
     height: 140px;
-    aspect-ratio: 3/2;
   }
   
   .about-card-content h3,
   .safety-card-content h3 {
     font-size: 1.1rem;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
   }
   
   .about-card-content p,
+  .safety-card-content p {
+    font-size: 0.9rem;
+    line-height: 1.4;
   .safety-card-content p {
     font-size: 0.9rem;
     line-height: 1.4;
@@ -2539,9 +2611,11 @@ section:not(:first-child)::before {
   justify-content: center;
   width: 56px;
   height: 56px;
-  border-radius: var(--radius-full);
+  padding: 24px;
   box-shadow: var(--shadow-xl);
-  transition: all var(--transition-base);
+  min-height: 320px;
+  max-width: 800px;
+  margin: 0 auto;
   text-decoration: none;
   color: var(--text-inverse);
   font-size: var(--font-size-lg);
@@ -3051,34 +3125,35 @@ section:not(:first-child)::before {
 .row {
   display: flex;
   gap: var(--space-4);
-  height: 200px;
+  border-radius: 24px;
 }
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
 
 .row.single {
   max-width: 120px;
   max-height: 120px;
-  width: auto;
-  height: auto;
-}
+  height: 220px;
+  object-fit: cover;
 
+  border-radius: 20px;
 .field {
   flex: 1;
   min-width: 200px;
-}
+  transform: scale(1.03);
 
 .label {
   display: block;
-  font-weight: var(--font-weight-semibold);
+  padding: 20px 0;
   transform: translateY(-2px);
   margin-bottom: var(--space-2);
   font-size: var(--font-size-sm);
-  text-transform: uppercase;
+  font-size: 1.5rem;
   letter-spacing: 0.05em;
-  background: var(--gradient-primary);
+  font-size: 1.1rem;
   height: 4px;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-}
+  margin: 0 0 20px 0;
   width: 100%;
   order: 1;
 .input,
@@ -3086,8 +3161,8 @@ section:not(:first-child)::before {
 .textarea {
   width: 100%;
   padding: var(--space-4) var(--space-5);
-  border: 2px solid rgba(102, 126, 234, 0.2);
-  border-radius: var(--radius-lg);
+  width: 56px;
+  height: 56px;
   background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
   font-family: inherit;
   font-size: var(--font-size-base);
@@ -3107,6 +3182,7 @@ section:not(:first-child)::before {
 }
 
 .textarea {
+  z-index: 50;
   min-height: 120px;
   resize: vertical;
   line-height: var(--line-height-relaxed);
@@ -3120,54 +3196,85 @@ section:not(:first-child)::before {
 
 .spacer {
   height: var(--space-6);
-}
+  left: -28px;
 
 .media {
   display: flex;
-  gap: var(--space-4);
+  right: -28px;
   align-items: center;
 }
 
 .round {
   border-radius: var(--radius-full);
-}
-
+  bottom: 24px;
+  z-index: 100;
+  .swipe-container {
+    max-width: 100%;
+    margin: 0 -20px;
+    border-radius: 0;
+    min-height: 350px;
+  }
+  
+  .swipe-nav {
+    width: 48px;
+    height: 48px;
+    font-size: 1rem;
+  }
+  
+  .swipe-prev {
+    left: 16px;
+  }
+  
+  .swipe-next {
+    right: 16px;
+  }
+  
 .chips {
   display: flex;
   gap: var(--space-2);
   flex-wrap: wrap;
-}
-
+    padding: 32px 24px;
+    min-height: 300px;
 .chip {
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.05) 100%);
   color: var(--primary-700);
   padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-full);
-  font-size: var(--font-size-xs);
+    order: 1;
+    margin: 0 auto;
+    max-width: 280px;
   font-weight: var(--font-weight-semibold);
   border: 1px solid rgba(102, 126, 234, 0.2);
 }
 
-/* ===== 페이지 레이아웃 ===== */
+    height: 180px;
 .page {
   min-height: 100vh;
   padding: var(--space-8) 0;
   position: relative;
-  max-width: 1200px;
+    order: 2;
+    padding: 16px 0 0 0;
   margin: 0 auto;
   padding-left: var(--space-4);
   padding-right: var(--space-4);
 }
-
+    font-size: 1.3rem;
+    margin-bottom: 16px;
 @media (min-width: 768px) {
   .page {
     padding-left: var(--space-6);
     padding-right: var(--space-6);
-  }
+    font-size: 1rem;
+    line-height: 1.6;
 }
 
 /* ===== 반응형 조정 ===== */
 @media (max-width: 640px) {
+  .swipe-container {
+    min-height: 320px;
+    margin: 0 -16px;
+  }
+  
   .hero-title {
     font-size: var(--font-size-3xl);
   }
