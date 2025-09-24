@@ -696,7 +696,7 @@
           
           <!-- 이메일 인증 버튼 -->
           <button type="button" class="btn btn-primary" id="sendVerificationBtn">
-            📧 계정 생성 및 이메일 인증
+            📧 이메일 인증번호 받기
           </button>
           
           <div id="formResult"></div>
@@ -731,7 +731,7 @@
 
         <!-- 최종 가입 완료 버튼 -->
         <button type="button" class="btn btn-primary hidden" id="completeSignupBtn" style="width: 100%; margin-top: 24px; font-size: 1.2rem; padding: 20px;">
-          🎉 PUZZMI 회원가입 완료하기
+          🎉 회원가입 완료하기
         </button>
       </div>
 
@@ -894,19 +894,39 @@
       sendVerificationBtn.innerHTML = '<div class="loading"></div> 이메일 인증번호 발송 중...';
       
       try {
-        // 6자리 인증번호 발송
-        const result = await emailVerificationService.sendVerificationCode(email);
-        verificationId = result.verificationId;
+        // Edge Function을 통한 6자리 OTP 발송
+        const response = await fetch(`https://eevvgbbokenpjnvtmztk.supabase.co/functions/v1/email-verification`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4`,
+          },
+          body: JSON.stringify({
+            email: email,
+            action: 'send'
+          })
+        });
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`서버 오류: ${response.status} - ${errorText}`);
+        }
+        
+        const result = await response.json();
+        
+        if (!result.success) {
+          throw new Error(result.error || '인증번호 발송 실패');
+        }
         
         showEmailVerificationSection(email);
-        formResult.innerHTML = '<div class="success">✅ 6자리 인증번호를 이메일로 발송했습니다!</div>';
+        formResult.innerHTML = '<div class="success">✅ 6자리 인증번호를 이메일로 발송했습니다! (10분간 유효)</div>';
         
       } catch (error) {
         console.error('인증번호 발송 실패:', error);
         formResult.innerHTML = `<div class="error">❌ 인증번호 발송 실패: ${error.message}</div>`;
       } finally {
         sendVerificationBtn.disabled = false;
-        sendVerificationBtn.innerHTML = '📧 계정 생성 및 이메일 인증';
+        sendVerificationBtn.innerHTML = '📧 이메일 인증번호 받기';
       }
     });
 
@@ -935,8 +955,30 @@
       verifyCodeBtn.innerHTML = '<div class="loading"></div> 인증 중...';
       
       try {
-        // 인증번호 확인
-        await emailVerificationService.verifyCode(email, code);
+        // Edge Function을 통한 인증번호 확인
+        const response = await fetch(`https://eevvgbbokenpjnvtmztk.supabase.co/functions/v1/email-verification`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4`,
+          },
+          body: JSON.stringify({
+            email: email,
+            action: 'verify',
+            code: code
+          })
+        });
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`서버 오류: ${response.status} - ${errorText}`);
+        }
+        
+        const result = await response.json();
+        
+        if (!result.success) {
+          throw new Error(result.error || '인증 실패');
+        }
         
         isEmailVerified = true;
         verificationResult.innerHTML = '<div class="success">✅ 이메일 인증이 완료되었습니다!</div>';
@@ -966,7 +1008,30 @@
       resendCodeBtn.innerHTML = '<div class="loading"></div> 재발송 중...';
       
       try {
-        await emailVerificationService.sendVerificationCode(email);
+        // Edge Function을 통한 재발송
+        const response = await fetch(`https://eevvgbbokenpjnvtmztk.supabase.co/functions/v1/email-verification`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4`,
+          },
+          body: JSON.stringify({
+            email: email,
+            action: 'send'
+          })
+        });
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`서버 오류: ${response.status} - ${errorText}`);
+        }
+        
+        const result = await response.json();
+        
+        if (!result.success) {
+          throw new Error(result.error || '재발송 실패');
+        }
+        
         verificationResult.innerHTML = '<div class="success">✅ 새로운 6자리 인증번호를 발송했습니다!</div>';
         
       } catch (error) {
@@ -988,7 +1053,7 @@
       completeSignupBtn.innerHTML = '<div class="loading"></div> 회원가입 처리 중...';
       
       try {
-        // 1. Supabase 계정 생성 (이메일 인증 없이)
+        // 1. Supabase 계정 생성 (이메일 인증 완료 상태로)
         const { data, error } = await supabase.auth.signUp({
           email: userData.email,
           password: userData.password,
@@ -996,11 +1061,10 @@
             data: {
               full_name: userData.fullName,
               signup_step: 'completed',
-              email_verified: true // 우리가 직접 인증했음을 표시
+              email_verified: true, // 서버에서 인증 완료
+              verification_method: 'email_otp'
             },
-            emailRedirectTo: `${window.location.origin}/email_verified.html`,
-            // 이메일 확인 비활성화 (우리가 직접 처리했으므로)
-            shouldCreateUser: true
+            emailRedirectTo: `${window.location.origin}/email_verified.html`
           }
         });
         
