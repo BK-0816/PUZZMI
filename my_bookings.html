@@ -376,10 +376,10 @@
       const canReview = bk.status === 'completed' && !bk.has_review;
       const dt = `${bk.date} ${bk.start_time} (${bk.duration_hours}h)`;
       const statusClass = `status-${bk.status}`;
-      const statusText = bk.status === 'pending' ? '⏳ 대기중' :
-                        bk.status === 'confirmed' ? '✅ 예약 확정' :
-                        bk.status === 'completed' ? '🎉 진행 완료' :
-                        (bk.status === 'cancelled' || bk.status === 'canceled_by_mate') ? '❌ 예약 취소' : bk.status;
+      const statusText = bk.status === 'pending' ? '⏳ 待機中' :
+                        bk.status === 'confirmed' ? '✅ 予約確定' :
+                        bk.status === 'completed' ? '🎉 進行完了' :
+                        (bk.status === 'cancelled' || bk.status === 'canceled_by_mate') ? '❌ 予約キャンセル' : bk.status;
       
       return `
         <div class="booking-card" data-id="${bk.id}">
@@ -389,7 +389,7 @@
               <div class="booking-meta">
                 <div class="meta-item">
                   <div class="meta-icon">👤</div>
-                  <span>메이트: ${bk.mate_name ?? bk.mate_id}</span>
+                  <span>メイト: ${bk.mate_name ?? bk.mate_id}</span>
                 </div>
                 ${bk.notes ? `
                 <div class="meta-item">
@@ -405,25 +405,25 @@
           </div>
           ${canReview ? `
             <div class="booking-actions">
-              <button class="btn-review" data-act="review">✨ 리뷰 작성하기</button>
+              <button class="btn-review" data-act="review">✨ レビューを作成する</button>
             </div>
           ` : ''}
           <div class="review-form hidden" data-review="${bk.id}">
-            <h4>리뷰 작성하기</h4>
+            <h4>レビューを作成する</h4>
             <div class="rating-section">
-              <label class="rating-label">별점을 선택해주세요</label>
+              <label class="rating-label">星を選択してください</label>
               <div class="rating-pills">
-                <button class="rating-pill" data-rate="5">⭐ 5점 최고예요!</button>
-                <button class="rating-pill" data-rate="4">⭐ 4점 좋아요</button>
-                <button class="rating-pill" data-rate="3">⭐ 3점 보통</button>
-                <button class="rating-pill" data-rate="2">⭐ 2점 아쉬워요</button>
-                <button class="rating-pill" data-rate="1">⭐ 1점 별로예요</button>
+                <button class="rating-pill" data-rate="5">⭐ 5点 最高です！</button>
+                <button class="rating-pill" data-rate="4">⭐ 4点 いいですね</button>
+                <button class="rating-pill" data-rate="3">⭐ 3点 普通</button>
+                <button class="rating-pill" data-rate="2">⭐ 2点 残念です</button>
+                <button class="rating-pill" data-rate="1">⭐ 1点 イマイチです</button>
                 <input type="hidden" data-rating value="">
               </div>
             </div>
-            <textarea class="review-textarea" data-text placeholder="메이트와 함께한 경험을 자세히 공유해주세요. 어떤 곳을 가셨나요? 어떤 대화를 나누셨나요? 다른 이용자들에게 도움이 되는 솔직한 후기를 남겨주시면 감사하겠습니다."></textarea>
+            <textarea class="review-textarea" data-text placeholder="メイトと一緒にした経験を詳しく共有してください。 どんなところに行きましたか？ どんな会話を交わしましたか？ 他の利用者に役立つ率直なレビューを残していただければ幸いです。"></textarea>
             <div class="booking-actions" style="margin-top: 20px;">
-              <button class="btn-review" data-save="${bk.id}">🌟 리뷰 등록하기</button>
+              <button class="btn-review" data-save="${bk.id}">🌟 レビューを登録する</button>
             </div>
             <div class="muted" data-result></div>
           </div>
@@ -432,7 +432,7 @@
 
     async function load(){
       const { data:{ user } } = await supabase.auth.getUser();
-      if(!user){ list.innerHTML='<div class="note">로그인이 필요합니다.</div>'; return; }
+      if(!user){ list.innerHTML='<div class="note">ログインが必要です。</div>'; return; }
 
       // 내 예약
       const { data, error } = await supabase
@@ -446,8 +446,8 @@
         list.innerHTML = `
           <div class="empty-state">
             <div class="empty-icon">📅</div>
-            <div class="empty-text">아직 예약이 없습니다</div>
-            <div class="empty-subtext">메이트와 함께 특별한 경험을 시작해보세요!</div>
+            <div class="empty-text">まだ予約がありません</div>
+            <div class="empty-subtext">メイトと一緒に特別な経験を始めてみてください！</div>
           </div>
         `; 
         return; 
@@ -506,12 +506,12 @@
         const rating = Number(block.querySelector('[data-rating]').value||0);
         const text = block.querySelector('[data-text]').value.trim();
         const result = block.querySelector('[data-result]');
-        if (!(rating>=1 && rating<=5)) return result.textContent = '별점을 선택하세요.';
-        if (!text) return result.textContent = '내용을 입력하세요.';
+        if (!(rating>=1 && rating<=5)) return result.textContent = '星を選択してください。';
+        if (!text) return result.textContent = '内容を入力してください。';
 
         // mate_id
         const { data: one, error: oneErr } = await supabase.from('bookings').select('mate_id').eq('id', id).maybeSingle();
-        if (oneErr || !one) { result.textContent = '조회 실패'; return; }
+        if (oneErr || !one) { result.textContent = '照会失敗'; return; }
 
         const { data:{ user } } = await supabase.auth.getUser();
         const { error } = await supabase.from('reviews').insert({
@@ -524,12 +524,12 @@
 
         if (error) {
           if (error.message && error.message.includes('duplicate')) {
-            result.textContent = '이미 이 예약에 대한 리뷰를 작성하셨습니다.';
+            result.textContent = 'すでにこの予約のレビューを作成しています。';
           } else {
-            result.textContent = '등록 실패: ' + error.message;
+            result.textContent = '登録失敗: ' + error.message;
           }
         } else {
-          result.textContent = '등록되었습니다.';
+          result.textContent = '登録されました。';
         }
         if (!error) load();
       }
