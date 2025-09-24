@@ -566,30 +566,38 @@ a:hover {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  opacity: 0.8;
-  position: relative;
+  transition: all 1s ease-in-out;
+  z-index: 1;
 }
 
-/* 히어로 배경 이미지 텍스트 오버레이 */
+/* 히어로 배경 텍스트 */
 .hero-bg::after {
   content: '';
   position: absolute;
-  bottom: 20px;
+  bottom: 60px;
   left: 50%;
   transform: translateX(-50%);
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 1rem;
-  font-weight: 600;
+  background: rgba(0,0,0,0.6);
+  color: white;
+  padding: 16px 32px;
+  border-radius: 16px;
+  font-size: 1.2rem;
+  font-weight: 700;
   text-align: center;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  padding: 8px 16px;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 20px;
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  z-index: 1;
-  transition: all 2s ease;
-  z-index: 1;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.2);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  letter-spacing: 0.5px;
+  z-index: 2;
+}
+
+@media (max-width: 768px) {
+  .hero-bg::after {
+    bottom: 40px;
+    font-size: 1rem;
+    padding: 12px 24px;
+    border-radius: 12px;
+  }
 }
 
 .hero-overlay {
@@ -598,16 +606,17 @@ a:hover {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(240, 147, 251, 0.1) 100%);
-  z-index: 2;
+  background: linear-gradient(135deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.1) 100%);
+  z-index: 3;
 }
 
 .hero-content {
   position: relative;
-  z-index: 3;
+  z-index: 4;
   text-align: center;
+  color: var(--text-inverse);
   max-width: 800px;
-  padding: var(--space-8);
+  padding: 0 var(--space-4);
 }
 
 .hero-title {
@@ -1178,26 +1187,17 @@ a:hover {
 
 /* ===== 안전 섹션 ===== */
 .safety {
-  background: var(--bg-secondary);
+  padding: var(--space-20) 0;
+  background: var(--bg-primary);
   position: relative;
-  overflow: hidden;
-}
-
-.safety::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="%23667eea" opacity="0.05"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-  opacity: 0.5;
 }
 
 .safety-grid {
   display: grid;
   gap: var(--space-8);
   list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 @media (min-width: 768px) {
@@ -1207,14 +1207,13 @@ a:hover {
 }
 
 .safety-card {
-  background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
-  backdrop-filter: blur(15px);
-  border: 1px solid rgba(255,255,255,0.4);
-  border-radius: var(--radius-xl);
+  background: var(--bg-secondary);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-2xl);
   padding: var(--space-8);
-  box-shadow: var(--shadow-lg);
-  transition: all var(--transition-base);
   text-align: center;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-lg);
   position: relative;
   overflow: hidden;
 }
@@ -1226,25 +1225,65 @@ a:hover {
   left: 0;
   right: 0;
   height: 4px;
-  background: var(--gradient-accent);
+  background: var(--gradient-primary);
   opacity: 0;
   transition: opacity var(--transition-base);
 }
 
 .safety-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-xl);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: var(--shadow-2xl);
+  border-color: var(--primary-300);
 }
 
 .safety-card:hover::before {
   opacity: 1;
 }
 
-.safety-media img {
-  width: 80px;
-  height: 80px;
-  object-fit: contain;
+.safety-media {
   margin-bottom: var(--space-6);
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (min-width: 768px) {
+  .safety-media {
+    height: 140px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .safety-media {
+    height: 160px;
+  }
+}
+
+.safety-media img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  border-radius: var(--radius-xl);
+  transition: transform var(--transition-base);
+}
+
+@media (min-width: 768px) {
+  .safety-media img {
+    width: 120px;
+    height: 120px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .safety-media img {
+    width: 140px;
+    height: 140px;
+  }
+}
+
+.safety-card:hover .safety-media img {
+  transform: scale(1.1) rotate(5deg);
 }
 
 .safety-copy h3 {
@@ -1257,12 +1296,12 @@ a:hover {
 .safety-copy p {
   color: var(--text-secondary);
   line-height: var(--line-height-relaxed);
-  margin: 0;
 }
 
 /* ===== 어바웃 섹션 ===== */
 .about {
-  background: var(--bg-primary);
+  padding: var(--space-20) 0;
+  background: var(--bg-secondary);
   position: relative;
 }
 
@@ -1279,13 +1318,45 @@ a:hover {
 }
 
 .about-text {
-  order: 2;
+  max-width: 600px;
+}
+
+.about-photo {
+  position: relative;
+  border-radius: var(--radius-2xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-xl);
+  transition: all var(--transition-base);
+  height: 400px;
+}
+
+@media (min-width: 768px) {
+  .about-photo {
+    height: 500px;
+  }
 }
 
 @media (min-width: 1024px) {
-  .about-text {
-    order: 1;
+  .about-photo {
+    height: 600px;
   }
+}
+
+.about-photo:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: var(--shadow-2xl);
+}
+
+.about-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: var(--bg-primary);
+  transition: transform var(--transition-base);
+}
+
+.about-photo:hover img {
+  transform: scale(1.02);
 }
 
 .about-gallery {
@@ -1302,34 +1373,14 @@ a:hover {
   }
 }
 
-.about-photo {
-  margin: 0;
-  border-radius: var(--radius-xl);
-  overflow: hidden;
-  box-shadow: var(--shadow-lg);
-  transition: all var(--transition-base);
+.about-text {
+  order: 2;
 }
 
-.about-photo:hover {
-  transform: scale(1.05);
-  box-shadow: var(--shadow-xl);
-}
-
-.about-photo img {
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
-  transition: transform var(--transition-slow);
-}
-
-@media (min-width: 768px) {
-  .about-photo img {
-    height: 250px;
+@media (min-width: 1024px) {
+  .about-text {
+    order: 1;
   }
-}
-
-.about-photo:hover img {
-  transform: scale(1.1);
 }
 
 .lead-copy {
@@ -1617,10 +1668,9 @@ a:hover {
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(240, 147, 251, 0.05) 100%);
   color: var(--primary-700);
 }
-  width: 100%;
-  height: 280px;
+
+.faq-toggle {
   margin-left: auto;
-  object-position: center;
   transition: transform var(--transition-base);
   color: var(--primary-500);
 }
@@ -2005,14 +2055,6 @@ a:hover {
 *:focus {
   outline: 2px solid var(--primary-500);
   outline-offset: 2px;
-  
-  .about-photo img {
-    height: 320px;
-  }
-  
-  .about-photo:first-child img {
-    height: 240px;
-  }
 }
 
 .btn:focus,
@@ -2190,6 +2232,7 @@ a:hover {
   max-height: 120px;
   width: auto;
   height: auto;
+}
 
 .field {
   flex: 1;
@@ -2378,6 +2421,16 @@ a:hover {
   
   .review-card {
     padding: var(--space-4);
+  }
+}
+
+@media (min-width: 768px) {
+  .about-photo img {
+    height: 320px;
+  }
+  
+  .about-photo:first-child img {
+    height: 240px;
   }
 }
 

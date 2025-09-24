@@ -411,43 +411,52 @@ const backgroundTexts = [
 ];
 
 function changeHeroBackground() {
-    // 이전 이미지의 opacity를 0으로
-    if (heroBgElement.style.backgroundImage) {
-        heroBgElement.style.opacity = '0';
-    }
-
+    if (!heroBgElement) return;
+    
     // 다음 이미지 인덱스로 업데이트
     currentBgIndex = (currentBgIndex + 1) % heroBackgrounds.length;
-
-    // 새로운 이미지를 설정하고 서서히 나타나게 함
+    
+    // 페이드 아웃
+    heroBgElement.style.opacity = '0';
+    
     setTimeout(() => {
+        // 새로운 배경 이미지 설정
         heroBgElement.style.backgroundImage = `url('${heroBackgrounds[currentBgIndex]}')`;
-        heroBgElement.style.opacity = '1';
         
         // 배경 텍스트 업데이트
-        const afterContent = backgroundTexts[currentBgIndex];
-        const style = document.querySelector('#hero-bg-text-style') || document.createElement('style');
-        style.id = 'hero-bg-text-style';
-        style.textContent = `.hero-bg::after { content: '${afterContent}'; }`;
-        if (!document.querySelector('#hero-bg-text-style')) {
-            document.head.appendChild(style);
-        }
-    }, 1000); // CSS transition 시간과 동일하게 설정
+        updateHeroText(backgroundTexts[currentBgIndex]);
+        
+        // 페이드 인
+        heroBgElement.style.opacity = '1';
+    }, 500);
 }
 
-// 초기 배경 이미지 설정
-heroBgElement.style.backgroundImage = `url('${heroBackgrounds[currentBgIndex]}')`;
-heroBgElement.style.opacity = '1';
+function updateHeroText(text) {
+    const style = document.querySelector('#hero-bg-text-style') || document.createElement('style');
+    style.id = 'hero-bg-text-style';
+    style.textContent = `.hero-bg::after { content: '${text}'; }`;
+    if (!document.querySelector('#hero-bg-text-style')) {
+        document.head.appendChild(style);
+    }
+}
 
-// 초기 배경 텍스트 설정
-const initialStyle = document.createElement('style');
-initialStyle.id = 'hero-bg-text-style';
-initialStyle.textContent = `.hero-bg::after { content: '${backgroundTexts[currentBgIndex]}'; }`;
-document.head.appendChild(initialStyle);
+// 초기 설정 및 배경 변경 시작
+function initializeHeroBackground() {
+    if (!heroBgElement) return;
+    
+    // 초기 배경 이미지 설정
+    heroBgElement.style.backgroundImage = `url('${heroBackgrounds[currentBgIndex]}')`;
+    heroBgElement.style.opacity = '1';
+    
+    // 초기 배경 텍스트 설정
+    updateHeroText(backgroundTexts[currentBgIndex]);
+    
+    // 4초마다 배경 변경
+    setInterval(changeHeroBackground, 4000);
+}
 
-// 4초마다 배경 변경 함수 호출
-setInterval(changeHeroBackground, 4000);
-
+// 페이지 로드 시 히어로 배경 초기화
+document.addEventListener('DOMContentLoaded', initializeHeroBackground);
 
 // 애니메이션 초기화
 function initializeAnimations() {
