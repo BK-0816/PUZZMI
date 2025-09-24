@@ -1063,4 +1063,259 @@
       <!-- 사진 갤러리 (스와이프) -->
       <div class="photo-gallery" id="photoGallery">
         <!-- 사진 카운터 -->
-        <div class="photo-counter" id="photoCounter" style="display: none;">1 
+        <div class="photo-counter" id="photoCounter" style="display: none;">1 / 1</div>
+        
+        <!-- 사진 스와이퍼 -->
+        <div class="photo-swiper" id="photoSwiper">
+          <!-- 사진들이 여기에 동적으로 추가됩니다 -->
+        </div>
+        
+        <!-- 네비게이션 버튼 -->
+        <button class="photo-nav photo-nav-prev" id="photoPrev" style="display: none;">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="photo-nav photo-nav-next" id="photoNext" style="display: none;">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+        
+        <!-- 인디케이터 -->
+        <div class="photo-indicators" id="photoIndicators">
+          <!-- 인디케이터들이 여기에 동적으로 추가됩니다 -->
+        </div>
+      </div>
+
+      <!-- 액션 버튼 (가로 배치) -->
+      <div class="action-buttons">
+        <a id="bookingBtn" class="action-btn btn-primary">
+          <i class="fas fa-calendar-check"></i>
+          예약하기
+        </a>
+        <button id="favoriteBtn" class="action-btn btn-secondary">
+          <i class="fas fa-heart"></i>
+          찜하기
+        </button>
+      </div>
+    </section>
+
+    <!-- 소개 섹션 -->
+    <section class="info-section">
+      <h3 class="info-title">
+        <i class="fas fa-user"></i>
+        소개
+      </h3>
+      <div id="profileBio" class="info-content">
+        소개를 불러오는 중...
+      </div>
+    </section>
+
+    <!-- 전문 분야 섹션 -->
+    <section class="info-section">
+      <h3 class="info-title">
+        <i class="fas fa-tags"></i>
+        전문 분야
+      </h3>
+      <div class="tags-container" id="profileTags">
+        <!-- 태그들이 여기에 동적으로 추가됩니다 -->
+      </div>
+    </section>
+
+    <!-- 활동 지역 섹션 -->
+    <section class="info-section">
+      <h3 class="info-title">
+        <i class="fas fa-map-marker-alt"></i>
+        활동 지역
+      </h3>
+      <div class="tags-container" id="profileAreas">
+        <!-- 지역들이 여기에 동적으로 추가됩니다 -->
+      </div>
+    </section>
+
+    <!-- 언어 섹션 -->
+    <section class="info-section">
+      <h3 class="info-title">
+        <i class="fas fa-globe"></i>
+        사용 가능한 언어
+      </h3>
+      <div class="tags-container" id="profileLanguages">
+        <!-- 언어들이 여기에 동적으로 추가됩니다 -->
+      </div>
+    </section>
+
+    <!-- 리뷰 섹션 -->
+    <section class="reviews-section">
+      <h3 class="reviews-title">
+        <i class="fas fa-star"></i>
+        리뷰
+      </h3>
+      
+      <!-- 리뷰 통계 -->
+      <div id="reviewsStats" class="reviews-stats" style="display: none;">
+        <span class="reviews-count">총 0개 리뷰</span>
+        <div class="reviews-average">
+          <i class="fas fa-star"></i>
+          <span id="averageRating">0.0</span>
+        </div>
+      </div>
+
+      <!-- 리뷰 작성 폼 (조건부 표시) -->
+      <div id="reviewForm" class="review-form" style="display: none;">
+        <h4 class="form-title">
+          <i class="fas fa-edit"></i>
+          리뷰 작성하기
+        </h4>
+        <form id="reviewFormElement">
+          <div class="rating-selector">
+            <label class="rating-label">별점을 선택해주세요</label>
+            <div class="rating-buttons">
+              <button type="button" class="rating-btn" data-rating="5">⭐ 5</button>
+              <button type="button" class="rating-btn" data-rating="4">⭐ 4</button>
+              <button type="button" class="rating-btn" data-rating="3">⭐ 3</button>
+              <button type="button" class="rating-btn" data-rating="2">⭐ 2</button>
+              <button type="button" class="rating-btn" data-rating="1">⭐ 1</button>
+            </div>
+            <input type="hidden" id="selectedRating" value="">
+          </div>
+          
+          <textarea 
+            id="reviewText" 
+            class="review-textarea" 
+            placeholder="메이트와 함께한 경험을 간단히 공유해주세요..."
+            required
+          ></textarea>
+          
+          <button type="submit" class="action-btn btn-primary">
+            <i class="fas fa-star"></i>
+            리뷰 등록하기
+          </button>
+          
+          <div id="reviewResult"></div>
+        </form>
+      </div>
+
+      <!-- 리뷰 목록 -->
+      <div class="reviews-container" id="reviewsContainer">
+        <div id="reviewsList">
+          <div class="empty-state">리뷰를 불러오는 중...</div>
+        </div>
+      </div>
+      
+      <!-- 리뷰 더보기/접기 토글 -->
+      <div class="reviews-toggle" id="reviewsToggle" style="display: none;">
+        <button class="toggle-btn" id="toggleReviewsBtn">
+          <i class="fas fa-chevron-down"></i>
+          <span>더 보기</span>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { supabase } from "./nav.js";
+
+    const params = new URLSearchParams(location.search);
+    const mateId = params.get('mate_id');
+    
+    if (!mateId) {
+      alert('메이트 ID가 없습니다.');
+      history.back();
+      throw new Error('mate_id required');
+    }
+
+    // DOM 요소들
+    const profileName = document.getElementById('profileName');
+    const profileMeta = document.getElementById('profileMeta');
+    const profileRating = document.getElementById('profileRating');
+    const ratingValue = document.getElementById('ratingValue');
+    const photoGallery = document.getElementById('photoGallery');
+    const photoSwiper = document.getElementById('photoSwiper');
+    const photoCounter = document.getElementById('photoCounter');
+    const photoPrev = document.getElementById('photoPrev');
+    const photoNext = document.getElementById('photoNext');
+    const photoIndicators = document.getElementById('photoIndicators');
+    const profileBio = document.getElementById('profileBio');
+    const profileTags = document.getElementById('profileTags');
+    const profileAreas = document.getElementById('profileAreas');
+    const profileLanguages = document.getElementById('profileLanguages');
+    const bookingBtn = document.getElementById('bookingBtn');
+    const favoriteBtn = document.getElementById('favoriteBtn');
+    const reviewForm = document.getElementById('reviewForm');
+    const reviewsList = document.getElementById('reviewsList');
+
+    // 사진 갤러리 상태
+    let currentPhotoIndex = 0;
+    let allPhotos = [];
+    let startX = 0;
+    let currentX = 0;
+    let isDragging = false;
+
+    // 현재 로그인한 사용자가 이 메이트 본인인지 확인
+    const { data: { user } } = await supabase.auth.getUser();
+    const isOwnProfile = user && user.id === mateId;
+
+    // 스토리지 키를 URL로 변환
+    function keyToUrl(key) {
+      if (!key) return 'https://picsum.photos/seed/puzzmi/400/300';
+      if (/^https?:\/\//i.test(key)) return key;
+      const pure = key.startsWith('mates/') ? key.replace(/^mates\//, '') : key;
+      return supabase.storage.from('mates').getPublicUrl(pure).data.publicUrl;
+    }
+
+    // 이메일 마스킹 함수
+    function maskEmail(email) {
+      if (!email || typeof email !== 'string') return '익명';
+      
+      const atIndex = email.indexOf('@');
+      if (atIndex === -1) return email;
+      
+      const localPart = email.substring(0, atIndex);
+      const domain = email.substring(atIndex);
+      
+      if (localPart.length <= 2) {
+        return localPart[0] + '*'.repeat(localPart.length - 1) + domain;
+      } else if (localPart.length <= 4) {
+        return localPart[0] + '*'.repeat(localPart.length - 2) + localPart[localPart.length - 1] + domain;
+      } else {
+        const start = localPart.substring(0, 2);
+        const end = localPart.substring(localPart.length - 2);
+        const middle = '*'.repeat(localPart.length - 4);
+        return start + middle + end + domain;
+      }
+    }
+
+    // 별점 표시 함수
+    function renderStars(rating) {
+      const fullStars = Math.floor(rating);
+      const hasHalfStar = rating % 1 >= 0.5;
+      let starsHtml = '';
+      
+      for (let i = 0; i < fullStars; i++) {
+        starsHtml += '⭐';
+      }
+      
+      if (hasHalfStar) {
+        starsHtml += '⭐';
+      }
+      
+      return starsHtml;
+    }
+
+    // 사진 갤러리 업데이트
+    function updatePhotoGallery() {
+      if (!allPhotos.length) {
+        photoSwiper.innerHTML = '<div class="no-photos">등록된 사진이 없습니다</div>';
+        photoCounter.style.display = 'none';
+        photoPrev.style.display = 'none';
+        photoNext.style.display = 'none';
+        photoIndicators.innerHTML = '';
+        return;
+      }
+
+      // 사진 슬라이드 생성
+      photoSwiper.innerHTML = allPhotos.map((photo, index) => 
+        `<div class="photo-slide">
+          <img src="${keyToUrl(photo)}" alt="메이트 사진 ${index + 1}" loading="lazy">
+        </div>`
+      ).join('');
+
+      // 카운터 업데이트
+      if (allPhotos.length > 
