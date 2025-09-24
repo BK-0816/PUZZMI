@@ -1006,8 +1006,8 @@
       const email = (row.user_email || '').toLowerCase();
       
       return title.includes(searchTerm) || 
-             content.includes(searchTerm) || 
-             email.includes(searchTerm);
+            content.includes(searchTerm) || 
+            email.includes(searchTerm);
     });
     
     // 상태 필터링
@@ -1049,7 +1049,7 @@
     }
     
     if (!filteredData || filteredData.length === 0) {
-      list.innerHTML = `<div class="muted">문의 내역이 없습니다.<br>궁금한 점이 있으시면 언제든 문의해주세요!</div>`;
+      list.innerHTML = `<div class="muted">お問い合わせの履歴がありません。<br>ご不明な点がございましたら、いつでもお問い合わせください！</div>`;
       return;
     }
 
