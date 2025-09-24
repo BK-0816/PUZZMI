@@ -786,12 +786,6 @@
           </div>
         </div>
         
-        <div class="form-row single">
-          <div class="form-field">
-            <label class="form-label" for="occupation">직업</label>
-            <input class="form-input" type="text" id="occupation" placeholder="대학생, 회사원, 프리랜서 등"/>
-          </div>
-        </div>
         
         <div class="form-row single">
           <div class="form-field">
@@ -889,8 +883,8 @@
         </div>
         
         <div class="action-group">
-          <button class="btn btn-secondary" type="button" onclick="alert('이메일 변경은 고객센터에 문의해주세요.')">
-            📧 이메일 변경 문의
+          <button class="btn btn-secondary" type="button" onclick="alert('メールの変更は、カスタマーサポートにお問い合わせください。')">
+            📧 Eメールの変更に関するお問い合わせ
           </button>
         </div>
       </form>
@@ -899,17 +893,17 @@
       <form id="passwordForm" class="form-grid" style="margin-top: 32px;">
         <div class="form-row">
           <div class="form-field">
-            <label class="form-label" for="newPassword">새 비밀번호</label>
-            <input class="form-input" type="password" id="newPassword" minlength="8" placeholder="8자 이상 입력"/>
+            <label class="form-label" for="newPassword">新しいパスワード</label>
+            <input class="form-input" type="password" id="newPassword" minlength="8" placeholder="8文字以上入力"/>
           </div>
           <div class="form-field">
-            <label class="form-label" for="confirmPassword">비밀번호 확인</label>
-            <input class="form-input" type="password" id="confirmPassword" minlength="8" placeholder="비밀번호 재입력"/>
+            <label class="form-label" for="confirmPassword">パスワード確認</label>
+            <input class="form-input" type="password" id="confirmPassword" minlength="8" placeholder="パスワード再入力"/>
           </div>
         </div>
         
         <div class="action-group">
-          <button class="btn btn-primary" type="submit">🔒 비밀번호 변경</button>
+          <button class="btn btn-primary" type="submit">🔒 パスワード変更</button>
           <div id="passwordResult"></div>
         </div>
       </form>
@@ -917,14 +911,14 @@
 
     <!-- 계정 삭제 섹션 -->
     <section class="section-card">
-      <h3 class="section-title">⚠️ 위험 구역</h3>
+      <h3 class="section-title">⚠️ 会員脱退</h3>
       <div class="help-text" style="margin-bottom: 20px;">
-        계정을 삭제하면 모든 데이터가 영구적으로 삭제되며 복구할 수 없습니다.
+        アカウントを削除すると、すべてのデータが永久に削除され、回復できません。
       </div>
       
       <div class="action-group">
         <button class="btn btn-danger" type="button" onclick="confirmAccountDeletion()">
-          🗑️ 계정 삭제
+          🗑️ アカウント削除
         </button>
       </div>
     </section>
@@ -1002,18 +996,18 @@
           statusEl.innerHTML = `
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
               <i class="fas fa-check-circle" style="color: #28a745;"></i>
-              <strong>LINE 계정이 연동되어 있습니다</strong>
+              <strong>LINEアカウントが連動しています</strong>
             </div>
             <div style="font-size: 0.9rem;">
-              연동된 계정: ${lineAccount.line_display_name || '사용자'}<br>
-              연동일: ${lineAccount.connected_at ? new Date(lineAccount.connected_at).toLocaleDateString('ko-KR') : '-'}
+              連動したアカウント: ${lineAccount.line_display_name || '사용자'}<br>
+              連動日: ${lineAccount.connected_at ? new Date(lineAccount.connected_at).toLocaleDateString('ko-KR') : '-'}
             </div>
           `;
           
           actionsEl.innerHTML = `
             <button class="btn btn-danger" id="disconnectLineBtn">
               <i class="fab fa-line"></i>
-              LINE 연동 해제
+              LINE連動解除
             </button>
           `;
           
