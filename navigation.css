@@ -427,114 +427,108 @@
 
 /* ===== 모바일 메뉴 오버레이 ===== */
 .mobile-menu {
-  position: fixed;
-  top: 0;
+  position: absolute;
+  top: 100%;
   left: 0;
   right: 0;
-  bottom: 0;
-  background: rgba(0,0,0,0.7);
-  backdrop-filter: blur(8px);
+  background: rgba(255,255,255,0.98) !important;
+  backdrop-filter: blur(25px);
+  border: 1px solid rgba(255,255,255,0.4);
+  border-top: none;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
   z-index: 9999;
-  opacity: 0;
-  visibility: hidden;
-  transition: all var(--transition-base);
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, box-shadow 0.3s ease;
 }
 
 .mobile-menu.active {
-  opacity: 1;
-  visibility: visible;
+  max-height: 80vh;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.2);
 }
 
 .mobile-menu-content {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 90%;
-  max-width: 400px;
-  height: 100%;
+  position: relative;
+  width: 100%;
   background: rgba(255,255,255,0.98) !important;
-  backdrop-filter: blur(25px);
-  border-left: 1px solid rgba(255,255,255,0.4);
-  box-shadow: 0 0 50px rgba(0,0,0,0.3);
-  transform: translateX(100%);
-  transition: transform var(--transition-base);
-  overflow-y: auto;
-}
-
-.mobile-menu.active .mobile-menu-content {
-  transform: translateX(0);
+  padding: var(--space-6) var(--space-4);
 }
 
 .mobile-menu-header {
-  padding: var(--space-8);
-  border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+  padding: var(--space-4) 0 var(--space-6) 0;
+  border-bottom: 2px solid rgba(102, 126, 234, 0.15);
   display: flex;
   align-items: center;
   justify-content: space-between;
   background: rgba(255,255,255,0.98) !important;
+  margin-bottom: var(--space-6);
 }
 
 .mobile-menu-close {
-  width: 40px;
-  height: 40px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  border-radius: var(--radius-lg);
-  transition: all var(--transition-fast);
-  color: var(--text-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--font-size-lg);
-}
-
-.mobile-menu-close:hover {
-  background: linear-gradient(135deg, #fadbd8 0%, #f1948a 100%);
-  color: #922b21;
-  transform: scale(1.1);
+  display: none;
 }
 
 .mobile-menu-nav {
-  padding: var(--space-8);
+  padding: 0;
 }
 
 .mobile-menu-section {
-  margin-bottom: var(--space-10);
+  margin-bottom: var(--space-8);
+  padding: var(--space-6);
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(240, 147, 251, 0.03) 100%);
+  border: 2px solid rgba(102, 126, 234, 0.1);
+  border-radius: var(--radius-xl);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
 }
 
 .mobile-menu-section-title {
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-lg);
   font-weight: var(--font-weight-bold);
-  color: var(--text-secondary);
+  color: var(--text-primary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: var(--space-6);
-  padding-left: var(--space-3);
+  padding: var(--space-3) var(--space-4);
   background: var(--gradient-primary);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+  padding-bottom: var(--space-3);
+  position: relative;
+}
+
+.mobile-menu-section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 60px;
+  height: 2px;
+  background: var(--gradient-primary);
+  border-radius: 1px;
 }
 
 .mobile-menu-link {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-5);
+  padding: var(--space-4) var(--space-5);
   font-weight: var(--font-weight-medium);
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-lg);
   color: var(--text-primary);
   text-decoration: none;
   border-radius: var(--radius-lg);
   transition: all var(--transition-fast);
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--space-4);
   position: relative;
   overflow: hidden;
   background: rgba(255,255,255,0.9) !important;
-  border: 1px solid rgba(255,255,255,0.4);
+  border: 2px solid rgba(255,255,255,0.6);
   backdrop-filter: blur(6px);
-  min-height: 56px;
+  min-height: 64px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
 .mobile-menu-link::before {
@@ -551,20 +545,23 @@
 .mobile-menu-link:hover {
   background: rgba(255,255,255,1) !important;
   color: var(--primary-600);
-  padding-left: var(--space-6);
+  padding-left: var(--space-7);
   border-color: rgba(102, 126, 234, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
 }
 
 .mobile-menu-link:hover::before {
-  width: 3px;
+  width: 4px;
 }
 
 .mobile-menu-link i {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   text-align: center;
   flex-shrink: 0;
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-xl);
+  color: var(--primary-600);
 }
 
 /* ===== 사용자 정보 표시 ===== */
