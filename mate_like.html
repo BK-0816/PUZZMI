@@ -200,51 +200,58 @@
       z-index: 10;
     }
     
-    /* 프로필 정보 오버레이 */
-    .profile-overlay {
-      position: absolute;
-      top: 16px;
-      left: 16px;
-      background: rgba(255,255,255,0.95);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255,255,255,0.4);
-      border-radius: 20px;
-      padding: 20px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-      z-index: 10;
-      max-width: calc(100% - 120px);
+    /* 프로필 헤더 (사진 위 별도 영역) */
+    .profile-header {
+      padding: 24px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
+      backdrop-filter: blur(15px);
+      border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+    }
+    
+    .profile-info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    
+    .profile-basic {
+      flex: 1;
+      min-width: 200px;
     }
     
     .profile-name {
-      font-size: 1.5rem;
+      font-size: 1.8rem;
       font-weight: 800;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      margin: 0 0 8px 0;
+      margin: 0 0 6px 0;
       letter-spacing: -0.01em;
     }
     
     .profile-meta {
       color: var(--text-secondary);
-      font-size: 0.95rem;
+      font-size: 1.1rem;
       font-weight: 500;
-      margin-bottom: 12px;
+      margin: 0;
       line-height: 1.4;
     }
     
     .profile-rating {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
-      padding: 6px 12px;
+      padding: 10px 16px;
       border-radius: 16px;
       font-weight: 700;
-      font-size: 0.85rem;
+      font-size: 1rem;
       box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
+      flex-shrink: 0;
     }
     
     /* 액션 버튼 (가로 배치) */
@@ -654,19 +661,28 @@
         margin: 16px auto;
       }
       
-      .profile-overlay {
-        top: 12px;
-        left: 12px;
-        padding: 16px;
-        max-width: calc(100% - 100px);
+      .profile-header {
+        padding: 20px;
+      }
+      
+      .profile-info-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
       }
       
       .profile-name {
-        font-size: 1.3rem;
+        font-size: 1.6rem;
       }
       
       .profile-meta {
+        font-size: 1rem;
+      }
+      
+      .profile-rating {
+        padding: 8px 14px;
         font-size: 0.9rem;
+        align-self: flex-start;
       }
       
       .photo-nav {
@@ -726,24 +742,21 @@
         margin: 12px auto;
       }
       
-      .profile-overlay {
-        top: 8px;
-        left: 8px;
-        padding: 12px;
-        max-width: calc(100% - 80px);
+      .profile-header {
+        padding: 16px;
       }
       
       .profile-name {
-        font-size: 1.1rem;
+        font-size: 1.4rem;
       }
       
       .profile-meta {
-        font-size: 0.85rem;
+        font-size: 0.95rem;
       }
       
       .profile-rating {
-        font-size: 0.8rem;
-        padding: 4px 8px;
+        font-size: 0.85rem;
+        padding: 6px 12px;
       }
       
       .action-buttons {
@@ -804,18 +817,22 @@
 
     <!-- 메인 프로필 카드 -->
     <section class="profile-card">
-      <!-- 사진 갤러리 (스와이프) -->
-      <div class="photo-gallery" id="photoGallery">
-        <!-- 프로필 정보 오버레이 (좌측 상단) -->
-        <div class="profile-overlay">
-          <h1 id="profileName" class="profile-name">메이트</h1>
-          <div id="profileMeta" class="profile-meta"></div>
+      <!-- 프로필 헤더 (사진 위 별도 영역) -->
+      <div class="profile-header">
+        <div class="profile-info-row">
+          <div class="profile-basic">
+            <h1 id="profileName" class="profile-name">메이트</h1>
+            <div id="profileMeta" class="profile-meta"></div>
+          </div>
           <div id="profileRating" class="profile-rating" style="display: none;">
             <i class="fas fa-star"></i>
             <span id="ratingValue">N/A</span>
           </div>
         </div>
-        
+      </div>
+      
+      <!-- 사진 갤러리 (스와이프) -->
+      <div class="photo-gallery" id="photoGallery">
         <!-- 사진 카운터 -->
         <div class="photo-counter" id="photoCounter" style="display: none;">1 / 1</div>
         
