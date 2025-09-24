@@ -110,7 +110,6 @@ function toggleDropdown(dropdownElement) {
 function toggleMobileMenu() {
   const mobileMenu = document.querySelector('.mobile-menu');
   const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-  const navContainer = document.querySelector('.nav-container');
   
   if (mobileMenu && mobileMenuBtn) {
     const isActive = mobileMenu.classList.contains('active');
@@ -119,10 +118,6 @@ function toggleMobileMenu() {
       mobileMenu.classList.remove('active');
       mobileMenuBtn.classList.remove('active');
       document.body.style.overflow = '';
-      // 네비게이션 요소들 다시 보이기
-      if (navContainer) {
-        navContainer.style.pointerEvents = '';
-      }
     } else {
       mobileMenu.classList.add('active');
       mobileMenuBtn.classList.add('active');
@@ -139,16 +134,11 @@ function toggleMobileMenu() {
 function closeMobileMenu() {
   const mobileMenu = document.querySelector('.mobile-menu');
   const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-  const navContainer = document.querySelector('.nav-container');
   
   if (mobileMenu && mobileMenuBtn) {
     mobileMenu.classList.remove('active');
     mobileMenuBtn.classList.remove('active');
     document.body.style.overflow = '';
-    // 네비게이션 요소들 다시 보이기
-    if (navContainer) {
-      navContainer.style.pointerEvents = '';
-    }
   }
 }
 
