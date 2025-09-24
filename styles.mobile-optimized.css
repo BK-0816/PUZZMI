@@ -4047,3 +4047,99 @@ var(--bg-cream);
   .nav-brand { font-size: 1.2rem; }
   .logo { height: 48px; }
 }
+
+
+
+/* ============================================================
+   Mobile image/card/navbar refinements
+   Generated: 2025-09-24 13:28:12
+   Append-only: place after previous overrides
+   ============================================================ */
+
+/* ---------- NAVBAR (mobile) ---------- */
+@media (max-width: 1024px) {
+  .header { position: sticky; top: 0; background: rgba(255,255,255,.98); }
+  .nav { padding: 8px 0; }
+  .nav .container { padding: 0 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .logo { height: 52px; width: auto; max-height: 52px; }
+  .nav-brand { font-size: 1.25rem; font-weight: 800; }
+  .nav-actions { display: flex; align-items: center; gap: 8px; }
+  .language-selector { padding: 0; background: transparent; }
+  .lang-btn { padding: 6px 8px; font-size: .95rem; }
+  .login-btn { padding: 8px 12px; border-radius: 999px; font-size: .95rem; }
+  .mobile-menu-btn { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; font-size: 22px; }
+  /* off-canvas style sheet menu */
+  .nav-menu {
+    position: fixed;
+    top: 60px; left: 0; right: 0;
+    background: #fff;
+    display: flex; flex-direction: column; gap: 6px;
+    padding: 8px 16px 16px;
+    max-height: calc(100dvh - 60px);
+    overflow-y: auto;
+    border-top: 1px solid var(--border-color);
+    box-shadow: 0 12px 24px rgba(0,0,0,.08);
+    transform: translateY(-8px);
+    opacity: 0; visibility: hidden;
+  }
+  .nav-menu.active { transform: translateY(0); opacity: 1; visibility: visible; }
+  .nav-menu li { margin: 0; }
+  .nav-menu a { display: block; padding: 14px 6px; font-size: 1.02rem; border-bottom: 1px solid var(--bg-tertiary); }
+  .nav-menu a:last-child { border-bottom: 0; }
+  .nav-menu a::after { content: none; }
+  body.no-scroll { overflow: hidden; touch-action: none; }
+}
+
+@media (max-width: 480px) {
+  .logo { height: 46px; max-height: 46px; }
+  .nav-brand { font-size: 1.15rem; }
+  .nav-menu { top: 56px; max-height: calc(100dvh - 56px); }
+}
+
+/* ---------- CARDS (mobile sizing) ---------- */
+@media (max-width: 768px) {
+  .friends-grid, .reviews-grid { padding: 0 8px; gap: 16px; }
+  .friend-card, .review-card { max-width: 420px; width: 100%; margin: 0 auto; border-radius: 18px; box-shadow: var(--shadow-md); }
+  .friend-info { padding: 18px 16px; }
+  .friend-name { font-size: 1.22rem; }
+  .friend-age, .friend-specialties { font-size: .95rem; }
+  .friend-description { font-size: .98rem; }
+  .friend-price { margin-top: 6px; margin-bottom: 12px; }
+  .price { font-size: 1.5rem; }
+  .step, .feature { padding: 20px 16px; border-radius: 16px; }
+}
+
+@media (max-width: 480px) {
+  .friend-card, .review-card { border-radius: 16px; }
+  .friend-info { padding: 16px 14px; }
+  .friend-name { font-size: 1.18rem; }
+}
+
+/* ---------- IMAGES (mobile aspect & fit) ---------- */
+@media (max-width: 768px) {
+  /* Friend cards: portrait ratio looks better on mobile */
+  .friend-image { height: auto; }
+  .friend-image img { width: 100%; height: auto; aspect-ratio: 3 / 4; object-fit: cover; }
+  /* About gallery: keep 4:3, ensure no fixed heights leak in */
+  .about-photo img { height: auto !important; aspect-ratio: 4 / 3; object-fit: cover; }
+  /* Safety visuals */
+  .safety-media { width: 100%; max-width: 360px; margin: 0 auto; }
+  .safety-media img { width: 100%; height: auto; aspect-ratio: 1 / 1; object-fit: cover; }
+}
+
+@media (max-width: 480px) {
+  .safety-media { max-width: 300px; }
+}
+
+/* ---------- BUTTONS & TAPS ---------- */
+@media (max-width: 768px) {
+  .btn, .login-btn { min-height: 44px; }
+  .filter-btn { padding: 10px 14px; font-size: .95rem; border-radius: 18px; }
+}
+
+/* ---------- SPACING UTILS FOR TIGHT SCREENS ---------- */
+@media (max-width: 360px) {
+  .container { padding: 0 12px; }
+  .hero-buttons .btn { padding: 12px 14px; }
+  .friend-info { padding: 14px; }
+}
