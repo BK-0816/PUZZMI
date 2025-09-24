@@ -372,11 +372,12 @@ function initializeSwipeCards() {
             currentX = e.touches[0].clientX;
             const diffX = currentX - startX;
             const currentSlide = getCurrentSlide(container.id);
-            const slideWidth = container.offsetWidth;
             
             // 현재 슬라이드 위치에서 드래그 거리만큼 이동
-            const translateX = -(currentSlide * slideWidth) + diffX;
-            wrapper.style.transform = `translateX(${translateX}px)`;
+            const currentTranslate = -(currentSlide * 100);
+            const dragPercent = (diffX / container.offsetWidth) * 100;
+            const translateX = currentTranslate + dragPercent;
+            wrapper.style.transform = `translateX(${translateX}%)`;
         }, { passive: true });
         
         // 터치 종료
@@ -421,10 +422,11 @@ function initializeSwipeCards() {
             currentX = e.clientX;
             const diffX = currentX - startX;
             const currentSlide = getCurrentSlide(container.id);
-            const slideWidth = container.offsetWidth;
             
-            const translateX = -(currentSlide * slideWidth) + diffX;
-            wrapper.style.transform = `translateX(${translateX}px)`;
+            const currentTranslate = -(currentSlide * 100);
+            const dragPercent = (diffX / container.offsetWidth) * 100;
+            const translateX = currentTranslate + dragPercent;
+            wrapper.style.transform = `translateX(${translateX}%)`;
         });
         
         container.addEventListener('mouseup', (e) => {
@@ -458,6 +460,10 @@ function initializeSwipeCards() {
                 goToSlide(container.id, currentSlide);
             }
         });
+        
+        // 초기 슬라이드 설정
+        container.dataset.currentSlide = '0';
+        goToSlide(container.id, 0);
     });
     
     // 자동 슬라이드 (선택사항)
