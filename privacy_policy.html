@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PUZZMI プライバシーポリシー</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="pages.css"/>
+  <link rel="stylesheet" href="pages-theme.css"/>
+  <link rel="stylesheet" href="nav.css"/>
+  <script type="module" src="nav.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <style>
+    body.bg-cream { 
+      background: var(--bg-cream); 
+      background-repeat: no-repeat; 
+      background-size: cover; 
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+    
+    /* 배경 장식 요소 */
+    .decorative-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    
+    .decorative-element {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.2;
+      animation: float 12s ease-in-out infinite;
+    }
+    
+    .decorative-element:nth-child(1) {
+      width: 200px;
+      height: 200px;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      top: 10%;
+      left: 5%;
+      animation-delay: 0s;
+    }
+    
+    .decorative-element:nth-child(2) {
+      width: 150px;
+      height: 150px;
+      background: linear-gradient(45deg, #f093fb, #f5576c);
+      top: 60%;
+      right: 10%;
+      animation-delay: 4s;
+    }
+    
+    .decorative-element:nth-child(3) {
+      width: 120px;
+      height: 120px;
+      background: linear-gradient(45deg, #4facfe, #00f2fe);
+      bottom: 20%;
+      left: 15%;
+      animation-delay: 8s;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      33% { transform: translateY(-20px) rotate(120deg); }
+      66% { transform: translateY(10px) rotate(240deg); }
+    }
+    
+    /* 메인 컨테이너 */
+    .privacy-wrap { 
+      max-width: 900px; 
+      margin: 40px auto; 
+      padding: 0 20px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    /* 페이지 헤더 */
+    .page-header {
+      background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
+      backdrop-filter: blur(25px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 28px;
+      padding: 50px;
+      margin-bottom: 40px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.04);
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+    }
+    
+    .page-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 20%, #f093fb 40%, #f5576c 60%, #4facfe 80%, #00f2fe 100%);
+      animation: shimmer 4s ease-in-out infinite;
+    }
+    
+    @keyframes shimmer {
+      0%, 100% { opacity: 1; transform: translateX(0); }
+      50% { opacity: 0.8; transform: translateX(8px); }
+    }
+    
+    .page-title {
+      font-size: 3rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 20px 0;
+      letter-spacing: -0.03em;
+      position: relative;
+    }
+    
+    .page-title::after {
+      content: '';
+      position: absolute;
+      bottom: -16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 5px;
+      background: linear-gradient(90deg, #667eea 0%, #f093fb 50%, #4facfe 100%);
+      border-radius: 3px;
+    }
+    
+    .effective-date {
+      color: var(--text-secondary);
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 0;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(240, 147, 251, 0.05) 100%);
+      padding: 12px 24px;
+      border-radius: 20px;
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      display: inline-block;
+    }
+    
+    /* 뒤로가기 버튼 */
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 16px;
+      color: var(--text-primary);
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      margin-bottom: 32px;
+    }
+    
+    .back-btn:hover {
+      background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 100%);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+      border-color: rgba(102, 126, 234, 0.3);
+    }
+    
+    /* 콘텐츠 카드 */
+    .content-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 24px;
+      padding: 50px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.04);
+      position: relative;
+      overflow: hidden;
+      line-height: 1.8;
+      font-size: 1.05rem;
+    }
+    
+    .content-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 33%, #f093fb 66%, #f5576c 100%);
+      opacity: 0.8;
+    }
+    
+    /* 섹션 제목 */
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 40px 0 20px 0;
+      padding-bottom: 12px;
+      border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+      position: relative;
+    }
+    
+    .section-title::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: -2px;
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    /* 목록 스타일 */
+    .content-card ol,
+    .content-card ul {
+      margin: 20px 0;
+      padding-left: 24px;
+    }
+    
+    .content-card li {
+      margin-bottom: 12px;
+      color: var(--text-primary);
+    }
+    
+    .content-card li strong {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 700;
+    }
+    
+    /* 구분선 */
+    .divider {
+      margin: 40px 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent 0%, rgba(102, 126, 234, 0.3) 50%, transparent 100%);
+      border: none;
+    }
+    
+    /* 강조 박스 */
+    .highlight-box {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(240, 147, 251, 0.05) 100%);
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 16px;
+      padding: 24px;
+      margin: 24px 0;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.1);
+    }
+    
+    .highlight-box h4 {
+      color: #667eea;
+      font-weight: 800;
+      margin: 0 0 12px 0;
+      font-size: 1.2rem;
+    }
+    
+    /* 연락처 정보 */
+    .contact-info {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(240, 147, 251, 0.05) 100%);
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 20px;
+      padding: 32px;
+      margin: 32px 0;
+      text-align: center;
+    }
+    
+    .contact-info h4 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 16px 0;
+    }
+    
+    .contact-details {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px 20px;
+      align-items: center;
+      max-width: 400px;
+      margin: 0 auto;
+      text-align: left;
+    }
+    
+    .contact-label {
+      font-weight: 700;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+    
+    .contact-value {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+    
+    /* 반응형 디자인 */
+    @media (max-width: 768px) {
+      .privacy-wrap {
+        margin: 20px auto;
+        padding: 0 16px;
+      }
+      
+      .page-header {
+        padding: 32px 24px;
+        border-radius: 20px;
+      }
+      
+      .page-title {
+        font-size: 2.2rem;
+      }
+      
+      .content-card {
+        padding: 32px 24px;
+        border-radius: 20px;
+        font-size: 1rem;
+      }
+      
+      .section-title {
+        font-size: 1.3rem;
+      }
+      
+      .contact-details {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body class="bg-cream">
+  <!-- 배경 장식 요소 -->
+  <div class="decorative-bg">
+    <div class="decorative-element"></div>
+    <div class="decorative-element"></div>
+    <div class="decorative-element"></div>
+  </div>
+
+  <div id="app-nav"></div>
+  
+  <main class="privacy-wrap">
+    <!-- 뒤로가기 버튼 -->
+    <a href="index.html" class="back-btn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="m12 19-7-7 7-7"/>
+        <path d="m19 12H5"/>
+      </svg>
+      ホームに戻る
+    </a>
+
+    <!-- 페이지 헤더 -->
+    <section class="page-header">
+      <h1 class="page-title">🔒 プライバシーポリシー</h1>
+      <div class="effective-date">施行日：2025年9月20日</div>
+    </section>
+
+    <!-- 메인 콘텐츠 -->
+    <section class="content-card">
+      <p style="font-size: 1.1rem; color: var(--text-primary); margin-bottom: 32px; text-align: center; line-height: 1.7;">
+        PUZZMI（以下「当社」）は、「個人情報保護法」など関連法令を遵守し、利用者の個人情報を安全に保護するため、次のとおりプライバシーポリシーを定めます。
+      </p>
+
+      <hr class="divider">
+
+      <h2 class="section-title">第1条（個人情報の利用目的）</h2>
+      <p>当社は収集した個人情報を以下の目的の範囲内で利用します。</p>
+      <ol>
+        <li><strong>会員登録およびアカウント管理：</strong>会員識別・認証、不正利用防止、通知・苦情処理</li>
+        <li><strong>LINEアカウント連携：</strong>会員登録時のLINEアカウント連携、ログイン/通知/決済案内、顧客サポート</li>
+        <li><strong>サービス提供：</strong>メイト予約・マッチング、同行実施、決済・精算、返金・取消処理</li>
+        <li><strong>本人確認（KYC）：</strong>予約実行時、決済直前にLINEを通じてパスポート認証を行い、本人確認、未成年利用防止、国籍確認、性別確認（女性メイトサービス運営目的）</li>
+        <li><strong>安全な運営および紛争対応：</strong>サービス品質改善、苦情処理、法令・約款違反対応</li>
+      </ol>
+
+      <hr class="divider">
+
+      <h2 class="section-title">第2条（収集する個人情報の項目）</h2>
+      
+      <h3 style="color: #667eea; font-weight: 700; margin: 24px 0 16px 0;">1. 会員登録時</h3>
+      <ul>
+        <li><strong>必須：</strong>氏名、メールアドレス、携帯電話番号、パスワード、生年月日、性別、国籍、LINEアカウント情報（ユーザーID、プロフィール名/画像等）</li>
+        <li><strong>任意：</strong>プロフィール写真、関心事項、SNSアカウント</li>
+      </ul>
+
+      <h3 style="color: #667eea; font-weight: 700; margin: 24px 0 16px 0;">2. 決済および返金処理時</h3>
+      <ul>
+        <li>決済手段情報（カード/口座等）、決済・返金履歴</li>
+      </ul>
+
+      <h3 style="color: #667eea; font-weight: 700; margin: 24px 0 16px 0;">3. メイト応募および活動時</h3>
+      <ul>
+        <li>氏名、連絡先、年齢、性別、住民登録番号（本人認証）、口座番号（精算目的）、学歴・経歴情報</li>
+      </ul>
+
+      <h3 style="color: #667eea; font-weight: 700; margin: 24px 0 16px 0;">4. 予約および決済前の本人確認（KYC）</h3>
+      <div class="highlight-box">
+        <h4>📋 収集・処理 정보</h4>
+        <ul style="margin: 0;">
+          <li><strong>提出：</strong>パスポート画像（本人確認用）</li>
+          <li><strong>抽出・保存：</strong>氏名、生年月日、国籍、性別（最小限情報）</li>
+          <li><strong>重要：</strong>パスポート画像は確認直後に廃棄</li>
+        </ul>
+      </div>
+
+      <h3 style="color: #667eea; font-weight: 700; margin: 24px 0 16px 0;">5. サービス利用過程で自動収集される情報</h3>
+      <ul>
+        <li>接続ログ、IP、Cookie、デバイス情報、利用記録</li>
+      </ul>
+
+      <hr class="divider">
+
+      <h2 class="section-title">第3条（個人情報の保有および利用期間）</h2>
+      <ol>
+        <li><strong>会員情報：</strong>退会時に直ちに削除（ただし、紛争・債務関係が存続する場合は解決まで保管）</li>
+        <li><strong>電子商取引法など関連法令に基づく保管</strong>
+          <ul>
+            <li>契約・申込撤回記録：5年間</li>
+            <li>決済・供給記録：5年間</li>
+            <li>消費者苦情・紛争処理記録：3年間</li>
+            <li>表示・広告記録：6か月間</li>
+          </ul>
+        </li>
+        <li><strong>通信秘密保護法に基づく接続ログ：</strong>3か月</li>
+        <li><strong>KYC最小情報（氏名・生年月日・国籍・性別）：</strong>予約管理および性別確認目的達成後直ちに削除（最長1年以内）</li>
+        <li><strong>LINE連携情報：</strong>会員退会時に直ちに削除（法令に基づく保存義務がある場合を除く）</li>
+      </ol>
+
+      <hr class="divider">
+
+      <h2 class="section-title">第4条（個人情報の第三者提供）</h2>
+      <p>当社は原則として会員の個人情報を外部に提供しません。ただし、以下の場合は例外とします。</p>
+      <ul>
+        <li>利用者の同意がある場合</li>
+        <li>法令に基づく要請がある場合</li>
+        <li>サービス提供のためにやむを得ず提携業者に提供する場合（事前告知および同意手続きあり）</li>
+      </ul>
+
+      <hr class="divider">
+
+      <h2 class="section-title">第5条（個人情報処理の委託）</h2>
+      <p>当社はサービス提供のため、業務の一部を外部に委託することがあります。委託時は契約などを通じて安全に管理します。</p>
+      <div class="highlight-box">
+        <h4>📋 委託先 예시</h4>
+        <p style="margin: 0;">決済代行業者、本人認証業者、クラウドサーバー提供業者、LINE API提供業者など</p>
+      </div>
+
+      <hr class="divider">
+
+      <h2 class="section-title">第6条（利用者の権利）</h2>
+      <p>会員は自身の個人情報について、閲覧、訂正、削除、処理停止、同意撤回をいつでも要求できます。</p>
+      <div class="highlight-box">
+        <h4>📞 요청 경로</h4>
+        <ul style="margin: 0;">
+          <li>ウェブ/アプリ内「個人情報管理」メニュー</li>
+          <li>カスタマーサポート</li>
+          <li>LINE公式アカウント</li>
+        </ul>
+        <p style="margin: 12px 0 0 0; font-style: italic;">当社は法定保存義務がある情報を除き、遅滞なく対応します。</p>
+      </div>
+
+      <hr class="divider">
+
+      <h2 class="section-title">第7条（個人情報の廃棄手続および方法）</h2>
+      <ul>
+        <li><strong>電子ファイル：</strong>復元不可能な技術的方法により完全削除</li>
+        <li><strong>紙文書：</strong>裁断または焼却</li>
+      </ul>
+
+      <hr class="divider">
+
+      <h2 class="section-title">第8条（安全性確保措置）</h2>
+      <ul>
+        <li><strong>管理的措置：</strong>内部管理計画の策定・教育、アクセス権限の最小化、定期点検</li>
+        <li><strong>技術的措置：</strong>暗号化保存、アクセス制御、侵入防止システムの運営</li>
+        <li><strong>物理的措置：</strong>サーバールーム、資料保管室の入退室制御</li>
+      </ul>
+
+      <hr class="divider">
+
+      <h2 class="section-title">第9条（個人情報保護責任者）</h2>
+      <div class="contact-info">
+        <h4>📞 개인정보보호 책임자</h4>
+        <div class="contact-details">
+          <span class="contact-label">氏名：</span>
+          <span class="contact-value">崔書準（チェ・ソジュン）</span>
+          <span class="contact-label">役職：</span>
+          <span class="contact-value">代表</span>
+          <span class="contact-label">メール：</span>
+          <span class="contact-value">puzzmi0721@gmail.com</span>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <h2 class="section-title">第10条（プライバシーポリシーの変更）</h2>
+      <p>本方針は<strong>2025年9月20日</strong>から適用されます。</p>
+      <p>法令・サービスの変更により追加・削除・修正がある場合、少なくとも<strong>7日前</strong>（重要な変更は<strong>30日前</strong>）に当サイトのお知らせを通じて案内します。</p>
+
+      <div class="highlight-box" style="margin-top: 40px;">
+        <h4>📢 お知らせ</h4>
+        <p style="margin: 0;">
+          このプライバシーポリシーに関してご質問がございましたら、上記の個人情報保護責任者までお気軽にお問い合わせください。
+        </p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
