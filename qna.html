@@ -1201,7 +1201,7 @@
 
     const submitBtn = e.target.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
-    submitBtn.innerHTML = '<div class="loading"></div> 등록 중...';
+    submitBtn.innerHTML = '<div class="loading"></div>登録中...';
 
     try {
       const { error } = await supabase.from('qna').insert({
@@ -1216,7 +1216,7 @@
       
       if (error) throw error;
       
-      newResult.innerHTML = `<div class="success">✅ 문의가 등록되었습니다! 빠른 시일 내에 답변드리겠습니다.</div>`;
+      newResult.innerHTML = `<div class="success">✅ お問い合わせが登録されました！ 早いうちにお返事します。</div>`;
       document.getElementById('title').value = '';
       document.getElementById('content').value = '';
       await loadList();
@@ -1227,10 +1227,10 @@
       }, 3000);
       
     } catch (error) {
-      newResult.innerHTML = `<div class="error">❌ 등록 실패: ${error.message}</div>`;
+      newResult.innerHTML = `<div class="error">❌ 登録失敗: ${error.message}</div>`;
     } finally {
       submitBtn.disabled = false;
-      submitBtn.innerHTML = '📤 문의 등록';
+      submitBtn.innerHTML = '📤 問合せ登録';
     }
   });
 </script>
