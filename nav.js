@@ -184,15 +184,15 @@ export async function renderNavbar(rootId='app-nav') {
     const userMenu = el('div', { class: 'dropdown-menu' }, [
       el('a', { class: 'dropdown-item', href: 'my_favorites.html' }, [
         el('i', { class: 'fas fa-heart', style: 'margin-right: 8px; color: #f093fb;' }),
-        el('span', {}, '내 찜')
+        el('span', {}, 'ネチムリスト')
       ]),
       el('a', { class: 'dropdown-item', href: 'my_bookings.html' }, [
         el('i', { class: 'fas fa-calendar-check', style: 'margin-right: 8px; color: #667eea;' }),
-        el('span', {}, '내 예약')
+        el('span', {}, '私の予約リスト')
       ]),
       el('a', { class: 'dropdown-item', href: 'my_profile.html' }, [
         el('i', { class: 'fas fa-user-edit', style: 'margin-right: 8px; color: #764ba2;' }),
-        el('span', {}, '내 정보')
+        el('span', {}, '私の情報')
       ])
     ]);
     

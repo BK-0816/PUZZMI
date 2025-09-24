@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>내 찜 - PUZZMI</title>
+  <title>ネチムリスト - PUZZMI</title>
   <link rel="stylesheet" href="styles.css"/>
   <link rel="stylesheet" href="pages.css"/>
   <link rel="stylesheet" href="nav.css"/>
@@ -439,8 +439,8 @@
   <main class="favorites-wrap">
     <!-- 페이지 헤더 -->
     <section class="page-header">
-      <h2>💖 내가 찜한 메이트</h2>
-      <p class="page-subtitle">마음에 드는 메이트들을 모아보세요</p>
+      <h2>💖 私のお気に入りのメイト</h2>
+      <p class="page-subtitle">お気に入りのメイトをチェックしてみてください！</p>
     </section>
 
     <!-- 찜 목록 -->
@@ -484,8 +484,8 @@
         list.innerHTML = `
           <div class="empty-state">
             <div class="empty-icon">🔐</div>
-            <div class="empty-text">로그인이 필요합니다</div>
-            <div class="empty-subtext">찜 목록을 보려면 로그인해주세요</div>
+            <div class="empty-text">ログインが必要です</div>
+            <div class="empty-subtext">蒸し物リストをご覧になるにはログインしてください</div>
             <a href="auth_combo.html" class="empty-action">
               <i class="fas fa-sign-in-alt"></i>
               로그인하기
@@ -495,7 +495,7 @@
         return;
       }
 
-      list.innerHTML = '<div class="loading">찜한 메이트를 불러오는 중...</div>';
+      list.innerHTML = '<div class="loading">気まずいメイトを呼び込み中...</div>';
 
       try {
         const { data, error } = await supabase
@@ -511,11 +511,11 @@
           .order('created_at', { ascending: false });
 
         if (error) {
-          console.error('찜 목록 로드 실패:', error);
+          console.error('チムリストロード失敗:', error);
           list.innerHTML = `
             <div class="empty-state">
               <div class="empty-icon">❌</div>
-              <div class="empty-text">불러오기 실패</div>
+              <div class="empty-text">読み込み失敗</div>
               <div class="empty-subtext">${error.message}</div>
             </div>
           `;
@@ -526,11 +526,11 @@
           list.innerHTML = `
             <div class="empty-state">
               <div class="empty-icon">💔</div>
-              <div class="empty-text">찜한 메이트가 없습니다</div>
-              <div class="empty-subtext">마음에 드는 메이트를 찜해보세요!</div>
+              <div class="empty-text">気になるメイトがいません</div>
+              <div class="empty-subtext">お気に入りのメイトをチェックしてみてください！</div>
               <a href="index.html#friends" class="empty-action">
                 <i class="fas fa-heart"></i>
-                메이트 둘러보기
+                メイト見学
               </a>
             </div>
           `;
@@ -571,20 +571,20 @@
                     ${langs.map(lang => `<span class="language-chip">${lang}</span>`).join('')}
                   </div>
                   <div class="mate-meta" style="font-size: 0.85rem; opacity: 0.8;">
-                    💖 ${createdAt}에 찜함
+                    💖 ${createdAt}を蒸す
                   </div>
                   <div class="mate-actions">
                     <a class="btn btn-primary" href="mate_like.html?mate_id=${row.mate_id}">
                       <i class="fas fa-eye"></i>
-                      프로필 보기
+                      プロフィールを見る
                     </a>
                     <a class="btn btn-primary" href="booking.html?mate_id=${row.mate_id}">
                       <i class="fas fa-calendar-check"></i>
-                      예약하기
+                      予約する
                     </a>
                     <button class="btn btn-danger" data-unlike="${row.mate_id}">
                       <i class="fas fa-heart-broken"></i>
-                      찜 해제
+                      蒸解剤
                     </button>
                   </div>
                 </div>
@@ -598,7 +598,7 @@
           btn.addEventListener('click', async () => {
             const mateId = btn.getAttribute('data-unlike');
             
-            if (!confirm('정말로 찜을 해제하시겠습니까?')) return;
+            if (!confirm('本当に蒸し物を解除しますか？')) return;
             
             const originalText = btn.innerHTML;
             btn.disabled = true;
@@ -613,7 +613,7 @@
               
               if (error) throw error;
               
-              showToast('💔 찜이 해제되었습니다');
+              showToast('💔 蒸し物が解除されました');
               await load(); // 목록 새로고침
               
             } catch (error) {
