@@ -146,6 +146,52 @@
       font-weight: 500;
     }
     
+    /* 단계 표시 */
+    .step-indicator {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      margin: 32px 0;
+      padding: 20px;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(240, 147, 251, 0.03) 100%);
+      border-radius: 16px;
+      border: 2px solid rgba(102, 126, 234, 0.2);
+    }
+    
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+    
+    .step.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    
+    .step.completed {
+      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    }
+    
+    .step.inactive {
+      background: rgba(255,255,255,0.6);
+      color: var(--text-secondary);
+    }
+    
+    .step-arrow {
+      color: var(--text-secondary);
+      font-size: 1.2rem;
+    }
+    
     /* 폼 그리드 */
     .form-grid {
       display: grid;
@@ -389,6 +435,7 @@
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
       box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+      width: 100%;
     }
     
     .btn-primary:hover {
@@ -565,6 +612,15 @@
         width: 100%;
         justify-content: center;
       }
+      
+      .step-indicator {
+        flex-direction: column;
+        gap: 8px;
+      }
+      
+      .step-arrow {
+        transform: rotate(90deg);
+      }
     }
     
     /* 로딩 애니메이션 */
@@ -602,9 +658,27 @@
         <p class="signup-subtitle">특별한 여행을 위한 첫 걸음을 시작해보세요</p>
       </div>
 
+      <!-- 단계 표시 -->
+      <div class="step-indicator">
+        <div class="step active" id="step1">
+          <i class="fas fa-user"></i>
+          <span>기본정보</span>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step inactive" id="step2">
+          <i class="fas fa-envelope"></i>
+          <span>이메일 인증</span>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step inactive" id="step3">
+          <i class="fas fa-check-circle"></i>
+          <span>가입완료</span>
+        </div>
+      </div>
+
       <!-- 회원가입 폼 -->
-      <div id="signupForm">
-        <form class="form-grid" id="mainForm">
+      <div id="signupFormSection">
+        <form class="form-grid" id="signupForm">
           <!-- 기본정보 -->
           <div class="form-row">
             <div class="form-field">
@@ -694,12 +768,12 @@
             </div>
           </div>
           
-          <!-- 이메일 인증 버튼 -->
-          <button type="button" class="btn btn-primary" id="sendVerificationBtn">
-            📧 이메일 인증번호 받기
+          <!-- 회원가입 버튼 -->
+          <button type="submit" class="btn btn-primary" id="signupBtn">
+            📧 계정 생성 및 이메일 인증
           </button>
           
-          <div id="formResult"></div>
+          <div id="signupResult"></div>
         </form>
 
         <!-- 이메일 인증 섹션 -->
@@ -714,7 +788,7 @@
           <div class="form-field">
             <label class="form-label required" for="verificationCode">인증번호 (6자리)</label>
             <input class="form-input verification-code-input" type="text" id="verificationCode" maxlength="6" placeholder="123456"/>
-            <div class="help-text">이메일로 받은 6자리 인증번호를 입력해주세요</div>
+            <div class="help-text">이메일로 받은 6자리 인증번호를 입력해주세요 (10분 유효)</div>
           </div>
           
           <div class="verification-actions">
@@ -728,11 +802,6 @@
           
           <div id="verificationResult"></div>
         </div>
-
-        <!-- 최종 가입 완료 버튼 -->
-        <button type="button" class="btn btn-primary hidden" id="completeSignupBtn" style="width: 100%; margin-top: 24px; font-size: 1.2rem; padding: 20px;">
-          🎉 회원가입 완료하기
-        </button>
       </div>
 
       <!-- 완료 섹션 -->
@@ -788,32 +857,51 @@
 
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-    import { emailVerificationService } from './email_verification_service.js';
     
-    const supabase = createClient(
-      "https://eevvgbbokenpjnvtmztk.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4"
-    );
+    const SUPABASE_URL = "https://eevvgbbokenpjnvtmztk.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4";
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let userData = {};
-    let isEmailVerified = false;
-    let verificationId = null;
+    let currentStep = 1;
 
     // DOM 요소들
-    const sendVerificationBtn = document.getElementById('sendVerificationBtn');
+    const signupForm = document.getElementById('signupForm');
     const emailVerificationSection = document.getElementById('emailVerificationSection');
+    const completionSection = document.getElementById('completionSection');
+    const signupFormSection = document.getElementById('signupFormSection');
+    
+    const step1 = document.getElementById('step1');
+    const step2 = document.getElementById('step2');
+    const step3 = document.getElementById('step3');
+    
     const verificationEmailDisplay = document.getElementById('verificationEmailDisplay');
     const verifyCodeBtn = document.getElementById('verifyCodeBtn');
     const resendCodeBtn = document.getElementById('resendCodeBtn');
-    const completeSignupBtn = document.getElementById('completeSignupBtn');
-    const signupForm = document.getElementById('signupForm');
-    const completionSection = document.getElementById('completionSection');
-    const formResult = document.getElementById('formResult');
+    const signupResult = document.getElementById('signupResult');
     const verificationResult = document.getElementById('verificationResult');
 
-    // 이메일 인증번호 발송
-    sendVerificationBtn.addEventListener('click', async () => {
-      // 폼 데이터 수집 및 검증
+    // 단계 업데이트 함수
+    function updateSteps(activeStep) {
+      currentStep = activeStep;
+      
+      [step1, step2, step3].forEach((step, index) => {
+        step.classList.remove('active', 'completed', 'inactive');
+        
+        if (index + 1 < activeStep) {
+          step.classList.add('completed');
+        } else if (index + 1 === activeStep) {
+          step.classList.add('active');
+        } else {
+          step.classList.add('inactive');
+        }
+      });
+    }
+
+    // 회원가입 폼 제출 (1단계 → 2단계)
+    signupForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
       // 폼 유효성 검사
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
@@ -829,24 +917,24 @@
       
       // 유효성 검사
       if (!email || !password || !fullName || !birthDate || !gender || !phoneNumber || !nationality) {
-        formResult.innerHTML = '<div class="error">❌ 모든 필수 항목을 입력해주세요.</div>';
+        signupResult.innerHTML = '<div class="error">❌ 모든 필수 항목을 입력해주세요.</div>';
         return;
       }
       
       if (selectedLanguages.length === 0) {
-        formResult.innerHTML = '<div class="error">❌ 최소 1개 이상의 언어를 선택해주세요.</div>';
+        signupResult.innerHTML = '<div class="error">❌ 최소 1개 이상의 언어를 선택해주세요.</div>';
         return;
       }
       
       if (password.length < 8) {
-        formResult.innerHTML = '<div class="error">❌ 비밀번호는 8자 이상이어야 합니다.</div>';
+        signupResult.innerHTML = '<div class="error">❌ 비밀번호는 8자 이상이어야 합니다.</div>';
         return;
       }
       
       // 이메일 형식 검증
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
-        formResult.innerHTML = '<div class="error">❌ 올바른 이메일 형식을 입력해주세요.</div>';
+        signupResult.innerHTML = '<div class="error">❌ 올바른 이메일 형식을 입력해주세요.</div>';
         return;
       }
       
@@ -860,20 +948,8 @@
       }
       
       if (age < 16) {
-        formResult.innerHTML = '<div class="error">❌ 16세 이상만 가입 가능합니다.</div>';
+        signupResult.innerHTML = '<div class="error">❌ 16세 이상만 가입 가능합니다.</div>';
         return;
-      }
-      
-      // 이메일 중복 확인
-      try {
-        const isDuplicate = await emailVerificationService.checkEmailDuplicate(email);
-        if (isDuplicate) {
-          formResult.innerHTML = '<div class="error">❌ 이미 가입된 이메일입니다. 로그인을 시도해주세요.</div>';
-          return;
-        }
-      } catch (error) {
-        console.warn('이메일 중복 확인 실패:', error);
-        // 중복 확인 실패 시에도 계속 진행
       }
       
       // 사용자 데이터 저장
@@ -890,14 +966,12 @@
         languages: selectedLanguages
       };
       
-      sendVerificationBtn.disabled = true;
-      sendVerificationBtn.innerHTML = '<div class="loading"></div> 이메일 인증번호 발송 중...';
+      const submitBtn = document.getElementById('signupBtn');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<div class="loading"></div> 이메일 인증번호 발송 중...';
       
       try {
-        // Edge Function을 통한 실제 이메일 발송 (환경변수 사용)
-        const SUPABASE_URL = "https://eevvgbbokenpjnvtmztk.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4";
-        
+        // 서버에서 6자리 OTP 생성 및 이메일 발송
         const response = await fetch(`${SUPABASE_URL}/functions/v1/email-verification`, {
           method: 'POST',
           headers: {
@@ -920,15 +994,17 @@
           throw new Error(result.error || '이메일 발송 실패');
         }
         
+        // 2단계로 이동
+        updateSteps(2);
         showEmailVerificationSection(email);
-        formResult.innerHTML = '<div class="success">✅ 인증번호가 이메일로 발송되었습니다! 메일함을 확인해주세요.</div>';
+        signupResult.innerHTML = '<div class="success">✅ 인증번호가 이메일로 발송되었습니다! 메일함을 확인해주세요.</div>';
         
       } catch (error) {
         console.error('인증번호 발송 실패:', error);
-        formResult.innerHTML = `<div class="error">❌ 인증번호 발송 실패: ${error.message}</div>`;
+        signupResult.innerHTML = `<div class="error">❌ 인증번호 발송 실패: ${error.message}</div>`;
       } finally {
-        sendVerificationBtn.disabled = false;
-        sendVerificationBtn.innerHTML = '📧 이메일 인증번호 받기';
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '📧 계정 생성 및 이메일 인증';
       }
     });
 
@@ -943,10 +1019,9 @@
       }, 500);
     }
 
-    // 인증번호 확인
+    // 인증번호 확인 (2단계 → 3단계)
     verifyCodeBtn.addEventListener('click', async () => {
       const code = document.getElementById('verificationCode').value.trim();
-      const email = userData.email;
       
       if (!code || code.length !== 6) {
         verificationResult.innerHTML = '<div class="error">❌ 6자리 인증번호를 입력해주세요.</div>';
@@ -957,10 +1032,7 @@
       verifyCodeBtn.innerHTML = '<div class="loading"></div> 인증 중...';
       
       try {
-        // Edge Function을 통한 실제 인증번호 검증 (환경변수 사용)
-        const SUPABASE_URL = "https://eevvgbbokenpjnvtmztk.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4";
-        
+        // 서버에서 인증번호 검증
         const response = await fetch(`${SUPABASE_URL}/functions/v1/email-verification`, {
           method: 'POST',
           headers: {
@@ -984,16 +1056,8 @@
           throw new Error(result.error || '인증번호가 올바르지 않습니다.');
         }
         
-        isEmailVerified = true;
-        verificationResult.innerHTML = '<div class="success">✅ 이메일 인증이 완료되었습니다!</div>';
-        
-        // 최종 가입 완료 버튼 표시
-        completeSignupBtn.classList.remove('hidden');
-        emailVerificationSection.style.opacity = '0.7';
-        
-        setTimeout(() => {
-          completeSignupBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 500);
+        // 인증 성공 - 즉시 회원가입 완료 처리
+        await completeSignup();
         
       } catch (error) {
         console.error('인증 실패:', error);
@@ -1006,16 +1070,10 @@
 
     // 인증번호 재발송
     resendCodeBtn.addEventListener('click', async () => {
-      const email = userData.email;
-      
       resendCodeBtn.disabled = true;
       resendCodeBtn.innerHTML = '<div class="loading"></div> 재발송 중...';
       
       try {
-        // Edge Function을 통한 실제 이메일 재발송 (환경변수 사용)
-        const SUPABASE_URL = "https://eevvgbbokenpjnvtmztk.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4";
-        
         const response = await fetch(`${SUPABASE_URL}/functions/v1/email-verification`, {
           method: 'POST',
           headers: {
@@ -1048,27 +1106,17 @@
       }
     });
 
-    // 최종 회원가입 완료
-    completeSignupBtn.addEventListener('click', async () => {
-      if (!isEmailVerified) {
-        alert('먼저 이메일 인증을 완료해주세요.');
-        return;
-      }
-      
-      completeSignupBtn.disabled = true;
-      completeSignupBtn.innerHTML = '<div class="loading"></div> 회원가입 처리 중...';
-      
+    // 회원가입 완료 처리
+    async function completeSignup() {
       try {
-        // 1. Supabase 계정 생성 (이메일 인증 완료 상태로)
+        // 1. Supabase 계정 생성
         const { data, error } = await supabase.auth.signUp({
           email: userData.email,
           password: userData.password,
           options: {
             data: {
               full_name: userData.fullName,
-              signup_step: 'completed',
-              email_verified: true, // 서버에서 인증 완료
-              verification_method: 'email_otp'
+              email_verified: true
             },
             emailRedirectTo: `${window.location.origin}/email_verified.html`
           }
@@ -1109,28 +1157,18 @@
         
         userData.userId = data.user.id;
         
-        // 3. 이메일 인증 기록 업데이트
-        await supabase
-          .from('email_verifications')
-          .update({ 
-            verified: true,
-            verified_at: new Date().toISOString()
-          })
-          .eq('email', userData.email)
-          .eq('verified', true); // 이미 인증된 것만 업데이트
-        
-        // 4. 완료 섹션 표시
-        signupForm.style.display = 'none';
+        // 3. 3단계로 이동 (완료)
+        updateSteps(3);
+        signupFormSection.style.display = 'none';
         completionSection.classList.add('show');
         
+        verificationResult.innerHTML = '<div class="success">✅ 회원가입이 완료되었습니다!</div>';
+        
       } catch (error) {
-        console.error('회원가입 실패:', error);
-        formResult.innerHTML = `<div class="error">❌ 회원가입 실패: ${error.message}</div>`;
-      } finally {
-        completeSignupBtn.disabled = false;
-        completeSignupBtn.innerHTML = '🎉 회원가입 완료하기';
+        console.error('회원가입 완료 실패:', error);
+        verificationResult.innerHTML = `<div class="error">❌ 회원가입 실패: ${error.message}</div>`;
       }
-    });
+    }
 
     // 인증번호 입력 시 자동 검증 (6자리 입력 완료 시)
     document.getElementById('verificationCode').addEventListener('input', (e) => {
@@ -1266,11 +1304,6 @@
         birthDateInput.setAttribute('max', today);
         birthDateInput.setAttribute('min', minDateStr);
       }
-      
-      // 개발 환경 안내
-      console.log('🔧 개발 환경 이메일 인증 안내:');
-      console.log('📧 테스트 인증번호: 123456 또는 000000');
-      console.log('💡 실제 환경에서는 이메일로 발송된 인증번호를 사용하세요');
     });
   </script>
 </body>
