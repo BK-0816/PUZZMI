@@ -202,42 +202,52 @@
     
     /* 프로필 헤더 (사진 위 별도 영역) */
     .profile-header {
-      padding: 8px 16px 4px 16px;
+      padding: 4px 12px 2px 12px;
       background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
       backdrop-filter: blur(15px);
       border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+      position: relative;
+      z-index: 10;
     }
     
     .profile-info-row {
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-start;
       align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
+      gap: 16px;
       margin: 0;
     }
     
-    .profile-basic {
+    .profile-name-section {
       flex: 1;
-      min-width: 200px;
-      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    
+    .profile-name-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 2px;
     }
     
     .profile-name {
-      font-size: 1.8rem;
+      font-size: 1.6rem;
       font-weight: 800;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      margin: 0 0 2px 0;
+      margin: 0;
       letter-spacing: -0.01em;
       line-height: 1.1;
+      flex-shrink: 0;
     }
     
     .profile-meta {
       color: var(--text-secondary);
-      font-size: 1.1rem;
+      font-size: 0.95rem;
       font-weight: 500;
       margin: 0;
       line-height: 1.4;
@@ -246,16 +256,17 @@
     .profile-rating {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
-      padding: 6px 12px;
+      padding: 4px 10px;
       border-radius: 16px;
       font-weight: 700;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
       display: inline-flex;
       align-items: center;
       gap: 4px;
       flex-shrink: 0;
       height: fit-content;
+      align-self: flex-start;
     }
     
     /* 액션 버튼 (가로 배치) */
@@ -666,30 +677,28 @@
       }
       
       .profile-header {
-        padding: 6px 16px 2px 16px;
+        padding: 2px 12px 1px 12px;
       }
       
       .profile-info-row {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 4px;
+        gap: 12px;
+      }
+      
+      .profile-name-section {
+        gap: 1px;
       }
       
       .profile-name {
-        font-size: 1.5rem;
-        margin: 0 0 1px 0;
+        font-size: 1.4rem;
       }
       
       .profile-meta {
-        font-size: 0.95rem;
-        margin: 0;
+        font-size: 0.9rem;
       }
       
       .profile-rating {
-        padding: 4px 10px;
-        font-size: 0.9rem;
-        align-self: flex-start;
-        margin-top: 2px;
+        padding: 3px 8px;
+        font-size: 0.8rem;
       }
       
       .photo-nav {
@@ -754,23 +763,28 @@
       }
       
       .profile-header {
-        padding: 4px 12px 2px 12px;
+        padding: 1px 8px 1px 8px;
+      }
+      
+      .profile-info-row {
+        gap: 8px;
+      }
+      
+      .profile-name-section {
+        gap: 0px;
       }
       
       .profile-name {
-        font-size: 1.3rem;
-        margin: 0 0 1px 0;
+        font-size: 1.2rem;
       }
       
       .profile-meta {
-        font-size: 0.9rem;
-        margin: 0;
+        font-size: 0.85rem;
       }
       
       .profile-rating {
-        font-size: 0.85rem;
-        padding: 3px 8px;
-        margin-top: 1px;
+        font-size: 0.8rem;
+        padding: 2px 6px;
       }
       
       .action-buttons {
@@ -846,13 +860,15 @@
       <!-- 프로필 헤더 (사진 위 별도 영역) -->
       <div class="profile-header">
         <div class="profile-info-row">
-          <div class="profile-basic">
-            <h1 id="profileName" class="profile-name">메이트</h1>
+          <div class="profile-name-section">
+            <div class="profile-name-row">
+              <h1 id="profileName" class="profile-name">메이트</h1>
+              <div id="profileRating" class="profile-rating" style="display: none;">
+                <i class="fas fa-star"></i>
+                <span id="ratingValue">N/A</span>
+              </div>
+            </div>
             <div id="profileMeta" class="profile-meta"></div>
-          </div>
-          <div id="profileRating" class="profile-rating" style="display: none;">
-            <i class="fas fa-star"></i>
-            <span id="ratingValue">N/A</span>
           </div>
         </div>
       </div>
