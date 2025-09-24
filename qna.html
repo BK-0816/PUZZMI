@@ -965,8 +965,8 @@
     newInquirySection.style.display = 'none';
     document.getElementById('adminToolbar').style.display = 'block';
   } else {
-    qnaTitle.textContent = '💬 1:1 문의';
-    listTitle.innerHTML = '<span style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">📋 내 문의 목록</span>';
+    qnaTitle.textContent = '💬1:1お問い合わせ';
+    listTitle.innerHTML = '<span style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">📋 私の問い合わせリスト</span>';
     newInquirySection.style.display = 'block';
     document.getElementById('adminToolbar').style.display = 'none';
   }
@@ -976,7 +976,7 @@
   let filteredData = []; // 필터링된 데이터
   
   async function loadList() {
-    list.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--text-secondary);"><div class="loading" style="margin: 0 auto 16px;"></div>문의를 불러오는 중...</div>';
+    list.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--text-secondary);"><div class="loading" style="margin: 0 auto 16px;"></div>問い合わせの呼び出し中...</div>';
     
     const sel = supabase.from('qna')
       .select('id, user_email, subject, title, content, message, status, answer, created_at, answered_at, answered_by')
@@ -984,7 +984,7 @@
 
     const { data, error } = isAdmin ? await sel : await sel.eq('user_id', user.id);
     if (error) {
-      list.innerHTML = `<div class="error">❌ 불러오기 실패: ${error.message}</div>`;
+      list.innerHTML = `<div class="error">❌ 読み込み失敗: ${error.message}</div>`;
       return;
     }
     
