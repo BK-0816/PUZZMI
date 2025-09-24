@@ -412,246 +412,235 @@
     
     /* 리뷰 섹션 */
     .reviews-section {
-      background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255,255,255,0.4);
-      border-radius: 20px;
-      padding: 18px;
-      margin-bottom: 12px;
-      box-shadow: 0 16px 40px rgba(0,0,0,0.08);
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .reviews-section::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, #4facfe 0%, #00f2fe 50%, #667eea 100%);
-      animation: shimmer 3s ease-in-out infinite;
+      background: rgba(255,255,255,0.6);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(0,0,0,0.05);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
     
     .reviews-title {
-      font-size: 1.8rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 50%, #667eea 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 16px;
-      text-align: center;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .reviews-title::before {
+      content: '💬';
+      font-size: 1rem;
     }
     
     /* 리뷰 아이템 */
     .review-item {
-      background: rgba(255,255,255,0.8);
-      border: 1px solid rgba(102, 126, 234, 0.1);
-      border-radius: 16px;
-      padding: 20px;
+      background: rgba(255,255,255,0.4);
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 8px;
+      padding: 16px;
       margin-bottom: 16px;
-      transition: all 0.3s ease;
+      transition: all 0.2s ease;
     }
     
     .review-item:hover {
-      background: rgba(255,255,255,0.95);
-      border-color: rgba(102, 126, 234, 0.2);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      background: rgba(255,255,255,0.7);
+      border-color: rgba(0,0,0,0.1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
     
     .review-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
-      flex-wrap: wrap;
-      gap: 8px;
+      margin-bottom: 8px;
     }
     
     .review-author {
-      font-weight: 700;
-      color: var(--text-primary);
-      font-size: 1rem;
+      font-weight: 600;
+      color: #333;
+      font-size: 0.9rem;
     }
     
     .review-rating {
-      color: #ffd700;
-      font-size: 1rem;
+      color: #ff9500;
+      font-size: 0.85rem;
+      font-weight: 500;
     }
     
     .review-date {
-      color: var(--text-secondary);
-      font-size: 0.85rem;
+      color: #888;
+      font-size: 0.8rem;
+      margin-top: 2px;
     }
     
     .review-content {
-      color: var(--text-primary);
+      color: #444;
       line-height: 1.6;
-      font-size: 0.95rem;
-      margin-bottom: 12px;
+      font-size: 0.9rem;
+      margin: 12px 0;
     }
     
     /* 메이트 답변 */
     .mate-reply {
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(240, 147, 251, 0.03) 100%);
-      border: 1px solid rgba(102, 126, 234, 0.1);
-      border-radius: 12px;
+      background: rgba(248,249,250,0.8);
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 6px;
       padding: 16px;
       margin-top: 12px;
-      position: relative;
-    }
-    
-    .mate-reply::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 3px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border-radius: 2px 0 0 2px;
+      border-left: 3px solid #667eea;
     }
     
     .reply-label {
-      font-weight: 700;
+      font-weight: 600;
       color: #667eea;
-      font-size: 0.9rem;
-      margin-bottom: 8px;
+      font-size: 0.8rem;
+      margin-bottom: 6px;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     
     .reply-content {
-      color: var(--text-primary);
+      color: #555;
       line-height: 1.5;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
     }
     
     /* 리뷰 작성 폼 */
     .review-form {
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(240, 147, 251, 0.05) 100%);
-      border: 2px solid rgba(102, 126, 234, 0.2);
-      border-radius: 20px;
+      background: rgba(248,249,250,0.8);
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 8px;
       padding: 24px;
       margin-bottom: 24px;
     }
     
     .form-title {
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 20px;
-      text-align: center;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .form-title::before {
+      content: '✍️';
+      font-size: 1rem;
     }
     
     .rating-selector {
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
     
     .rating-label {
       display: block;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 12px;
-      font-size: 0.95rem;
+      font-weight: 500;
+      color: #555;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
     }
     
     .rating-buttons {
       display: flex;
-      flex-direction: column;
-      gap: 8px;
+      gap: 6px;
+      flex-wrap: wrap;
     }
     
     .rating-btn {
-      width: 100%;
-      padding: 12px 16px;
-      border: 2px solid rgba(102, 126, 234, 0.2);
-      border-radius: 12px;
-      background: rgba(255,255,255,0.8);
+      padding: 8px 12px;
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: 20px;
+      background: rgba(255,255,255,0.6);
       cursor: pointer;
-      transition: all 0.3s ease;
-      font-weight: 600;
-      color: var(--text-primary);
-      text-align: center;
+      transition: all 0.2s ease;
+      font-weight: 500;
+      color: #555;
+      font-size: 0.85rem;
+      flex: 1;
+      min-width: 80px;
     }
     
     .rating-btn:hover {
-      border-color: rgba(102, 126, 234, 0.4);
-      background: rgba(255,255,255,0.95);
-      transform: translateY(-1px);
+      background: rgba(255,255,255,0.9);
+      border-color: #667eea;
     }
     
     .rating-btn.active {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: #667eea;
       color: white;
       border-color: transparent;
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
     }
     
     .review-textarea {
       width: 100%;
-      min-height: 100px;
-      padding: 16px;
-      border: 2px solid rgba(102, 126, 234, 0.2);
-      border-radius: 12px;
-      background: rgba(255,255,255,0.9);
+      min-height: 80px;
+      padding: 12px;
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: 6px;
+      background: rgba(255,255,255,0.8);
       font-family: inherit;
-      font-size: 1rem;
+      font-size: 0.9rem;
       line-height: 1.5;
       resize: vertical;
-      margin-bottom: 16px;
-      transition: all 0.3s ease;
+      margin-bottom: 12px;
+      transition: all 0.2s ease;
     }
     
     .review-textarea:focus {
       outline: none;
-      border-color: rgba(102, 126, 234, 0.5);
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      border-color: #667eea;
+      background: rgba(255,255,255,0.95);
+      box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
     }
     
     .review-textarea::placeholder {
-      color: rgba(102, 126, 234, 0.5);
+      color: #999;
       font-style: italic;
     }
     
     /* 메시지 */
     .message {
-      padding: 12px 16px;
-      border-radius: 12px;
-      font-weight: 600;
-      text-align: center;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 0.9rem;
       margin-top: 16px;
     }
     
     .message.success {
-      background: linear-gradient(135deg, #d1f2eb 0%, #a3e4d7 100%);
-      color: #0e6b47;
-      border: 1px solid rgba(25, 135, 84, 0.3);
+      background: rgba(34, 197, 94, 0.1);
+      color: #059669;
+      border: 1px solid rgba(34, 197, 94, 0.2);
     }
     
     .message.error {
-      background: linear-gradient(135deg, #fadbd8 0%, #f1948a 100%);
-      color: #922b21;
-      border: 1px solid rgba(220, 53, 69, 0.3);
+      background: rgba(239, 68, 68, 0.1);
+      color: #dc2626;
+      border: 1px solid rgba(239, 68, 68, 0.2);
     }
     
     .empty-state {
       text-align: center;
-      padding: 40px 20px;
-      color: var(--text-secondary);
-      font-style: italic;
+      padding: 32px 20px;
+      color: #888;
+      font-size: 0.9rem;
     }
     
     .empty-state::before {
-      content: '📝';
+      content: '💭';
       display: block;
-      font-size: 2rem;
-      margin-bottom: 12px;
-      opacity: 0.6;
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+      opacity: 0.5;
     }
     
     /* 로딩 애니메이션 */
