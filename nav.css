@@ -3,11 +3,19 @@
   position: sticky; 
   top: 0; 
   z-index: 1000; 
-  background: rgba(255,255,255,.95); 
+  background: rgba(255,255,255,0.98); 
   backdrop-filter: saturate(120%) blur(15px); 
   border-bottom: 1px solid rgba(0,0,0,.08); 
   box-shadow: 0 2px 20px rgba(0,0,0,.06);
   width: 100%;
+}
+
+/* 스크롤 시에도 흰색 배경 유지 */
+.app-nav.scrolled {
+  background: rgba(255,255,255,0.98);
+  backdrop-filter: saturate(120%) blur(20px);
+  border-bottom: 1px solid rgba(0,0,0,.12);
+  box-shadow: 0 4px 24px rgba(0,0,0,.08);
 }
 
 /* Font Awesome 아이콘 지원 */

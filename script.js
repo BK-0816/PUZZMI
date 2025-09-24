@@ -403,6 +403,12 @@ navBrand.querySelector('.logo').style.verticalAlign = 'middle';
 // 히어로 배경 이미지 순환 로직
 let currentBgIndex = 0;
 const heroBgElement = document.querySelector('.hero-bg');
+const backgroundTexts = [
+    'ソウルの隠れた名所を発見',
+    '現地の友達と特別な思い出',
+    '本格的な韓国グルメ体験',
+    'あなただけのソウル旅行'
+];
 
 function changeHeroBackground() {
     // 이전 이미지의 opacity를 0으로
@@ -417,12 +423,27 @@ function changeHeroBackground() {
     setTimeout(() => {
         heroBgElement.style.backgroundImage = `url('${heroBackgrounds[currentBgIndex]}')`;
         heroBgElement.style.opacity = '1';
+        
+        // 배경 텍스트 업데이트
+        const afterContent = backgroundTexts[currentBgIndex];
+        const style = document.querySelector('#hero-bg-text-style') || document.createElement('style');
+        style.id = 'hero-bg-text-style';
+        style.textContent = `.hero-bg::after { content: '${afterContent}'; }`;
+        if (!document.querySelector('#hero-bg-text-style')) {
+            document.head.appendChild(style);
+        }
     }, 1000); // CSS transition 시간과 동일하게 설정
 }
 
 // 초기 배경 이미지 설정
 heroBgElement.style.backgroundImage = `url('${heroBackgrounds[currentBgIndex]}')`;
 heroBgElement.style.opacity = '1';
+
+// 초기 배경 텍스트 설정
+const initialStyle = document.createElement('style');
+initialStyle.id = 'hero-bg-text-style';
+initialStyle.textContent = `.hero-bg::after { content: '${backgroundTexts[currentBgIndex]}'; }`;
+document.head.appendChild(initialStyle);
 
 // 4초마다 배경 변경 함수 호출
 setInterval(changeHeroBackground, 4000);

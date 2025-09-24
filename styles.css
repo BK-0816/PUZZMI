@@ -567,6 +567,27 @@ a:hover {
   background-position: center;
   background-repeat: no-repeat;
   opacity: 0.8;
+  position: relative;
+}
+
+/* 히어로 배경 이미지 텍스트 오버레이 */
+.hero-bg::after {
+  content: '';
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  padding: 8px 16px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 20px;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  z-index: 1;
   transition: all 2s ease;
   z-index: 1;
 }
@@ -1596,9 +1617,10 @@ a:hover {
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(240, 147, 251, 0.05) 100%);
   color: var(--primary-700);
 }
-
-.faq-toggle {
+  width: 100%;
+  height: 280px;
   margin-left: auto;
+  object-position: center;
   transition: transform var(--transition-base);
   color: var(--primary-500);
 }
@@ -1983,6 +2005,14 @@ a:hover {
 *:focus {
   outline: 2px solid var(--primary-500);
   outline-offset: 2px;
+  
+  .about-photo img {
+    height: 320px;
+  }
+  
+  .about-photo:first-child img {
+    height: 240px;
+  }
 }
 
 .btn:focus,
@@ -2152,12 +2182,14 @@ a:hover {
 .row {
   display: flex;
   gap: var(--space-4);
-  flex-wrap: wrap;
+  height: 140px;
 }
 
 .row.single {
-  flex-direction: column;
-}
+  max-width: 120px;
+  max-height: 120px;
+  width: auto;
+  height: auto;
 
 .field {
   flex: 1;
