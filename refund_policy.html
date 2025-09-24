@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PUZZMI 返金・キャンセル案内</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="pages.css"/>
+  <link rel="stylesheet" href="pages-theme.css"/>
+  <link rel="stylesheet" href="nav.css"/>
+  <script type="module" src="nav.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <style>
+    body.bg-cream { 
+      background: var(--bg-cream); 
+      background-repeat: no-repeat; 
+      background-size: cover; 
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+    
+    /* 배경 장식 요소 */
+    .decorative-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    
+    .decorative-element {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.2;
+      animation: float 12s ease-in-out infinite;
+    }
+    
+    .decorative-element:nth-child(1) {
+      width: 200px;
+      height: 200px;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      top: 10%;
+      left: 5%;
+      animation-delay: 0s;
+    }
+    
+    .decorative-element:nth-child(2) {
+      width: 150px;
+      height: 150px;
+      background: linear-gradient(45deg, #f093fb, #f5576c);
+      top: 60%;
+      right: 10%;
+      animation-delay: 4s;
+    }
+    
+    .decorative-element:nth-child(3) {
+      width: 120px;
+      height: 120px;
+      background: linear-gradient(45deg, #4facfe, #00f2fe);
+      bottom: 20%;
+      left: 15%;
+      animation-delay: 8s;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      33% { transform: translateY(-20px) rotate(120deg); }
+      66% { transform: translateY(10px) rotate(240deg); }
+    }
+    
+    /* 메인 컨테이너 */
+    .refund-wrap { 
+      max-width: 900px; 
+      margin: 40px auto; 
+      padding: 0 20px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    /* 페이지 헤더 */
+    .page-header {
+      background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
+      backdrop-filter: blur(25px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 28px;
+      padding: 50px;
+      margin-bottom: 40px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.04);
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+    }
+    
+    .page-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 20%, #f093fb 40%, #f5576c 60%, #4facfe 80%, #00f2fe 100%);
+      animation: shimmer 4s ease-in-out infinite;
+    }
+    
+    @keyframes shimmer {
+      0%, 100% { opacity: 1; transform: translateX(0); }
+      50% { opacity: 0.8; transform: translateX(8px); }
+    }
+    
+    .page-title {
+      font-size: 3rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 20px 0;
+      letter-spacing: -0.03em;
+      position: relative;
+    }
+    
+    .page-title::after {
+      content: '';
+      position: absolute;
+      bottom: -16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 5px;
+      background: linear-gradient(90deg, #667eea 0%, #f093fb 50%, #4facfe 100%);
+      border-radius: 3px;
+    }
+    
+    .page-subtitle {
+      color: var(--text-secondary);
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 0;
+    }
+    
+    /* 뒤로가기 버튼 */
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 16px;
+      color: var(--text-primary);
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      margin-bottom: 32px;
+    }
+    
+    .back-btn:hover {
+      background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 100%);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+      border-color: rgba(102, 126, 234, 0.3);
+    }
+    
+    /* 콘텐츠 카드 */
+    .content-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 24px;
+      padding: 50px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.04);
+      position: relative;
+      overflow: hidden;
+      line-height: 1.8;
+      font-size: 1.05rem;
+    }
+    
+    .content-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 33%, #f093fb 66%, #f5576c 100%);
+      opacity: 0.8;
+    }
+    
+    /* 핵심 환불 규정 하이라이트 */
+    .refund-highlight {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin: 32px 0;
+      padding: 24px;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(240, 147, 251, 0.05) 100%);
+      border-radius: 20px;
+      border: 2px solid rgba(102, 126, 234, 0.2);
+    }
+    
+    .highlight-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.4);
+      transition: all 0.3s ease;
+      backdrop-filter: blur(8px);
+    }
+    
+    .highlight-item:hover {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 12px 32px rgba(102, 126, 234, 0.15);
+    }
+    
+    .highlight-icon {
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+      filter: grayscale(0.2);
+    }
+    
+    .highlight-text strong {
+      display: block;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .highlight-text span {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    
+    /* 섹션 제목 */
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 40px 0 20px 0;
+      padding-bottom: 12px;
+      border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+      position: relative;
+    }
+    
+    .section-title::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: -2px;
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    /* 목록 스타일 */
+    .content-card ol,
+    .content-card ul {
+      margin: 20px 0;
+      padding-left: 24px;
+    }
+    
+    .content-card li {
+      margin-bottom: 12px;
+      color: var(--text-primary);
+    }
+    
+    .content-card li strong {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 700;
+    }
+    
+    /* 구분선 */
+    .divider {
+      margin: 40px 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent 0%, rgba(102, 126, 234, 0.3) 50%, transparent 100%);
+      border: none;
+    }
+    
+    /* 강조 박스 */
+    .highlight-box {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(240, 147, 251, 0.05) 100%);
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 16px;
+      padding: 24px;
+      margin: 24px 0;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.1);
+    }
+    
+    .highlight-box h4 {
+      color: #667eea;
+      font-weight: 800;
+      margin: 0 0 12px 0;
+      font-size: 1.2rem;
+    }
+    
+    /* 경고 박스 */
+    .warning-box {
+      background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+      border: 2px solid rgba(255, 193, 7, 0.3);
+      border-radius: 16px;
+      padding: 24px;
+      margin: 24px 0;
+      box-shadow: 0 8px 24px rgba(255, 193, 7, 0.2);
+    }
+    
+    .warning-box h4 {
+      color: #856404;
+      font-weight: 800;
+      margin: 0 0 12px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    /* 중요 박스 */
+    .important-box {
+      background: linear-gradient(135deg, #fadbd8 0%, #f1948a 100%);
+      border: 2px solid rgba(220, 53, 69, 0.3);
+      border-radius: 16px;
+      padding: 24px;
+      margin: 24px 0;
+      box-shadow: 0 8px 24px rgba(220, 53, 69, 0.2);
+    }
+    
+    .important-box h4 {
+      color: #721c24;
+      font-weight: 800;
+      margin: 0 0 12px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    /* 연락처 정보 */
+    .contact-info {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(240, 147, 251, 0.05) 100%);
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 20px;
+      padding: 32px;
+      margin: 32px 0;
+      text-align: center;
+    }
+    
+    .contact-info h4 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 16px 0;
+    }
+    
+    .contact-details {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px 20px;
+      align-items: center;
+      max-width: 400px;
+      margin: 0 auto;
+      text-align: left;
+    }
+    
+    .contact-label {
+      font-weight: 700;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+    
+    .contact-value {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+    
+    /* 반응형 디자인 */
+    @media (max-width: 768px) {
+      .refund-wrap {
+        margin: 20px auto;
+        padding: 0 16px;
+      }
+      
+      .page-header {
+        padding: 32px 24px;
+        border-radius: 20px;
+      }
+      
+      .page-title {
+        font-size: 2.2rem;
+      }
+      
+      .content-card {
+        padding: 32px 24px;
+        border-radius: 20px;
+        font-size: 1rem;
+      }
+      
+      .section-title {
+        font-size: 1.3rem;
+      }
+      
+      .refund-highlight {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      
+      .highlight-item {
+        flex-direction: row;
+        text-align: left;
+        padding: 16px;
+      }
+      
+      .highlight-icon {
+        font-size: 2rem;
+        margin-bottom: 0;
+        margin-right: 16px;
+      }
+    }
+  </style>
+</head>
+<body class="bg-cream">
+  <!-- 배경 장식 요소 -->
+  <div class="decorative-bg">
+    <div class="decorative-element"></div>
+    <div class="decorative-element"></div>
+    <div class="decorative-element"></div>
+  </div>
+
+  <div id="app-nav"></div>
+  
+  <main class="refund-wrap">
+    <!-- 뒤로가기 버튼 -->
+    <a href="index.html" class="back-btn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="m12 19-7-7 7-7"/>
+        <path d="m19 12H5"/>
+      </svg>
+      ホームに戻る
+    </a>
+
+    <!-- 페이지 헤더 -->
+    <section class="page-header">
+      <h1 class="page-title">💰 返金・キャンセル案内</h1>
+      <p class="page-subtitle">PUZZMI サービスの返金・キャンセルポリシーをご案内します</p>
+    </section>
+
+    <!-- 메인 콘텐츠 -->
+    <section class="content-card">
+      <!-- 핵심 환불 규정 -->
+      <div class="refund-highlight">
+        <div class="highlight-item">
+          <div class="highlight-icon">⏰</div>
+          <div class="highlight-text">
+            <strong>利用24時間前まで</strong>
+            <span>全額返金</span>
+          </div>
+        </div>
+        <div class="highlight-item">
+          <div class="highlight-icon">🕐</div>
+          <div class="highlight-text">
+            <strong>24時間～4時間前</strong>
+            <span>50%返金</span>
+          </div>
+        </div>
+        <div class="highlight-item">
+          <div class="highlight-icon">❌</div>
+          <div class="highlight-text">
+            <strong>4時間以内／当日・無断キャンセル</strong>
+            <span>返金不可</span>
+          </div>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <h2 class="section-title">1) 予約・決済の流れ</h2>
+      <ol>
+        <li>お客様が希望の日時を選択します。</li>
+        <li>管理者がスケジュールを確認し、メイトと調整します。</li>
+        <li>時間が合えば予約が確定します。</li>
+        <li>決済リクエストはLINEメッセージでお送りします。メッセージ内の決済リンクよりお支払いください。</li>
+      </ol>
+
+      <div class="highlight-box">
+        <h4>📱 リンク有効時間</h4>
+        <ul style="margin: 0;">
+          <li><strong>通常予約:</strong> 12時間</li>
+          <li><strong>緊急予約（利用24時間以内に発行）:</strong> 2時間</li>
+        </ul>
+      </div>
+
+      <hr class="divider">
+
+      <h2 class="section-title">2) キャンセル・返金（お客様都合）</h2>
+      <ul>
+        <li><strong>予約確定前:</strong> 自由にキャンセル可能</li>
+        <li><strong>予約確定後～決済前:</strong> 自由にキャンセル可能（リンク有効時間内に未決済の場合、自動的にキャンセルされる場合があります）</li>
+        <li><strong>決済後:</strong>
+          <ul>
+            <li>利用24時間前まで: <span style="color: #28a745; font-weight: 700;">全額返金</span></li>
+            <li>利用24時間～4時間前: <span style="color: #ffc107; font-weight: 700;">50%返金</span></li>
+            <li>利用4時間以内／当日キャンセル・ノーショー: <span style="color: #dc3545; font-weight: 700;">返金不可</span></li>
+            <li>利用中にお客様の都合で早期終了した場合: <span style="color: #dc3545; font-weight: 700;">既に利用した時間＋残り時間とも返金不可</span></li>
+          </ul>
+        </li>
+      </ul>
+
+      <div class="warning-box">
+        <h4><i class="fas fa-exclamation-triangle"></i> 手数料に関する注意</h4>
+        <p style="margin: 0;">カード会社／PG／両替などで回収できない手数料は、返金額から差し引かれる場合があります。</p>
+      </div>
+
+      <hr class="divider">
+
+      <h2 class="section-title">3) PUZZMI／メイト側の問題による不便</h2>
+      <ul>
+        <li><strong>メイトが15分以上遅刻した場合</strong><br>
+          → 遅延分の延長、または遅延分の金額返金から選択可能</li>
+        <li><strong>メイトの無断欠席・途中離脱・重大なサービス問題が発生した場合</strong><br>
+          → 全額返金またはすぐに他のメイトへ変更（可能な場合）<br>
+          → 変更が難しい場合は全額返金＋再予約の優先権／クーポン提供（当社基準による）</li>
+      </ul>
+
+      <hr class="divider">
+
+      <h2 class="section-title">4) 天候・安全</h2>
+      <ul>
+        <li><strong>気象特報／安全上のリスクにより正常に実施できない場合</strong><br>
+          → 1回無料変更または全額返金（お客様選択）</li>
+        <li><strong>通常の雨／曇りは返金対象外</strong>となる場合があり、その際は屋内コースへの変更をご提案いたします。</li>
+      </ul>
+
+      <hr class="divider">
+
+      <h2 class="section-title">5) 日程変更</h2>
+      <ul>
+        <li><strong>決済後～利用12時間前まで:</strong> 1回無料変更可能</li>
+        <li><strong>利用12時間以内の変更依頼は、</strong>上記キャンセル・返金規定が適用されます。</li>
+      </ul>
+
+      <hr class="divider">
+
+      <h2 class="section-title">6) 返金方法・期間</h2>
+      <ul>
+        <li>元のお支払い方法で返金いたします。カード会社／ウォレット／PGのポリシーにより、営業日基準で3～10日ほどかかる場合があります。</li>
+        <li>海外決済の場合、為替変動・仲介手数料により支払額と返金額が一致しない場合があります。</li>
+        <li>クーポン／プロモーション利用分は、ポリシーに従って復元または差し引かれる場合があります。</li>
+      </ul>
+
+      <hr class="divider">
+
+      <h2 class="section-title">7) 現地費用</h2>
+      <div class="important-box">
+        <h4><i class="fas fa-wallet"></i> 重要事項</h4>
+        <p style="margin: 0;">交通費・入場料・飲食費などの現地実費はお客様負担であり、返金対象外です（事前に有料オプションとしてお支払い済みのものを除く）。</p>
+      </div>
+
+      <hr class="divider">
+
+      <!-- 연락처 정보 -->
+      <div class="contact-info">
+        <h4>📞 お問い合わせ</h4>
+        <div class="contact-details">
+          <span class="contact-label">LINE:</span>
+          <span class="contact-value">PUZZMI公式アカウント</span>
+          <span class="contact-label">メール:</span>
+          <span class="contact-value">puzzmi0721@gmail.com</span>
+          <span class="contact-label">アプリ:</span>
+          <span class="contact-value">Web/アプリ内お問い合わせ</span>
+        </div>
+      </div>
+
+      <div class="highlight-box" style="margin-top: 40px;">
+        <h4>📢 お知らせ</h4>
+        <p style="margin: 0;">
+          返金・キャンセルに関してご質問がございましたら、上記の連絡先までお気軽にお問い合わせください。迅速かつ丁寧に対応いたします。
+        </p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
