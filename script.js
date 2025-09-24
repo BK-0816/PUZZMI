@@ -542,7 +542,6 @@ function startAutoSlide() {
 // 전역 함수로 등록 (HTML onclick에서 사용)
 window.changeSlide = changeSlide;
 window.goToSlide = goToSlide;
-});
 
 // 언어 초기화
 function initializeLanguage() {
