@@ -5,7 +5,7 @@
   position: sticky;
   top: 0;
   z-index: var(--z-sticky);
-  background: rgba(255, 255, 255, 0.98);
+  background: rgba(255, 255, 255, 0.98) !important;
   backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(102, 126, 234, 0.1);
   box-shadow: var(--shadow-sm);
@@ -13,10 +13,21 @@
 }
 
 .app-nav.scrolled {
-  background: rgba(255, 255, 255, 0.98);
+  background: rgba(255, 255, 255, 0.98) !important;
   box-shadow: var(--shadow-md);
   border-bottom-color: rgba(102, 126, 234, 0.15);
   backdrop-filter: blur(25px);
+}
+
+/* 모바일에서도 흰색 배경 강제 적용 */
+@media (max-width: 1024px) {
+  .app-nav {
+    background: rgba(255,255,255,0.98) !important;
+  }
+  
+  .app-nav.scrolled {
+    background: rgba(255,255,255,0.98) !important;
+  }
 }
 
 .nav-container {
@@ -440,7 +451,7 @@
   width: 100%;
   max-width: 320px;
   height: 100%;
-  background: rgba(255,255,255,0.98);
+  background: rgba(255,255,255,0.98) !important;
   backdrop-filter: blur(25px);
   border-left: 1px solid rgba(255,255,255,0.4);
   box-shadow: var(--shadow-2xl);
@@ -459,7 +470,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(255,255,255,0.95);
+  background: rgba(255,255,255,0.98) !important;
 }
 
 .mobile-menu-close {
