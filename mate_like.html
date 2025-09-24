@@ -1301,7 +1301,18 @@
 
     // 사진 갤러리 업데이트
     function updatePhotoGallery() {
-      if (!allPhotos.length) {
+      // 대표 사진을 첫 번째로 정렬
+      const orderedPhotos = [];
+      if (window.mateData?.primary_photo) {
+        orderedPhotos.push(window.mateData.primary_photo);
+      }
+      // 나머지 사진들 추가 (대표 사진 제외)
+      const otherPhotos = allPhotos.filter(photo => photo !== window.mateData?.primary_photo);
+      orderedPhotos.push(...otherPhotos);
+      
+      const finalPhotos = orderedPhotos.filter(Boolean);
+      
+      if (!finalPhotos.length) {
         photoSwiper.innerHTML = '<div class="no-photos">등록된 사진이 없습니다</div>';
         photoCounter.style.display = 'none';
         photoPrev.style.display = 'none';
@@ -1311,23 +1322,23 @@
       }
 
       // 사진 슬라이드 생성
-      photoSwiper.innerHTML = allPhotos.map((photo, index) => 
+      photoSwiper.innerHTML = finalPhotos.map((photo, index) => 
         `<div class="photo-slide">
           <img src="${keyToUrl(photo)}" alt="메이트 사진 ${index + 1}" loading="lazy">
         </div>`
       ).join('');
 
       // 카운터 업데이트
-      if (allPhotos.length > 1) {
+      if (finalPhotos.length > 1) {
         photoCounter.style.display = 'block';
-        photoCounter.textContent = `${currentPhotoIndex + 1} / ${allPhotos.length}`;
+        photoCounter.textContent = `${currentPhotoIndex + 1} / ${finalPhotos.length}`;
         
         // 네비게이션 버튼 표시
         photoPrev.style.display = 'block';
         photoNext.style.display = 'block';
         
         // 인디케이터 생성
-        photoIndicators.innerHTML = allPhotos.map((_, index) => 
+        photoIndicators.innerHTML = finalPhotos.map((_, index) => 
           `<div class="photo-indicator ${index === currentPhotoIndex ? 'active' : ''}" data-index="${index}"></div>`
         ).join('');
       } else {
@@ -1337,6 +1348,9 @@
         photoIndicators.innerHTML = '';
       }
 
+      // 전역 변수 업데이트
+      allPhotos = finalPhotos;
+      
       // 현재 사진으로 이동
       updatePhotoPosition();
     }
@@ -1407,6 +1421,9 @@
 
         console.log('✅ 메이트 데이터 로드 성공:', mate);
 
+        // 전역 변수에 메이트 데이터 저장 (사진 정렬용)
+        window.mateData = mate;
+        
         // 기본 정보 표시
         profileName.textContent = mate.profiles.full_name || '메이트';
         
@@ -1427,6 +1444,11 @@
 
         // 사진 갤러리
         allPhotos = mate.photos || [];
+        console.log('📸 사진 데이터:', { 
+          allPhotos: allPhotos, 
+          primaryPhoto: mate.primary_photo,
+          photosLength: allPhotos.length 
+        });
         updatePhotoGallery();
 
         // 전문 분야 태그
@@ -1684,7 +1706,52 @@
     });
 
     // 리뷰 작성 폼 (본인 프로필이 아닌 경우에만 표시)
-    if (!isOwnProfile && user) {
+    // 리뷰 작성 권한 확인: 완료된 예약이 있는 경우에만
+    async function checkReviewPermission() {
+      if (isOwnProfile || !user) {
+        console.log('❌ 리뷰 작성 불가: 본인 프로필이거나 비로그인');
+        return false;
+      }
+      
+      try {
+        // 현재 사용자가 이 메이트와 완료된 예약이 있는지 확인
+        const { data: completedBookings, error } = await supabase
+          .from('bookings')
+          .select('id, status')
+          .eq('customer_id', user.id)
+          .eq('mate_id', mateId)
+          .eq('status', 'completed');
+        
+        if (error) {
+          console.error('예약 확인 실패:', error);
+          return false;
+        }
+        
+        const hasCompletedBooking = completedBookings && completedBookings.length > 0;
+        console.log('📋 예약 확인 결과:', { 
+          hasCompletedBooking, 
+          completedBookings: completedBookings?.length || 0 
+        });
+        
+        return hasCompletedBooking;
+        
+      } catch (error) {
+        console.error('리뷰 권한 확인 실패:', error);
+        return false;
+      }
+    }
+    
+    // 리뷰 작성 폼 초기화
+    async function initializeReviewForm() {
+      const canWriteReview = await checkReviewPermission();
+      
+      if (!canWriteReview) {
+        console.log('❌ 리뷰 작성 권한 없음 - 폼 숨김');
+        reviewForm.style.display = 'none';
+        return;
+      }
+      
+      console.log('✅ 리뷰 작성 권한 확인 - 폼 표시');
       reviewForm.style.display = 'block';
       
       // 별점 선택
@@ -1766,6 +1833,9 @@
         
         console.log('3️⃣ 찜 상태 확인...');
         await checkFavoriteStatus();
+        
+        console.log('4️⃣ 리뷰 작성 권한 확인...');
+        await initializeReviewForm();
         
         console.log('✅ 모든 초기화 완료');
         
