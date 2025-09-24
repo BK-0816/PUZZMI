@@ -1755,14 +1755,6 @@
         }
       });
     }
-          document.getElementById('reviewsToggle').style.display = 'flex';
-        }
-
-      } catch (error) {
-        console.error('리뷰 로드 실패:', error);
-        reviewsList.innerHTML = '<div class="empty-state">리뷰를 불러오는데 실패했습니다.</div>';
-      }
-    }
 
     // 찜 상태 확인
     async function checkFavoriteStatus() {
@@ -1909,117 +1901,6 @@
         toggleReviewsBtn.innerHTML = '<i class="fas fa-chevron-up"></i><span>접기</span>';
       }
     });
-
-    // 리뷰 작성 폼 (본인 프로필이 아닌 경우에만 표시)
-    // 리뷰 작성 권한 확인: 완료된 예약이 있는 경우에만
-    async function checkReviewPermission() {
-      if (isOwnProfile || !user) {
-        console.log('❌ 리뷰 작성 불가: 본인 프로필이거나 비로그인');
-        return false;
-      }
-      
-      try {
-        // 현재 사용자가 이 메이트와 완료된 예약이 있는지 확인
-        const { data: completedBookings, error } = await supabase
-          .from('bookings')
-          .select('id, status')
-          .eq('customer_id', user.id)
-          .eq('mate_id', mateId)
-          .eq('status', 'completed');
-        
-        if (error) {
-          console.error('예약 확인 실패:', error);
-          return false;
-        }
-        
-        const hasCompletedBooking = completedBookings && completedBookings.length > 0;
-        console.log('📋 예약 확인 결과:', { 
-          hasCompletedBooking, 
-          completedBookings: completedBookings?.length || 0 
-        });
-        
-        return hasCompletedBooking;
-        
-      } catch (error) {
-        console.error('리뷰 권한 확인 실패:', error);
-        return false;
-      }
-    }
-    
-    // 리뷰 작성 폼 초기화
-    async function initializeReviewForm() {
-      const canWriteReview = await checkReviewPermission();
-      
-      if (!canWriteReview) {
-        console.log('❌ 리뷰 작성 권한 없음 - 폼 숨김');
-        reviewForm.style.display = 'none';
-        return;
-      }
-      
-      console.log('✅ 리뷰 작성 권한 확인 - 폼 표시');
-      reviewForm.style.display = 'block';
-      
-      // 별점 선택
-      const ratingButtons = document.querySelectorAll('.rating-btn');
-      const selectedRating = document.getElementById('selectedRating');
-      
-      ratingButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-          ratingButtons.forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          selectedRating.value = btn.dataset.rating;
-        });
-      });
-      
-      // 리뷰 제출
-      document.getElementById('reviewFormElement').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const rating = selectedRating.value;
-        const content = document.getElementById('reviewText').value.trim();
-        const resultDiv = document.getElementById('reviewResult');
-        
-        if (!rating) {
-          resultDiv.innerHTML = '<div class="message error">별점을 선택해주세요.</div>';
-          return;
-        }
-        
-        if (!content) {
-          resultDiv.innerHTML = '<div class="message error">리뷰 내용을 입력해주세요.</div>';
-          return;
-        }
-        
-        try {
-          const { error } = await supabase
-            .from('reviews')
-            .insert({
-              mate_id: mateId,
-              reviewer_id: user.id,
-              rating: parseInt(rating),
-              content: content
-            });
-          
-          if (error) throw error;
-          
-          resultDiv.innerHTML = '<div class="message success">리뷰가 등록되었습니다!</div>';
-          
-          // 폼 초기화
-          document.getElementById('reviewFormElement').reset();
-          ratingButtons.forEach(b => b.classList.remove('active'));
-          selectedRating.value = '';
-          
-          // 리뷰 목록 새로고침
-          setTimeout(() => {
-            loadReviews();
-            resultDiv.innerHTML = '';
-          }, 2000);
-          
-        } catch (error) {
-          console.error('리뷰 등록 실패:', error);
-          resultDiv.innerHTML = '<div class="message error">리뷰 등록에 실패했습니다.</div>';
-        }
-      });
-    }
 
     // 초기 로드
     async function initialize() {
