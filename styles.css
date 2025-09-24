@@ -1320,6 +1320,18 @@ a:hover {
 .about-text {
   max-width: 600px;
 }
+/* About 이미지 갤러리 컨테이너 */
+.about-images {
+  display: grid;
+  gap: var(--space-6);
+}
+
+@media (min-width: 768px) {
+  .about-images {
+    gap: var(--space-8);
+  }
+}
+
 
 .about-photo {
   position: relative;
@@ -1338,7 +1350,7 @@ a:hover {
 
 @media (min-width: 1024px) {
   .about-photo {
-    height: 600px;
+    height: 320px;
   }
 }
 
@@ -1348,10 +1360,12 @@ a:hover {
 }
 
 .about-photo img {
-  width: 100%;
+  transform: scale(1.02);
   height: 100%;
   object-fit: contain;
   background: var(--bg-primary);
+  width: 100%;
+  max-width: 100%;
   transition: transform var(--transition-base);
 }
 
@@ -2417,7 +2431,7 @@ a:hover {
   .feature,
   .safety-card {
     padding: var(--space-6);
-  }
+  height: 240px;
   
   .review-card {
     padding: var(--space-4);
@@ -2430,7 +2444,7 @@ a:hover {
   }
   
   .about-photo:first-child img {
-    height: 240px;
+    height: 280px;
   }
 }
 

@@ -423,21 +423,12 @@ function changeHeroBackground() {
         // 새로운 배경 이미지 설정
         heroBgElement.style.backgroundImage = `url('${heroBackgrounds[currentBgIndex]}')`;
         
-        // 배경 텍스트 업데이트
-        updateHeroText(backgroundTexts[currentBgIndex]);
+        // 배경 텍스트 업데이트 (data-text 속성 사용)
+        heroBgElement.setAttribute('data-text', backgroundTexts[currentBgIndex]);
         
         // 페이드 인
         heroBgElement.style.opacity = '1';
     }, 500);
-}
-
-function updateHeroText(text) {
-    const style = document.querySelector('#hero-bg-text-style') || document.createElement('style');
-    style.id = 'hero-bg-text-style';
-    style.textContent = `.hero-bg::after { content: '${text}'; }`;
-    if (!document.querySelector('#hero-bg-text-style')) {
-        document.head.appendChild(style);
-    }
 }
 
 // 초기 설정 및 배경 변경 시작
@@ -448,11 +439,11 @@ function initializeHeroBackground() {
     heroBgElement.style.backgroundImage = `url('${heroBackgrounds[currentBgIndex]}')`;
     heroBgElement.style.opacity = '1';
     
-    // 초기 배경 텍스트 설정
-    updateHeroText(backgroundTexts[currentBgIndex]);
+    // 초기 배경 텍스트 설정 (data-text 속성 사용)
+    heroBgElement.setAttribute('data-text', backgroundTexts[currentBgIndex]);
     
-    // 4초마다 배경 변경
-    setInterval(changeHeroBackground, 4000);
+    // 5초마다 배경 변경 (조금 더 여유있게)
+    setInterval(changeHeroBackground, 5000);
 }
 
 // 페이지 로드 시 히어로 배경 초기화
