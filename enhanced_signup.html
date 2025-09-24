@@ -640,6 +640,241 @@
     
     /* 숨김 상태 */
     .hidden { display: none !important; }
+    
+    /* 약관 동의 섹션 */
+    .terms-agreement-section {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(240, 147, 251, 0.05) 100%);
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 20px;
+      padding: 32px;
+      margin: 32px 0;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.1);
+    }
+    
+    .terms-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 12px 0;
+      text-align: center;
+    }
+    
+    .terms-subtitle {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      text-align: center;
+      margin: 0 0 24px 0;
+      line-height: 1.6;
+    }
+    
+    .terms-checkboxes {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    .terms-checkbox-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      cursor: pointer;
+      padding: 20px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+      border: 2px solid rgba(255,255,255,0.4);
+      border-radius: 16px;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .terms-checkbox-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+      transition: left 0.5s ease;
+    }
+    
+    .terms-checkbox-item:hover::before {
+      left: 100%;
+    }
+    
+    .terms-checkbox-item:hover {
+      background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 100%);
+      border-color: rgba(102, 126, 234, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    }
+    
+    .terms-checkbox-item.required::after {
+      content: '*';
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      color: #f5576c;
+      font-size: 1.5rem;
+      font-weight: 800;
+    }
+    
+    .terms-checkbox-item input[type="checkbox"] {
+      display: none;
+    }
+    
+    .checkmark {
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(102, 126, 234, 0.3);
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+      position: relative;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+      margin-top: 2px;
+      backdrop-filter: blur(6px);
+    }
+    
+    .terms-checkbox-item:hover .checkmark {
+      border-color: rgba(102, 126, 234, 0.5);
+      background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 100%);
+      transform: scale(1.05);
+    }
+    
+    .terms-checkbox-item input[type="checkbox"]:checked + .checkmark {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-color: transparent;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .terms-checkbox-item input[type="checkbox"]:checked + .checkmark::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-weight: 800;
+      font-size: 16px;
+    }
+    
+    .checkbox-text {
+      flex: 1;
+      line-height: 1.6;
+    }
+    
+    .checkbox-text strong {
+      display: block;
+      color: var(--text-primary);
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    
+    .checkbox-subtext {
+      display: block;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-style: italic;
+      margin-bottom: 8px;
+    }
+    
+    .terms-link {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 4px 8px;
+      border-radius: 8px;
+      background: rgba(102, 126, 234, 0.1);
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .terms-link:hover {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    
+    .privacy-details {
+      background: rgba(255,255,255,0.8);
+      border: 1px solid rgba(102, 126, 234, 0.2);
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 8px;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      color: var(--text-primary);
+    }
+    
+    .terms-notice {
+      background: linear-gradient(135deg, rgba(245, 87, 108, 0.1) 0%, rgba(240, 147, 251, 0.05) 100%);
+      border: 2px solid rgba(245, 87, 108, 0.2);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-top: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #f5576c;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+    
+    .terms-notice i {
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+    
+    /* 제출 버튼 비활성화 상태 */
+    .btn-primary:disabled {
+      background: linear-gradient(135deg, rgba(200, 200, 200, 0.8) 0%, rgba(180, 180, 180, 0.6) 100%);
+      color: rgba(255, 255, 255, 0.7);
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .btn-primary:disabled:hover {
+      transform: none !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    /* 반응형 디자인 */
+    @media (max-width: 768px) {
+      .terms-agreement-section {
+        padding: 24px;
+        border-radius: 16px;
+      }
+      
+      .terms-checkbox-item {
+        padding: 16px;
+        border-radius: 12px;
+      }
+      
+      .checkbox-text strong {
+        font-size: 0.95rem;
+      }
+      
+      .checkbox-subtext {
+        font-size: 0.85rem;
+      }
+      
+      .privacy-details {
+        font-size: 0.8rem;
+      }
+    }
   </style>
 </head>
 <body class="bg-cream">
@@ -771,6 +1006,103 @@
           <div id="signupResult"></div>
         </form>
 
+        <!-- 약관 동의 섹션 -->
+        <div class="terms-agreement-section">
+          <h4 class="terms-title">📋 利用規約および同意事項</h4>
+          <p class="terms-subtitle">サービス利用のために以下の項目をご確認の上、同意してください。</p>
+          
+          <div class="terms-checkboxes">
+            <!-- 필수 동의 항목들 -->
+            <label class="terms-checkbox-item required">
+              <input type="checkbox" id="ageConsent" required>
+              <span class="checkmark"></span>
+              <span class="checkbox-text">
+                <strong>私は18歳以上です。</strong>
+                <span class="checkbox-subtext">만 18세 이상입니다.</span>
+              </span>
+            </label>
+            
+            <label class="terms-checkbox-item required">
+              <input type="checkbox" id="passportConsent" required>
+              <span class="checkmark"></span>
+              <span class="checkbox-text">
+                <strong>現地でパスポート現物確認に同意します。撮影・複製・保管は行いません。(成人可否／確認者／確認時刻のみ記録)</strong>
+                <span class="checkbox-subtext">현장에서 여권 실물 확인에 동의합니다. 사진 촬영·복사·보관은 하지 않습니다. (성인 여부/확인자/확인시각만 기록)</span>
+              </span>
+            </label>
+            
+            <label class="terms-checkbox-item required">
+              <input type="checkbox" id="termsConsent" required>
+              <span class="checkmark"></span>
+              <span class="checkbox-text">
+                <strong>利用規約に同意します。</strong>
+                <span class="checkbox-subtext">이용약관에 동의합니다.</span>
+                <a href="terms_of_service.html" target="_blank" class="terms-link">📋 利用規約を確認</a>
+              </span>
+            </label>
+            
+            <label class="terms-checkbox-item required">
+              <input type="checkbox" id="refundConsent" required>
+              <span class="checkmark"></span>
+              <span class="checkbox-text">
+                <strong>返金・キャンセルポリシー（24時間前全額／24～4時間前50％／4時間以内・ノーショー不可）に同意します。</strong>
+                <span class="checkbox-subtext">환불·취소 정책(24시간 전 전액 / 24~4시간 50% / 4시간 이내·노쇼 불가)에 동의합니다.</span>
+                <a href="refund_policy.html" target="_blank" class="terms-link">💰 返金ポリシーを確認</a>
+              </span>
+            </label>
+            
+            <label class="terms-checkbox-item required">
+              <input type="checkbox" id="coolingOffConsent" required>
+              <span class="checkmark"></span>
+              <span class="checkbox-text">
+                <strong>日時指定サービスの性質上、「7日間のクーリングオフ」適用が制限されること（第11条）に同意します。</strong>
+                <span class="checkbox-subtext">시간지정 서비스 특성상 '청약철회(7일)'가 제한됨(제11조)에 동의합니다.</span>
+              </span>
+            </label>
+            
+            <label class="terms-checkbox-item required">
+              <input type="checkbox" id="privacyConsent" required>
+              <span class="checkmark"></span>
+              <span class="checkbox-text">
+                <strong>個人情報の収集・利用に同意します。</strong>
+                <span class="checkbox-subtext">개인정보 수집·이용에 동의합니다.</span>
+                <div class="privacy-details">
+                  <strong>項目:</strong> 氏名・連絡先・LINE ID・予約情報・成人確認結果（可/否）・確認者/時刻<br>
+                  <strong>目的:</strong> 予約・本人/年齢確認・紛争対応<br>
+                  <strong>保管:</strong> 成人確認ログ［例：12か月］等
+                </div>
+              </span>
+            </label>
+            
+            <label class="terms-checkbox-item required">
+              <input type="checkbox" id="transferConsent" required>
+              <span class="checkmark"></span>
+              <span class="checkbox-text">
+                <strong>個人情報の国外移転および第三者提供（決済・メッセージ配信）に同意します。</strong>
+                <span class="checkbox-subtext">개인정보 국외이전 및 제3자 제공(결제·메시징)에 동의합니다.</span>
+                <div class="privacy-details">
+                  <strong>提供先:</strong> LINE Corporation（日本/他）、決済事業者等<br>
+                  <strong>目的:</strong> 決済処理・通知送信<br>
+                  <strong>項目:</strong> 氏名・連絡先・決済識別子・予約情報（必要最小限）
+                </div>
+              </span>
+            </label>
+            
+            <label class="terms-checkbox-item required">
+              <input type="checkbox" id="lineNotificationConsent" required>
+              <span class="checkmark"></span>
+              <span class="checkbox-text">
+                <strong>契約・決済に関する通知をLINEで受信することに同意します。</strong>
+                <span class="checkbox-subtext">계약·결제 관련 고지를 LINE 메시지로 받는 것에 동의합니다.</span>
+              </span>
+            </label>
+          </div>
+          
+          <div class="terms-notice">
+            <i class="fas fa-info-circle"></i>
+            <span>すべての必須項目に同意していただく必要があります。</span>
+          </div>
+        </div>
         <!-- 이메일 인증 섹션 -->
         <div class="email-verification-section" id="emailVerificationSection">
           <div class="verification-header">
@@ -865,6 +1197,7 @@
     const emailVerificationSection = document.getElementById('emailVerificationSection');
     const completionSection = document.getElementById('completionSection');
     const signupFormSection = document.getElementById('signupFormSection');
+    const signupBtn = document.getElementById('signupBtn');
     
     const step1 = document.getElementById('step1');
     const step2 = document.getElementById('step2');
@@ -893,6 +1226,24 @@
       });
     }
 
+    // 약관 동의 상태 확인 및 버튼 활성화
+    function checkTermsAgreement() {
+      const requiredCheckboxes = [
+        'ageConsent', 'passportConsent', 'termsConsent', 'refundConsent', 
+        'coolingOffConsent', 'privacyConsent', 'transferConsent', 'lineNotificationConsent'
+      ];
+      
+      const allChecked = requiredCheckboxes.every(id => document.getElementById(id).checked);
+      signupBtn.disabled = !allChecked;
+    }
+    
+    // 체크박스 이벤트 리스너 추가
+    document.addEventListener('change', (e) => {
+      if (e.target.type === 'checkbox' && e.target.closest('.terms-checkboxes')) {
+        checkTermsAgreement();
+      }
+    });
+
     // 회원가입 폼 제출 (1단계 → 2단계)
     signupForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -918,6 +1269,18 @@
       
       if (selectedLanguages.length === 0) {
         signupResult.innerHTML = '<div class="error">❌少なくとも 1 つの言語を選択してください。</div>';
+        return;
+      }
+      
+      // 약관 동의 확인
+      const requiredCheckboxes = [
+        'ageConsent', 'passportConsent', 'termsConsent', 'refundConsent', 
+        'coolingOffConsent', 'privacyConsent', 'transferConsent', 'lineNotificationConsent'
+      ];
+      
+      const uncheckedItems = requiredCheckboxes.filter(id => !document.getElementById(id).checked);
+      if (uncheckedItems.length > 0) {
+        signupResult.innerHTML = '<div class="error">❌ すべての必須同意項目にチェックしてください。</div>';
         return;
       }
       
@@ -1327,6 +1690,9 @@
         birthDateInput.setAttribute('max', today);
         birthDateInput.setAttribute('min', minDateStr);
       }
+      
+      // 초기 버튼 상태 설정
+      checkTermsAgreement();
     });
   </script>
 </body>
