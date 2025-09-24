@@ -1228,17 +1228,11 @@ a:hover {
 
 .safety-grid {
   display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: var(--space-8);
   list-style: none;
   padding: 0;
   margin: 0;
-}
-
-@media (min-width: 768px) {
-  .safety-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-10);
-  }
 }
 
 .safety-card {
@@ -1251,12 +1245,12 @@ a:hover {
   transition: all var(--transition-base);
   position: relative;
   overflow: hidden;
-  text-align: center;
-  min-height: 400px;
+  min-height: 480px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
+  text-align: center;
+  gap: var(--space-6);
 }
 
 .safety-card::before {
@@ -1266,100 +1260,100 @@ a:hover {
   left: 0;
   right: 0;
   height: 4px;
-  background: var(--gradient-primary);
-  opacity: 0;
-  transition: opacity var(--transition-base);
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 33%, #f093fb 66%, #f5576c 100%);
+  opacity: 0.8;
 }
 
 .safety-card:hover {
   transform: translateY(-8px) scale(1.02);
   box-shadow: var(--shadow-2xl);
-  border-color: var(--primary-300);
+  border-color: rgba(102, 126, 234, 0.3);
 }
 
 .safety-card:hover::before {
   opacity: 1;
+  height: 5px;
 }
 
 .safety-media {
-  margin: 0 0 var(--space-6) 0;
-  width: 160px;
-  height: 160px;
+  width: 220px;
+  height: 220px;
   border-radius: var(--radius-xl);
-  overflow: hidden;
-  box-shadow: var(--shadow-lg);
-  transition: all var(--transition-base);
-  flex-shrink: 0;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(240, 147, 251, 0.05) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(240, 147, 251, 0.03) 100%);
-}
-
-@media (min-width: 768px) {
-  .safety-media {
-    width: 180px;
-    height: 180px;
-  }
-}
-
-@media (min-width: 1024px) {
-  .safety-media {
-    width: 200px;
-    height: 200px;
-  }
+  margin: 0;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-md);
+  border: 2px solid rgba(255,255,255,0.6);
 }
 
 .safety-media img {
-  width: 100%;
-  height: 100%;
+  width: 180px;
+  height: 180px;
   object-fit: contain;
-  object-position: center;
   transition: transform var(--transition-base);
 }
 
+.safety-card:hover .safety-media {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-lg);
+  border-color: rgba(102, 126, 234, 0.4);
+}
+
 .safety-card:hover .safety-media img {
-  transform: scale(1.1) rotate(5deg);
+  transform: scale(1.1);
 }
 
 .safety-copy {
-  text-align: center;
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 0 var(--space-2);
+  gap: var(--space-4);
 }
 
 .safety-copy h3 {
   font-size: var(--font-size-2xl);
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight-extrabold);
   background: var(--gradient-primary);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  margin-bottom: var(--space-4);
+  margin: 0;
   letter-spacing: -0.01em;
-  line-height: var(--line-height-tight);
+  line-height: 1.3;
 }
 
 .safety-copy p {
   font-size: var(--font-size-lg);
   line-height: var(--line-height-relaxed);
-  color: var(--text-secondary);
+  color: var(--text-primary);
   margin: 0;
-  text-align: center;
+  font-weight: var(--font-weight-medium);
 }
 
-@media (max-width: 767px) {
+@media (max-width: 768px) {
+  .safety-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+  
   .safety-card {
-    min-height: 350px;
+    min-height: 400px;
     padding: var(--space-8);
+    gap: var(--space-5);
   }
   
   .safety-media {
-    width: 140px;
-    height: 140px;
+    width: 180px;
+    height: 180px;
+  }
+  
+  .safety-media img {
+    width: 150px;
+    height: 150px;
   }
   
   .safety-copy h3 {
