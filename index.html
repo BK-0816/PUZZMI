@@ -475,78 +475,66 @@
       <p class="section-subtitle">あなたの"⼀緒に⾏きたい"という気持ちを叶えるサービス！</p>
     </div>
 
-    <!-- 스와이프 카드 컨테이너 -->
-    <div class="swipe-container" id="aboutSwipeContainer">
-      <div class="swipe-wrapper">
-        <div class="swipe-slide active">
-          <div class="about-card">
-            <div class="about-card-image">
-              <img src="about1.png" alt="PUZZMI 소개 사진 1" />
+    <div class="about-content">
+      <!-- 스와이프 카드 컨테이너 -->
+      <div class="swipe-container" id="aboutSwipeContainer">
+        <div class="swipe-wrapper">
+          <div class="swipe-slide active">
+            <div class="about-card">
+              <div class="about-card-image">
+                <img src="about1.png" alt="PUZZMI 소개 사진 1" />
+              </div>
+              <div class="about-card-content">
+                <h3>一人では行けない、お店、グルメやカフェを楽しもう！</h3>
+                <p>現地の友達と一緒なら、ローカルグルメも安心！言葉の壁を気にせず、韓国を思いっきり楽しもう！</p>
+              </div>
             </div>
-            <div class="about-card-content">
-              <h3>一人では行けない、お店、グルメやカフェを楽しもう！</h3>
-              <p>現地の友達と一緒なら、ローカルグルメも安心！言葉の壁を気にせず、韓国を思いっきり楽しもう！</p>
+          </div>
+          
+          <div class="swipe-slide">
+            <div class="about-card">
+              <div class="about-card-image">
+                <img src="about2.png" alt="PUZZMI 소개 사진 2" />
+              </div>
+              <div class="about-card-content">
+                <h3>ガイドブックに載っていない、あなただけの韓国を見つけよう！</h3>
+                <p>ガイドブックには載っていない、地元の人だけが知っている隠れた名店もご紹介します。人気観光地とあわせて、韓国の魅力を存分にお楽しみください。</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="swipe-slide">
+            <div class="about-card">
+              <div class="about-card-image">
+                <img src="about3.png" alt="PUZZMI 소개 사진 3" />
+              </div>
+              <div class="about-card-content">
+                <h3>周りと差がつく韓国旅行を！</h3>
+                <p>現地韓国女子と、韓国の最新トレンドをリアルに体験できます！ファッションやコスメ、話題のカフェや最新スポットまで韓国の「今」を満喫しよう！</p>
+              </div>
             </div>
           </div>
         </div>
         
-        <div class="swipe-slide">
-          <div class="about-card">
-            <div class="about-card-image">
-              <img src="about2.png" alt="PUZZMI 소개 사진 2" />
-            </div>
-            <div class="about-card-content">
-              <h3>ガイドブックに載っていない、あなただけの韓国を見つけよう！</h3>
-              <p>ガイドブックには載っていない、地元の人だけが知っている隠れた名店もご紹介します。人気観光地とあわせて、韓国の魅力を存分にお楽しみください。</p>
-            </div>
-          </div>
-        </div>
+        <!-- 네비게이션 버튼 -->
+        <button class="swipe-nav swipe-prev" onclick="changeSlide('aboutSwipeContainer', -1)">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="swipe-nav swipe-next" onclick="changeSlide('aboutSwipeContainer', 1)">
+          <i class="fas fa-chevron-right"></i>
+        </button>
         
-        <div class="swipe-slide">
-          <div class="about-card">
-            <div class="about-card-image">
-              <img src="about3.png" alt="PUZZMI 소개 사진 3" />
-            </div>
-            <div class="about-card-content">
-              <h3>周りと差がつく韓国旅行を！</h3>
-              <p>現地韓国女子と、韓国の最新トレンドをリアルに体験できます！ファッションやコスメ、話題のカフェや最新スポットまで韓国の「今」を満喫しよう！</p>
-            </div>
-          </div>
+        <!-- 인디케이터 -->
+        <div class="swipe-indicators">
+          <span class="indicator active" onclick="goToSlide('aboutSwipeContainer', 0)"></span>
+          <span class="indicator" onclick="goToSlide('aboutSwipeContainer', 1)"></span>
+          <span class="indicator" onclick="goToSlide('aboutSwipeContainer', 2)"></span>
         </div>
-        
-        <div class="swipe-slide">
-          <div class="about-card">
-            <div class="about-card-image">
-              <img src="safety1.png" alt="언어 지원 일러스트" />
-            </div>
-            <div class="about-card-content">
-              <h3>言葉の壁も心配なし!</h3>
-              <p>韓国語が不安でも大丈夫！注文や交通、ショッピング、道案内など、しっかりサポートいたします。安心して旅行を楽しめます！</p>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <!-- 네비게이션 버튼 -->
-      <button class="swipe-nav swipe-prev" onclick="changeSlide('aboutSwipeContainer', -1)">
-        <i class="fas fa-chevron-left"></i>
-      </button>
-      <button class="swipe-nav swipe-next" onclick="changeSlide('aboutSwipeContainer', 1)">
-        <i class="fas fa-chevron-right"></i>
-      </button>
-      
-      <!-- 인디케이터 -->
-      <div class="swipe-indicators">
-        <span class="indicator active" onclick="goToSlide('aboutSwipeContainer', 0)"></span>
-        <span class="indicator" onclick="goToSlide('aboutSwipeContainer', 1)"></span>
-        <span class="indicator" onclick="goToSlide('aboutSwipeContainer', 2)"></span>
-        <span class="indicator" onclick="goToSlide('aboutSwipeContainer', 3)"></span>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ✅ NEW: SAFETY SECTION -->
 <section id="safety" class="safety">
   <div class="container">
     <div class="section-header" data-eyebrow="SAFETY">
@@ -554,59 +542,61 @@
       <p class="section-subtitle">はじめてでも安心の3つのポイント</p>
     </div>
 
-    <!-- 스와이프 카드 컨테이너 -->
-    <div class="swipe-container" id="safetySwipeContainer">
-      <div class="swipe-wrapper">
-        <div class="swipe-slide active">
-          <div class="safety-card">
-            <div class="safety-card-image">
-              <img src="safety1.png" alt="메이트 본인확인 일러스트" />
+    <div class="safety-content">
+      <!-- 스와이프 카드 컨테이너 -->
+      <div class="swipe-container" id="safetySwipeContainer">
+        <div class="swipe-wrapper">
+          <div class="swipe-slide active">
+            <div class="safety-card">
+              <div class="safety-card-image">
+                <img src="safety1.png" alt="메이트 본인확인 일러스트" />
+              </div>
+              <div class="safety-card-content">
+                <h3>メイト全員の本人確認</h3>
+                <p>メイト全員が身分証による本人確認に加え、<strong>면접</strong>で対応力やマナーをチェックしております。信頼できるメイトと、安全で楽しい時間を提供いたします。</p>
+              </div>
             </div>
-            <div class="safety-card-content">
-              <h3>メイト全員の本人確認</h3>
-              <p>メイト全員が身分証による本人確認に加え、<strong>面接</strong>で対応力やマナーをチェックしております。信頼できるメイトと、安全で楽しい時間を提供いたします。</p>
+          </div>
+          
+          <div class="swipe-slide">
+            <div class="safety-card">
+              <div class="safety-card-image">
+                <img src="safety2.png" alt="일본인 스태프 상주 일러스트" />
+              </div>
+              <div class="safety-card-content">
+                <h3>日本人スタッフの常駐</h3>
+                <p>日本人スタッフが常駐しているため、<strong>언어·문화</strong>の壁を気にせず、初めての方も安心してご利用いただけます。</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="swipe-slide">
+            <div class="safety-card">
+              <div class="safety-card-image">
+                <img src="safety3.png" alt="지원 및 상담 운영 일러스트" />
+              </div>
+              <div class="safety-card-content">
+                <h3>安全・安心のサポート・相談体制</h3>
+                <p>万が一ご利用中に問題が起きても、<strong>신속한 대응</strong>でサポートいたします。いつでもお気軽にご相談くださいませ。</p>
+              </div>
             </div>
           </div>
         </div>
         
-        <div class="swipe-slide">
-          <div class="safety-card">
-            <div class="safety-card-image">
-              <img src="safety2.png" alt="일본인 스태프 상주 일러스트" />
-            </div>
-            <div class="safety-card-content">
-              <h3>日本人スタッフの常駐</h3>
-              <p>日本人スタッフが常駐しているため、<strong>言語·文化</strong>の壁を気にせず、初めての方も安心してご利用いただけます。</p>
-            </div>
-          </div>
-        </div>
+        <!-- 네비게이션 버튼 -->
+        <button class="swipe-nav swipe-prev" onclick="changeSlide('safetySwipeContainer', -1)">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="swipe-nav swipe-next" onclick="changeSlide('safetySwipeContainer', 1)">
+          <i class="fas fa-chevron-right"></i>
+        </button>
         
-        <div class="swipe-slide">
-          <div class="safety-card">
-            <div class="safety-card-image">
-              <img src="safety3.png" alt="지원 및 상담 운영 일러스트" />
-            </div>
-            <div class="safety-card-content">
-              <h3>安全・安心のサポート・相談体制</h3>
-              <p>万が一ご利用中に問題が起きても、<strong>迅速な対応</strong>でサポートいたします。いつでもお気軽にご相談くださいませ。</p>
-            </div>
-          </div>
+        <!-- 인디케이터 -->
+        <div class="swipe-indicators">
+          <span class="indicator active" onclick="goToSlide('safetySwipeContainer', 0)"></span>
+          <span class="indicator" onclick="goToSlide('safetySwipeContainer', 1)"></span>
+          <span class="indicator" onclick="goToSlide('safetySwipeContainer', 2)"></span>
         </div>
-      </div>
-      
-      <!-- 네비게이션 버튼 -->
-      <button class="swipe-nav swipe-prev" onclick="changeSlide('safetySwipeContainer', -1)">
-        <i class="fas fa-chevron-left"></i>
-      </button>
-      <button class="swipe-nav swipe-next" onclick="changeSlide('safetySwipeContainer', 1)">
-        <i class="fas fa-chevron-right"></i>
-      </button>
-      
-      <!-- 인디케이터 -->
-      <div class="swipe-indicators">
-        <span class="indicator active" onclick="goToSlide('safetySwipeContainer', 0)"></span>
-        <span class="indicator" onclick="goToSlide('safetySwipeContainer', 1)"></span>
-        <span class="indicator" onclick="goToSlide('safetySwipeContainer', 2)"></span>
       </div>
     </div>
   </div>
