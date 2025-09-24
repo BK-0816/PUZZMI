@@ -92,6 +92,46 @@ body {
     /* 로고와 텍스트를 수직으로 중앙 정렬 */
 }
 
+@media (max-width: 1024px) {
+    .nav .container {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .logo {
+        height: 96px;
+        width: auto;
+    }
+
+    .nav-brand {
+        font-size: 36px;
+    }
+}
+
+@media (max-width: 768px) {
+    .nav .container {
+        padding: 0 12px;
+    }
+
+    .logo {
+        height: 72px;
+    }
+
+    .nav-brand {
+        font-size: 30px;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo {
+        height: 56px;
+    }
+
+    .nav-brand {
+        font-size: 24px;
+    }
+}
+
 .nav-brand {
     display: flex;
     align-items: center;
