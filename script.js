@@ -604,15 +604,17 @@ function initializeContactForm() {
 
 // 헤더 스크롤 효과
 function initializeHeaderScroll() {
-    const header = document.querySelector('.header');
+    const header = document.querySelector('.app-nav');
+    
+    if (!header) {
+        return; // Exit if navigation element is not found
+    }
     
     window.addEventListener('scroll', () => {
         if (window.scrollY > 100) {
-            header.style.background = 'rgba(255, 255, 255, 0.98)';
-            header.style.boxShadow = 'var(--shadow-medium)';
+            header.classList.add('scrolled');
         } else {
-            header.style.background = 'rgba(255, 255, 255, 0.95)';
-            header.style.boxShadow = 'none';
+            header.classList.remove('scrolled');
         }
     });
 }

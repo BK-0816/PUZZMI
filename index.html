@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PUZZMI - 서울 렌탈친구 서비스</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="navigation.css">
+    <link rel="stylesheet" href="pages.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;600;800&display=swap" rel="stylesheet">
@@ -12,7 +14,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;800&family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="nav.css"/>
 <script type="module" src="nav.js"></script>
 </head>
 
@@ -457,100 +458,98 @@ async function refreshHeartCount() {
 
 
 
-<body>
+<body class="bg-cream">
     <div id="app-nav"></div>
     
-    <header class="header">
-        <nav class="nav">
-            <div class="container">
-                <div class="nav-brand">
-                    <img src="puzzmi_original.png" alt="PUZZMI 로고" class="logo">
-                    <span>PUZZMI</span>
-                </div>
-            </div>
-        </nav>
-    </header>
-
     <section id="home" class="hero">
         <div class="hero-bg"></div>
+        <div class="hero-overlay"></div>
         <div class="container">
             <div class="hero-content">
                 <h1 class="hero-title" data-key="hero-title">一生忘れないとっておきの瞬間をあなたに！</h1>
                 <p class="hero-subtitle" data-key="hero-subtitle">現地の友達と一緒に、グルメ・人気スポット・穴場スポットまで！<br>思い出のパズルをつなげよう
 </p>
-                
-
+                <div class="hero-actions">
+                    <a href="#friends" class="btn btn-primary btn-xl">
+                        <i class="fas fa-users"></i>
+                        友達を探す
+                    </a>
+                    <a href="#about" class="btn btn-secondary btn-xl">
+                        <i class="fas fa-info-circle"></i>
+                        サービス紹介
+                    </a>
+                </div>
             </div>
         </div>
     </section>
 
 <section id="about" class="about">
-  <div class="container about-content">
+  <div class="container">
+    <div class="about-content">
+      <div class="about-text">
+        <div class="section-header" data-eyebrow="ABOUT">
+          <h2 class="section-title">''PUZZMI'とはどんなサービス？</h2>
+          <p class="section-subtitle">あなたの"⼀緒に⾏きたい"という気持ちを叶えるサービス！</p>
+        </div>
 
+        <!-- 보조 카피 -->
+        <p class="section-subtitle">
+          韓国人と一緒に語学交換や文化交流をしながら、旅を特別な思い出に！
+          <br><span class="nobr">わたしたちはただの′ガイド´ではなく友達です！</span>
+        </p>
 
-    <div class="about-text">
-  <h2 class="section-title">''PUZZMI'とはどんなサービス？</h2>
+        <!-- 베네핏 리스트 -->
+        <ul class="benefits">
+          <li>
+            <div class="icon">✓</div>
+            <div class="text">
+              <strong>一人では行けない、お店、グルメやカフェを楽しもう！</strong><br>
+              現地の友達と一緒なら、ローカルグルメも安心！言葉の壁を気にせず、韓国を思いっきり楽しもう！
+            </div>
+          </li>
+          <li>
+            <div class="icon">✓</div>
+            <div class="text">
+              <strong>ガイドブックに載っていない、あなただけの韓国を見つけよう！</strong><br>
+              ガイドブックには載っていない、地元の人だけが知っている隠れた名店もご紹介します。人気観光地とあわせて、韓国の魅力を存分にお楽しみください。
+            </div>
+          </li>
+          <li>
+            <div class="icon">✓</div>
+            <div class="text">
+              <strong>周りと差がつく韓国旅行を！</strong><br>
+              現地韓国女子と、韓国の最新トレンドをリアルに体験できます！ やファッションやコスメ、話題のカフェや最新スポットまで韓国の「今」を満喫しよう！
+            </div>
+          </li>
+          <li>
+            <div class="icon">✓</div>
+            <div class="text">
+              <strong>言葉の壁も心配なし!</strong><br>
+              韓国語が不安でも大丈夫！注文や交通、ショッピング、道案内など、しっかりサポートいたします。安心して旅行を楽しめます！
+            </div>
+          </li>
+        </ul>
 
-   <div class="about-gallery">
-  <figure class="about-photo">
-    <img src="about1.png" alt="PUZZMI 소개 사진 1" />
-  </figure>
-  <figure class="about-photo">
-    <img src="about2.png" alt="PUZZMI 소개 사진 2" />
-  </figure>
-  <figure class="about-photo">
-    <img src="about3.png" alt="PUZZMI 소개 사진 3" />
-  </figure>
-</div>
-
-  <!-- 핵심 한 줄 카피(리드) -->
-  <p class="lead-copy">あなたの“⼀緒に⾏きたい”という気持ちを叶えるサービス！</p>
-
-  <!-- 보조 카피(두 줄) -->
-  <p class="section-subtitle">
-    韓国人と一緒に語学交換や文化交流をしながら、旅を特別な思い出に！
-     <br><span class="nobr">わたしたちはただの′ガイド´ではなく友達です！</span>
-
-  </p>
-
-  <!-- 베네핏 리스트(체크 아이콘 + 설명) -->
-  <ul class="benefits">
-    <li>
-      <div class="icon">✓</div>
-      <div class="text">
-        <strong>一人では行けない、お店、グルメやカフェを楽しもう！</strong><br>
-        現地の友達と一緒なら、ローカルグルメも安心！言葉の壁を気にせず、韓国を思いっきり楽しもう！
+        <!-- 마무리 메시지 -->
+        <div class="about-quote">
+          <span class="quote-mark">"</span>
+          あなたの韓国旅行を最高の時間にいたします！
+        </div>
       </div>
-    </li>
-    <li>
-      <div class="icon">✓</div>
-      <div class="text">
-        <strong>ガイドブックに載っていない、あなただけの韓国を見つけよう！</strong><br>
-        ガイドブックには載っていない、地元の人だけが知っている隠れた名店もご紹介します。人気観光地とあわせて、韓国の魅力を存分にお楽しみください。
+      
+      <div class="about-gallery">
+        <figure class="about-photo">
+          <img src="about1.png" alt="PUZZMI 소개 사진 1" />
+        </figure>
+        <figure class="about-photo">
+          <img src="about2.png" alt="PUZZMI 소개 사진 2" />
+        </figure>
+        <figure class="about-photo">
+          <img src="about3.png" alt="PUZZMI 소개 사진 3" />
+        </figure>
       </div>
-    </li>
-    <li>
-      <div class="icon">✓</div>
-      <div class="text">
-        <strong>周りと差がつく韓国旅行を！</strong><br>
-        現地韓国女子と、韓国の最新トレンドをリアルに体験できます！ やファッションやコスメ、話題のカフェや最新スポットまで韓国の「今」を満喫しよう！
-      </div>
-    </li>
-     <li>
-      <div class="icon">✓</div>
-      <div class="text">
-        <strong>言葉の壁も心配なし!</strong><br>
-        韓国語が不安でも大丈夫！注文や交通、ショッピング、道案内など、しっかりサポートいたします。安心して旅行を楽しめます！
-      </div>
-    </li>
-  </ul>
-
-  <!-- 마무리 메시지(인용 카드) -->
-  <div class="about-quote">
-    <span class="quote-mark">"</span>
-     あなたの韓国旅行を最高の時間にいたします！
+    </div>
   </div>
-</div>
 </section>
 
 <!-- ✅ NEW: SAFETY SECTION -->
@@ -607,28 +606,32 @@ async function refreshHeartCount() {
 
 
     <section id="friends" class="friends">
-  <div class="container">
-    <div class="section-header">
-      <h2 class="section-title" data-key="friends-title">メイトに会ってみよう</h2>
-      <p class="section-subtitle" data-key="friends-subtitle">趣味も、グルメも、最新トレンドも、一緒に楽しめる友達と！</p>
-    </div>
+      <div class="container">
+        <div class="section-header" data-eyebrow="FRIENDS">
+          <h2 class="section-title" data-key="friends-title">メイトに会ってみよう</h2>
+          <p class="section-subtitle" data-key="friends-subtitle">趣味も、グルメも、最新トレンドも、一緒に楽しめる友達と！</p>
+        </div>
 
-    <div class="friend-filters">
-      <button class="filter-btn active" data-filter="all" data-key="filter-all">すべて見る</button>
-    </div>
+        <div class="friend-filters">
+          <button class="quick-filter active" data-filter="all" data-key="filter-all">すべて見る</button>
+        </div>
 
-    <!-- ★ JS가 카드를 채워 넣을 컨테이너 -->
-    <div class="friends-grid"></div>
-    <!-- ✅ 더 보기 버튼 -->
-<div class="friends-actions" style="text-align:center; margin-top:12px;">
-  <button id="loadMore" class="cta-btn" style="display:none">더 보기</button>
-</div>
-  </div>
-</section>
+        <!-- JS가 카드를 채워 넣을 컨테이너 -->
+        <div class="friends-grid"></div>
+        
+        <!-- 더 보기 버튼 -->
+        <div class="friends-actions text-center">
+          <button id="loadMore" class="btn btn-primary btn-lg" style="display:none">
+            <i class="fas fa-plus"></i>
+            더 보기
+          </button>
+        </div>
+      </div>
+    </section>
 
     <section id="how-it-works" class="how-it-works">
         <div class="container">
-            <div class="section-header">
+            <div class="section-header" data-eyebrow="HOW IT WORKS">
                 <h2 class="section-title" data-key="how-title">ご利用流れ</h2>
                 <p class="section-subtitle" data-key="how-subtitle">ソウルでの一日が、かけがえのない思い出になりますように</p>
             </div>
@@ -674,7 +677,7 @@ async function refreshHeartCount() {
 
     <section id="reviews" class="reviews">
         <div class="container">
-            <div class="section-header">
+            <div class="section-header" data-eyebrow="REVIEWS">
                 <h2 class="section-title" data-key="reviews-title">思い出のパズルを完成させよう</h2>
                 <p class="section-subtitle" data-key="reviews-subtitle">PUZZMIと一緒に旅したお客様のの貴重な声</p>
             </div>
@@ -767,7 +770,7 @@ async function refreshHeartCount() {
 
     <section id="contact" class="contact">
         <div class="container">
-            <div class="section-header">
+            <div class="section-header" data-eyebrow="FAQ">
                 <h2 class="section-title">よくあるご質問 (FAQ)</h2>
                 <p class="section-subtitle">PUZZMIサービスに関するよくあるご質問</p>
             </div>
@@ -910,6 +913,7 @@ async function refreshHeartCount() {
             <div class="footer-content">
                 <div class="footer-brand">
                     <div class="nav-brand">
+                        <img src="puzzmi_original.png" alt="PUZZMI 로고">
                         <span>PUZZMI</span>
                     </div>
                     <p class="footer-description" data-key="footer-desc">一生忘れないとっておきの瞬間をあなたに！</p>
@@ -953,20 +957,20 @@ async function refreshHeartCount() {
     </footer>
 
     <script src="script.js"></script>
+    
     <div class="floating-actions" aria-label="빠른 실행 버튼">
-  <a href="https://instagram.com/puzzmi_official" target="_blank" class="floating-btn insta" aria-label="Instagram">
-    <i class="fab fa-instagram" aria-hidden="true"></i><span>Instagram</span>
-  </a>
-  <a href="https://lin.ee/NbNPSUz" target="_blank" class="floating-btn line" aria-label="LINE">
-    <i class="fab fa-line" aria-hidden="true"></i><span>LINE</span>
-  </a>
-  <a href="https://x.com/puzzmi19889" target="_blank" class="floating-btn x" aria-label="X (Twitter)">
-  <i class="fa-brands fa-x-twitter" aria-hidden="true"></i><span>X</span>
-</a>
-  <!-- 문의하기 버튼으로 변경 -->
-  <a href="qna.html" class="floating-btn book" aria-label="お問い合わせ">
-    <i class="fas fa-question-circle" aria-hidden="true"></i><span>お問い合わせ</span>
-  </a>
-</div>
+      <a href="https://instagram.com/puzzmi_official" target="_blank" class="floating-btn insta" aria-label="Instagram">
+        <i class="fab fa-instagram" aria-hidden="true"></i><span>Instagram</span>
+      </a>
+      <a href="https://lin.ee/NbNPSUz" target="_blank" class="floating-btn line" aria-label="LINE">
+        <i class="fab fa-line" aria-hidden="true"></i><span>LINE</span>
+      </a>
+      <a href="https://x.com/puzzmi19889" target="_blank" class="floating-btn x" aria-label="X (Twitter)">
+        <i class="fa-brands fa-x-twitter" aria-hidden="true"></i><span>X</span>
+      </a>
+      <a href="qna.html" class="floating-btn book" aria-label="お問い合わせ">
+        <i class="fas fa-question-circle" aria-hidden="true"></i><span>お問い合わせ</span>
+      </a>
+    </div>
 </body>
 </html>
