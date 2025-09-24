@@ -15,7 +15,7 @@
 .app-nav.scrolled {
   background: rgba(255, 255, 255, 0.98);
   box-shadow: var(--shadow-md);
-  border-bottom-color: rgba(102, 126, 234, 0.2);
+  border-bottom-color: rgba(102, 126, 234, 0.15);
   backdrop-filter: blur(25px);
 }
 
@@ -440,7 +440,7 @@
   width: 100%;
   max-width: 320px;
   height: 100%;
-  background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
+  background: rgba(255,255,255,0.98);
   backdrop-filter: blur(25px);
   border-left: 1px solid rgba(255,255,255,0.4);
   box-shadow: var(--shadow-2xl);
@@ -459,7 +459,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(240, 147, 251, 0.03) 100%);
+  background: rgba(255,255,255,0.95);
 }
 
 .mobile-menu-close {
@@ -518,7 +518,7 @@
   margin-bottom: var(--space-2);
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.6) 100%);
+  background: rgba(255,255,255,0.8);
   border: 1px solid rgba(255,255,255,0.4);
   backdrop-filter: blur(6px);
 }
@@ -535,7 +535,7 @@
 }
 
 .mobile-menu-link:hover {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(240, 147, 251, 0.03) 100%);
+  background: rgba(102, 126, 234, 0.05);
   color: var(--primary-600);
   padding-left: var(--space-5);
   border-color: rgba(102, 126, 234, 0.2);
