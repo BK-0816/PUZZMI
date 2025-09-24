@@ -1256,8 +1256,8 @@ a:hover {
   content: '';
   position: absolute;
   top: 0;
-  left: 0;
-  right: 0;
+  width: 160px;
+  height: 160px;
   height: 4px;
   background: var(--gradient-primary);
   opacity: 0;
@@ -1274,23 +1274,23 @@ a:hover {
   opacity: 1;
 }
 
-.safety-media {
+    height: 220px;
   margin-bottom: var(--space-6);
   height: 120px;
   display: flex;
-  align-items: center;
-  justify-content: center;
+    width: 180px;
+    height: 180px;
 }
 
 @media (min-width: 768px) {
   .safety-media {
     height: 140px;
-  }
+    height: 240px;
 }
 
 @media (min-width: 1024px) {
-  .safety-media {
-    height: 160px;
+    width: 200px;
+    height: 200px;
   }
 }
 
@@ -2272,7 +2272,7 @@ a:hover {
 .row {
   display: flex;
   gap: var(--space-4);
-  height: 140px;
+  height: 200px;
 }
 
 .row.single {

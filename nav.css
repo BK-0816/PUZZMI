@@ -257,6 +257,62 @@ async function refreshHeartCount() {
       // 하트 카운트 업데이트
       await refreshHeartCount();
       
+/* ===== 네비게이션 CSS 스타일 추가 ===== */
+const navStyles = `
+/* 드롭다운 메뉴 흰색 배경 강제 적용 */
+.dropdown-menu {
+  background: rgba(255,255,255,0.98) !important;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.4);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  z-index: 9999;
+}
+
+.dropdown-item {
+  background: rgba(255,255,255,0.9) !important;
+  color: var(--text-primary) !important;
+}
+
+.dropdown-item:hover {
+  background: rgba(255,255,255,1) !important;
+  color: #667eea !important;
+}
+
+/* 모바일 메뉴 가시성 강화 */
+.mobile-menu {
+  z-index: 9999 !important;
+  background: rgba(0,0,0,0.8) !important;
+}
+
+.mobile-menu-content {
+  background: rgba(255,255,255,0.98) !important;
+  box-shadow: 0 0 50px rgba(0,0,0,0.4) !important;
+  z-index: 10000 !important;
+}
+
+.mobile-menu-header {
+  background: rgba(255,255,255,0.98) !important;
+}
+
+.mobile-menu-link {
+  background: rgba(255,255,255,0.9) !important;
+  color: var(--text-primary) !important;
+}
+
+.mobile-menu-link:hover {
+  background: rgba(255,255,255,1) !important;
+  color: #667eea !important;
+}
+`;
+
+// 스타일 주입
+if (!document.querySelector('#nav-override-styles')) {
+  const styleEl = document.createElement('style');
+  styleEl.id = 'nav-override-styles';
+  styleEl.textContent = navStyles;
+  document.head.appendChild(styleEl);
+}
+
     } catch (error) {
       console.error('찜하기 오류:', error);
       btn.textContent = originalText;
