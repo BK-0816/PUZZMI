@@ -894,8 +894,11 @@
       sendVerificationBtn.innerHTML = '<div class="loading"></div> 이메일 인증번호 발송 중...';
       
       try {
-        // Edge Function을 통한 실제 이메일 발송
-        const response = await fetch('https://eevvgbbokenpjnvtmztk.supabase.co/functions/v1/email-verification', {
+        // Edge Function을 통한 실제 이메일 발송 (환경변수 사용)
+        const SUPABASE_URL = "https://eevvgbbokenpjnvtmztk.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4";
+        
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/email-verification`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -954,8 +957,11 @@
       verifyCodeBtn.innerHTML = '<div class="loading"></div> 인증 중...';
       
       try {
-        // Edge Function을 통한 실제 인증번호 검증
-        const response = await fetch('https://eevvgbbokenpjnvtmztk.supabase.co/functions/v1/email-verification', {
+        // Edge Function을 통한 실제 인증번호 검증 (환경변수 사용)
+        const SUPABASE_URL = "https://eevvgbbokenpjnvtmztk.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4";
+        
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/email-verification`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -1006,8 +1012,11 @@
       resendCodeBtn.innerHTML = '<div class="loading"></div> 재발송 중...';
       
       try {
-        // Edge Function을 통한 실제 이메일 재발송
-        const response = await fetch('https://eevvgbbokenpjnvtmztk.supabase.co/functions/v1/email-verification', {
+        // Edge Function을 통한 실제 이메일 재발송 (환경변수 사용)
+        const SUPABASE_URL = "https://eevvgbbokenpjnvtmztk.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4";
+        
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/email-verification`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

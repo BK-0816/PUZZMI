@@ -19,8 +19,27 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Supabase 환경변수 확인
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error('Missing Supabase environment variables:', {
+        hasUrl: !!supabaseUrl,
+        hasServiceKey: !!supabaseServiceKey
+      });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Supabase 환경변수가 설정되지 않았습니다.'
+        }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
+    }
+    
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     const { email, action, code }: EmailVerificationRequest = await req.json();
