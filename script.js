@@ -342,7 +342,206 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeScrollProgress();
     initializeHeroParallax();
     initializeFAQ();
+    initializeSwipeCards();
+});
 
+// 스와이프 카드 시스템 초기화
+function initializeSwipeCards() {
+    // 각 스와이프 컨테이너에 터치 이벤트 추가
+    const containers = document.querySelectorAll('.swipe-container');
+    
+    containers.forEach(container => {
+        let startX = 0;
+        let currentX = 0;
+        let isDragging = false;
+        
+        const wrapper = container.querySelector('.swipe-wrapper');
+        if (!wrapper) return;
+        
+        // 터치 시작
+        container.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            isDragging = true;
+            wrapper.style.transition = 'none';
+        }, { passive: true });
+        
+        // 터치 이동
+        container.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            
+            currentX = e.touches[0].clientX;
+            const diffX = currentX - startX;
+            const currentSlide = getCurrentSlide(container.id);
+            const slideWidth = container.offsetWidth;
+            
+            // 현재 슬라이드 위치에서 드래그 거리만큼 이동
+            const translateX = -(currentSlide * slideWidth) + diffX;
+            wrapper.style.transform = `translateX(${translateX}px)`;
+        }, { passive: true });
+        
+        // 터치 종료
+        container.addEventListener('touchend', (e) => {
+            if (!isDragging) return;
+            
+            isDragging = false;
+            wrapper.style.transition = 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+            
+            const diffX = currentX - startX;
+            const threshold = container.offsetWidth * 0.2; // 20% 이상 스와이프해야 넘어감
+            
+            if (Math.abs(diffX) > threshold) {
+                if (diffX > 0) {
+                    // 오른쪽으로 스와이프 - 이전 슬라이드
+                    changeSlide(container.id, -1);
+                } else {
+                    // 왼쪽으로 스와이프 - 다음 슬라이드
+                    changeSlide(container.id, 1);
+                }
+            } else {
+                // 임계값 미달 - 원래 위치로 복귀
+                const currentSlide = getCurrentSlide(container.id);
+                goToSlide(container.id, currentSlide);
+            }
+        }, { passive: true });
+        
+        // 마우스 드래그 지원 (데스크톱)
+        let isMouseDown = false;
+        
+        container.addEventListener('mousedown', (e) => {
+            startX = e.clientX;
+            isMouseDown = true;
+            wrapper.style.transition = 'none';
+            wrapper.style.cursor = 'grabbing';
+            e.preventDefault();
+        });
+        
+        container.addEventListener('mousemove', (e) => {
+            if (!isMouseDown) return;
+            
+            currentX = e.clientX;
+            const diffX = currentX - startX;
+            const currentSlide = getCurrentSlide(container.id);
+            const slideWidth = container.offsetWidth;
+            
+            const translateX = -(currentSlide * slideWidth) + diffX;
+            wrapper.style.transform = `translateX(${translateX}px)`;
+        });
+        
+        container.addEventListener('mouseup', (e) => {
+            if (!isMouseDown) return;
+            
+            isMouseDown = false;
+            wrapper.style.transition = 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+            wrapper.style.cursor = 'grab';
+            
+            const diffX = currentX - startX;
+            const threshold = container.offsetWidth * 0.2;
+            
+            if (Math.abs(diffX) > threshold) {
+                if (diffX > 0) {
+                    changeSlide(container.id, -1);
+                } else {
+                    changeSlide(container.id, 1);
+                }
+            } else {
+                const currentSlide = getCurrentSlide(container.id);
+                goToSlide(container.id, currentSlide);
+            }
+        });
+        
+        container.addEventListener('mouseleave', () => {
+            if (isMouseDown) {
+                isMouseDown = false;
+                wrapper.style.transition = 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                wrapper.style.cursor = 'grab';
+                const currentSlide = getCurrentSlide(container.id);
+                goToSlide(container.id, currentSlide);
+            }
+        });
+    });
+    
+    // 자동 슬라이드 (선택사항)
+    startAutoSlide();
+}
+
+// 현재 활성 슬라이드 인덱스 가져오기
+function getCurrentSlide(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return 0;
+    
+    const activeSlide = container.querySelector('.swipe-slide.active');
+    const slides = container.querySelectorAll('.swipe-slide');
+    
+    return Array.from(slides).indexOf(activeSlide);
+}
+
+// 슬라이드 변경 함수
+function changeSlide(containerId, direction) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    const slides = container.querySelectorAll('.swipe-slide');
+    const currentIndex = getCurrentSlide(containerId);
+    let newIndex = currentIndex + direction;
+    
+    // 순환 처리
+    if (newIndex < 0) {
+        newIndex = slides.length - 1;
+    } else if (newIndex >= slides.length) {
+        newIndex = 0;
+    }
+    
+    goToSlide(containerId, newIndex);
+}
+
+// 특정 슬라이드로 이동
+function goToSlide(containerId, index) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    const wrapper = container.querySelector('.swipe-wrapper');
+    const slides = container.querySelectorAll('.swipe-slide');
+    const indicators = container.querySelectorAll('.indicator');
+    
+    if (!wrapper || !slides.length) return;
+    
+    // 슬라이드 위치 계산
+    const slideWidth = container.offsetWidth;
+    const translateX = -(index * slideWidth);
+    
+    // 슬라이드 이동
+    wrapper.style.transform = `translateX(${translateX}px)`;
+    
+    // 활성 상태 업데이트
+    slides.forEach((slide, i) => {
+        slide.classList.toggle('active', i === index);
+    });
+    
+    indicators.forEach((indicator, i) => {
+        indicator.classList.toggle('active', i === index);
+    });
+}
+
+// 자동 슬라이드 (8초마다)
+function startAutoSlide() {
+    const containers = ['aboutSwipeContainer', 'safetySwipeContainer'];
+    
+    containers.forEach(containerId => {
+        setInterval(() => {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            // 마우스가 컨테이너 위에 있으면 자동 슬라이드 중지
+            if (container.matches(':hover')) return;
+            
+            changeSlide(containerId, 1);
+        }, 8000); // 8초마다
+    });
+}
+
+// 전역 함수로 등록 (HTML onclick에서 사용)
+window.changeSlide = changeSlide;
+window.goToSlide = goToSlide;
 });
 
 // 언어 초기화
