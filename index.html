@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PUZZMI - 서울 렌탈친구 서비스</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="navigation.css">
-    <link rel="stylesheet" href="pages.css">
+    <link rel="stylesheet" href="nav.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;600;800&display=swap" rel="stylesheet">
@@ -14,452 +13,448 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;800&family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
-<script type="module" src="nav.js"></script>
 </head>
-
-<!-- Supabase JS v2 (ESM) -->
-<script type="module">
-  // nav.js에서 만든 싱글톤 supabase 재사용 (중복 인스턴스 방지)
-  import { supabase } from "./nav.js";
-
-  // ===== 1) 메이트 목록 (페이지네이션) =====
-  const ONLY_VERIFIED = false;          // 공개만 노출하려면 true
-  const PAGE_SIZE     = 8;
-  let page = 0, isLoading = false, hasMore = true;
-
-  const grid = document.querySelector(".friends-grid");
-  const loadMoreBtn = document.getElementById("loadMore");
-
-async function refreshHeartCount() {
-  const badges = Array.from(document.querySelectorAll('.heart-badge[data-heart]'));
-  if (!badges.length) return;
-
-  const ids = [...new Set(badges.map(b => b.getAttribute('data-heart')).filter(Boolean))];
-
-  // 각 메이트별 찜 개수 조회
-  const { data, error } = await supabase
-    .from('favorites')
-    .select('mate_id')
-    .in('mate_id', ids);
-
-  if (error) {
-    console.warn('heart refresh error:', error);
-    return;
-  }
-  
-  const counts = {};
-  for (const row of (data || [])) {
-    counts[row.mate_id] = (counts[row.mate_id] || 0) + 1;
-  }
-
-  for (const id of ids) {
-    const n = counts[id] || 0;
-    const el = document.querySelector(`.heart-badge[data-heart="${id}"] .count`);
-    if (el) el.textContent = n;
-  }
-}
-  // storage key → public URL
-  function keyToUrl(key) {
-    if (!key) return "";
-    if (/^https?:\/\//i.test(key)) return key;
-    const pure = key.startsWith("mates/") ? key.replace(/^mates\//,"") : key;
-    return supabase.storage.from("mates").getPublicUrl(pure).data.publicUrl;
-  }
-
-  // 성별 → 기호
-  function genderIcon(gender) {
-    const g = (gender || "").toString().trim().toLowerCase();
-    if (["female","f","여","여자","woman","여성"].includes(g)) return "♀";
-    if (["male","m","남","남자","man","남성"].includes(g))   return "♂";
-    return "⚧";
-  }
-
-  // 카드 렌더
-  function renderCard(row) {
-    const name   = row.profiles?.full_name ?? "이름 비공개";
-    const age    = row.profiles?.age ? `${row.profiles.age}세` : "";
-    const gender = row.profiles?.gender ?? "";
-    const langs  = Array.isArray(row.profiles?.languages) ? row.profiles.languages : [];
-    const gIcon  = genderIcon(gender);
-
-    const keys   = Array.isArray(row.photos) ? row.photos : [];
-    const cover  = row.primary_photo || keys[0] || row.profiles?.avatar_url || "https://picsum.photos/seed/puzzmi/400/300";
-    const img    = cover.startsWith("http") ? cover : keyToUrl(cover);
-
-    const priceJpy = new Intl.NumberFormat("ja-JP", { style: "currency", currency: "JPY", maximumFractionDigits: 0 }).format(4000);
-    const tagsTxt  = (row.tags ?? []).slice(0,3).join(", ") || "서울 투어";
-    const subline  = [gIcon, age].filter(Boolean).join(" • ");
-
-
-    const card = document.createElement("div");
-    card.className = "friend-card";
-    card.innerHTML = `
-      <div class="friend-image">
-        <img src="${img}" alt="${name}">
-        <div class="heart-badge" data-heart="${row.user_id}" style="position:absolute;right:8px;top:8px;background:#e0245e;color:#fff;border-radius:16px;padding:4px 8px;font-size:12px;display:flex;gap:6px;align-items:center;">
-          <i class="fas fa-heart"></i><span class="count">0</span>
-        </div>
-      </div>
-      <div class="friend-info">
-        <h3 class="friend-name">${name}</h3>
-        <p class="friend-age">${subline || "정보 미기재"}</p>
-        <p class="friend-specialties">${tagsTxt}</p>
-        <p class="friend-description">${row.bio ?? "함께 서울의 숨은 명소를 즐겨봐요!"}</p>
-        <div class="friend-languages">
-          ${langs.map(l => `<span class="language">${l}</span>`).join("")}
-        </div>
-        <div class="friend-price">
-          <span class="price">${priceJpy}</span><span class="duration">/時間</span>
-        </div>
-        <div style="margin-top:10px; display:flex; gap:8px;">
-          <a class="cta-btn" data-requires-auth="true" href="mate_like.html?mate_id=${row.user_id}">プロフィールを見る</a>
-          <a class="cta-btn"          data-requires-auth="true" href="booking.html?mate_id=${row.user_id}">予約する</a>
-          <a class="cta-btn" data-fav-mate="${row.user_id}">お気に入り</a>
-        </div>
-      </div>
-    `;
-    grid.appendChild(card);
-
-  }
-
-  async function loadMates({ reset=false } = {}) {
-    if (!grid || isLoading || (!hasMore && !reset)) return;
-    if (reset) { page = 0; hasMore = true; grid.innerHTML = ""; }
-
-    isLoading = true;
-    const from = page * PAGE_SIZE;
-    const to   = from + PAGE_SIZE - 1;
-
-    // Retry logic for network issues
-    let retryCount = 0;
-    const maxRetries = 3;
-    
-    while (retryCount < maxRetries) {
-      try {
-        let query = supabase
-          .from("mate_profiles")
-          .select(`
-            user_id, bio, hourly_rate, tags, areas, is_verified, rating, photos, primary_photo,
-            profiles:profiles ( id, full_name, age, gender, languages, avatar_url )
-          `, { count: "exact" })
-          .order("rating", { ascending: false })
-          .range(from, to);
-
-        if (ONLY_VERIFIED) query = query.eq("is_verified", true);
-
-        const { data, error, count } = await query;
-
-        if (error) {
-          throw error;
-        }
-
-        // Success - process the data
-        (data || []).forEach(renderCard);
-
-        const fetched = (data || []).length;
-        const total   = typeof count === "number" ? count : (from + fetched);
-        hasMore = (from + fetched) < total;
-
-        if (loadMoreBtn) loadMoreBtn.style.display = hasMore ? "inline-block" : "none";
-        if (hasMore) page += 1;
-
-        isLoading = false;
-        return; // Success, exit retry loop
-        
-      } catch (error) {
-        console.error(`loadMates error (attempt ${retryCount + 1}):`, error);
-        retryCount++;
-        
-        if (retryCount >= maxRetries) {
-          // Final failure after all retries
-          if (!grid.innerHTML) {
-            grid.innerHTML = `
-              <div style="padding:16px; text-align:center;">
-                <p>메이트를 불러오지 못했습니다.</p>
-                <p style="font-size:0.9em; color:#666; margin-top:8px;">
-                  네트워크 연결을 확인하고 페이지를 새로고침해주세요.
-                </p>
-                <button onclick="location.reload()" style="margin-top:12px; padding:8px 16px; background:#667eea; color:white; border:none; border-radius:4px; cursor:pointer;">
-                  새로고침
-                </button>
-              </div>
-            `;
-          }
-          loadMoreBtn && (loadMoreBtn.style.display = "none");
-          isLoading = false;
-          return;
-        }
-        
-        // Wait before retry (exponential backoff)
-        await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount) * 1000));
-      }
-    }
-  }
-
-  loadMoreBtn?.addEventListener("click", () => loadMates());
-
-  // ===== 3) 인증 가드 & 찜하기 처리 =====
-
-  // 찜하기 기능
-  document.addEventListener('click', async (e) => {
-    const btn = e.target.closest('[data-fav-mate]');
-    if (!btn) return;
-    e.preventDefault();
-    
-    // 로그인 체크
-    const { data: { user }, error: authErr } = await supabase.auth.getUser();
-    if (authErr || !user) {
-      const redir = encodeURIComponent(location.pathname + location.search);
-      location.href = `auth_combo.html?redirect=${redir}`;
-      return;
-    }
-
-    const mateId = btn.getAttribute('data-fav-mate');
-    const originalText = btn.textContent;
-    btn.disabled = true;
-    btn.textContent = '처리중...';
-
-    try {
-      // 이미 찜했는지 확인
-      const { data: existing } = await supabase
-        .from('favorites')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('mate_id', mateId)
-        .maybeSingle();
-
-      if (existing) {
-        // 이미 찜한 경우 - 찜 해제
-        const { error } = await supabase
-          .from('favorites')
-          .delete()
-          .eq('user_id', user.id)
-          .eq('mate_id', mateId);
-        
-        if (error) throw error;
-        
-        btn.textContent = '찜하기';
-        btn.classList.remove('is-faved');
-        showToast('💔 찜 해제되었습니다');
-      } else {
-        // 찜하기
-        const { error } = await supabase
-          .from('favorites')
-          .insert({ user_id: user.id, mate_id: mateId });
-        
-        if (error) throw error;
-        
-        btn.textContent = '찜 완료';
-        btn.classList.add('is-faved');
-        showToast('💖 찜 목록에 추가되었습니다!');
-      }
-
-      // 하트 카운트 업데이트
-      await refreshHeartCount();
-      
-    } catch (error) {
-      console.error('찜하기 오류:', error);
-      btn.textContent = originalText;
-      showToast('❌ 오류가 발생했습니다: ' + error.message);
-    } finally {
-      btn.disabled = false;
-    }
-  });
-
-  // 토스트 메시지 함수
-  function showToast(message) {
-    const toast = document.createElement('div');
-    toast.style.cssText = `
-      position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white; padding: 12px 24px; border-radius: 12px;
-      z-index: 9999; font-weight: 600; box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
-      animation: slideDown 0.3s ease;
-    `;
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
-  }
-
-
-  // 초기 실행
-  (async () => {
-    await loadMates({ reset: true });
-    await refreshHeartCount();
-    await loadHomepageReviews();
-    
-    // 자동 완료 체크 실행
-    try {
-      const { autoCompleteBookings } = await import('./auto_complete_bookings.js');
-      await autoCompleteBookings();
-      // 5분마다 자동 완료 체크
-      setInterval(autoCompleteBookings, 5 * 60 * 1000);
-    } catch (error) {
-      console.warn('자동 완료 기능 로드 실패:', error);
-    }
-  })();
-
-  // ===== 4) 메인페이지 리뷰 로드 =====
-  async function loadHomepageReviews() {
-    const reviewsGrid = document.getElementById('reviewsGrid');
-    if (!reviewsGrid) return;
-
-    try {
-      // 평점 높고 글자수 많은 순으로 리뷰 가져오기
-      const { data: reviews, error } = await supabase
-        .from('reviews')
-        .select(`
-          id, content, rating, created_at, author_name,
-          mate_profiles!inner (
-            user_id,
-            profiles!inner ( full_name )
-          )
-        `)
-        .not('content', 'is', null)
-        .order('rating', { ascending: false })
-        .limit(50); // 많이 가져와서 JS에서 정렬
-
-      if (error) {
-        console.error('리뷰 로드 실패:', error);
-        reviewsGrid.innerHTML = `
-          <div class="review-card">
-            <p class="review-text">리뷰를 불러오는 중 오류가 발생했습니다.</p>
-          </div>
-        `;
-        return;
-      }
-
-      if (!reviews || reviews.length === 0) {
-        reviewsGrid.innerHTML = `
-          <div class="review-card">
-            <p class="review-text">아직 등록된 리뷰가 없습니다. 첫 번째 리뷰를 남겨보세요!</p>
-          </div>
-        `;
-        return;
-      }
-
-      // 평점 높고 글자수 많은 순으로 정렬
-      const sortedReviews = reviews
-        .sort((a, b) => {
-          // 1차: 평점 높은 순
-          if (b.rating !== a.rating) {
-            return b.rating - a.rating;
-          }
-          // 2차: 글자수 많은 순
-          if ((b.content?.length || 0) !== (a.content?.length || 0)) {
-            return (b.content?.length || 0) - (a.content?.length || 0);
-          }
-          // 3차: 최신순
-          return new Date(b.created_at) - new Date(a.created_at);
-        })
-        .slice(0, 6); // 최대 6개만 표시
-
-      // 이메일 마스킹 함수
-      function maskEmail(email) {
-        if (!email || typeof email !== 'string') return '익명';
-        
-        const atIndex = email.indexOf('@');
-        if (atIndex === -1) return email; // @ 없으면 원본 반환 (실명)
-        
-        const localPart = email.substring(0, atIndex);
-        const domain = email.substring(atIndex);
-        
-        if (localPart.length <= 2) {
-          return localPart[0] + '*'.repeat(localPart.length - 1) + domain;
-        } else if (localPart.length <= 4) {
-          return localPart[0] + '*'.repeat(localPart.length - 2) + localPart[localPart.length - 1] + domain;
-        } else {
-          const start = localPart.substring(0, 2);
-          const end = localPart.substring(localPart.length - 2);
-          const middle = '*'.repeat(localPart.length - 4);
-          return start + middle + end + domain;
-        }
-      }
-
-      // 별점 표시 함수
-      function renderStars(rating) {
-        const fullStars = Math.floor(rating);
-        const hasHalfStar = rating % 1 >= 0.5;
-        let starsHtml = '';
-        
-        for (let i = 0; i < fullStars; i++) {
-          starsHtml += '<i class="fas fa-star"></i>';
-        }
-        
-        if (hasHalfStar) {
-          starsHtml += '<i class="fas fa-star-half-alt"></i>';
-        }
-        
-        const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-        for (let i = 0; i < emptyStars; i++) {
-          starsHtml += '<i class="far fa-star"></i>';
-        }
-        
-        return starsHtml;
-      }
-
-      // 랜덤 아바타 생성 함수
-      function getRandomAvatar(index) {
-        const avatars = [
-          'https://images.pexels.com/photos/1382731/pexels-photo-1382731.jpeg?auto=compress&cs=tinysrgb&w=100',
-          'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=100',
-          'https://images.pexels.com/photos/1542085/pexels-photo-1542085.jpeg?auto=compress&cs=tinysrgb&w=100',
-          'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100',
-          'https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=100',
-          'https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpeg?auto=compress&cs=tinysrgb&w=100'
-        ];
-        return avatars[index % avatars.length];
-      }
-
-      // 랜덤 지역 생성 함수
-      reviewsGrid.innerHTML = sortedReviews.map((review, index) => {
-        const mateName = review.mate_profiles?.profiles?.full_name || '메이트';
-        const authorName = maskEmail(review.author_name || '익명');
-        const reviewDate = new Date(review.created_at).toLocaleDateString('ko-KR', { 
-          year: 'numeric', 
-          month: 'long' 
-        });
-        const avatar = getRandomAvatar(index);
-        
-        return `
-          <div class="review-card">
-            <div class="review-header">
-              <div class="reviewer-info">
-                <img src="${avatar}" alt="${authorName}" class="reviewer-avatar">
-                <div>
-                  <h4 class="reviewer-name">${authorName}</h4>
-                </div>
-              </div>
-            </div>
-            <p class="review-text">"${review.content}"</p>
-            <div class="review-rating">
-              ${renderStars(review.rating)}
-            </div>
-            <p class="review-date">${reviewDate}</p>
-            <div class="review-mate" style="margin-top: 12px; padding: 8px 12px; background: rgba(102, 126, 234, 0.1); border-radius: 8px; font-size: 0.9rem; color: var(--text-secondary);">
-              メイト <strong>${mateName}</strong> さんとの旅
-            </div>
-          </div>
-        `;
-      }).join('');
-
-
-    } catch (error) {
-      console.error('리뷰 로드 중 오류:', error);
-      reviewsGrid.innerHTML = `
-        <div class="review-card">
-          <p class="review-text">리뷰를 불러오는 중 오류가 발생했습니다.</p>
-        </div>
-      `;
-    }
-  }
-</script>
-
-
-
 
 <body class="bg-cream">
     <div id="app-nav"></div>
+    
+    <!-- Supabase JS v2 (ESM) -->
+    <script type="module">
+      // nav.js에서 만든 싱글톤 supabase 재사용 (중복 인스턴스 방지)
+      import { supabase } from "./nav.js";
+
+      // ===== 1) 메이트 목록 (페이지네이션) =====
+      const ONLY_VERIFIED = false;          // 공개만 노출하려면 true
+      const PAGE_SIZE     = 8;
+      let page = 0, isLoading = false, hasMore = true;
+
+      const grid = document.querySelector(".friends-grid");
+      const loadMoreBtn = document.getElementById("loadMore");
+
+      async function refreshHeartCount() {
+        const badges = Array.from(document.querySelectorAll('.heart-badge[data-heart]'));
+        if (!badges.length) return;
+
+        const ids = [...new Set(badges.map(b => b.getAttribute('data-heart')).filter(Boolean))];
+
+        // 각 메이트별 찜 개수 조회
+        const { data, error } = await supabase
+          .from('favorites')
+          .select('mate_id')
+          .in('mate_id', ids);
+
+        if (error) {
+          console.warn('heart refresh error:', error);
+          return;
+        }
+        
+        const counts = {};
+        for (const row of (data || [])) {
+          counts[row.mate_id] = (counts[row.mate_id] || 0) + 1;
+        }
+
+        for (const id of ids) {
+          const n = counts[id] || 0;
+          const el = document.querySelector(`.heart-badge[data-heart="${id}"] .count`);
+          if (el) el.textContent = n;
+        }
+      }
+      
+      // storage key → public URL
+      function keyToUrl(key) {
+        if (!key) return "";
+        if (/^https?:\/\//i.test(key)) return key;
+        const pure = key.startsWith("mates/") ? key.replace(/^mates\//,"") : key;
+        return supabase.storage.from("mates").getPublicUrl(pure).data.publicUrl;
+      }
+
+      // 성별 → 기호
+      function genderIcon(gender) {
+        const g = (gender || "").toString().trim().toLowerCase();
+        if (["female","f","여","여자","woman","여성"].includes(g)) return "♀";
+        if (["male","m","남","남자","man","남성"].includes(g))   return "♂";
+        return "⚧";
+      }
+
+      // 카드 렌더
+      function renderCard(row) {
+        const name   = row.profiles?.full_name ?? "이름 비공개";
+        const age    = row.profiles?.age ? `${row.profiles.age}세` : "";
+        const gender = row.profiles?.gender ?? "";
+        const langs  = Array.isArray(row.profiles?.languages) ? row.profiles.languages : [];
+        const gIcon  = genderIcon(gender);
+
+        const keys   = Array.isArray(row.photos) ? row.photos : [];
+        const cover  = row.primary_photo || keys[0] || row.profiles?.avatar_url || "https://picsum.photos/seed/puzzmi/400/300";
+        const img    = cover.startsWith("http") ? cover : keyToUrl(cover);
+
+        const priceJpy = new Intl.NumberFormat("ja-JP", { style: "currency", currency: "JPY", maximumFractionDigits: 0 }).format(4000);
+        const tagsTxt  = (row.tags ?? []).slice(0,3).join(", ") || "서울 투어";
+        const subline  = [gIcon, age].filter(Boolean).join(" • ");
+
+        const card = document.createElement("div");
+        card.className = "friend-card";
+        card.innerHTML = `
+          <div class="friend-image">
+            <img src="${img}" alt="${name}">
+            <div class="heart-badge" data-heart="${row.user_id}" style="position:absolute;right:8px;top:8px;background:#e0245e;color:#fff;border-radius:16px;padding:4px 8px;font-size:12px;display:flex;gap:6px;align-items:center;">
+              <i class="fas fa-heart"></i><span class="count">0</span>
+            </div>
+          </div>
+          <div class="friend-info">
+            <h3 class="friend-name">${name}</h3>
+            <p class="friend-age">${subline || "정보 미기재"}</p>
+            <p class="friend-specialties">${tagsTxt}</p>
+            <p class="friend-description">${row.bio ?? "함께 서울의 숨은 명소를 즐겨봐요!"}</p>
+            <div class="friend-languages">
+              ${langs.map(l => `<span class="language">${l}</span>`).join("")}
+            </div>
+            <div class="friend-price">
+              <span class="price">${priceJpy}</span><span class="duration">/時間</span>
+            </div>
+            <div style="margin-top:10px; display:flex; gap:8px;">
+              <a class="cta-btn" data-requires-auth="true" href="mate_like.html?mate_id=${row.user_id}">プロフィールを見る</a>
+              <a class="cta-btn" data-requires-auth="true" href="booking.html?mate_id=${row.user_id}">予約する</a>
+              <a class="cta-btn" data-fav-mate="${row.user_id}">お気に入り</a>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      }
+
+      async function loadMates({ reset=false } = {}) {
+        if (!grid || isLoading || (!hasMore && !reset)) return;
+        if (reset) { page = 0; hasMore = true; grid.innerHTML = ""; }
+
+        isLoading = true;
+        const from = page * PAGE_SIZE;
+        const to   = from + PAGE_SIZE - 1;
+
+        // Retry logic for network issues
+        let retryCount = 0;
+        const maxRetries = 3;
+        
+        while (retryCount < maxRetries) {
+          try {
+            let query = supabase
+              .from("mate_profiles")
+              .select(`
+                user_id, bio, hourly_rate, tags, areas, is_verified, rating, photos, primary_photo,
+                profiles:profiles ( id, full_name, age, gender, languages, avatar_url )
+              `, { count: "exact" })
+              .order("rating", { ascending: false })
+              .range(from, to);
+
+            if (ONLY_VERIFIED) query = query.eq("is_verified", true);
+
+            const { data, error, count } = await query;
+
+            if (error) {
+              throw error;
+            }
+
+            // Success - process the data
+            (data || []).forEach(renderCard);
+
+            const fetched = (data || []).length;
+            const total   = typeof count === "number" ? count : (from + fetched);
+            hasMore = (from + fetched) < total;
+
+            if (loadMoreBtn) loadMoreBtn.style.display = hasMore ? "inline-block" : "none";
+            if (hasMore) page += 1;
+
+            isLoading = false;
+            return; // Success, exit retry loop
+            
+          } catch (error) {
+            console.error(`loadMates error (attempt ${retryCount + 1}):`, error);
+            retryCount++;
+            
+            if (retryCount >= maxRetries) {
+              // Final failure after all retries
+              if (!grid.innerHTML) {
+                grid.innerHTML = `
+                  <div style="padding:16px; text-align:center;">
+                    <p>메이트를 불러오지 못했습니다.</p>
+                    <p style="font-size:0.9em; color:#666; margin-top:8px;">
+                      네트워크 연결을 확인하고 페이지를 새로고침해주세요.
+                    </p>
+                    <button onclick="location.reload()" style="margin-top:12px; padding:8px 16px; background:#667eea; color:white; border:none; border-radius:4px; cursor:pointer;">
+                      새로고침
+                    </button>
+                  </div>
+                `;
+              }
+              loadMoreBtn && (loadMoreBtn.style.display = "none");
+              isLoading = false;
+              return;
+            }
+            
+            // Wait before retry (exponential backoff)
+            await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount) * 1000));
+          }
+        }
+      }
+
+      loadMoreBtn?.addEventListener("click", () => loadMates());
+
+      // ===== 3) 인증 가드 & 찜하기 처리 =====
+
+      // 찜하기 기능
+      document.addEventListener('click', async (e) => {
+        const btn = e.target.closest('[data-fav-mate]');
+        if (!btn) return;
+        e.preventDefault();
+        
+        // 로그인 체크
+        const { data: { user }, error: authErr } = await supabase.auth.getUser();
+        if (authErr || !user) {
+          const redir = encodeURIComponent(location.pathname + location.search);
+          location.href = `auth_combo.html?redirect=${redir}`;
+          return;
+        }
+
+        const mateId = btn.getAttribute('data-fav-mate');
+        const originalText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = '처리중...';
+
+        try {
+          // 이미 찜했는지 확인
+          const { data: existing } = await supabase
+            .from('favorites')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('mate_id', mateId)
+            .maybeSingle();
+
+          if (existing) {
+            // 이미 찜한 경우 - 찜 해제
+            const { error } = await supabase
+              .from('favorites')
+              .delete()
+              .eq('user_id', user.id)
+              .eq('mate_id', mateId);
+            
+            if (error) throw error;
+            
+            btn.textContent = '찜하기';
+            btn.classList.remove('is-faved');
+            showToast('💔 찜 해제되었습니다');
+          } else {
+            // 찜하기
+            const { error } = await supabase
+              .from('favorites')
+              .insert({ user_id: user.id, mate_id: mateId });
+            
+            if (error) throw error;
+            
+            btn.textContent = '찜 완료';
+            btn.classList.add('is-faved');
+            showToast('💖 찜 목록에 추가되었습니다!');
+          }
+
+          // 하트 카운트 업데이트
+          await refreshHeartCount();
+          
+        } catch (error) {
+          console.error('찜하기 오류:', error);
+          btn.textContent = originalText;
+          showToast('❌ 오류가 발생했습니다: ' + error.message);
+        } finally {
+          btn.disabled = false;
+        }
+      });
+
+      // 토스트 메시지 함수
+      function showToast(message) {
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+          position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white; padding: 12px 24px; border-radius: 12px;
+          z-index: 9999; font-weight: 600; box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+          animation: slideDown 0.3s ease;
+        `;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+      }
+
+      // 초기 실행
+      (async () => {
+        await loadMates({ reset: true });
+        await refreshHeartCount();
+        await loadHomepageReviews();
+        
+        // 자동 완료 체크 실행
+        try {
+          const { autoCompleteBookings } = await import('./auto_complete_bookings.js');
+          await autoCompleteBookings();
+          // 5분마다 자동 완료 체크
+          setInterval(autoCompleteBookings, 5 * 60 * 1000);
+        } catch (error) {
+          console.warn('자동 완료 기능 로드 실패:', error);
+        }
+      })();
+
+      // ===== 4) 메인페이지 리뷰 로드 =====
+      async function loadHomepageReviews() {
+        const reviewsGrid = document.getElementById('reviewsGrid');
+        if (!reviewsGrid) return;
+
+        try {
+          // 평점 높고 글자수 많은 순으로 리뷰 가져오기
+          const { data: reviews, error } = await supabase
+            .from('reviews')
+            .select(`
+              id, content, rating, created_at, author_name,
+              mate_profiles!inner (
+                user_id,
+                profiles!inner ( full_name )
+              )
+            `)
+            .not('content', 'is', null)
+            .order('rating', { ascending: false })
+            .limit(50); // 많이 가져와서 JS에서 정렬
+
+          if (error) {
+            console.error('리뷰 로드 실패:', error);
+            reviewsGrid.innerHTML = `
+              <div class="review-card">
+                <p class="review-text">리뷰를 불러오는 중 오류가 발생했습니다.</p>
+              </div>
+            `;
+            return;
+          }
+
+          if (!reviews || reviews.length === 0) {
+            reviewsGrid.innerHTML = `
+              <div class="review-card">
+                <p class="review-text">아직 등록된 리뷰가 없습니다. 첫 번째 리뷰를 남겨보세요!</p>
+              </div>
+            `;
+            return;
+          }
+
+          // 평점 높고 글자수 많은 순으로 정렬
+          const sortedReviews = reviews
+            .sort((a, b) => {
+              // 1차: 평점 높은 순
+              if (b.rating !== a.rating) {
+                return b.rating - a.rating;
+              }
+              // 2차: 글자수 많은 순
+              if ((b.content?.length || 0) !== (a.content?.length || 0)) {
+                return (b.content?.length || 0) - (a.content?.length || 0);
+              }
+              // 3차: 최신순
+              return new Date(b.created_at) - new Date(a.created_at);
+            })
+            .slice(0, 6); // 최대 6개만 표시
+
+          // 이메일 마스킹 함수
+          function maskEmail(email) {
+            if (!email || typeof email !== 'string') return '익명';
+            
+            const atIndex = email.indexOf('@');
+            if (atIndex === -1) return email; // @ 없으면 원본 반환 (실명)
+            
+            const localPart = email.substring(0, atIndex);
+            const domain = email.substring(atIndex);
+            
+            if (localPart.length <= 2) {
+              return localPart[0] + '*'.repeat(localPart.length - 1) + domain;
+            } else if (localPart.length <= 4) {
+              return localPart[0] + '*'.repeat(localPart.length - 2) + localPart[localPart.length - 1] + domain;
+            } else {
+              const start = localPart.substring(0, 2);
+              const end = localPart.substring(localPart.length - 2);
+              const middle = '*'.repeat(localPart.length - 4);
+              return start + middle + end + domain;
+            }
+          }
+
+          // 별점 표시 함수
+          function renderStars(rating) {
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating % 1 >= 0.5;
+            let starsHtml = '';
+            
+            for (let i = 0; i < fullStars; i++) {
+              starsHtml += '<i class="fas fa-star"></i>';
+            }
+            
+            if (hasHalfStar) {
+              starsHtml += '<i class="fas fa-star-half-alt"></i>';
+            }
+            
+            const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+            for (let i = 0; i < emptyStars; i++) {
+              starsHtml += '<i class="far fa-star"></i>';
+            }
+            
+            return starsHtml;
+          }
+
+          // 랜덤 아바타 생성 함수
+          function getRandomAvatar(index) {
+            const avatars = [
+              'https://images.pexels.com/photos/1382731/pexels-photo-1382731.jpeg?auto=compress&cs=tinysrgb&w=100',
+              'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=100',
+              'https://images.pexels.com/photos/1542085/pexels-photo-1542085.jpeg?auto=compress&cs=tinysrgb&w=100',
+              'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100',
+              'https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=100',
+              'https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpeg?auto=compress&cs=tinysrgb&w=100'
+            ];
+            return avatars[index % avatars.length];
+          }
+
+          // 랜덤 지역 생성 함수
+          reviewsGrid.innerHTML = sortedReviews.map((review, index) => {
+            const mateName = review.mate_profiles?.profiles?.full_name || '메이트';
+            const authorName = maskEmail(review.author_name || '익명');
+            const reviewDate = new Date(review.created_at).toLocaleDateString('ko-KR', { 
+              year: 'numeric', 
+              month: 'long' 
+            });
+            const avatar = getRandomAvatar(index);
+            
+            return `
+              <div class="review-card">
+                <div class="review-header">
+                  <div class="reviewer-info">
+                    <img src="${avatar}" alt="${authorName}" class="reviewer-avatar">
+                    <div>
+                      <h4 class="reviewer-name">${authorName}</h4>
+                    </div>
+                  </div>
+                </div>
+                <p class="review-text">"${review.content}"</p>
+                <div class="review-rating">
+                  ${renderStars(review.rating)}
+                </div>
+                <p class="review-date">${reviewDate}</p>
+                <div class="review-mate" style="margin-top: 12px; padding: 8px 12px; background: rgba(102, 126, 234, 0.1); border-radius: 8px; font-size: 0.9rem; color: var(--text-secondary);">
+                  メイト <strong>${mateName}</strong> さんとの旅
+                </div>
+              </div>
+            `;
+          }).join('');
+
+
+        } catch (error) {
+          console.error('리뷰 로드 중 오류:', error);
+          reviewsGrid.innerHTML = `
+            <div class="review-card">
+              <p class="review-text">리뷰를 불러오는 중 오류가 발생했습니다.</p>
+            </div>
+          `;
+        }
+      }
+    </script>
+
+    <script type="module" src="nav.js"></script>
     
     <section id="home" class="hero">
         <div class="hero-bg"></div>
