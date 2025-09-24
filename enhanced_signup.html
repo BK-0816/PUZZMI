@@ -1135,9 +1135,11 @@
           options: {
             data: {
               full_name: userData.fullName,
-              email_verified: true
+              full_name: userData.fullName
             },
-            emailRedirectTo: `${window.location.origin}/email_verified.html`
+            emailRedirectTo: `${window.location.origin}/email_verified.html`,
+            // 이메일 확인 비활성화 (즉시 로그인 가능)
+            emailConfirmation: false
           }
         });
         

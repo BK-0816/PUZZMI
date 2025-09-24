@@ -337,6 +337,11 @@
           </div>
         </div>
         <button class="btn btn-primary" type="submit">ログイン</button>
+        <div style="text-align: center; margin-top: 16px;">
+          <a href="forgot_password.html" style="color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; transition: color 0.3s ease;">
+            パスワードを忘れましたか？
+          </a>
+        </div>
         <div id="login_result"></div>
       </form>
 
@@ -367,6 +372,14 @@
       "https://eevvgbbokenpjnvtmztk.supabase.co",
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4"
     );
+
+    // 로그인 상태 확인 및 리디렉션
+    const { data: { user: currentUser } } = await supabase.auth.getUser();
+    if (currentUser) {
+      // 이미 로그인된 경우 리디렉션
+      const redirect = getRedirect();
+      location.href = redirect;
+    }
 
     // ===== Tabs =====
     const tabs = document.querySelectorAll('.tab');
@@ -401,8 +414,6 @@
       
       if (error) {
         document.getElementById('login_result').innerHTML = '<div class="error">' + error.message + '</div>';
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = 'ログイン';
       } else {
         // 이메일 인증 상태 확인
         const { data: { user } } = await supabase.auth.getUser();
@@ -410,8 +421,6 @@
         if (user && !user.email_confirmed_at) {
           // 이메일 미인증 사용자
           document.getElementById('login_result').innerHTML = '<div class="error">メール認証が必要です。 認証メールをご確認ください。</div>';
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = 'ログイン';
           
           setTimeout(() => {
             location.href = `email_verification_pending.html?email=${encodeURIComponent(user.email)}`;
@@ -422,7 +431,10 @@
           setTimeout(() => location.href = getRedirect(), 600);
         }
       }
-      render();
+      
+      // 버튼 상태 복원
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = 'ログイン';
     };
 
     // ===== LOGOUT =====

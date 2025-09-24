@@ -1274,6 +1274,7 @@
         }
 
         const updateData = {
+          id: user.id,
           full_name: fullNameEl.value.trim() || null,
           birth_date: birthDateEl.value || null,
           age: age,
@@ -1284,8 +1285,7 @@
 
         const { error } = await supabase
           .from('profiles')
-          .update(updateData)
-          .eq('id', user.id);
+          .upsert(updateData, { onConflict: 'id' });
 
         if (error) throw error;
 
@@ -1319,9 +1319,9 @@
           .map(cb => cb.value);
 
         const updateData = {
+          id: user.id,
           nationality: nationalityEl.value || null,
           residence: residenceEl.value.trim() || null,
-          occupation: occupationEl.value.trim() || null,
           languages: selectedLanguages.length > 0 ? selectedLanguages : null,
           interests: selectedInterests.length > 0 ? selectedInterests : null,
           updated_at: new Date().toISOString()
@@ -1329,8 +1329,7 @@
 
         const { error } = await supabase
           .from('profiles')
-          .update(updateData)
-          .eq('id', user.id);
+          .upsert(updateData, { onConflict: 'id' });
 
         if (error) throw error;
 
