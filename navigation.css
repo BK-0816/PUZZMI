@@ -449,8 +449,8 @@
   position: absolute;
   top: 0;
   right: 0;
-  width: 100%;
-  max-width: 320px;
+  width: 90%;
+  max-width: 400px;
   height: 100%;
   background: rgba(255,255,255,0.98) !important;
   backdrop-filter: blur(25px);
@@ -466,7 +466,7 @@
 }
 
 .mobile-menu-header {
-  padding: var(--space-6);
+  padding: var(--space-8);
   border-bottom: 1px solid rgba(102, 126, 234, 0.1);
   display: flex;
   align-items: center;
@@ -496,21 +496,21 @@
 }
 
 .mobile-menu-nav {
-  padding: var(--space-6);
+  padding: var(--space-8);
 }
 
 .mobile-menu-section {
-  margin-bottom: var(--space-8);
+  margin-bottom: var(--space-10);
 }
 
 .mobile-menu-section-title {
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-base);
   font-weight: var(--font-weight-bold);
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: var(--space-4);
-  padding-left: var(--space-2);
+  margin-bottom: var(--space-6);
+  padding-left: var(--space-3);
   background: var(--gradient-primary);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -521,18 +521,20 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-4);
+  padding: var(--space-5);
   font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-base);
   color: var(--text-primary);
   text-decoration: none;
   border-radius: var(--radius-lg);
   transition: all var(--transition-fast);
-  margin-bottom: var(--space-2);
+  margin-bottom: var(--space-3);
   position: relative;
   overflow: hidden;
   background: rgba(255,255,255,0.9) !important;
   border: 1px solid rgba(255,255,255,0.4);
   backdrop-filter: blur(6px);
+  min-height: 56px;
 }
 
 .mobile-menu-link::before {
@@ -549,7 +551,7 @@
 .mobile-menu-link:hover {
   background: rgba(255,255,255,1) !important;
   color: var(--primary-600);
-  padding-left: var(--space-5);
+  padding-left: var(--space-6);
   border-color: rgba(102, 126, 234, 0.2);
 }
 
@@ -558,9 +560,11 @@
 }
 
 .mobile-menu-link i {
-  width: 20px;
+  width: 24px;
+  height: 24px;
   text-align: center;
   flex-shrink: 0;
+  font-size: var(--font-size-lg);
 }
 
 /* ===== 사용자 정보 표시 ===== */
@@ -641,7 +645,8 @@
   }
   
   .mobile-menu-content {
-    max-width: 280px;
+    max-width: 360px;
+    width: 85%;
   }
 }
 
@@ -754,7 +759,19 @@
   }
   
   .mobile-menu-nav {
+    padding: var(--space-6);
+  }
+  
+  .mobile-menu-link {
     padding: var(--space-4);
+    font-size: var(--font-size-sm);
+    min-height: 48px;
+  }
+  
+  .mobile-menu-link i {
+    width: 20px;
+    height: 20px;
+    font-size: var(--font-size-base);
   }
 }
 
