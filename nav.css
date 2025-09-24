@@ -1,1022 +1,887 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PUZZMI - 서울 렌탈친구 서비스</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="navigation.css">
-    <link rel="stylesheet" href="pages.css">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;600;800&display=swap" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;800&family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
-<script type="module" src="nav.js"></script>
-</head>
+/* PUZZMI - 네비게이션 전용 스타일 (기존 색감 유지) */
 
-<!-- Supabase JS v2 (ESM) -->
-<script type="module">
-  // nav.js에서 만든 싱글톤 supabase 재사용 (중복 인스턴스 방지)
-  import { supabase } from "./nav.js";
+/* ===== 메인 네비게이션 바 ===== */
+.app-nav {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  background: rgba(255, 255, 255, 0.98) !important;
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-base);
+}
 
-  // ===== 1) 메이트 목록 (페이지네이션) =====
-  const ONLY_VERIFIED = false;          // 공개만 노출하려면 true
-  const PAGE_SIZE     = 8;
-  let page = 0, isLoading = false, hasMore = true;
+.app-nav.scrolled {
+  background: rgba(255, 255, 255, 0.98) !important;
+  box-shadow: var(--shadow-md);
+  border-bottom-color: rgba(102, 126, 234, 0.15);
+  backdrop-filter: blur(25px);
+}
 
-  const grid = document.querySelector(".friends-grid");
-  const loadMoreBtn = document.getElementById("loadMore");
-
-async function refreshHeartCount() {
-  const badges = Array.from(document.querySelectorAll('.heart-badge[data-heart]'));
-  if (!badges.length) return;
-
-  const ids = [...new Set(badges.map(b => b.getAttribute('data-heart')).filter(Boolean))];
-
-  // 각 메이트별 찜 개수 조회
-  const { data, error } = await supabase
-    .from('favorites')
-    .select('mate_id')
-    .in('mate_id', ids);
-
-  if (error) {
-    console.warn('heart refresh error:', error);
-    return;
+/* 모바일에서도 흰색 배경 강제 적용 */
+@media (max-width: 1024px) {
+  .app-nav {
+    background: rgba(255,255,255,0.98) !important;
   }
   
-  const counts = {};
-  for (const row of (data || [])) {
-    counts[row.mate_id] = (counts[row.mate_id] || 0) + 1;
-  }
-
-  for (const id of ids) {
-    const n = counts[id] || 0;
-    const el = document.querySelector(`.heart-badge[data-heart="${id}"] .count`);
-    if (el) el.textContent = n;
+  .app-nav.scrolled {
+    background: rgba(255,255,255,0.98) !important;
   }
 }
-  // storage key → public URL
-  function keyToUrl(key) {
-    if (!key) return "";
-    if (/^https?:\/\//i.test(key)) return key;
-    const pure = key.startsWith("mates/") ? key.replace(/^mates\//,"") : key;
-    return supabase.storage.from("mates").getPublicUrl(pure).data.publicUrl;
+
+.nav-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 72px;
+}
+
+@media (min-width: 768px) {
+  .nav-container {
+    padding: 0 var(--space-6);
   }
+}
 
-  // 성별 → 기호
-  function genderIcon(gender) {
-    const g = (gender || "").toString().trim().toLowerCase();
-    if (["female","f","여","여자","woman","여성"].includes(g)) return "♀";
-    if (["male","m","남","남자","man","남성"].includes(g))   return "♂";
-    return "⚧";
+/* ===== 브랜드 로고 ===== */
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+.nav-brand:hover {
+  transform: scale(1.05);
+}
+
+.nav-brand img {
+  height: 40px;
+  width: auto;
+  transition: transform var(--transition-fast);
+}
+
+.nav-brand:hover img {
+  transform: rotate(5deg);
+}
+
+/* ===== 왼쪽 네비게이션 메뉴 ===== */
+.nav-left {
+  display: none;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1;
+  justify-content: center;
+  margin: 0 var(--space-8);
+}
+
+@media (min-width: 1024px) {
+  .nav-left {
+    display: flex;
   }
+}
 
-  // 카드 렌더
-  function renderCard(row) {
-    const name   = row.profiles?.full_name ?? "이름 비공개";
-    const age    = row.profiles?.age ? `${row.profiles.age}세` : "";
-    const gender = row.profiles?.gender ?? "";
-    const langs  = Array.isArray(row.profiles?.languages) ? row.profiles.languages : [];
-    const gIcon  = genderIcon(gender);
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+}
 
-    const keys   = Array.isArray(row.photos) ? row.photos : [];
-    const cover  = row.primary_photo || keys[0] || row.profiles?.avatar_url || "https://picsum.photos/seed/puzzmi/400/300";
-    const img    = cover.startsWith("http") ? cover : keyToUrl(cover);
+.nav-link::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+  transition: left 0.5s ease;
+}
 
-    const priceJpy = new Intl.NumberFormat("ja-JP", { style: "currency", currency: "JPY", maximumFractionDigits: 0 }).format(4000);
-    const tagsTxt  = (row.tags ?? []).slice(0,3).join(", ") || "서울 투어";
-    const subline  = [gIcon, age].filter(Boolean).join(" • ");
+.nav-link:hover::before {
+  left: 100%;
+}
 
+.nav-link:hover {
+  color: var(--primary-600);
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(240, 147, 251, 0.03) 100%);
+  transform: translateY(-1px);
+}
 
-    const card = document.createElement("div");
-    card.className = "friend-card";
-    card.innerHTML = `
-      <div class="friend-image">
-        <img src="${img}" alt="${name}">
-        <div class="heart-badge" data-heart="${row.user_id}" style="position:absolute;right:8px;top:8px;background:#e0245e;color:#fff;border-radius:16px;padding:4px 8px;font-size:12px;display:flex;gap:6px;align-items:center;">
-          <i class="fas fa-heart"></i><span class="count">0</span>
-        </div>
-      </div>
-      <div class="friend-info">
-        <h3 class="friend-name">${name}</h3>
-        <p class="friend-age">${subline || "정보 미기재"}</p>
-        <p class="friend-specialties">${tagsTxt}</p>
-        <p class="friend-description">${row.bio ?? "함께 서울의 숨은 명소를 즐겨봐요!"}</p>
-        <div class="friend-languages">
-          ${langs.map(l => `<span class="language">${l}</span>`).join("")}
-        </div>
-        <div class="friend-price">
-          <span class="price">${priceJpy}</span><span class="duration">/時間</span>
-        </div>
-        <div style="margin-top:10px; display:flex; gap:8px;">
-          <a class="cta-btn" data-requires-auth="true" href="mate_like.html?mate_id=${row.user_id}">プロフィールを見る</a>
-          <a class="cta-btn"          data-requires-auth="true" href="booking.html?mate_id=${row.user_id}">予約する</a>
-          <a class="cta-btn" data-fav-mate="${row.user_id}">お気に入り</a>
-        </div>
-      </div>
-    `;
-    grid.appendChild(card);
+.nav-link.active {
+  color: var(--primary-700);
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(240, 147, 251, 0.05) 100%);
+  font-weight: var(--font-weight-semibold);
+}
 
-  }
+/* ===== 오른쪽 액션 영역 ===== */
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
 
-  async function loadMates({ reset=false } = {}) {
-    if (!grid || isLoading || (!hasMore && !reset)) return;
-    if (reset) { page = 0; hasMore = true; grid.innerHTML = ""; }
+/* ===== 알림 아이콘 ===== */
+.notification-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+  border: 2px solid rgba(102, 126, 234, 0.2);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+  text-decoration: none;
+  color: var(--text-primary);
+  backdrop-filter: blur(8px);
+}
 
-    isLoading = true;
-    const from = page * PAGE_SIZE;
-    const to   = from + PAGE_SIZE - 1;
+.notification-icon:hover {
+  background: var(--gradient-primary);
+  color: var(--text-inverse);
+  transform: translateY(-1px) scale(1.05);
+  box-shadow: var(--shadow-lg);
+  border-color: transparent;
+}
 
-    // Retry logic for network issues
-    let retryCount = 0;
-    const maxRetries = 3;
-    
-    while (retryCount < maxRetries) {
-      try {
-        let query = supabase
-          .from("mate_profiles")
-          .select(`
-            user_id, bio, hourly_rate, tags, areas, is_verified, rating, photos, primary_photo,
-            profiles:profiles ( id, full_name, age, gender, languages, avatar_url )
-          `, { count: "exact" })
-          .order("rating", { ascending: false })
-          .range(from, to);
+.notification-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: var(--gradient-secondary);
+  color: var(--text-inverse);
+  border-radius: var(--radius-full);
+  width: 20px;
+  height: 20px;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md);
+  animation: pulse 2s ease-in-out infinite;
+}
 
-        if (ONLY_VERIFIED) query = query.eq("is_verified", true);
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+}
 
-        const { data, error, count } = await query;
+/* ===== 드롭다운 메뉴 ===== */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
 
-        if (error) {
-          throw error;
-        }
+.dropdown-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+  border: 2px solid rgba(102, 126, 234, 0.2);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-weight: var(--font-weight-medium);
+  box-shadow: var(--shadow-sm);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  backdrop-filter: blur(8px);
+}
 
-        // Success - process the data
-        (data || []).forEach(renderCard);
+.dropdown-toggle:hover {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(240, 147, 251, 0.03) 100%);
+  border-color: rgba(102, 126, 234, 0.3);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
 
-        const fetched = (data || []).length;
-        const total   = typeof count === "number" ? count : (from + fetched);
-        hasMore = (from + fetched) < total;
+.dropdown-toggle.active {
+  background: var(--gradient-primary);
+  color: var(--text-inverse);
+  border-color: transparent;
+  box-shadow: var(--shadow-lg);
+}
 
-        if (loadMoreBtn) loadMoreBtn.style.display = hasMore ? "inline-block" : "none";
-        if (hasMore) page += 1;
-
-        isLoading = false;
-        return; // Success, exit retry loop
-        
-      } catch (error) {
-        console.error(`loadMates error (attempt ${retryCount + 1}):`, error);
-        retryCount++;
-        
-        if (retryCount >= maxRetries) {
-          // Final failure after all retries
-          if (!grid.innerHTML) {
-            grid.innerHTML = `
-              <div style="padding:16px; text-align:center;">
-                <p>메이트를 불러오지 못했습니다.</p>
-                <p style="font-size:0.9em; color:#666; margin-top:8px;">
-                  네트워크 연결을 확인하고 페이지를 새로고침해주세요.
-                </p>
-                <button onclick="location.reload()" style="margin-top:12px; padding:8px 16px; background:#667eea; color:white; border:none; border-radius:4px; cursor:pointer;">
-                  새로고침
-                </button>
-              </div>
-            `;
-          }
-          loadMoreBtn && (loadMoreBtn.style.display = "none");
-          isLoading = false;
-          return;
-        }
-        
-        // Wait before retry (exponential backoff)
-        await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount) * 1000));
-      }
-    }
-  }
-
-  loadMoreBtn?.addEventListener("click", () => loadMates());
-
-  // ===== 3) 인증 가드 & 찜하기 처리 =====
-
-  // 찜하기 기능
-  document.addEventListener('click', async (e) => {
-    const btn = e.target.closest('[data-fav-mate]');
-    if (!btn) return;
-    e.preventDefault();
-    
-    // 로그인 체크
-    const { data: { user }, error: authErr } = await supabase.auth.getUser();
-    if (authErr || !user) {
-      const redir = encodeURIComponent(location.pathname + location.search);
-      location.href = `auth_combo.html?redirect=${redir}`;
-      return;
-    }
-
-    const mateId = btn.getAttribute('data-fav-mate');
-    const originalText = btn.textContent;
-    btn.disabled = true;
-    btn.textContent = '처리중...';
-
-    try {
-      // 이미 찜했는지 확인
-      const { data: existing } = await supabase
-        .from('favorites')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('mate_id', mateId)
-        .maybeSingle();
-
-      if (existing) {
-        // 이미 찜한 경우 - 찜 해제
-        const { error } = await supabase
-          .from('favorites')
-          .delete()
-          .eq('user_id', user.id)
-          .eq('mate_id', mateId);
-        
-        if (error) throw error;
-        
-        btn.textContent = '찜하기';
-        btn.classList.remove('is-faved');
-        showToast('💔 찜 해제되었습니다');
-      } else {
-        // 찜하기
-        const { error } = await supabase
-          .from('favorites')
-          .insert({ user_id: user.id, mate_id: mateId });
-        
-        if (error) throw error;
-        
-        btn.textContent = '찜 완료';
-        btn.classList.add('is-faved');
-        showToast('💖 찜 목록에 추가되었습니다!');
-      }
-
-      // 하트 카운트 업데이트
-      await refreshHeartCount();
-      
-/* ===== 네비게이션 CSS 스타일 추가 ===== */
-const navStyles = `
-/* 드롭다운 메뉴 흰색 배경 강제 적용 */
 .dropdown-menu {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  min-width: 220px;
   background: rgba(255,255,255,0.98) !important;
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255,255,255,0.4);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-  z-index: 9999;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px) scale(0.95);
+  transition: all var(--transition-base);
+  z-index: var(--z-dropdown);
+  overflow: hidden;
+}
+
+.dropdown.active .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+.dropdown-menu::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 33%, #f093fb 66%, #f5576c 100%);
+  opacity: 0.8;
 }
 
 .dropdown-item {
-  background: rgba(255,255,255,0.9) !important;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
   color: var(--text-primary) !important;
+  text-decoration: none;
+  font-weight: var(--font-weight-medium);
+  transition: all var(--transition-fast);
+  border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+  position: relative;
+  overflow: hidden;
+  background: rgba(255,255,255,0.9) !important;
+}
+
+.dropdown-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  transition: width var(--transition-base);
 }
 
 .dropdown-item:hover {
   background: rgba(255,255,255,1) !important;
-  color: #667eea !important;
+  color: var(--primary-600) !important;
+  padding-left: var(--space-6);
 }
 
-/* 모바일 메뉴 가시성 강화 */
+.dropdown-item:hover::before {
+  width: 4px;
+}
+
+.dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.dropdown-item i {
+  width: 16px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* ===== 로그아웃 버튼 ===== */
+.logout-btn {
+  background: var(--gradient-secondary);
+  color: var(--text-inverse);
+  border: none;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.logout-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.logout-btn:hover::before {
+  left: 100%;
+}
+
+.logout-btn:hover {
+  transform: translateY(-1px) scale(1.05);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ===== 모바일 메뉴 ===== */
+.mobile-menu-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+  border: 2px solid rgba(102, 126, 234, 0.2);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  color: var(--text-primary);
+  backdrop-filter: blur(8px);
+  box-shadow: var(--shadow-sm);
+}
+
+@media (min-width: 1024px) {
+  .mobile-menu-btn {
+    display: none;
+  }
+}
+
+.mobile-menu-btn:hover {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(240, 147, 251, 0.03) 100%);
+  border-color: rgba(102, 126, 234, 0.3);
+  transform: scale(1.05);
+}
+
+.mobile-menu-btn.active {
+  background: var(--gradient-primary);
+  color: var(--text-inverse);
+  border-color: transparent;
+}
+
+/* 햄버거 아이콘 */
+.hamburger {
+  width: 20px;
+  height: 20px;
+  position: relative;
+  transform: rotate(0deg);
+  transition: 0.3s ease-in-out;
+}
+
+.hamburger span {
+  display: block;
+  position: absolute;
+  height: 2px;
+  width: 100%;
+  background: currentColor;
+  border-radius: 2px;
+  opacity: 1;
+  left: 0;
+  transform: rotate(0deg);
+  transition: 0.25s ease-in-out;
+}
+
+.hamburger span:nth-child(1) {
+  top: 0px;
+}
+
+.hamburger span:nth-child(2) {
+  top: 8px;
+}
+
+.hamburger span:nth-child(3) {
+  top: 16px;
+}
+
+.mobile-menu-btn.active .hamburger span:nth-child(1) {
+  top: 8px;
+  transform: rotate(135deg);
+}
+
+.mobile-menu-btn.active .hamburger span:nth-child(2) {
+  opacity: 0;
+  left: -20px;
+}
+
+.mobile-menu-btn.active .hamburger span:nth-child(3) {
+  top: 8px;
+  transform: rotate(-135deg);
+}
+
+/* ===== 모바일 메뉴 오버레이 ===== */
 .mobile-menu {
-  z-index: 9999 !important;
-  background: rgba(0,0,0,0.8) !important;
+  position: fixed;
+  top: 72px;
+  left: 0;
+  right: 0;
+  max-height: 0;
+  background: rgba(0,0,0,0.95);
+  backdrop-filter: blur(20px);
+  z-index: 9999;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mobile-menu.active {
+  max-height: calc(100vh - 72px);
 }
 
 .mobile-menu-content {
-  background: rgba(255,255,255,0.98) !important;
-  box-shadow: 0 0 50px rgba(0,0,0,0.4) !important;
-  z-index: 10000 !important;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.95) 100%);
+  backdrop-filter: blur(25px);
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 0 0 32px 32px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  overflow-y: auto;
+  padding: 32px 24px;
+  min-height: calc(100vh - 72px);
 }
 
 .mobile-menu-header {
-  background: rgba(255,255,255,0.98) !important;
+  padding: 24px 0 32px 0;
+  border-bottom: 3px solid rgba(102, 126, 234, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 32px;
+  position: relative;
+}
+
+.mobile-menu-header::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #667eea 0%, #f093fb 100%);
+  border-radius: 2px;
+}
+
+.mobile-menu-header .nav-brand {
+  font-size: 1.8rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.mobile-menu-header .nav-brand img {
+  height: 36px;
+}
+
+.mobile-menu-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.mobile-menu-section {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(240, 147, 251, 0.05) 100%);
+  border: 2px solid rgba(102, 126, 234, 0.2);
+  border-radius: 24px;
+  padding: 24px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.mobile-menu-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 33%, #f093fb 66%, #f5576c 100%);
+  opacity: 0.8;
+}
+
+.mobile-menu-section-title {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 20px;
+  padding: 16px 20px;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+  padding-bottom: 16px;
+  position: relative;
+  text-align: center;
+}
+
+.mobile-menu-section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 2px;
+  background: var(--gradient-primary);
+  border-radius: 2px;
 }
 
 .mobile-menu-link {
-  background: rgba(255,255,255,0.9) !important;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+  font-weight: 600;
+  font-size: 1.2rem;
   color: var(--text-primary) !important;
+  text-decoration: none;
+  border-radius: 16px;
+  transition: all 0.3s ease;
+  margin-bottom: 12px;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%) !important;
+  border: 2px solid rgba(255,255,255,0.4);
+  backdrop-filter: blur(8px);
+  min-height: 64px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+}
+
+.mobile-menu-link::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  background: var(--gradient-primary);
+  transition: width 0.3s ease;
 }
 
 .mobile-menu-link:hover {
-  background: rgba(255,255,255,1) !important;
-  color: #667eea !important;
-}
-`;
-
-// 스타일 주입
-if (!document.querySelector('#nav-override-styles')) {
-  const styleEl = document.createElement('style');
-  styleEl.id = 'nav-override-styles';
-  styleEl.textContent = navStyles;
-  document.head.appendChild(styleEl);
+  background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.95) 100%) !important;
+  color: var(--primary-600) !important;
+  padding-left: 32px;
+  border-color: rgba(102, 126, 234, 0.2);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.15);
 }
 
-    } catch (error) {
-      console.error('찜하기 오류:', error);
-      btn.textContent = originalText;
-      showToast('❌ 오류가 발생했습니다: ' + error.message);
-    } finally {
-      btn.disabled = false;
-    }
-  });
+.mobile-menu-link:hover::before {
+  width: 6px;
+}
 
-  // 토스트 메시지 함수
-  function showToast(message) {
-    const toast = document.createElement('div');
-    toast.style.cssText = `
-      position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white; padding: 12px 24px; border-radius: 12px;
-      z-index: 9999; font-weight: 600; box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
-      animation: slideDown 0.3s ease;
-    `;
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
+.mobile-menu-link i {
+  width: 32px;
+  height: 32px;
+  text-align: center;
+  flex-shrink: 0;
+  font-size: 1.4rem;
+  color: var(--primary-600);
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(240, 147, 251, 0.05) 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(102, 126, 234, 0.2);
+}
+
+.mobile-menu-link:hover i {
+  background: var(--gradient-primary);
+  color: white;
+  border-color: transparent;
+  transform: scale(1.1);
+}
+
+/* ===== 사용자 정보 표시 ===== */
+.user-info {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(240, 147, 251, 0.05) 100%);
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--primary-700);
+}
+
+/* ===== 드롭다운 아이콘 회전 ===== */
+.dropdown-icon {
+  transition: transform var(--transition-base);
+}
+
+.dropdown.active .dropdown-icon {
+  transform: rotate(180deg);
+}
+
+/* ===== 네비게이션 반응형 ===== */
+@media (max-width: 1023px) {
+  .nav-left {
+    display: none;
   }
-
-
-  // 초기 실행
-  (async () => {
-    await loadMates({ reset: true });
-    await refreshHeartCount();
-    await loadHomepageReviews();
-    
-    // 자동 완료 체크 실행
-    try {
-      const { autoCompleteBookings } = await import('./auto_complete_bookings.js');
-      await autoCompleteBookings();
-      // 5분마다 자동 완료 체크
-      setInterval(autoCompleteBookings, 5 * 60 * 1000);
-    } catch (error) {
-      console.warn('자동 완료 기능 로드 실패:', error);
-    }
-  })();
-
-  // ===== 4) 메인페이지 리뷰 로드 =====
-  async function loadHomepageReviews() {
-    const reviewsGrid = document.getElementById('reviewsGrid');
-    if (!reviewsGrid) return;
-
-    try {
-      // 평점 높고 글자수 많은 순으로 리뷰 가져오기
-      const { data: reviews, error } = await supabase
-        .from('reviews')
-        .select(`
-          id, content, rating, created_at, author_name,
-          mate_profiles!inner (
-            user_id,
-            profiles!inner ( full_name )
-          )
-        `)
-        .not('content', 'is', null)
-        .order('rating', { ascending: false })
-        .limit(50); // 많이 가져와서 JS에서 정렬
-
-      if (error) {
-        console.error('리뷰 로드 실패:', error);
-        reviewsGrid.innerHTML = `
-          <div class="review-card">
-            <p class="review-text">리뷰를 불러오는 중 오류가 발생했습니다.</p>
-          </div>
-        `;
-        return;
-      }
-
-      if (!reviews || reviews.length === 0) {
-        reviewsGrid.innerHTML = `
-          <div class="review-card">
-            <p class="review-text">아직 등록된 리뷰가 없습니다. 첫 번째 리뷰를 남겨보세요!</p>
-          </div>
-        `;
-        return;
-      }
-
-      // 평점 높고 글자수 많은 순으로 정렬
-      const sortedReviews = reviews
-        .sort((a, b) => {
-          // 1차: 평점 높은 순
-          if (b.rating !== a.rating) {
-            return b.rating - a.rating;
-          }
-          // 2차: 글자수 많은 순
-          if ((b.content?.length || 0) !== (a.content?.length || 0)) {
-            return (b.content?.length || 0) - (a.content?.length || 0);
-          }
-          // 3차: 최신순
-          return new Date(b.created_at) - new Date(a.created_at);
-        })
-        .slice(0, 6); // 최대 6개만 표시
-
-      // 이메일 마스킹 함수
-      function maskEmail(email) {
-        if (!email || typeof email !== 'string') return '익명';
-        
-        const atIndex = email.indexOf('@');
-        if (atIndex === -1) return email; // @ 없으면 원본 반환 (실명)
-        
-        const localPart = email.substring(0, atIndex);
-        const domain = email.substring(atIndex);
-        
-        if (localPart.length <= 2) {
-          return localPart[0] + '*'.repeat(localPart.length - 1) + domain;
-        } else if (localPart.length <= 4) {
-          return localPart[0] + '*'.repeat(localPart.length - 2) + localPart[localPart.length - 1] + domain;
-        } else {
-          const start = localPart.substring(0, 2);
-          const end = localPart.substring(localPart.length - 2);
-          const middle = '*'.repeat(localPart.length - 4);
-          return start + middle + end + domain;
-        }
-      }
-
-      // 별점 표시 함수
-      function renderStars(rating) {
-        const fullStars = Math.floor(rating);
-        const hasHalfStar = rating % 1 >= 0.5;
-        let starsHtml = '';
-        
-        for (let i = 0; i < fullStars; i++) {
-          starsHtml += '<i class="fas fa-star"></i>';
-        }
-        
-        if (hasHalfStar) {
-          starsHtml += '<i class="fas fa-star-half-alt"></i>';
-        }
-        
-        const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-        for (let i = 0; i < emptyStars; i++) {
-          starsHtml += '<i class="far fa-star"></i>';
-        }
-        
-        return starsHtml;
-      }
-
-      // 랜덤 아바타 생성 함수
-      function getRandomAvatar(index) {
-        const avatars = [
-          'https://images.pexels.com/photos/1382731/pexels-photo-1382731.jpeg?auto=compress&cs=tinysrgb&w=100',
-          'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=100',
-          'https://images.pexels.com/photos/1542085/pexels-photo-1542085.jpeg?auto=compress&cs=tinysrgb&w=100',
-          'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100',
-          'https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=100',
-          'https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpeg?auto=compress&cs=tinysrgb&w=100'
-        ];
-        return avatars[index % avatars.length];
-      }
-
-      // 랜덤 지역 생성 함수
-      reviewsGrid.innerHTML = sortedReviews.map((review, index) => {
-        const mateName = review.mate_profiles?.profiles?.full_name || '메이트';
-        const authorName = maskEmail(review.author_name || '익명');
-        const reviewDate = new Date(review.created_at).toLocaleDateString('ko-KR', { 
-          year: 'numeric', 
-          month: 'long' 
-        });
-        const avatar = getRandomAvatar(index);
-        
-        return `
-          <div class="review-card">
-            <div class="review-header">
-              <div class="reviewer-info">
-                <img src="${avatar}" alt="${authorName}" class="reviewer-avatar">
-                <div>
-                  <h4 class="reviewer-name">${authorName}</h4>
-                </div>
-              </div>
-            </div>
-            <p class="review-text">"${review.content}"</p>
-            <div class="review-rating">
-              ${renderStars(review.rating)}
-            </div>
-            <p class="review-date">${reviewDate}</p>
-            <div class="review-mate" style="margin-top: 12px; padding: 8px 12px; background: rgba(102, 126, 234, 0.1); border-radius: 8px; font-size: 0.9rem; color: var(--text-secondary);">
-              メイト <strong>${mateName}</strong> さんとの旅
-            </div>
-          </div>
-        `;
-      }).join('');
-
-
-    } catch (error) {
-      console.error('리뷰 로드 중 오류:', error);
-      reviewsGrid.innerHTML = `
-        <div class="review-card">
-          <p class="review-text">리뷰를 불러오는 중 오류가 발생했습니다.</p>
-        </div>
-      `;
-    }
+  
+  .nav-container {
+    min-height: 64px;
   }
-</script>
+  
+  .nav-brand {
+    font-size: var(--font-size-lg);
+  }
+  
+  .nav-brand img {
+    height: 32px;
+  }
+  
+  .nav-right {
+    gap: var(--space-2);
+  }
+  
+  .dropdown-toggle {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--font-size-xs);
+  }
+  
+  .notification-icon {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .logout-btn {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--font-size-xs);
+  }
+  
+  .mobile-menu {
+    top: 64px;
+  }
+  
+  .mobile-menu-content {
+    min-height: calc(100vh - 64px);
+  }
+}
 
+@media (max-width: 640px) {
+  .nav-container {
+    padding: 0 var(--space-3);
+    min-height: 60px;
+  }
+  
+  .nav-brand {
+    font-size: var(--font-size-base);
+  }
+  
+  .nav-brand img {
+    height: 28px;
+  }
+  
+  .dropdown-menu {
+    min-width: 200px;
+    right: -20px;
+  }
+  
+  .mobile-menu {
+    top: 60px;
+  }
+  
+  .mobile-menu-content {
+    max-width: 360px;
+    padding: 28px 20px;
+    min-height: calc(100vh - 60px);
+  }
+  
+  .mobile-menu-section {
+    padding: 20px;
+    border-radius: 20px;
+  }
+  
+  .mobile-menu-section-title {
+    font-size: 1.1rem;
+    margin-bottom: 16px;
+    padding: 12px 16px;
+    padding-bottom: 12px;
+  }
+  
+  .mobile-menu-link {
+    padding: 16px 20px;
+    font-size: 1.1rem;
+    min-height: 56px;
+    gap: 14px;
+  }
+  
+  .mobile-menu-link i {
+    width: 28px;
+    height: 28px;
+    font-size: 1.2rem;
+  }
+}
 
+/* ===== 스크롤 효과 ===== */
+.nav-scroll-effect {
+  transition: all var(--transition-base);
+}
 
+.nav-scroll-effect.scrolled {
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: var(--shadow-lg);
+}
 
-<body class="bg-cream">
-    <div id="app-nav"></div>
-    
-    <section id="home" class="hero">
-        <div class="hero-bg"></div>
-        <div class="hero-overlay"></div>
-        <div class="container">
-            <div class="hero-content">
-                <h1 class="hero-title" data-key="hero-title">一生忘れないとっておきの瞬間をあなたに！</h1>
-                <p class="hero-subtitle" data-key="hero-subtitle">現地の友達と一緒に、グルメ・人気スポット・穴場スポットまで！<br>思い出のパズルをつなげよう
-</p>
-            </div>
-        </div>
-    </section>
+.nav-scroll-effect.scrolled .nav-brand {
+  transform: scale(0.95);
+}
 
-<section id="about" class="about">
-  <div class="container">
-    <div class="about-content">
-      <div class="about-text">
-        <div class="section-header" data-eyebrow="ABOUT">
-          <h2 class="section-title">''PUZZMI'とはどんなサービス？</h2>
-          <p class="section-subtitle">あなたの"⼀緒に⾏きたい"という気持ちを叶えるサービス！</p>
-        </div>
+/* ===== 접근성 개선 ===== */
+.nav-link:focus,
+.dropdown-toggle:focus,
+.notification-icon:focus,
+.mobile-menu-btn:focus {
+  outline: 2px solid var(--primary-500);
+  outline-offset: 2px;
+}
 
-        <!-- 보조 카피 -->
-        <p class="section-subtitle">
-          韓国人と一緒に語学交換や文化交流をしながら、旅を特別な思い出に！
-          <br><span class="nobr">わたしたちはただの′ガイド´ではなく友達です！</span>
-        </p>
+/* 스크린 리더용 텍스트 */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 
-        <!-- 베네핏 리스트 -->
-        <ul class="benefits">
-          <li>
-            <div class="icon">✓</div>
-            <div class="text">
-              <strong>一人では行けない、お店、グルメやカフェを楽しもう！</strong><br>
-              現地の友達と一緒なら、ローカルグルメも安心！言葉の壁を気にせず、韓国を思いっきり楽しもう！
-            </div>
-          </li>
-          <li>
-            <div class="icon">✓</div>
-            <div class="text">
-              <strong>ガイドブックに載っていない、あなただけの韓国を見つけよう！</strong><br>
-              ガイドブックには載っていない、地元の人だけが知っている隠れた名店もご紹介します。人気観光地とあわせて、韓国の魅力を存分にお楽しみください。
-            </div>
-          </li>
-          <li>
-            <div class="icon">✓</div>
-            <div class="text">
-              <strong>周りと差がつく韓国旅行を！</strong><br>
-              現地韓国女子と、韓国の最新トレンドをリアルに体験できます！ やファッションやコスメ、話題のカフェや最新スポットまで韓国の「今」を満喫しよう！
-            </div>
-          </li>
-          <li>
-            <div class="icon">✓</div>
-            <div class="text">
-              <strong>言葉の壁も心配なし!</strong><br>
-              韓国語が不安でも大丈夫！注文や交通、ショッピング、道案内など、しっかりサポートいたします。安心して旅行を楽しめます！
-            </div>
-          </li>
-        </ul>
+/* ===== 키보드 네비게이션 ===== */
+.dropdown-item:focus {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(240, 147, 251, 0.03) 100%);
+  color: var(--primary-600);
+  outline: none;
+}
 
-        <!-- 마무리 메시지 -->
-        <div class="about-quote">
-          <span class="quote-mark">"</span>
-          あなたの韓国旅行を最高の時間にいたします！
-        </div>
-      </div>
-      
-          <figure class="about-photo reveal">
-        <figure class="about-photo">
-          <img src="about1.png" alt="PUZZMI 소개 사진 1" />
-          <figure class="about-photo reveal">
-        <figure class="about-photo">
-          <img src="about2.png" alt="PUZZMI 소개 사진 2" />
-          <figure class="about-photo reveal">
-        <figure class="about-photo">
-          <img src="about3.png" alt="PUZZMI 소개 사진 3" />
-        </figure>
-      </div>
-    </div>
-  </div>
-</section>
+.mobile-menu-link:focus {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(240, 147, 251, 0.03) 100%);
+  color: var(--primary-600);
+  outline: none;
+}
 
-<!-- ✅ NEW: SAFETY SECTION -->
-<section id="safety" class="safety">
-  <div class="container">
-    <div class="section-header" data-eyebrow="SAFETY">
-      <h2 class="section-title">ここがちがう！ PUZZMIの安全・安心の仕組み</h2>
-      <p class="section-subtitle">はじめてでも安心の3つのポイント</p>
-    </div>
+/* ===== 특별 상태 ===== */
+.nav-link.notification-active {
+  position: relative;
+}
 
-    <ul class="safety-grid">
-      <li class="safety-card reveal">
-        <figure class="safety-media reveal">
-          <img src="safety1.png" alt="메이트 본인확인 일러스트" width="96" height="96" />
-        </figure>
-        <div class="safety-copy">
-          <h3>メイト全員の本人確認</h3>
-          <p>
-            メイト全員が身分証による本人確認に加え、<strong>面接</strong>で対応
-          力やマナーをチェックしております。信頼できるメイトと、安全で楽しい時間を提供いたします。
-          </p>
-        </div>
-      </li>
+.nav-link.notification-active::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  background: var(--error-500);
+  border-radius: var(--radius-full);
+  animation: pulse 2s ease-in-out infinite;
+}
 
-      <li class="safety-card reveal">
-        <figure class="safety-media reveal">
-          <img src="safety2.png" alt="일본인 스태프 상주 일러스트" width="96" height="96" />
-        </figure>
-        <div class="safety-copy">
-          <h3>日本人スタッフの常駐</h3>
-          <p>
-            日本人スタッフが常駐しているため、<strong>言語·文化</strong>の壁を気にせず、
-            初めての方も安心してご利用いただけます。
-          </p>
-        </div>
-      </li>
+/* ===== 브랜드 호버 효과 ===== */
+.nav-brand:hover {
+  transform: scale(1.02);
+}
 
-        <li class="safety-card reveal">
-        <figure class="safety-media reveal">
-          <img src="safety3.png" alt="지원 및 상담 운영 일러스트" width="96" height="96" />
-        </figure>
-        <div class="safety-copy">
-          <h3>安全・安心のサポート・相談体制</h3>
-          <p>
-            万が一ご利用中に問題が起きても、<strong>迅速な対応</strong>でサポートいたします。
-            いつでもお気軽にご相談くださいませ。
-          </p>
-        </div>
-      </li>
-    </ul>
-  </div>
-</section>
+.nav-brand:hover img {
+  transform: rotate(2deg) scale(1.05);
+}
 
+/* ===== 모바일 전용 스타일 ===== */
+@media (max-width: 480px) {
+  .nav-container {
+    padding: 0 var(--space-2);
+  }
+  
+  .nav-right {
+    gap: var(--space-1);
+  }
+  
+  .dropdown-toggle {
+    padding: var(--space-2);
+    min-width: auto;
+  }
+  
+  .dropdown-toggle span {
+    display: none;
+  }
+  
+  .notification-icon {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .logout-btn {
+    padding: var(--space-2);
+    font-size: var(--font-size-xs);
+  }
+  
+  .mobile-menu-content {
+    max-width: 340px;
+  }
+  
+  .mobile-menu-link {
+    padding: var(--space-4);
+    font-size: var(--font-size-sm);
+    min-height: 48px;
+  }
+  
+  .mobile-menu-link i {
+    width: 20px;
+    height: 20px;
+    font-size: var(--font-size-base);
+  }
+}
 
+/* ===== 성능 최적화 ===== */
+.app-nav,
+.dropdown-menu,
+.mobile-menu-content {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
 
-    <section id="friends" class="friends">
-      <div class="container">
-        <div class="section-header" data-eyebrow="FRIENDS">
-          <h2 class="section-title" data-key="friends-title">メイトに会ってみよう</h2>
-          <p class="section-subtitle" data-key="friends-subtitle">趣味も、グルメも、最新トレンドも、一緒に楽しめる友達と！</p>
-        </div>
-
-        <div class="friend-filters">
-          <button class="quick-filter active" data-filter="all" data-key="filter-all">すべて見る</button>
-        </div>
-
-        <!-- JS가 카드를 채워 넣을 컨테이너 -->
-        <div class="friends-grid"></div>
-        
-        <!-- 더 보기 버튼 -->
-        <div class="friends-actions text-center">
-          <button id="loadMore" class="btn btn-primary btn-lg" style="display:none">
-            <i class="fas fa-plus"></i>
-            더 보기
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <section id="how-it-works" class="how-it-works">
-        <div class="container">
-            <div class="section-header" data-eyebrow="HOW IT WORKS">
-                <h2 class="section-title" data-key="how-title">ご利用流れ</h2>
-                <p class="section-subtitle" data-key="how-subtitle">ソウルでの一日が、かけがえのない思い出になりますように</p>
-            </div>
-            
-            <div class="steps">
-                <div class="step">
-                    <div class="step-number">01</div>
-                    <div class="step-content">
-                        <h3 class="step-title" data-key="step1-title">メイトの選択</h3>
-                        <p class="step-description" data-key="step1-desc">プロフィールをチェックして、好みに合う友達を見つけよう。言語や趣味、専門分野も確認できます。
-</p>
-                    </div>
-                    <div class="step-icon">
-                        <i class="fas fa-user-check"></i>
-                    </div>
-                </div>
-                
-                <div class="step">
-                    <div class="step-number">02</div>
-                    <div class="step-content">
-                        <h3 class="step-title" data-key="step2-title">日程の予約</h3>
-                        <p class="step-description" data-key="step2-desc">ご希望の日程・時間・内容を選んで予約をしてください。メイトとは事前にチャットで計画を立てることができます
-</p>
-                    </div>
-                    <div class="step-icon">
-                        <i class="fas fa-calendar-check"></i>
-                    </div>
-                </div>
-                
-                <div class="step">
-                    <div class="step-number">03</div>
-                    <div class="step-content">
-                        <h3 class="step-title" data-key="step3-title">会って楽しむ</h3>
-                        <p class="step-description" data-key="step3-desc">約束の場所でメイトと合流したら、あなただけのソウル旅行がスタートします！ 一生忘れられない思い出を作りましょう！</p>
-                    </div>
-                    <div class="step-icon">
-                        <i class="fas fa-heart"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="reviews" class="reviews">
-        <div class="container">
-            <div class="section-header" data-eyebrow="REVIEWS">
-                <h2 class="section-title" data-key="reviews-title">思い出のパズルを完成させよう</h2>
-                <p class="section-subtitle" data-key="reviews-subtitle">PUZZMIと一緒に旅したお客様のの貴重な声</p>
-            </div>
-            
-            <div class="reviews-grid" id="reviewsGrid">
-                <!-- 실제 리뷰 데이터가 여기에 로드됩니다 -->
-            </div>
-        </div>
-    </section>
-
-    <!-- 기존 문의하기 섹션 주석 처리
-    <section id="contact" class="contact">
-        <div class="container">
-            <div class="contact-content">
-                <div class="contact-info">
-                    <h2 class="section-title" data-key="contact-title">문의하기</h2>
-                    <p class="contact-description" data-key="contact-desc">궁금한 점이 있으시거나 특별한 요청이 있으시면 언제든 연락주세요. 24시간 고객지원팀이 도와드려요.</p>
-                    
-                    <div class="contact-details">
-                        <div class="contact-item">
-                            <i class="fas fa-envelope"></i>
-                            <div>
-                                <h4 data-key="contact-email-title">이메일</h4>
-                                <p>hello@seoulddays.com</p>
-                            </div>
-                        </div>
-                        
-                        <div class="contact-item">
-                            <i class="fas fa-phone"></i>
-                            <div>
-                                <h4 data-key="contact-phone-title">전화</h4>
-                                <p>+82-2-1234-5678</p>
-                            </div>
-                        </div>
-                        
-                        <div class="contact-item">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <div>
-                                <h4 data-key="contact-address-title">주소</h4>
-                                <p data-key="contact-address">서울특별시 강남구 테헤란로 123</p>
-                            </div>
-                        </div>
-                        
-                        <div class="contact-item">
-                            <i class="fas fa-clock"></i>
-                            <div>
-                                <h4 data-key="contact-hours-title">운영시간</h4>
-                                <p data-key="contact-hours">24시간 연중무휴</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="social-links">
-                        <a href="#" class="social-link">
-                            <i class="fab fa-instagram"></i>
-                        </a>
-                        <a href="#" class="social-link">
-                            <i class="fab fa-facebook"></i>
-                        </a>
-                        <a href="#" class="social-link">
-                            <i class="fab fa-twitter"></i>
-                        </a>
-                        <a href="#" class="social-link">
-                            <i class="fab fa-youtube"></i>
-                        </a>
-                    </div>
-                </div>
-                
-                <div class="contact-form-container">
-                    <form class="contact-form">
-                        <div class="form-group">
-                            <input type="text" placeholder="이름" data-placeholder-key="form-name" required>
-                        </div>
-                        <div class="form-group">
-                            <input type="email" placeholder="이메일 주소" data-placeholder-key="form-email" required>
-                        </div>
-                        <div class="form-group">
-                            <input type="text" placeholder="제목" data-placeholder-key="form-subject" required>
-                        </div>
-                        <div class="form-group">
-                            <textarea placeholder="메시지를 입력해주세요" data-placeholder-key="form-message" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary" data-key="form-submit">메시지 보내기</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
-    -->
-
-    <section id="contact" class="contact">
-        <div class="container">
-            <div class="section-header" data-eyebrow="FAQ">
-                <h2 class="section-title">よくあるご質問 (FAQ)</h2>
-                <p class="section-subtitle">PUZZMIサービスに関するよくあるご質問</p>
-            </div>
-            
-            <div class="faq-content">
-                <!-- 서비스 소개 -->
-                <div class="faq-category reveal">
-                    <h3 class="faq-category-title">
-                        <i class="fas fa-info-circle"></i>
-                        サービスのご紹介
-                    </h3>
-                    
-                    <div class="faq-item reveal">
-                        <div class="faq-question">
-                            <i class="fas fa-question-circle"></i>
-                            <span>Q1. レンタル友達とは何ですか？</span>
-                            <i class="fas fa-chevron-down faq-toggle"></i>
-                        </div>
-                        <div class="faq-answer">
-                            <p>一緒に観光やご飯に行ってくれる「友達」を一定時間レンタルできるサービスです。恋愛目的ではなく、気軽に友人としての交流を楽しむためのサービスです。
-</p>
-                        </div>
-                    </div>
-                    
-                    <div class="faq-item reveal">
-                        <div class="faq-question">
-                            <i class="fas fa-question-circle"></i>
-                            <span>Q2. 恋愛や出会い目的で利用できますか？</span>
-                            <i class="fas fa-chevron-down faq-toggle"></i>
-                        </div>
-                        <div class="faq-answer">
-                            <p>いいえ。当サービスは健全な友人関係に基づく交流を目的としており、恋愛・性的な関係は禁止させていただいております。みなさまが気持ちよく交流できる環境づくりにご協力ください。
-</p>
-                        </div>
-                    </div>
-                    
-                    <div class="faq-item reveal">
-                        <div class="faq-question">
-                            <i class="fas fa-question-circle"></i>
-                            <span>Q3. 誰が利用できますか？</span>
-                            <i class="fas fa-chevron-down faq-toggle"></i>
-                        </div>
-                        <div class="faq-answer">
-                            <p>原則として18歳以上の方が対象ですが、18歳未満の方は、保護者（成人）の同伴があればご利用いただけます。
-<br>また、利用規約を守っていただける方であれば、どなたでもご利用可能です。</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- 예약, 요금 -->
-                <div class="faq-category reveal">
-                    <h3 class="faq-category-title">
-                        <i class="fas fa-credit-card"></i>
-                        予約・料金について
-                    </h3>
-                    
-                    <div class="faq-item reveal">
-                        <div class="faq-question">
-                            <i class="fas fa-question-circle"></i>
-                            <span>Q1. 支払い方法は何ですか？</span>
-                            <i class="fas fa-chevron-down faq-toggle"></i>
-                        </div>
-                        <div class="faq-answer">
-                            <p>お支払いはクレジットカードのみ対応しております。<br>(Visa / MasterCard / JCB / AMEX など)</p>
-                        </div>
-                    </div>
-                    
-                    <div class="faq-item reveal">
-                        <div class="faq-question">
-                            <i class="fas fa-question-circle"></i>
-                            <span>Q2. 当日予約できますか？</span>
-                            <i class="fas fa-chevron-down faq-toggle"></i>
-                        </div>
-                        <div class="faq-answer">
-                            <p>ご予約状況によりますが、当日のご予約にもできる限り対応いたします。<br>なるべく前日までのご予約をおすすめしております。
-</p>
-                        </div>
-                    </div>
-                    
-                    <div class="faq-item reveal">
-                        <div class="faq-question">
-                            <i class="fas fa-question-circle"></i>
-                            <span>Q3. 食事代や交通費はどうなりますか？</span>
-                            <i class="fas fa-chevron-down faq-toggle"></i>
-                        </div>
-                        <div class="faq-answer">
-                            <p>原則として、レンタル友達の食事代・交通費はお客様のご負担となります</p>
-                        </div>
-                    </div>
-                    
-                    <div class="faq-item reveal">
-                        <div class="faq-question">
-                            <i class="fas fa-question-circle"></i>
-                            <span>Q4. 追加料金が発生することはありますか？</span>
-                            <i class="fas fa-chevron-down faq-toggle"></i>
-                        </div>
-                        <div class="faq-answer">
-                            <p>基本的に、表示されている料金以外の追加費用は発生しません。<br>利用時間の延長をご希望の場合も、どうぞお気軽にご相談ください。
-<br>できる限り柔軟に対応させていただきます。</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- 안심·안전 -->
-                <div class="faq-category reveal">
-                    <h3 class="faq-category-title">
-                        <i class="fas fa-shield-alt"></i>
-                        安心・安全について
-                    </h3>
-                    
-                    <div class="faq-item reveal">
-                        <div class="faq-question">
-                            <i class="fas fa-question-circle"></i>
-                            <span>Q1. メイトの本人確認は行われていますか？</span>
-                            <i class="fas fa-chevron-down faq-toggle"></i>
-                        </div>
-                        <div class="faq-answer">
-                            <p>はい、ご安心ください。<br>当サービスでは、ご登録いただく全てのメイトに、身分証による本人確認を必ず行っております。さらに、スタッフとのめんせつを実施し、安全面や信頼性をしっかりと確認しております。<br>お客様が安心して楽しい時間を過ごしていただける体制を整えております。</p>
-                        </div>
-                    </div>
-                    
-                    <div class="faq-item reveal">
-                        <div class="faq-question">
-                            <i class="fas fa-question-circle"></i>
-                            <span>Q2. トラブルが発生した場合はどうすればよいですか？</span>
-                            <i class="fas fa-chevron-down faq-toggle"></i>
-                        </div>
-                        <div class="faq-answer">
-                            <p>ご利用中に問題が発生した場合は、いつでも運営までご連絡ください。日本人スタッフが迅速かつ丁寧に対応し、状況に応じて返金や適切な対応をご案内いたします。
-</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-brand">
-                    <div class="nav-brand">
-                        <img src="puzzmi_original.png" alt="PUZZMI 로고">
-                        <span>PUZZMI</span>
-                    </div>
-                    <p class="footer-description" data-key="footer-desc">一生忘れないとっておきの瞬間をあなたに！</p>
-                </div>
-                
-                <div class="footer-links">
-                    <div class="footer-column">
-                        <h4 data-key="footer-service">サービス</h4>
-                        <ul>
-                            <li><a href="#" data-key="footer-pricing">ご利用料金</a></li>
-                            <li><a href="#" data-key="footer-safety">安全ポリシー</a></li>
-                        </ul>
-                    </div>
-                    
-                    <div class="footer-column">
-                        <h4 data-key="footer-support">お客様サポート</h4>
-                        <ul>
-                            <li><a href="#" data-key="footer-help">ヘルプ</a></li>
-                            <li><a href="#" data-key="footer-faq">よくあるご質問</a></li>
-                            <li><a href="#" data-key="footer-contact-us">お問い合わせ</a></li>
-                            <li><a href="#" data-key="footer-refund">返金ポリシー</a></li>
-                        </ul>
-                    </div>
-                  
-                </div>
-            </div>
-            
-            <div class="footer-bottom">
-                <p>&copy; 2025 PUZZMI. <span data-key="footer-rights">All rights reserved.</span></p>
-                <div class="business-info">
-                    <p>PUZZMI | 서울특별시 영등포구 디지털로 48길 23-1</p>
-                    <p>사업자번호 716-10-02780 | 대표 최서준</p>
-                </div>
-                <div class="footer-legal">
-                    <a href="terms_of_service.html" data-key="footer-terms">ご利用規約</a>
-                    <a href="privacy_policy.html" data-key="footer-privacy">プライバシーポリシー</a>
-                    <a href="refund_policy.html" data-key="footer-refund">払戻·取消約款</a>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <script src="script.js"></script>
-    
-    <div class="floating-actions" aria-label="빠른 실행 버튼">
-      <a href="https://instagram.com/puzzmi_official" target="_blank" class="floating-btn insta" aria-label="Instagram">
-        <i class="fab fa-instagram" aria-hidden="true"></i><span>Instagram</span>
-      </a>
-      <a href="https://lin.ee/NbNPSUz" target="_blank" class="floating-btn line" aria-label="LINE">
-        <i class="fab fa-line" aria-hidden="true"></i><span>LINE</span>
-      </a>
-      <a href="https://x.com/puzzmi19889" target="_blank" class="floating-btn x" aria-label="X (Twitter)">
-        <i class="fa-brands fa-x-twitter" aria-hidden="true"></i><span>X</span>
-      </a>
-      <a href="qna.html" class="floating-btn book" aria-label="お問い合わせ">
-        <i class="fas fa-question-circle" aria-hidden="true"></i><span>お問い合わせ</span>
-      </a>
-    </div>
-</body>
-</html>
+/* ===== 다크 모드 지원 (선택사항) ===== */
+@media (prefers-color-scheme: dark) {
+  .app-nav {
+    background: rgba(17, 24, 39, 0.95);
+    border-bottom-color: var(--gray-700);
+  }
+  
+  .dropdown-menu,
+  .mobile-menu-content {
+    background: linear-gradient(135deg, rgba(31, 41, 55, 0.98) 0%, rgba(31, 41, 55, 0.92) 100%);
+    border-color: var(--gray-700);
+  }
+  
+  .mobile-menu-header {
+    background: linear-gradient(135deg, rgba(55, 65, 81, 0.8) 0%, rgba(55, 65, 81, 0.6) 100%);
+    border-bottom-color: var(--gray-600);
+  }
+}
