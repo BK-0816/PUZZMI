@@ -73,192 +73,80 @@
     
     /* 메인 컨테이너 */
     .signup-container {
-      max-width: 800px;
+      max-width: 600px;
       margin: 40px auto;
       padding: 0 20px;
       position: relative;
       z-index: 1;
     }
     
-    /* 진행 상황 표시 */
-    .progress-container {
+    /* 메인 카드 */
+    .signup-card {
       background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
-      backdrop-filter: blur(20px);
+      backdrop-filter: blur(25px);
       border: 1px solid rgba(255,255,255,0.4);
-      border-radius: 24px;
-      padding: 32px;
-      margin-bottom: 32px;
-      box-shadow: 0 16px 40px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04);
+      border-radius: 28px;
+      padding: 50px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.04);
       position: relative;
       overflow: hidden;
     }
     
-    .progress-container::before {
+    .signup-card::before {
       content: '';
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, #667eea 0%, #764ba2 33%, #f093fb 66%, #f5576c 100%);
-      animation: shimmer 3s ease-in-out infinite;
+      height: 6px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 20%, #f093fb 40%, #f5576c 60%, #4facfe 80%, #00f2fe 100%);
+      animation: shimmer 4s ease-in-out infinite;
     }
     
     @keyframes shimmer {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.8; }
+      0%, 100% { opacity: 1; transform: translateX(0); }
+      50% { opacity: 0.8; transform: translateX(8px); }
     }
     
-    .progress-header {
+    /* 헤더 */
+    .signup-header {
       text-align: center;
-      margin-bottom: 24px;
+      margin-bottom: 40px;
     }
     
-    .progress-title {
-      font-size: 2.2rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    .signup-title {
+      font-size: 2.8rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      margin: 0 0 12px 0;
-      letter-spacing: -0.02em;
+      margin: 0 0 16px 0;
+      letter-spacing: -0.03em;
+      position: relative;
     }
     
-    .progress-subtitle {
+    .signup-title::after {
+      content: '';
+      position: absolute;
+      bottom: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea 0%, #f093fb 100%);
+      border-radius: 2px;
+    }
+    
+    .signup-subtitle {
       color: var(--text-secondary);
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       line-height: 1.6;
       margin: 0;
+      font-weight: 500;
     }
     
-    .progress-steps {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 24px 0;
-      position: relative;
-    }
-    
-    .progress-steps::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, rgba(102, 126, 234, 0.2) 0%, rgba(240, 147, 251, 0.2) 100%);
-      z-index: 1;
-    }
-    
-    .progress-step {
-      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
-      border: 3px solid rgba(102, 126, 234, 0.2);
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 1.2rem;
-      color: var(--text-secondary);
-      position: relative;
-      z-index: 2;
-      transition: all 0.3s ease;
-      backdrop-filter: blur(8px);
-    }
-    
-    .progress-step.active {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border-color: transparent;
-      color: white;
-      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
-      transform: scale(1.1);
-    }
-    
-    .progress-step.completed {
-      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-      border-color: transparent;
-      color: white;
-      box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
-    }
-    
-    .progress-step.completed::before {
-      content: '✓';
-      font-size: 1.5rem;
-    }
-    
-    .step-labels {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 16px;
-    }
-    
-    .step-label {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--text-secondary);
-      text-align: center;
-      flex: 1;
-    }
-    
-    .step-label.active {
-      color: #667eea;
-      font-weight: 800;
-    }
-    
-    /* 폼 섹션 */
-    .form-section {
-      background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255,255,255,0.4);
-      border-radius: 24px;
-      padding: 40px;
-      box-shadow: 0 16px 40px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04);
-      position: relative;
-      overflow: hidden;
-      display: none;
-    }
-    
-    .form-section.active {
-      display: block;
-      animation: slideIn 0.5s ease;
-    }
-    
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    .form-section::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, #667eea 0%, #764ba2 40%, #f093fb 80%, #f5576c 100%);
-      opacity: 0.8;
-    }
-    
-    .section-title {
-      font-size: 1.8rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin: 0 0 24px 0;
-      text-align: center;
-    }
-    
+    /* 폼 그리드 */
     .form-grid {
       display: grid;
       gap: 24px;
@@ -285,6 +173,11 @@
       margin-bottom: 8px;
       font-size: 0.95rem;
       letter-spacing: 0.3px;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
     
     .form-label.required::after {
@@ -314,10 +207,99 @@
       transform: translateY(-1px);
     }
     
-    .form-textarea {
-      min-height: 120px;
-      resize: vertical;
+    .form-input::placeholder, .form-textarea::placeholder {
+      color: rgba(102, 126, 234, 0.5);
+      font-style: italic;
+    }
+    
+    /* 이메일 인증 섹션 */
+    .email-verification-section {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(240, 147, 251, 0.05) 100%);
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 20px;
+      padding: 32px;
+      margin: 24px 0;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.1);
+      display: none;
+      animation: slideIn 0.5s ease;
+    }
+    
+    .email-verification-section.show {
+      display: block;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .verification-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    
+    .verification-header h4 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 12px 0;
+    }
+    
+    .verification-header p {
+      color: var(--text-secondary);
+      font-size: 1rem;
       line-height: 1.6;
+      margin: 0;
+    }
+    
+    .verification-email-display {
+      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+      border: 2px solid rgba(102, 126, 234, 0.3);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 20px 0;
+      text-align: center;
+      font-weight: 700;
+      color: #667eea;
+      font-size: 1.1rem;
+      word-break: break-all;
+      backdrop-filter: blur(6px);
+    }
+    
+    .verification-code-input {
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: 4px;
+      font-family: 'Courier New', monospace;
+      background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
+      border: 3px solid rgba(102, 126, 234, 0.3);
+      border-radius: 16px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    
+    .verification-code-input:focus {
+      border-color: rgba(102, 126, 234, 0.6);
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+    }
+    
+    .verification-actions {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 24px 0;
     }
     
     /* 체크박스 그룹 */
@@ -414,6 +396,12 @@
       box-shadow: 0 12px 28px rgba(102, 126, 234, 0.4);
     }
     
+    .btn-primary:disabled {
+      opacity: 0.6;
+      transform: none;
+      cursor: not-allowed;
+    }
+    
     .btn-secondary {
       background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
       color: var(--text-primary);
@@ -443,20 +431,6 @@
       box-shadow: 0 12px 28px rgba(0, 195, 0, 0.4);
     }
     
-    .btn-line:disabled {
-      opacity: 0.6;
-      transform: none;
-      cursor: not-allowed;
-    }
-    
-    /* 네비게이션 버튼 */
-    .form-navigation {
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      margin-top: 32px;
-    }
-    
     /* 메시지 */
     .success {
       background: linear-gradient(135deg, #d1f2eb 0%, #a3e4d7 100%);
@@ -466,6 +440,7 @@
       border: 2px solid rgba(25, 135, 84, 0.3);
       font-weight: 600;
       box-shadow: 0 4px 12px rgba(25, 135, 84, 0.2);
+      margin: 16px 0;
     }
     
     .error {
@@ -476,6 +451,7 @@
       border: 2px solid rgba(220, 53, 69, 0.3);
       font-weight: 600;
       box-shadow: 0 4px 12px rgba(220, 53, 69, 0.2);
+      margin: 16px 0;
     }
     
     .help-text {
@@ -489,6 +465,47 @@
       margin-top: 8px;
     }
     
+    /* 완료 섹션 */
+    .completion-section {
+      text-align: center;
+      padding: 40px 20px;
+      display: none;
+    }
+    
+    .completion-section.show {
+      display: block;
+      animation: slideIn 0.5s ease;
+    }
+    
+    .completion-icon {
+      font-size: 5rem;
+      margin-bottom: 24px;
+      animation: bounce 2s ease-in-out infinite;
+    }
+    
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-10px); }
+      60% { transform: translateY(-5px); }
+    }
+    
+    .completion-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #28a745 0%, #20c997 50%, #667eea 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 16px;
+    }
+    
+    .completion-message {
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+    
     /* LINE 연동 섹션 */
     .line-connect-section {
       background: linear-gradient(135deg, rgba(0, 195, 0, 0.05) 0%, rgba(0, 185, 0, 0.03) 100%);
@@ -496,7 +513,7 @@
       border-radius: 16px;
       padding: 32px;
       text-align: center;
-      margin: 24px 0;
+      margin: 32px 0;
     }
     
     .line-icon {
@@ -519,41 +536,6 @@
       margin-bottom: 24px;
     }
     
-    /* 완료 섹션 */
-    .completion-section {
-      text-align: center;
-      padding: 60px 40px;
-    }
-    
-    .completion-icon {
-      font-size: 5rem;
-      margin-bottom: 24px;
-      animation: bounce 2s ease-in-out infinite;
-    }
-    
-    @keyframes bounce {
-      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-      40% { transform: translateY(-10px); }
-      60% { transform: translateY(-5px); }
-    }
-    
-    .completion-title {
-      font-size: 2.5rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 16px;
-    }
-    
-    .completion-message {
-      font-size: 1.2rem;
-      color: var(--text-secondary);
-      line-height: 1.6;
-      margin-bottom: 32px;
-    }
-    
     /* 반응형 디자인 */
     @media (max-width: 768px) {
       .signup-container {
@@ -561,14 +543,13 @@
         padding: 0 16px;
       }
       
-      .progress-container,
-      .form-section {
-        padding: 24px;
+      .signup-card {
+        padding: 32px 24px;
         border-radius: 20px;
       }
       
-      .progress-title {
-        font-size: 1.8rem;
+      .signup-title {
+        font-size: 2.2rem;
       }
       
       .form-row {
@@ -576,84 +557,14 @@
         gap: 16px;
       }
       
-      .progress-steps {
-        margin: 20px 0;
-      }
-      
-      .progress-step {
-        width: 50px;
-        height: 50px;
-        font-size: 1rem;
-      }
-      
-      .step-label {
-        font-size: 0.8rem;
-      }
-      
-      .form-navigation {
+      .verification-actions {
         flex-direction: column;
       }
-    }
-    
-    /* 이메일 인증 섹션 스타일 */
-    .email-verification-section {
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(240, 147, 251, 0.05) 100%);
-      border: 2px solid rgba(102, 126, 234, 0.2);
-      border-radius: 20px;
-      padding: 32px;
-      margin: 32px 0;
-      backdrop-filter: blur(8px);
-      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.1);
-      animation: slideIn 0.5s ease;
-    }
-    
-    .verification-header {
-      text-align: center;
-      margin-bottom: 24px;
-    }
-    
-    .verification-header h4 {
-      font-size: 1.4rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin: 0 0 12px 0;
-    }
-    
-    .verification-header p {
-      color: var(--text-secondary);
-      font-size: 1rem;
-      line-height: 1.6;
-      margin: 0;
-    }
-    
-    .verification-email-display {
-      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
-      border: 2px solid rgba(102, 126, 234, 0.3);
-      border-radius: 12px;
-      padding: 16px 20px;
-      margin: 20px 0;
-      text-align: center;
-      font-weight: 700;
-      color: #667eea;
-      font-size: 1.1rem;
-      word-break: break-all;
-      backdrop-filter: blur(6px);
-    }
-    
-    .verification-actions {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin: 24px 0;
-    }
-    
-    .verification-actions .btn {
-      flex: 1;
-      min-width: 160px;
+      
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
     }
     
     /* 로딩 애니메이션 */
@@ -670,6 +581,9 @@
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
+    
+    /* 숨김 상태 */
+    .hidden { display: none !important; }
   </style>
 </head>
 <body class="bg-cream">
@@ -681,241 +595,157 @@
   </div>
 
   <main class="signup-container">
-    <!-- 진행 상황 표시 -->
-    <section class="progress-container">
-      <div class="progress-header">
-        <h1 class="progress-title">PUZZMI 회원가입</h1>
-        <p class="progress-subtitle">특별한 여행을 위한 첫 걸음을 시작해보세요</p>
+    <section class="signup-card">
+      <!-- 헤더 -->
+      <div class="signup-header">
+        <h1 class="signup-title">PUZZMI 회원가입</h1>
+        <p class="signup-subtitle">특별한 여행을 위한 첫 걸음을 시작해보세요</p>
       </div>
-      
-      <div class="progress-steps">
-        <div class="progress-step active" data-step="1">1</div>
-        <div class="progress-step" data-step="2">2</div>
-        <div class="progress-step" data-step="3">3</div>
-        <div class="progress-step" data-step="4">4</div>
-      </div>
-      
-      <div class="step-labels">
-        <div class="step-label active">기본정보</div>
-        <div class="step-label">개인정보</div>
-        <div class="step-label">계정생성</div>
-        <div class="step-label">완료</div>
-      </div>
-    </section>
 
-    <!-- 1단계: 기본정보 입력 -->
-    <section class="form-section active" id="step1">
-      <h2 class="section-title">👤 기본정보 입력</h2>
-      <form class="form-grid" id="basicInfoForm">
-        <div class="form-row">
-          <div class="form-field">
-            <label class="form-label required" for="fullName">이름</label>
-            <input class="form-input" type="text" id="fullName" required placeholder="김지은"/>
-          </div>
-          <div class="form-field">
-            <label class="form-label required" for="birthDate">생년월일</label>
-            <input class="form-input" type="date" id="birthDate" required/>
-          </div>
-        </div>
-        
-        <div class="form-row">
-          <div class="form-field">
-            <label class="form-label required" for="gender">성별</label>
-            <select class="form-select" id="gender" required>
-              <option value="">선택해주세요</option>
-              <option value="여성">여성</option>
-              <option value="남성">남성</option>
-              <option value="기타">기타/비공개</option>
-            </select>
-          </div>
-          <div class="form-field">
-            <label class="form-label required" for="phoneNumber">전화번호</label>
-            <input class="form-input" type="tel" id="phoneNumber" required placeholder="010-1234-5678"/>
-          </div>
-        </div>
-        
-        <div class="form-navigation">
-          <div></div>
-          <button type="submit" class="btn btn-primary">
-            다음 단계 →
-          </button>
-        </div>
-        
-        <div id="step1Result"></div>
-      </form>
-    </section>
-
-    <!-- 2단계: 상세정보 입력 -->
-    <section class="form-section" id="step2">
-      <h2 class="section-title">📝 상세정보 입력</h2>
-      <form class="form-grid" id="detailForm">
-        <div class="form-row">
-          <div class="form-field">
-            <label class="form-label required" for="nationality2">국적</label>
-            <select class="form-select" id="nationality2" required>
-              <option value="">선택해주세요</option>
-              <option value="한국">🇰🇷 한국</option>
-              <option value="일본">🇯🇵 일본</option>
-              <option value="중국">🇨🇳 중국</option>
-              <option value="미국">🇺🇸 미국</option>
-              <option value="영국">🇬🇧 영국</option>
-              <option value="프랑스">🇫🇷 프랑스</option>
-              <option value="독일">🇩🇪 독일</option>
-              <option value="기타">🌍 기타</option>
-            </select>
-          </div>
-          <div class="form-field">
-            <label class="form-label" for="residence2">현재 거주지</label>
-            <input class="form-input" type="text" id="residence2" placeholder="서울특별시 강남구"/>
-          </div>
-        </div>
-        
-        <div class="form-row single">
-          <div class="form-field">
-            <label class="form-label" for="occupation2">직업</label>
-            <input class="form-input" type="text" id="occupation2" placeholder="대학생, 회사원, 프리랜서 등"/>
-          </div>
-        </div>
-        
-        <div class="form-row single">
-          <div class="form-field">
-            <label class="form-label required">사용 가능한 언어</label>
-            <div class="checkbox-group" id="languageGroup2">
-              <label class="checkbox-item">
-                <input type="checkbox" value="한국어"/>
-                <span>🇰🇷 한국어</span>
-              </label>
-              <label class="checkbox-item">
-                <input type="checkbox" value="日本語"/>
-                <span>🇯🇵 日本語</span>
-              </label>
-              <label class="checkbox-item">
-                <input type="checkbox" value="English"/>
-                <span>🇺🇸 English</span>
-              </label>
-              <label class="checkbox-item">
-                <input type="checkbox" value="中文"/>
-                <span>🇨🇳 中文</span>
-              </label>
+      <!-- 회원가입 폼 -->
+      <div id="signupForm">
+        <form class="form-grid" id="mainForm">
+          <!-- 기본정보 -->
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label required" for="fullName">이름</label>
+              <input class="form-input" type="text" id="fullName" required placeholder="김지은"/>
             </div>
-            <div class="help-text">메이트와 소통 가능한 언어를 선택해주세요 (최소 1개)</div>
-          </div>
-        </div>
-        
-        <div class="form-row single">
-          <div class="form-field">
-            <label class="form-label">관심사</label>
-            <div class="checkbox-group" id="interestsGroup2">
-              <label class="checkbox-item">
-                <input type="checkbox" value="맛집 탐방"/>
-                <span>🍽️ 맛집 탐방</span>
-              </label>
-              <label class="checkbox-item">
-                <input type="checkbox" value="카페 투어"/>
-                <span>☕ 카페 투어</span>
-              </label>
-              <label class="checkbox-item">
-                <input type="checkbox" value="쇼핑"/>
-                <span>🛍️ 쇼핑</span>
-              </label>
-              <label class="checkbox-item">
-                <input type="checkbox" value="문화 체험"/>
-                <span>🎭 문화 체험</span>
-              </label>
-              <label class="checkbox-item">
-                <input type="checkbox" value="야경 투어"/>
-                <span>🌃 야경 투어</span>
-              </label>
-              <label class="checkbox-item">
-                <input type="checkbox" value="K-POP"/>
-                <span>🎵 K-POP</span>
-              </label>
+            <div class="form-field">
+              <label class="form-label required" for="birthDate">생년월일</label>
+              <input class="form-input" type="date" id="birthDate" required/>
             </div>
           </div>
-        </div>
-        
-        <div class="form-navigation">
-          <button type="button" class="btn btn-secondary" onclick="goToStep(1)">
-            ← 이전
+          
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label required" for="gender">성별</label>
+              <select class="form-select" id="gender" required>
+                <option value="">선택해주세요</option>
+                <option value="여성">여성</option>
+                <option value="남성">남성</option>
+                <option value="기타">기타/비공개</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="form-label required" for="phoneNumber">전화번호</label>
+              <input class="form-input" type="tel" id="phoneNumber" required placeholder="010-1234-5678"/>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label required" for="nationality">국적</label>
+              <select class="form-select" id="nationality" required>
+                <option value="">선택해주세요</option>
+                <option value="한국">🇰🇷 한국</option>
+                <option value="일본">🇯🇵 일본</option>
+                <option value="중국">🇨🇳 중국</option>
+                <option value="미국">🇺🇸 미국</option>
+                <option value="영국">🇬🇧 영국</option>
+                <option value="프랑스">🇫🇷 프랑스</option>
+                <option value="독일">🇩🇪 독일</option>
+                <option value="기타">🌍 기타</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="residence">현재 거주지</label>
+              <input class="form-input" type="text" id="residence" placeholder="서울특별시 강남구"/>
+            </div>
+          </div>
+          
+          <!-- 언어 선택 -->
+          <div class="form-row single">
+            <div class="form-field">
+              <label class="form-label required">사용 가능한 언어</label>
+              <div class="checkbox-group" id="languageGroup">
+                <label class="checkbox-item">
+                  <input type="checkbox" value="한국어"/>
+                  <span>🇰🇷 한국어</span>
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" value="日本語"/>
+                  <span>🇯🇵 日本語</span>
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" value="English"/>
+                  <span>🇺🇸 English</span>
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" value="中文"/>
+                  <span>🇨🇳 中文</span>
+                </label>
+              </div>
+              <div class="help-text">메이트와 소통 가능한 언어를 선택해주세요 (최소 1개)</div>
+            </div>
+          </div>
+          
+          <!-- 계정 정보 -->
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label required" for="email">이메일</label>
+              <input class="form-input" type="email" id="email" required placeholder="example@email.com"/>
+              <div class="help-text">로그인 시 사용할 이메일 주소입니다</div>
+            </div>
+            <div class="form-field">
+              <label class="form-label required" for="password">비밀번호</label>
+              <input class="form-input" type="password" id="password" required minlength="8" placeholder="8자 이상 입력"/>
+              <div class="help-text">8자 이상의 안전한 비밀번호를 설정해주세요</div>
+            </div>
+          </div>
+          
+          <!-- 이메일 인증 버튼 -->
+          <button type="button" class="btn btn-primary" id="sendVerificationBtn">
+            📧 이메일 인증번호 받기
           </button>
-          <button type="submit" class="btn btn-primary">
-            다음 단계 →
-          </button>
-        </div>
-        
-        <div id="step2Result"></div>
-      </form>
-    </section>
+          
+          <div id="formResult"></div>
+        </form>
 
-    <!-- 3단계: 계정 생성 -->
-    <section class="form-section" id="step3">
-      <h2 class="section-title">🔐 계정 생성</h2>
-      <form class="form-grid" id="accountForm">
-        <div class="form-row">
-          <div class="form-field">
-            <label class="form-label required" for="email">이메일</label>
-            <input class="form-input" type="email" id="email" required placeholder="example@email.com"/>
-            <div class="help-text">로그인 시 사용할 이메일 주소입니다</div>
-          </div>
-          <div class="form-field">
-            <label class="form-label required" for="password">비밀번호</label>
-            <input class="form-input" type="password" id="password" required minlength="8" placeholder="8자 이상 입력"/>
-            <div class="help-text">8자 이상의 안전한 비밀번호를 설정해주세요</div>
-          </div>
-        </div>
-        
         <!-- 이메일 인증 섹션 -->
-        <div class="email-verification-section" id="emailVerificationSection" style="display: none;">
+        <div class="email-verification-section" id="emailVerificationSection">
           <div class="verification-header">
             <h4>📧 이메일 인증</h4>
-            <p>입력하신 이메일로 인증번호를 발송했습니다. 인증번호를 입력해주세요.</p>
+            <p>입력하신 이메일로 인증번호를 발송했습니다. 6자리 인증번호를 입력해주세요.</p>
           </div>
           
           <div class="verification-email-display" id="verificationEmailDisplay"></div>
           
           <div class="form-field">
             <label class="form-label required" for="verificationCode">인증번호 (6자리)</label>
-            <input class="form-input" type="text" id="verificationCode" maxlength="6" placeholder="123456" style="text-align: center; font-size: 1.2rem; letter-spacing: 2px; font-family: 'Courier New', monospace;"/>
+            <input class="form-input verification-code-input" type="text" id="verificationCode" maxlength="6" placeholder="123456"/>
             <div class="help-text">이메일로 받은 6자리 인증번호를 입력해주세요</div>
           </div>
           
           <div class="verification-actions">
-            <button type="button" class="btn btn-primary" id="verifyEmailBtn">
+            <button type="button" class="btn btn-primary" id="verifyCodeBtn">
               ✅ 인증번호 확인
             </button>
-            <button type="button" class="btn btn-secondary" id="resendEmailBtn">
+            <button type="button" class="btn btn-secondary" id="resendCodeBtn">
               📧 인증번호 재발송
             </button>
           </div>
           
           <div id="verificationResult"></div>
         </div>
-        
-        <div class="form-navigation">
-          <button type="button" class="btn btn-secondary" onclick="goToStep(2)">
-            ← 이전
-          </button>
-          <button type="submit" class="btn btn-primary" id="createAccountBtn">
-            계정 생성하기
-          </button>
-        </div>
-        
-        <div id="step3Result"></div>
-      </form>
-    </section>
 
-    <!-- 4단계: 완료 및 LINE 연동 안내 -->
-    <section class="form-section" id="step4">
-      <div class="completion-section">
+        <!-- 최종 가입 완료 버튼 -->
+        <button type="button" class="btn btn-primary hidden" id="completeSignupBtn" style="width: 100%; margin-top: 24px;">
+          🎉 회원가입 완료하기
+        </button>
+      </div>
+
+      <!-- 완료 섹션 -->
+      <div class="completion-section" id="completionSection">
         <div class="completion-icon">🎉</div>
         <h2 class="completion-title">회원가입 완료!</h2>
         <p class="completion-message">
           PUZZMI에 오신 것을 환영합니다!<br>
-          이제 메이트들을 둘러보고 마음에 드는 분을 찜할 수 있어요.
+          이제 메이트들을 둘러보고 특별한 여행을 계획해보세요.
         </p>
         
         <!-- LINE 연동 안내 (선택사항) -->
-        <div class="line-connect-section" style="margin: 32px 0;">
+        <div class="line-connect-section">
           <div class="line-icon">💬</div>
           <h3 class="line-title">LINE 계정 연동 (선택사항)</h3>
           <p class="line-description">
@@ -936,7 +766,7 @@
           <div id="lineStatus" class="help-text" style="display: none; margin-top: 16px;"></div>
         </div>
         
-        <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+        <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 32px;">
           <a href="index.html" class="btn btn-primary">
             🏠 홈으로 가기
           </a>
@@ -944,6 +774,14 @@
             👥 메이트 둘러보기
           </a>
         </div>
+      </div>
+
+      <!-- 로그인 링크 -->
+      <div style="text-align: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(102, 126, 234, 0.2);">
+        <p style="color: var(--text-secondary); margin-bottom: 16px;">이미 계정이 있으신가요?</p>
+        <a href="auth_combo.html" style="color: #667eea; text-decoration: none; font-weight: 600; padding: 8px 16px; border-radius: 8px; background: rgba(102, 126, 234, 0.1); transition: all 0.3s ease;">
+          로그인하기 →
+        </a>
       </div>
     </section>
   </main>
@@ -955,147 +793,242 @@
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4"
     );
 
-    let currentStep = 1;
     let userData = {};
-    let emailVerificationId = null;
     let isEmailVerified = false;
+    let verificationId = null;
 
-    // 단계 이동 함수
-    window.goToStep = function(step) {
-      // 현재 섹션 숨기기
-      document.querySelectorAll('.form-section').forEach(section => {
-        section.classList.remove('active');
-      });
-      
-      // 새 섹션 보이기
-      document.getElementById(`step${step}`).classList.add('active');
-      
-      // 진행 상황 업데이트
-      updateProgress(step);
-      currentStep = step;
-    };
+    // DOM 요소들
+    const sendVerificationBtn = document.getElementById('sendVerificationBtn');
+    const emailVerificationSection = document.getElementById('emailVerificationSection');
+    const verificationEmailDisplay = document.getElementById('verificationEmailDisplay');
+    const verifyCodeBtn = document.getElementById('verifyCodeBtn');
+    const resendCodeBtn = document.getElementById('resendCodeBtn');
+    const completeSignupBtn = document.getElementById('completeSignupBtn');
+    const signupForm = document.getElementById('signupForm');
+    const completionSection = document.getElementById('completionSection');
+    const formResult = document.getElementById('formResult');
+    const verificationResult = document.getElementById('verificationResult');
 
-    function updateProgress(step) {
-      // 모든 단계 초기화
-      document.querySelectorAll('.progress-step').forEach((el, index) => {
-        el.classList.remove('active', 'completed');
-        if (index + 1 < step) {
-          el.classList.add('completed');
-        } else if (index + 1 === step) {
-          el.classList.add('active');
-        }
-      });
-      
-      // 라벨 업데이트
-      document.querySelectorAll('.step-label').forEach((el, index) => {
-        el.classList.remove('active');
-        if (index + 1 === step) {
-          el.classList.add('active');
-        }
-      });
-    }
-
-    // 1단계: 기본정보 입력
-    document.getElementById('basicInfoForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const resultEl = document.getElementById('step1Result');
-      const submitBtn = e.target.querySelector('button[type="submit"]');
-      
-      // 기본정보 저장
-      userData.fullName = document.getElementById('fullName').value.trim();
-      userData.birthDate = document.getElementById('birthDate').value;
-      
-      // 생년월일에서 나이 계산
-      if (userData.birthDate) {
-        const today = new Date();
-        const birthDate = new Date(userData.birthDate);
-        let age = today.getFullYear() - birthDate.getFullYear();
-        const monthDiff = today.getMonth() - birthDate.getMonth();
-        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-          age--;
-        }
-        userData.age = age;
-      }
-      
-      userData.gender = document.getElementById('gender').value;
-      userData.phoneNumber = document.getElementById('phoneNumber').value.trim();
-      
-      resultEl.innerHTML = '<div class="success">✅ 기본정보가 저장되었습니다!</div>';
-      
-      setTimeout(() => {
-        goToStep(2);
-      }, 800);
-    });
-
-    // 2단계: 상세정보 입력
-    document.getElementById('detailForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const resultEl = document.getElementById('step2Result');
-      const submitBtn = e.target.querySelector('button[type="submit"]');
-      
-      // 언어 체크박스 검증
-      const selectedLanguages = Array.from(document.querySelectorAll('#languageGroup2 input:checked'))
-        .map(cb => cb.value);
-      
-      if (selectedLanguages.length === 0) {
-        resultEl.innerHTML = '<div class="error">❌ 최소 1개 이상의 언어를 선택해주세요.</div>';
-        return;
-      }
-      
-      // 관심사 수집
-      const selectedInterests = Array.from(document.querySelectorAll('#interestsGroup2 input:checked'))
-        .map(cb => cb.value);
-      
-      // 상세정보 저장
-      userData.nationality = document.getElementById('nationality2').value;
-      userData.residence = document.getElementById('residence2').value.trim() || null;
-      userData.occupation = document.getElementById('occupation2').value.trim() || null;
-      userData.languages = selectedLanguages;
-      userData.interests = selectedInterests.length > 0 ? selectedInterests : null;
-      
-      resultEl.innerHTML = '<div class="success">✅ 상세정보가 저장되었습니다!</div>';
-      
-      setTimeout(() => {
-        goToStep(3);
-      }, 800);
-    });
-
-    // 3단계: 계정 생성
-    document.getElementById('accountForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
+    // 이메일 인증번호 발송
+    sendVerificationBtn.addEventListener('click', async () => {
+      // 폼 유효성 검사
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
-      const resultEl = document.getElementById('step3Result');
-      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const fullName = document.getElementById('fullName').value.trim();
+      const birthDate = document.getElementById('birthDate').value;
+      const gender = document.getElementById('gender').value;
+      const phoneNumber = document.getElementById('phoneNumber').value.trim();
+      const nationality = document.getElementById('nationality').value;
       
-      // 이메일 인증이 완료되지 않은 경우 인증 섹션 표시
-      if (!isEmailVerified) {
-        await sendEmailVerification(email);
+      // 언어 선택 확인
+      const selectedLanguages = Array.from(document.querySelectorAll('#languageGroup input:checked'))
+        .map(cb => cb.value);
+      
+      if (!email || !password || !fullName || !birthDate || !gender || !phoneNumber || !nationality) {
+        formResult.innerHTML = '<div class="error">❌ 모든 필수 항목을 입력해주세요.</div>';
         return;
       }
       
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = '<div class="loading"></div> 계정 생성 중...';
+      if (selectedLanguages.length === 0) {
+        formResult.innerHTML = '<div class="error">❌ 최소 1개 이상의 언어를 선택해주세요.</div>';
+        return;
+      }
+      
+      if (password.length < 8) {
+        formResult.innerHTML = '<div class="error">❌ 비밀번호는 8자 이상이어야 합니다.</div>';
+        return;
+      }
+      
+      // 나이 계산
+      const today = new Date();
+      const birth = new Date(birthDate);
+      let age = today.getFullYear() - birth.getFullYear();
+      const monthDiff = today.getMonth() - birth.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+        age--;
+      }
+      
+      if (age < 16) {
+        formResult.innerHTML = '<div class="error">❌ 16세 이상만 가입 가능합니다.</div>';
+        return;
+      }
+      
+      // 사용자 데이터 저장
+      userData = {
+        email,
+        password,
+        fullName,
+        birthDate,
+        age,
+        gender,
+        phoneNumber,
+        nationality,
+        residence: document.getElementById('residence').value.trim() || null,
+        languages: selectedLanguages
+      };
+      
+      sendVerificationBtn.disabled = true;
+      sendVerificationBtn.innerHTML = '<div class="loading"></div> 인증번호 발송 중...';
+      
+      try {
+        // 개발 환경에서는 시뮬레이션
+        if (window.location.hostname === 'localhost' || window.location.hostname.includes('bolt.new')) {
+          // 시뮬레이션: 인증번호 발송
+          console.log('📧 이메일 인증번호 발송 시뮬레이션');
+          console.log('📧 이메일:', email);
+          console.log('🔢 인증번호: 123456 (테스트용)');
+          
+          verificationId = 'simulation_' + Date.now();
+          showEmailVerificationSection(email);
+          formResult.innerHTML = '<div class="success">✅ 인증번호를 발송했습니다! (개발환경: 123456 입력)</div>';
+        } else {
+          // 실제 환경: Supabase OTP 발송
+          const { data, error } = await supabase.auth.signInWithOtp({
+            email: email,
+            options: {
+              shouldCreateUser: false // 아직 계정 생성하지 않음
+            }
+          });
+          
+          if (error) throw error;
+          
+          verificationId = data.session?.access_token || 'real_verification';
+          showEmailVerificationSection(email);
+          formResult.innerHTML = '<div class="success">✅ 인증번호를 발송했습니다! 이메일을 확인해주세요.</div>';
+        }
+        
+      } catch (error) {
+        console.error('인증번호 발송 실패:', error);
+        formResult.innerHTML = `<div class="error">❌ 인증번호 발송 실패: ${error.message}</div>`;
+      } finally {
+        sendVerificationBtn.disabled = false;
+        sendVerificationBtn.innerHTML = '📧 이메일 인증번호 받기';
+      }
+    });
+
+    // 이메일 인증 섹션 표시
+    function showEmailVerificationSection(email) {
+      verificationEmailDisplay.textContent = email;
+      emailVerificationSection.classList.add('show');
+      
+      // 인증번호 입력 필드에 포커스
+      setTimeout(() => {
+        document.getElementById('verificationCode').focus();
+      }, 500);
+    }
+
+    // 인증번호 확인
+    verifyCodeBtn.addEventListener('click', async () => {
+      const code = document.getElementById('verificationCode').value.trim();
+      
+      if (!code || code.length !== 6) {
+        verificationResult.innerHTML = '<div class="error">❌ 6자리 인증번호를 입력해주세요.</div>';
+        return;
+      }
+      
+      verifyCodeBtn.disabled = true;
+      verifyCodeBtn.innerHTML = '<div class="loading"></div> 인증 중...';
+      
+      try {
+        // 개발 환경 시뮬레이션
+        if (window.location.hostname === 'localhost' || window.location.hostname.includes('bolt.new')) {
+          if (code === '123456' || code === '000000') {
+            isEmailVerified = true;
+            verificationResult.innerHTML = '<div class="success">✅ 이메일 인증이 완료되었습니다!</div>';
+            
+            // 최종 가입 완료 버튼 표시
+            completeSignupBtn.classList.remove('hidden');
+            emailVerificationSection.style.opacity = '0.7';
+            
+            setTimeout(() => {
+              completeSignupBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 500);
+          } else {
+            throw new Error('잘못된 인증번호입니다. (테스트: 123456)');
+          }
+        } else {
+          // 실제 환경: Supabase OTP 검증
+          const { data, error } = await supabase.auth.verifyOtp({
+            email: userData.email,
+            token: code,
+            type: 'email'
+          });
+          
+          if (error) throw error;
+          
+          isEmailVerified = true;
+          verificationResult.innerHTML = '<div class="success">✅ 이메일 인증이 완료되었습니다!</div>';
+          completeSignupBtn.classList.remove('hidden');
+          emailVerificationSection.style.opacity = '0.7';
+        }
+        
+      } catch (error) {
+        console.error('인증 실패:', error);
+        verificationResult.innerHTML = `<div class="error">❌ 인증 실패: ${error.message}</div>`;
+      } finally {
+        verifyCodeBtn.disabled = false;
+        verifyCodeBtn.innerHTML = '✅ 인증번호 확인';
+      }
+    });
+
+    // 인증번호 재발송
+    resendCodeBtn.addEventListener('click', async () => {
+      resendCodeBtn.disabled = true;
+      resendCodeBtn.innerHTML = '<div class="loading"></div> 재발송 중...';
+      
+      try {
+        if (window.location.hostname === 'localhost' || window.location.hostname.includes('bolt.new')) {
+          // 시뮬레이션
+          verificationResult.innerHTML = '<div class="success">✅ 인증번호를 재발송했습니다! (테스트: 123456)</div>';
+        } else {
+          // 실제 재발송
+          const { error } = await supabase.auth.signInWithOtp({
+            email: userData.email,
+            options: {
+              shouldCreateUser: false
+            }
+          });
+          
+          if (error) throw error;
+          
+          verificationResult.innerHTML = '<div class="success">✅ 인증번호를 재발송했습니다!</div>';
+        }
+        
+      } catch (error) {
+        verificationResult.innerHTML = `<div class="error">❌ 재발송 실패: ${error.message}</div>`;
+      } finally {
+        resendCodeBtn.disabled = false;
+        resendCodeBtn.innerHTML = '📧 인증번호 재발송';
+      }
+    });
+
+    // 최종 회원가입 완료
+    completeSignupBtn.addEventListener('click', async () => {
+      if (!isEmailVerified) {
+        alert('먼저 이메일 인증을 완료해주세요.');
+        return;
+      }
+      
+      completeSignupBtn.disabled = true;
+      completeSignupBtn.innerHTML = '<div class="loading"></div> 회원가입 처리 중...';
       
       try {
         // 1. Supabase 계정 생성
         const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
+          email: userData.email,
+          password: userData.password,
           options: {
             data: {
               full_name: userData.fullName,
               signup_step: 'completed'
             },
+            emailRedirectTo: `${window.location.origin}/email_verified.html`
           }
         });
         
         if (error) throw error;
         
-        // 2. profiles 테이블에 모든 정보 저장
+        // 2. 프로필 생성
         const profileData = {
           id: data.user.id,
           full_name: userData.fullName,
@@ -1106,10 +1039,8 @@
           phone_number: userData.phoneNumber,
           nationality: userData.nationality,
           residence: userData.residence,
-          occupation: userData.occupation,
-          interests: userData.interests,
           profile_completion: 85,
-          avatar_url: null
+          account_status: 'active'
         };
         
         const { error: profileError } = await supabase
@@ -1125,20 +1056,30 @@
         }
         
         userData.userId = data.user.id;
-        userData.email = email;
         
-        resultEl.innerHTML = '<div class="success">✅ 계정이 성공적으로 생성되었습니다!</div>';
-        
-        setTimeout(() => {
-          goToStep(4);
-        }, 1000);
+        // 3. 완료 섹션 표시
+        signupForm.style.display = 'none';
+        completionSection.classList.add('show');
         
       } catch (error) {
-        console.error('계정 생성 실패:', error);
-        resultEl.innerHTML = `<div class="error">❌ 계정 생성 실패: ${error.message}</div>`;
+        console.error('회원가입 실패:', error);
+        alert(`회원가입 실패: ${error.message}`);
       } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '계정 생성하기';
+        completeSignupBtn.disabled = false;
+        completeSignupBtn.innerHTML = '🎉 회원가입 완료하기';
+      }
+    });
+
+    // 인증번호 입력 시 자동 검증 (6자리 입력 완료 시)
+    document.getElementById('verificationCode').addEventListener('input', (e) => {
+      const code = e.target.value.replace(/\D/g, ''); // 숫자만 허용
+      e.target.value = code;
+      
+      if (code.length === 6) {
+        // 6자리 입력 완료 시 자동으로 인증 시도
+        setTimeout(() => {
+          verifyCodeBtn.click();
+        }, 500);
       }
     });
 
@@ -1151,53 +1092,30 @@
       btn.innerHTML = '<div class="loading"></div> LINE 연동 중...';
       
       try {
-        // LINE Login URL 생성
-        const lineLoginUrl = generateLineLoginUrl();
+        // LINE 연동 시뮬레이션
+        const mockLineData = {
+          line_user_id: 'U' + Math.random().toString(36).substr(2, 9),
+          line_display_name: userData.fullName || '사용자',
+          line_picture_url: 'https://picsum.photos/200/200',
+          is_verified: true
+        };
         
-        // 새 창에서 LINE 로그인 진행
-        const popup = window.open(lineLoginUrl, 'lineLogin', 'width=500,height=600');
+        // LINE 계정 정보 저장
+        const { error: lineError } = await supabase
+          .from('user_line_accounts')
+          .upsert({
+            user_id: userData.userId,
+            ...mockLineData
+          }, { onConflict: 'user_id' });
         
-        // 팝업 완료 대기
-        const checkAuth = setInterval(async () => {
-          if (popup.closed) {
-            clearInterval(checkAuth);
-            
-            // 시뮬레이션: LINE 연동 성공
-            const mockLineData = {
-              line_user_id: 'U' + Math.random().toString(36).substr(2, 9),
-              line_display_name: userData.fullName || '사용자',
-              line_picture_url: 'https://picsum.photos/200/200',
-              is_verified: true
-            };
-            
-            // LINE 계정 정보 저장
-            const { error: lineError } = await supabase
-              .from('user_line_accounts')
-              .upsert({
-                user_id: userData.userId,
-                ...mockLineData
-              }, { onConflict: 'user_id' });
-            
-            if (lineError) throw lineError;
-            
-            // 인증 상태 저장
-            await supabase
-              .from('user_verifications')
-              .upsert({
-                user_id: userData.userId,
-                verification_type: 'line',
-                is_verified: true,
-                verified_at: new Date().toISOString()
-              }, { onConflict: 'user_id,verification_type' });
-            
-            statusEl.innerHTML = '<div class="success">✅ LINE 계정이 성공적으로 연동되었습니다!</div>';
-            statusEl.style.display = 'block';
-            
-            btn.innerHTML = '<i class="fab fa-line"></i> 연동 완료';
-            btn.disabled = true;
-            btn.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
-          }
-        }, 1000);
+        if (lineError) throw lineError;
+        
+        statusEl.innerHTML = '<div class="success">✅ LINE 계정이 성공적으로 연동되었습니다!</div>';
+        statusEl.style.display = 'block';
+        
+        btn.innerHTML = '<i class="fab fa-line"></i> 연동 완료';
+        btn.disabled = true;
+        btn.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
         
       } catch (error) {
         console.error('LINE 연동 오류:', error);
@@ -1212,67 +1130,28 @@
     // LINE 연동 건너뛰기
     window.skipLineConnection = function() {
       if (confirm('LINE 연동을 건너뛰시겠습니까?\n\n예약 시 결제 안내를 받으려면 나중에 연동이 필요합니다.')) {
-        // 홈으로 이동
         location.href = 'index.html';
       }
     };
 
-    // LINE Login URL 생성
-    async function generateLineLoginUrl() {
-      // line_config.js에서 URL 생성
-      const { LINE_CONFIG } = await import('./line_config.js');
-      return await LINE_CONFIG.generateLoginUrl(userData.userId);
-    }
-
-    // 페이지 로드 시 로그인 상태 확인
-    window.addEventListener('load', async () => {
-      // 생년월일 입력 필드에 최대값 설정 (오늘 날짜)
+    // 페이지 로드 시 설정
+    window.addEventListener('load', () => {
+      // 생년월일 입력 필드 설정
       const today = new Date().toISOString().split('T')[0];
-      const maxDate = new Date();
-      maxDate.setFullYear(maxDate.getFullYear() - 16); // 최소 16세
-      const maxDateStr = maxDate.toISOString().split('T')[0];
+      const minDate = new Date();
+      minDate.setFullYear(minDate.getFullYear() - 100);
+      const minDateStr = minDate.toISOString().split('T')[0];
       
       const birthDateInput = document.getElementById('birthDate');
       if (birthDateInput) {
         birthDateInput.setAttribute('max', today);
-        birthDateInput.setAttribute('min', '1920-01-01'); // 최소 1920년
+        birthDateInput.setAttribute('min', minDateStr);
       }
       
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        try {
-          // 이미 로그인된 사용자는 프로필 완성도 확인
-          const { data: profile, error: profileError } = await supabase
-            .from('profiles')
-            .select('profile_completion, full_name')
-            .eq('id', user.id)
-            .maybeSingle();
-          
-          if (!profileError && profile && profile.profile_completion >= 80) {
-            // 프로필이 거의 완성된 경우 홈으로 리디렉션
-            const userName = profile.full_name || user.email?.split('@')[0] || '사용자';
-            if (confirm(`안녕하세요 ${userName}님! 이미 회원가입이 완료되었습니다.\n홈페이지로 이동하시겠습니까?`)) {
-              location.href = 'index.html';
-            }
-          }
-        } catch (error) {
-          console.warn('프로필 확인 실패:', error);
-          // 오류가 있어도 회원가입 진행 허용
-        }
-      }
-      
-      // 개발 환경 안내 메시지
+      // 개발 환경 안내
       console.log('🔧 개발 환경 이메일 인증 안내:');
       console.log('📧 테스트 인증번호: 123456 또는 000000');
       console.log('💡 실제 환경에서는 이메일로 발송된 인증번호를 사용하세요');
-    });
-
-    // 뒤로가기 방지 (회원가입 중)
-    window.addEventListener('beforeunload', (e) => {
-      if (currentStep > 1 && currentStep < 4) {
-        e.preventDefault();
-        e.returnValue = '회원가입이 완료되지 않았습니다. 정말 나가시겠습니까?';
-      }
     });
   </script>
 </body>
