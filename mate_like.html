@@ -1384,21 +1384,35 @@
     // 메이트 프로필 로드
     async function loadMateProfile() {
       try {
+        console.log('🔍 메이트 프로필 쿼리 시작, mate_id:', mateId);
+        
         const { data: mate, error } = await supabase
-          .from('mates')
-          .select('*')
-          .eq('id', mateId)
+          .from('mate_profiles')
+          .select(`
+            *,
+            profiles!inner (
+              id,
+              full_name,
+              age,
+              gender,
+              languages,
+              avatar_url
+            )
+          `)
+          .eq('user_id', mateId)
           .single();
 
         if (error) throw error;
         if (!mate) throw new Error('메이트를 찾을 수 없습니다.');
 
+        console.log('✅ 메이트 데이터 로드 성공:', mate);
+
         // 기본 정보 표시
-        profileName.textContent = mate.name || '메이트';
+        profileName.textContent = mate.profiles.full_name || '메이트';
         
         const metaInfo = [];
-        if (mate.age) metaInfo.push(`${mate.age}세`);
-        if (mate.gender) metaInfo.push(mate.gender);
+        if (mate.profiles.age) metaInfo.push(`${mate.profiles.age}세`);
+        if (mate.profiles.gender) metaInfo.push(mate.profiles.gender);
         if (mate.location) metaInfo.push(mate.location);
         profileMeta.textContent = metaInfo.join(' • ');
 
@@ -1416,8 +1430,8 @@
         updatePhotoGallery();
 
         // 전문 분야 태그
-        if (mate.specialties && mate.specialties.length > 0) {
-          profileTags.innerHTML = mate.specialties.map(tag => 
+        if (mate.tags && mate.tags.length > 0) {
+          profileTags.innerHTML = mate.tags.map(tag => 
             `<span class="tag">${tag}</span>`
           ).join('');
         } else {
@@ -1434,8 +1448,8 @@
         }
 
         // 언어
-        if (mate.languages && mate.languages.length > 0) {
-          profileLanguages.innerHTML = mate.languages.map(lang => 
+        if (mate.profiles.languages && mate.profiles.languages.length > 0) {
+          profileLanguages.innerHTML = mate.profiles.languages.map(lang => 
             `<span class="language-tag">${lang}</span>`
           ).join('');
         } else {
@@ -1454,17 +1468,21 @@
     // 리뷰 로드
     async function loadReviews() {
       try {
+        console.log('🔍 리뷰 쿼리 시작, mate_id:', mateId);
+        
         const { data: reviews, error } = await supabase
           .from('reviews')
           .select(`
             *,
-            reviewer:reviewer_id(email),
-            mate:mate_id(name)
+            profiles:author_id(full_name),
+            mate_profiles:mate_id(profiles(full_name))
           `)
           .eq('mate_id', mateId)
           .order('created_at', { ascending: false });
 
         if (error) throw error;
+
+        console.log('✅ 리뷰 데이터 로드 성공:', reviews);
 
         if (!reviews || reviews.length === 0) {
           reviewsList.innerHTML = '<div class="empty-state">아직 리뷰가 없습니다.</div>';
@@ -1481,8 +1499,7 @@
 
         // 리뷰 목록 렌더링
         reviewsList.innerHTML = reviews.map(review => {
-          const reviewerEmail = review.reviewer?.email || '익명';
-          const maskedEmail = maskEmail(reviewerEmail);
+          const reviewerName = review.author_name || review.profiles?.full_name || '익명';
           const stars = renderStars(review.rating);
           const date = new Date(review.created_at).toLocaleDateString('ko-KR');
           
@@ -1490,7 +1507,7 @@
             <div class="review-item">
               <div class="review-header">
                 <div>
-                  <div class="review-author">${maskedEmail}</div>
+                  <div class="review-author">${reviewerName}</div>
                   <div class="review-date">${date}</div>
                 </div>
                 <div class="review-rating">${stars} ${review.rating}</div>
