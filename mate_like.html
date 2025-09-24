@@ -412,234 +412,400 @@
     
     /* 리뷰 섹션 */
     .reviews-section {
-      background: rgba(255,255,255,0.6);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(0,0,0,0.05);
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .reviews-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 33%, #f093fb 66%, #f5576c 100%);
+      opacity: 0.8;
     }
     
     .reviews-title {
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 20px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
       display: flex;
       align-items: center;
       gap: 8px;
     }
     
-    .reviews-title::before {
-      content: '💬';
-      font-size: 1rem;
-    }
-    
     /* 리뷰 아이템 */
     .review-item {
-      background: rgba(255,255,255,0.4);
-      border: 1px solid rgba(0,0,0,0.06);
-      border-radius: 8px;
-      padding: 16px;
-      margin-bottom: 16px;
-      transition: all 0.2s ease;
+      background: linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.6) 100%);
+      border: 1px solid rgba(102, 126, 234, 0.1);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 8px;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(6px);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .review-item::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      transition: width 0.3s ease;
     }
     
     .review-item:hover {
-      background: rgba(255,255,255,0.7);
-      border-color: rgba(0,0,0,0.1);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 100%);
+      border-color: rgba(102, 126, 234, 0.2);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    
+    .review-item:hover::before {
+      width: 3px;
     }
     
     .review-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
     
     .review-author {
-      font-weight: 600;
-      color: #333;
-      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      font-size: 0.85rem;
     }
     
     .review-rating {
-      color: #ff9500;
-      font-size: 0.85rem;
-      font-weight: 500;
+      color: #fbbf24;
+      font-size: 0.8rem;
+      font-weight: 600;
     }
     
     .review-date {
-      color: #888;
-      font-size: 0.8rem;
-      margin-top: 2px;
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      margin-top: 1px;
     }
     
     .review-content {
-      color: #444;
+      color: var(--text-primary);
       line-height: 1.6;
-      font-size: 0.9rem;
-      margin: 12px 0;
+      font-size: 0.85rem;
+      margin: 8px 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .review-content.expanded {
+      -webkit-line-clamp: unset;
+      overflow: visible;
+    }
+    
+    .review-expand {
+      color: #667eea;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 4px;
+      transition: color 0.3s ease;
+    }
+    
+    .review-expand:hover {
+      color: #5a6fd8;
     }
     
     /* 메이트 답변 */
     .mate-reply {
-      background: rgba(248,249,250,0.8);
-      border: 1px solid rgba(0,0,0,0.06);
-      border-radius: 6px;
-      padding: 16px;
-      margin-top: 12px;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(240, 147, 251, 0.03) 100%);
+      border: 1px solid rgba(102, 126, 234, 0.1);
+      border-radius: 8px;
+      padding: 10px;
+      margin-top: 8px;
       border-left: 3px solid #667eea;
+      backdrop-filter: blur(4px);
     }
     
     .reply-label {
-      font-weight: 600;
+      font-weight: 700;
       color: #667eea;
-      font-size: 0.8rem;
-      margin-bottom: 6px;
+      font-size: 0.7rem;
+      margin-bottom: 4px;
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 3px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
     
     .reply-content {
-      color: #555;
+      color: var(--text-primary);
       line-height: 1.5;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
+    }
+    
+    /* 리뷰 페이지네이션 */
+    .reviews-pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(102, 126, 234, 0.1);
+    }
+    
+    .pagination-btn {
+      padding: 6px 12px;
+      border: 1px solid rgba(102, 126, 234, 0.2);
+      border-radius: 8px;
+      background: rgba(255,255,255,0.8);
+      color: var(--text-primary);
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    
+    .pagination-btn:hover:not(:disabled) {
+      background: #667eea;
+      color: white;
+      border-color: transparent;
+    }
+    
+    .pagination-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .pagination-info {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    
+    /* 리뷰 통계 */
+    .reviews-stats {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding: 8px 12px;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(240, 147, 251, 0.03) 100%);
+      border-radius: 8px;
+      border: 1px solid rgba(102, 126, 234, 0.1);
+    }
+    
+    .reviews-count {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    
+    .reviews-average {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #fbbf24;
     }
     
     /* 리뷰 작성 폼 */
     .review-form {
-      background: rgba(248,249,250,0.8);
-      border: 1px solid rgba(0,0,0,0.08);
-      border-radius: 8px;
-      padding: 24px;
-      margin-bottom: 24px;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(240, 147, 251, 0.03) 100%);
+      border: 1px solid rgba(102, 126, 234, 0.15);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      backdrop-filter: blur(8px);
     }
     
     .form-title {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 16px;
+      font-size: 1rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
       display: flex;
       align-items: center;
       gap: 8px;
     }
     
-    .form-title::before {
-      content: '✍️';
-      font-size: 1rem;
-    }
-    
     .rating-selector {
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     }
     
     .rating-label {
       display: block;
-      font-weight: 500;
-      color: #555;
-      margin-bottom: 8px;
-      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+      font-size: 0.8rem;
     }
     
     .rating-buttons {
       display: flex;
-      gap: 6px;
+      gap: 4px;
       flex-wrap: wrap;
     }
     
     .rating-btn {
-      padding: 8px 12px;
-      border: 1px solid rgba(0,0,0,0.1);
-      border-radius: 20px;
-      background: rgba(255,255,255,0.6);
+      padding: 6px 10px;
+      border: 1px solid rgba(102, 126, 234, 0.2);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.8);
       cursor: pointer;
-      transition: all 0.2s ease;
-      font-weight: 500;
-      color: #555;
-      font-size: 0.85rem;
+      transition: all 0.3s ease;
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 0.75rem;
       flex: 1;
-      min-width: 80px;
+      min-width: 60px;
+      text-align: center;
     }
     
     .rating-btn:hover {
-      background: rgba(255,255,255,0.9);
+      background: rgba(255,255,255,1);
       border-color: #667eea;
+      transform: translateY(-1px);
     }
     
     .rating-btn.active {
       background: #667eea;
       color: white;
       border-color: transparent;
-      box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+      box-shadow: 0 3px 8px rgba(102, 126, 234, 0.3);
+      transform: translateY(-1px);
     }
     
     .review-textarea {
       width: 100%;
-      min-height: 80px;
-      padding: 12px;
-      border: 1px solid rgba(0,0,0,0.1);
-      border-radius: 6px;
-      background: rgba(255,255,255,0.8);
+      min-height: 60px;
+      padding: 10px;
+      border: 1px solid rgba(102, 126, 234, 0.2);
+      border-radius: 8px;
+      background: rgba(255,255,255,0.9);
       font-family: inherit;
-      font-size: 0.9rem;
+      font-size: 0.8rem;
       line-height: 1.5;
       resize: vertical;
-      margin-bottom: 12px;
-      transition: all 0.2s ease;
+      margin-bottom: 8px;
+      transition: all 0.3s ease;
     }
     
     .review-textarea:focus {
       outline: none;
       border-color: #667eea;
-      background: rgba(255,255,255,0.95);
+      background: rgba(255,255,255,1);
       box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
     }
     
     .review-textarea::placeholder {
-      color: #999;
+      color: rgba(102, 126, 234, 0.5);
       font-style: italic;
+    }
+    
+    /* 리뷰 더보기/접기 */
+    .reviews-container {
+      max-height: 400px;
+      overflow: hidden;
+      transition: max-height 0.5s ease;
+    }
+    
+    .reviews-container.expanded {
+      max-height: none;
+    }
+    
+    .reviews-toggle {
+      display: flex;
+      justify-content: center;
+      margin-top: 12px;
+    }
+    
+    .toggle-btn {
+      padding: 8px 16px;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(240, 147, 251, 0.05) 100%);
+      border: 1px solid rgba(102, 126, 234, 0.2);
+      border-radius: 20px;
+      color: #667eea;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .toggle-btn:hover {
+      background: #667eea;
+      color: white;
+      border-color: transparent;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
     }
     
     /* 메시지 */
     .message {
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-weight: 500;
-      font-size: 0.9rem;
-      margin-top: 16px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.8rem;
+      margin-top: 8px;
     }
     
     .message.success {
-      background: rgba(34, 197, 94, 0.1);
-      color: #059669;
-      border: 1px solid rgba(34, 197, 94, 0.2);
+      background: linear-gradient(135d, #d1f2eb 0%, #a3e4d7 100%);
+      color: #0e6b47;
+      border: 1px solid rgba(25, 135, 84, 0.3);
     }
     
     .message.error {
-      background: rgba(239, 68, 68, 0.1);
-      color: #dc2626;
-      border: 1px solid rgba(239, 68, 68, 0.2);
+      background: linear-gradient(135deg, #fadbd8 0%, #f1948a 100%);
+      color: #922b21;
+      border: 1px solid rgba(220, 53, 69, 0.3);
     }
     
     .empty-state {
       text-align: center;
-      padding: 32px 20px;
-      color: #888;
-      font-size: 0.9rem;
+      padding: 20px 16px;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.03) 0%, rgba(240, 147, 251, 0.02) 100%);
+      border-radius: 8px;
+      border: 1px dashed rgba(102, 126, 234, 0.2);
     }
     
     .empty-state::before {
       content: '💭';
       display: block;
-      font-size: 1.5rem;
-      margin-bottom: 8px;
+      font-size: 1.2rem;
+      margin-bottom: 6px;
       opacity: 0.5;
     }
     
@@ -738,14 +904,29 @@
       }
       
       .reviews-section {
-        padding: 16px;
-        border-radius: 18px;
-        margin-bottom: 10px;
+        padding: 12px;
+        border-radius: 14px;
+        margin-bottom: 8px;
       }
       
       .reviews-title {
-        font-size: 1.4rem;
-        margin-bottom: 10px;
+        font-size: 1rem;
+        margin-bottom: 8px;
+      }
+      
+      .review-item {
+        padding: 10px;
+        margin-bottom: 6px;
+      }
+      
+      .rating-buttons {
+        gap: 3px;
+      }
+      
+      .rating-btn {
+        padding: 5px 8px;
+        font-size: 0.7rem;
+        min-width: 50px;
       }
     }
     
@@ -811,8 +992,17 @@
       }
       
       .reviews-title {
-        font-size: 1.2rem;
+        font-size: 0.95rem;
         margin-bottom: 8px;
+      }
+      
+      .review-item {
+        padding: 8px;
+        margin-bottom: 4px;
+      }
+      
+      .reviews-container {
+        max-height: 300px;
       }
     }
     
@@ -953,20 +1143,35 @@
 
     <!-- 리뷰 섹션 -->
     <section class="reviews-section">
-      <h3 class="reviews-title">💬 리뷰</h3>
+      <h3 class="reviews-title">
+        <i class="fas fa-star"></i>
+        리뷰
+      </h3>
+      
+      <!-- 리뷰 통계 -->
+      <div id="reviewsStats" class="reviews-stats" style="display: none;">
+        <span class="reviews-count">총 0개 리뷰</span>
+        <div class="reviews-average">
+          <i class="fas fa-star"></i>
+          <span id="averageRating">0.0</span>
+        </div>
+      </div>
 
       <!-- 리뷰 작성 폼 (조건부 표시) -->
       <div id="reviewForm" class="review-form" style="display: none;">
-        <h4 class="form-title">리뷰 작성하기</h4>
+        <h4 class="form-title">
+          <i class="fas fa-edit"></i>
+          리뷰 작성하기
+        </h4>
         <form id="reviewFormElement">
           <div class="rating-selector">
             <label class="rating-label">별점을 선택해주세요</label>
             <div class="rating-buttons">
-              <button type="button" class="rating-btn" data-rating="5">⭐⭐⭐⭐⭐ 최고예요!</button>
-              <button type="button" class="rating-btn" data-rating="4">⭐⭐⭐⭐ 좋아요</button>
-              <button type="button" class="rating-btn" data-rating="3">⭐⭐⭐ 보통이에요</button>
-              <button type="button" class="rating-btn" data-rating="2">⭐⭐ 아쉬워요</button>
-              <button type="button" class="rating-btn" data-rating="1">⭐ 별로예요</button>
+              <button type="button" class="rating-btn" data-rating="5">⭐ 5</button>
+              <button type="button" class="rating-btn" data-rating="4">⭐ 4</button>
+              <button type="button" class="rating-btn" data-rating="3">⭐ 3</button>
+              <button type="button" class="rating-btn" data-rating="2">⭐ 2</button>
+              <button type="button" class="rating-btn" data-rating="1">⭐ 1</button>
             </div>
             <input type="hidden" id="selectedRating" value="">
           </div>
@@ -974,7 +1179,7 @@
           <textarea 
             id="reviewText" 
             class="review-textarea" 
-            placeholder="메이트와 함께한 경험을 자세히 공유해주세요. 다른 이용자들에게 도움이 되는 솔직한 후기를 남겨주시면 감사하겠습니다."
+            placeholder="메이트와 함께한 경험을 간단히 공유해주세요..."
             required
           ></textarea>
           
@@ -988,8 +1193,18 @@
       </div>
 
       <!-- 리뷰 목록 -->
-      <div id="reviewsList">
-        <div class="empty-state">리뷰를 불러오는 중...</div>
+      <div class="reviews-container" id="reviewsContainer">
+        <div id="reviewsList">
+          <div class="empty-state">리뷰를 불러오는 중...</div>
+        </div>
+      </div>
+      
+      <!-- 리뷰 더보기/접기 토글 -->
+      <div class="reviews-toggle" id="reviewsToggle" style="display: none;">
+        <button class="toggle-btn" id="toggleReviewsBtn">
+          <i class="fas fa-chevron-down"></i>
+          <span>더 보기</span>
+        </button>
       </div>
     </section>
   </main>
@@ -1391,23 +1606,31 @@
       try {
         const { data: reviews, error } = await supabase
           .from('reviews')
-          .select('id, content, rating, created_at, author_id, author_name, mate_reply, replied_at')
+          .select('id, content, rating, created_at, author_id, author_name, mate_reply, replied_at', { count: 'exact' })
           .eq('mate_id', mateId)
           .order('created_at', { ascending: false });
 
         if (error) throw error;
 
+        // 리뷰 통계 업데이트
+        updateReviewsStats(reviews);
+
         if (!reviews || reviews.length === 0) {
           reviewsList.innerHTML = '<div class="empty-state">아직 리뷰가 없습니다</div>';
+          document.getElementById('reviewsToggle').style.display = 'none';
           return;
         }
 
         const isMate = user?.id === mateId;
 
-        reviewsList.innerHTML = reviews.map(review => {
+        reviewsList.innerHTML = reviews.map((review, index) => {
           const authorName = maskEmail(review.author_name || '익명');
-          const reviewDate = new Date(review.created_at).toLocaleDateString('ko-KR');
+          const reviewDate = new Date(review.created_at).toLocaleDateString('ko-KR', {
+            month: 'short',
+            day: 'numeric'
+          });
           const stars = renderStars(review.rating);
+          const isLongContent = (review.content || '').length > 100;
           
           return `
             <div class="review-item">
@@ -1418,7 +1641,14 @@
                 </div>
                 <div class="review-rating">${stars}</div>
               </div>
-              <div class="review-content">${(review.content || '').replace(/</g,'<')}</div>
+              <div class="review-content ${isLongContent ? 'clampable' : ''}" id="content_${review.id}">
+                ${(review.content || '').replace(/</g,'<')}
+              </div>
+              ${isLongContent ? `
+                <div class="review-expand" onclick="toggleReviewContent(${review.id})">
+                  더 보기
+                </div>
+              ` : ''}
               ${review.mate_reply ? `
                 <div class="mate-reply">
                   <div class="reply-label">
@@ -1445,11 +1675,76 @@
           `;
         }).join('');
 
+        // 리뷰가 많으면 토글 버튼 표시
+        if (reviews.length > 3) {
+          document.getElementById('reviewsToggle').style.display = 'flex';
+          setupReviewsToggle();
+        } else {
+          document.getElementById('reviewsToggle').style.display = 'none';
+        }
+
       } catch (error) {
         console.error('리뷰 로드 실패:', error);
         reviewsList.innerHTML = '<div class="message error">리뷰를 불러올 수 없습니다</div>';
       }
     }
+
+    // 리뷰 통계 업데이트
+    function updateReviewsStats(reviews) {
+      const reviewsStats = document.getElementById('reviewsStats');
+      const reviewsCount = document.querySelector('.reviews-count');
+      const averageRating = document.getElementById('averageRating');
+      
+      if (!reviews || reviews.length === 0) {
+        reviewsStats.style.display = 'none';
+        return;
+      }
+      
+      const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+      const avgRating = (totalRating / reviews.length).toFixed(1);
+      
+      reviewsCount.textContent = `총 ${reviews.length}개 리뷰`;
+      averageRating.textContent = avgRating;
+      reviewsStats.style.display = 'flex';
+    }
+
+    // 리뷰 더보기/접기 토글
+    function setupReviewsToggle() {
+      const toggleBtn = document.getElementById('toggleReviewsBtn');
+      const container = document.getElementById('reviewsContainer');
+      let isExpanded = false;
+      
+      toggleBtn.addEventListener('click', () => {
+        isExpanded = !isExpanded;
+        
+        if (isExpanded) {
+          container.classList.add('expanded');
+          toggleBtn.innerHTML = '<i class="fas fa-chevron-up"></i><span>접기</span>';
+        } else {
+          container.classList.remove('expanded');
+          toggleBtn.innerHTML = '<i class="fas fa-chevron-down"></i><span>더 보기</span>';
+          // 스크롤을 리뷰 섹션 상단으로 이동
+          document.querySelector('.reviews-section').scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    }
+
+    // 개별 리뷰 내용 토글
+    window.toggleReviewContent = function(reviewId) {
+      const content = document.getElementById(`content_${reviewId}`);
+      const expandBtn = content.nextElementSibling;
+      
+      if (content.classList.contains('expanded')) {
+        content.classList.remove('expanded');
+        expandBtn.textContent = '더 보기';
+      } else {
+        content.classList.add('expanded');
+        expandBtn.textContent = '접기';
+      }
+    };
 
     // 리뷰 작성 가능 여부 확인
     async function checkReviewEligibility() {
