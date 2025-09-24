@@ -124,6 +124,10 @@ function closeMobileMenu() {
     mobileMenuBtn.classList.remove('active');
   }
 }
+
+// 전역 함수로 내보내기
+window.toggleMobileMenu = toggleMobileMenu;
+window.closeMobileMenu = closeMobileMenu;
 export async function renderNavbar(rootId='app-nav') {
   const root = document.getElementById(rootId) || document.body.insertBefore(document.createElement('div'), document.body.firstChild);
   root.id = rootId;

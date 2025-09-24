@@ -5,7 +5,7 @@
   position: sticky;
   top: 0;
   z-index: 1000;
-  background: rgba(255, 255, 255, 0.98);
+  background: rgba(255, 255, 255, 0.98) !important;
   backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(102, 126, 234, 0.1);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -14,7 +14,7 @@
 }
 
 .app-nav.scrolled {
-  background: rgba(255, 255, 255, 0.98);
+  background: rgba(255, 255, 255, 0.98) !important;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   border-bottom-color: rgba(102, 126, 234, 0.15);
   backdrop-filter: blur(25px);
@@ -225,7 +225,7 @@
   top: calc(100% + 8px);
   right: 0;
   min-width: 220px;
-  background: white;
+  background: white !important;
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255,255,255,0.4);
   border-radius: 16px;
@@ -260,14 +260,14 @@
   align-items: center;
   gap: 12px;
   padding: 16px 20px;
-  color: #333;
+  color: #333 !important;
   text-decoration: none;
   font-weight: 500;
   transition: all 0.3s ease;
   border-bottom: 1px solid rgba(102, 126, 234, 0.1);
   position: relative;
   overflow: hidden;
-  background: white;
+  background: white !important;
 }
 
 .dropdown-item::before {
@@ -282,8 +282,8 @@
 }
 
 .dropdown-item:hover {
-  background: #f8f9fa;
-  color: #667eea;
+  background: white !important;
+  color: #667eea !important;
   padding-left: 24px;
 }
 
@@ -735,8 +735,8 @@
 }
 
 .dropdown-item:focus {
-  background: #f8f9fa;
-  color: #667eea;
+  background: #f8f9fa !important;
+  color: #667eea !important;
   outline: none;
 }
 
