@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>이메일 시스템 상태 확인 - PUZZMI</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="pages.css"/>
+  <link rel="stylesheet" href="pages-theme.css"/>
+  <style>
+    body.bg-cream { 
+      background: var(--bg-cream); 
+      background-repeat: no-repeat; 
+      background-size: cover; 
+      min-height: 100vh;
+    }
+    
+    .check-container {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    
+    .check-header {
+      background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
+      backdrop-filter: blur(25px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 28px;
+      padding: 40px;
+      margin-bottom: 32px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.04);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .check-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, #dc3545 0%, #ffc107 50%, #28a745 100%);
+      animation: shimmer 3s ease-in-out infinite;
+    }
+    
+    @keyframes shimmer {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
+    }
+    
+    .check-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #dc3545 0%, #ffc107 50%, #28a745 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 16px 0;
+      letter-spacing: -0.02em;
+    }
+    
+    .check-section {
+      background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 24px;
+      padding: 32px;
+      margin-bottom: 24px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .check-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 33%, #f093fb 66%, #f5576c 100%);
+      opacity: 0.8;
+    }
+    
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 20px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .check-item {
+      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+      border: 2px solid rgba(255,255,255,0.4);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(8px);
+    }
+    
+    .check-item.success {
+      border-color: #28a745;
+      background: linear-gradient(135deg, #d1f2eb 0%, #a3e4d7 100%);
+    }
+    
+    .check-item.error {
+      border-color: #dc3545;
+      background: linear-gradient(135deg, #fadbd8 0%, #f1948a 100%);
+    }
+    
+    .check-item.warning {
+      border-color: #ffc107;
+      background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    }
+    
+    .check-item-title {
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .check-item-content {
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      background: rgba(0,0,0,0.05);
+      padding: 12px;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      max-height: 300px;
+      overflow-y: auto;
+      line-height: 1.4;
+    }
+    
+    .btn {
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin: 8px;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 6px 16px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(102, 126, 234, 0.2);
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body class="bg-cream">
+  <div class="check-container">
+    <!-- 헤더 -->
+    <section class="check-header">
+      <h1 class="check-title">📧 이메일 시스템 상태 확인</h1>
+      <p>Supabase SMTP 설정과 이메일 발송 상태를 진단합니다</p>
+    </section>
+
+    <!-- 데이터베이스 테이블 확인 -->
+    <section class="check-section">
+      <h2 class="section-title">🗄️ 데이터베이스 테이블</h2>
+      <div id="databaseCheck">
+        <div class="check-item">
+          <div class="check-item-title">
+            <div class="loading"></div>
+            email_verifications 테이블 확인 중...
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Edge Function 상태 확인 -->
+    <section class="check-section">
+      <h2 class="section-title">⚡ Edge Function 상태</h2>
+      <div id="edgeFunctionCheck">
+        <div class="check-item">
+          <div class="check-item-title">
+            <div class="loading"></div>
+            Edge Function 연결 확인 중...
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 실제 이메일 발송 테스트 -->
+    <section class="check-section">
+      <h2 class="section-title">📧 실제 이메일 발송 테스트</h2>
+      <div style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.05) 100%); border: 2px solid rgba(102, 126, 234, 0.2); border-radius: 16px; padding: 24px; margin-bottom: 20px;">
+        <h4 style="margin: 0 0 16px 0; color: #667eea;">실제 이메일 발송 테스트</h4>
+        <input type="email" id="testEmail" placeholder="테스트할 이메일 주소 입력" style="width: 100%; padding: 12px 16px; border: 2px solid rgba(102, 126, 234, 0.2); border-radius: 8px; margin-bottom: 12px; font-size: 1rem;"/>
+        <button class="btn btn-primary" id="sendTestBtn">📧 테스트 이메일 발송</button>
+        <div id="testResult" style="margin-top: 16px;"></div>
+      </div>
+    </section>
+
+    <!-- Supabase Auth 설정 확인 -->
+    <section class="check-section">
+      <h2 class="section-title">🔐 Supabase Auth 설정</h2>
+      <div id="authSettingsCheck">
+        <div class="check-item">
+          <div class="check-item-title">
+            <div class="loading"></div>
+            Auth 설정 확인 중...
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SMTP 설정 가이드 -->
+    <section class="check-section">
+      <h2 class="section-title">📋 SMTP 설정 가이드</h2>
+      <div style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.05) 100%); border: 2px solid rgba(102, 126, 234, 0.2); border-radius: 16px; padding: 24px;">
+        <h4 style="color: #667eea; margin: 0 0 16px 0;">Supabase Dashboard에서 SMTP 설정 확인</h4>
+        <ol style="margin: 0; padding-left: 20px; line-height: 1.8; color: var(--text-primary);">
+          <li><strong>Supabase Dashboard</strong> 접속</li>
+          <li><strong>Settings</strong> → <strong>Authentication</strong> 클릭</li>
+          <li><strong>SMTP Settings</strong> 섹션 확인</li>
+          <li>SMTP 서버 정보가 올바르게 설정되어 있는지 확인</li>
+          <li><strong>Test SMTP</strong> 버튼으로 설정 테스트</li>
+        </ol>
+        
+        <div style="background: rgba(255, 193, 7, 0.1); border: 1px solid rgba(255, 193, 7, 0.3); border-radius: 8px; padding: 16px; margin-top: 16px;">
+          <h5 style="color: #856404; margin: 0 0 8px 0;">⚠️ 주의사항</h5>
+          <p style="margin: 0; color: #856404; font-size: 0.95rem;">
+            SMTP 설정이 완료되지 않으면 이메일이 발송되지 않습니다.<br>
+            Gmail, Outlook 등의 SMTP 서버를 사용하거나 SendGrid, Mailgun 등의 서비스를 연동해야 합니다.
+          </p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+    const supabase = createClient(
+      "https://eevvgbbokenpjnvtmztk.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4"
+    );
+
+    // 체크 결과 표시 함수
+    function showCheckResult(containerId, title, success, content, isWarning = false) {
+      const container = document.getElementById(containerId);
+      const statusClass = success ? 'success' : (isWarning ? 'warning' : 'error');
+      const icon = success ? '✅' : (isWarning ? '⚠️' : '❌');
+      
+      container.innerHTML = `
+        <div class="check-item ${statusClass}">
+          <div class="check-item-title">
+            ${icon} ${title}
+          </div>
+          <div class="check-item-content">${content}</div>
+        </div>
+      `;
+    }
+
+    // 1. 데이터베이스 테이블 확인
+    async function checkDatabase() {
+      try {
+        const { data, error } = await supabase
+          .from('email_verifications')
+          .select('count(*)', { count: 'exact', head: true });
+        
+        if (error) throw error;
+        
+        showCheckResult('databaseCheck', 'email_verifications 테이블 확인', true, 
+          `✅ 테이블이 존재하고 접근 가능합니다.\n현재 레코드 수: ${data || 0}개\n\n테이블 구조:\n- id (bigint, primary key)\n- email (text)\n- verification_code (text)\n- expires_at (timestamptz)\n- attempts (integer)\n- verified (boolean)\n- verified_at (timestamptz)\n- created_at (timestamptz)`);
+        
+      } catch (error) {
+        showCheckResult('databaseCheck', 'email_verifications 테이블 확인', false, 
+          `❌ 테이블이 존재하지 않거나 접근할 수 없습니다.\n\n오류: ${error.message}\n\n해결방법:\n1. 마이그레이션 파일이 실행되었는지 확인\n2. Supabase Dashboard에서 테이블 존재 여부 확인\n3. RLS 정책이 올바르게 설정되었는지 확인`);
+      }
+    }
+
+    // 2. Edge Function 상태 확인
+    async function checkEdgeFunction() {
+      try {
+        const response = await fetch('https://eevvgbbokenpjnvtmztk.supabase.co/functions/v1/email-verification', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            email: 'test@example.com',
+            action: 'send'
+          })
+        });
+        
+        const responseText = await response.text();
+        let result;
+        
+        try {
+          result = JSON.parse(responseText);
+        } catch (e) {
+          result = { error: 'JSON 파싱 실패', rawResponse: responseText };
+        }
+        
+        const functionInfo = `응답 상태: ${response.status} ${response.statusText}
+응답 헤더: ${JSON.stringify(Object.fromEntries(response.headers.entries()), null, 2)}
+
+=== 응답 내용 ===
+${JSON.stringify(result, null, 2)}
+
+=== 원본 응답 ===
+${responseText}
+
+=== 분석 ===
+${response.ok ? '✅ Edge Function이 정상적으로 응답합니다.' : '❌ Edge Function 오류가 발생했습니다.'}
+${result.success ? '✅ 이메일 발송 로직이 정상 작동합니다.' : '❌ 이메일 발송에 문제가 있습니다.'}`;
+        
+        showCheckResult('edgeFunctionCheck', 'Edge Function 상태', response.ok && result.success, functionInfo, !response.ok);
+        
+      } catch (error) {
+        showCheckResult('edgeFunctionCheck', 'Edge Function 연결 실패', false, 
+          `네트워크 오류: ${error.message}\n\n가능한 원인:\n1. Edge Function이 배포되지 않음\n2. 함수 이름이 잘못됨\n3. 네트워크 연결 문제\n\n해결방법:\n1. Supabase Dashboard → Functions에서 배포 상태 확인\n2. 함수 로그 확인\n3. 로컬에서 supabase functions deploy 실행`);
+      }
+    }
+
+    // 3. Auth 설정 확인
+    async function checkAuthSettings() {
+      try {
+        // 현재 사용자 정보로 Auth 상태 확인
+        const { data: { user }, error } = await supabase.auth.getUser();
+        
+        const authInfo = `현재 Auth 상태: ${user ? '로그인됨' : '비로그인'}
+사용자 정보: ${user ? JSON.stringify({
+  id: user.id,
+  email: user.email,
+  email_confirmed_at: user.email_confirmed_at,
+  created_at: user.created_at
+}, null, 2) : '없음'}
+
+=== Auth 설정 상태 ===
+- 이메일 확인 필요: ${user && !user.email_confirmed_at ? 'YES' : 'NO'}
+- 계정 상태: ${user ? '활성' : '비활성'}
+
+=== SMTP 설정 확인 필요 ===
+Supabase Dashboard → Settings → Authentication → SMTP Settings에서:
+1. SMTP 서버 정보 입력 여부
+2. Test SMTP 기능으로 설정 검증
+3. 이메일 템플릿 설정 확인`;
+        
+        showCheckResult('authSettingsCheck', 'Supabase Auth 설정', !error, authInfo);
+        
+      } catch (error) {
+        showCheckResult('authSettingsCheck', 'Auth 설정 확인 실패', false, 
+          `오류: ${error.message}`);
+      }
+    }
+
+    // 4. 실제 이메일 발송 테스트
+    document.getElementById('sendTestBtn').addEventListener('click', async () => {
+      const email = document.getElementById('testEmail').value.trim();
+      const btn = document.getElementById('sendTestBtn');
+      const result = document.getElementById('testResult');
+      
+      if (!email) {
+        result.innerHTML = '<div class="check-item error"><div class="check-item-title">❌ 이메일 주소를 입력해주세요</div></div>';
+        return;
+      }
+      
+      btn.disabled = true;
+      btn.innerHTML = '<div class="loading"></div> 발송 중...';
+      
+      try {
+        const response = await fetch('https://eevvgbbokenpjnvtmztk.supabase.co/functions/v1/email-verification', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: email,
+            action: 'send'
+          })
+        });
+        
+        const responseData = await response.json();
+        
+        if (response.ok && responseData.success) {
+          result.innerHTML = `
+            <div class="check-item success">
+              <div class="check-item-title">✅ 이메일 발송 성공</div>
+              <div class="check-item-content">이메일이 ${email}로 발송되었습니다.
+메일함을 확인해주세요. (스팸함도 확인)
+
+응답 데이터:
+${JSON.stringify(responseData, null, 2)}</div>
+            </div>
+          `;
+        } else {
+          result.innerHTML = `
+            <div class="check-item error">
+              <div class="check-item-title">❌ 이메일 발송 실패</div>
+              <div class="check-item-content">상태: ${response.status}
+오류: ${responseData.error || '알 수 없는 오류'}
+
+전체 응답:
+${JSON.stringify(responseData, null, 2)}
+
+해결방법:
+1. Supabase Dashboard → Settings → Authentication → SMTP Settings 확인
+2. SMTP 서버 정보가 올바르게 입력되었는지 확인
+3. Test SMTP 기능으로 설정 검증
+4. Edge Function 로그 확인</div>
+            </div>
+          `;
+        }
+        
+      } catch (error) {
+        result.innerHTML = `
+          <div class="check-item error">
+            <div class="check-item-title">❌ 네트워크 오류</div>
+            <div class="check-item-content">오류: ${error.message}
+
+가능한 원인:
+1. Edge Function이 배포되지 않음
+2. 네트워크 연결 문제
+3. CORS 설정 문제</div>
+          </div>
+        `;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '📧 테스트 이메일 발송';
+      }
+    });
+
+    // 초기 실행
+    await checkDatabase();
+    await checkEdgeFunction();
+    await checkAuthSettings();
+  </script>
+</body>
+</html>
