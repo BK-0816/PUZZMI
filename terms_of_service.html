@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PUZZMI 利用規約</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="pages.css"/>
+  <link rel="stylesheet" href="pages-theme.css"/>
+  <link rel="stylesheet" href="nav.css"/>
+  <script type="module" src="nav.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <style>
+    body.bg-cream { 
+      background: var(--bg-cream); 
+      background-repeat: no-repeat; 
+      background-size: cover; 
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+    
+    /* 배경 장식 요소 */
+    .decorative-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    
+    .decorative-element {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.2;
+      animation: float 12s ease-in-out infinite;
+    }
+    
+    .decorative-element:nth-child(1) {
+      width: 200px;
+      height: 200px;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      top: 10%;
+      left: 5%;
+      animation-delay: 0s;
+    }
+    
+    .decorative-element:nth-child(2) {
+      width: 150px;
+      height: 150px;
+      background: linear-gradient(45deg, #f093fb, #f5576c);
+      top: 60%;
+      right: 10%;
+      animation-delay: 4s;
+    }
+    
+    .decorative-element:nth-child(3) {
+      width: 120px;
+      height: 120px;
+      background: linear-gradient(45deg, #4facfe, #00f2fe);
+      bottom: 20%;
+      left: 15%;
+      animation-delay: 8s;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      33% { transform: translateY(-20px) rotate(120deg); }
+      66% { transform: translateY(10px) rotate(240deg); }
+    }
+    
+    /* 메인 컨테이너 */
+    .terms-wrap { 
+      max-width: 900px; 
+      margin: 40px auto; 
+      padding: 0 20px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    /* 페이지 헤더 */
+    .page-header {
+      background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
+      backdrop-filter: blur(25px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 28px;
+      padding: 50px;
+      margin-bottom: 40px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.04);
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+    }
+    
+    .page-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 20%, #f093fb 40%, #f5576c 60%, #4facfe 80%, #00f2fe 100%);
+      animation: shimmer 4s ease-in-out infinite;
+    }
+    
+    @keyframes shimmer {
+      0%, 100% { opacity: 1; transform: translateX(0); }
+      50% { opacity: 0.8; transform: translateX(8px); }
+    }
+    
+    .page-title {
+      font-size: 3rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 20px 0;
+      letter-spacing: -0.03em;
+      position: relative;
+    }
+    
+    .page-title::after {
+      content: '';
+      position: absolute;
+      bottom: -16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 5px;
+      background: linear-gradient(90deg, #667eea 0%, #f093fb 50%, #4facfe 100%);
+      border-radius: 3px;
+    }
+    
+    .effective-date {
+      color: var(--text-secondary);
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 0;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(240, 147, 251, 0.05) 100%);
+      padding: 12px 24px;
+      border-radius: 20px;
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      display: inline-block;
+    }
+    
+    /* 뒤로가기 버튼 */
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 16px;
+      color: var(--text-primary);
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      margin-bottom: 32px;
+    }
+    
+    .back-btn:hover {
+      background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 100%);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+      border-color: rgba(102, 126, 234, 0.3);
+    }
+    
+    /* 콘텐츠 카드 */
+    .content-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 24px;
+      padding: 50px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.04);
+      position: relative;
+      overflow: hidden;
+      line-height: 1.8;
+      font-size: 1.05rem;
+    }
+    
+    .content-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 33%, #f093fb 66%, #f5576c 100%);
+      opacity: 0.8;
+    }
+    
+    /* 목차 */
+    .table-of-contents {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(240, 147, 251, 0.05) 100%);
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 16px;
+      padding: 24px;
+      margin: 32px 0;
+      backdrop-filter: blur(8px);
+    }
+    
+    .table-of-contents h3 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 16px 0;
+    }
+    
+    .table-of-contents ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 8px;
+    }
+    
+    .table-of-contents li {
+      margin: 0;
+    }
+    
+    .table-of-contents a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+      padding: 8px 12px;
+      border-radius: 8px;
+      display: block;
+      transition: all 0.3s ease;
+    }
+    
+    .table-of-contents a:hover {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.05) 100%);
+      transform: translateX(4px);
+    }
+    
+    /* 장 제목 */
+    .chapter-title {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 50px 0 30px 0;
+      padding: 20px 0;
+      border-bottom: 3px solid rgba(102, 126, 234, 0.2);
+      position: relative;
+    }
+    
+    .chapter-title::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: -3px;
+      width: 80px;
+      height: 3px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    /* 조 제목 */
+    .article-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 30px 0 16px 0;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+    }
+    
+    /* 목록 스타일 */
+    .content-card ol,
+    .content-card ul {
+      margin: 20px 0;
+      padding-left: 24px;
+    }
+    
+    .content-card li {
+      margin-bottom: 12px;
+      color: var(--text-primary);
+    }
+    
+    .content-card li strong {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 700;
+    }
+    
+    /* 구분선 */
+    .divider {
+      margin: 40px 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent 0%, rgba(102, 126, 234, 0.3) 50%, transparent 100%);
+      border: none;
+    }
+    
+    /* 강조 박스 */
+    .highlight-box {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(240, 147, 251, 0.05) 100%);
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 16px;
+      padding: 24px;
+      margin: 24px 0;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.1);
+    }
+    
+    .highlight-box h4 {
+      color: #667eea;
+      font-weight: 800;
+      margin: 0 0 12px 0;
+      font-size: 1.2rem;
+    }
+    
+    /* 경고 박스 */
+    .warning-box {
+      background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+      border: 2px solid rgba(255, 193, 7, 0.3);
+      border-radius: 16px;
+      padding: 24px;
+      margin: 24px 0;
+      box-shadow: 0 8px 24px rgba(255, 193, 7, 0.2);
+    }
+    
+    .warning-box h4 {
+      color: #856404;
+      font-weight: 800;
+      margin: 0 0 12px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    /* 중요 박스 */
+    .important-box {
+      background: linear-gradient(135deg, #fadbd8 0%, #f1948a 100%);
+      border: 2px solid rgba(220, 53, 69, 0.3);
+      border-radius: 16px;
+      padding: 24px;
+      margin: 24px 0;
+      box-shadow: 0 8px 24px rgba(220, 53, 69, 0.2);
+    }
+    
+    .important-box h4 {
+      color: #721c24;
+      font-weight: 800;
+      margin: 0 0 12px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    /* 연락처 정보 */
+    .contact-info {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(240, 147, 251, 0.05) 100%);
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 20px;
+      padding: 32px;
+      margin: 32px 0;
+      text-align: center;
+    }
+    
+    .contact-info h4 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 16px 0;
+    }
+    
+    .contact-details {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px 20px;
+      align-items: center;
+      max-width: 400px;
+      margin: 0 auto;
+      text-align: left;
+    }
+    
+    .contact-label {
+      font-weight: 700;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+    
+    .contact-value {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+    
+    /* 반응형 디자인 */
+    @media (max-width: 768px) {
+      .terms-wrap {
+        margin: 20px auto;
+        padding: 0 16px;
+      }
+      
+      .page-header {
+        padding: 32px 24px;
+        border-radius: 20px;
+      }
+      
+      .page-title {
+        font-size: 2.2rem;
+      }
+      
+      .content-card {
+        padding: 32px 24px;
+        border-radius: 20px;
+        font-size: 1rem;
+      }
+      
+      .chapter-title {
+        font-size: 1.6rem;
+      }
+      
+      .article-title {
+        font-size: 1.2rem;
+      }
+      
+      .table-of-contents ul {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body class="bg-cream">
+  <!-- 배경 장식 요소 -->
+  <div class="decorative-bg">
+    <div class="decorative-element"></div>
+    <div class="decorative-element"></div>
+    <div class="decorative-element"></div>
+  </div>
+
+  <div id="app-nav"></div>
+  
+  <main class="terms-wrap">
+    <!-- 뒤로가기 버튼 -->
+    <a href="index.html" class="back-btn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="m12 19-7-7 7-7"/>
+        <path d="m19 12H5"/>
+      </svg>
+      ホームに戻る
+    </a>
+
+    <!-- 페이지 헤더 -->
+    <section class="page-header">
+      <h1 class="page-title">📋 PUZZMI 利用規約</h1>
+      <div class="effective-date">最終更新日：2025年9月19日</div>
+    </section>
+
+    <!-- 메인 콘텐츠 -->
+    <section class="content-card">
+      <p style="font-size: 1.1rem; color: var(--text-primary); margin-bottom: 32px; text-align: center; line-height: 1.7;">
+        本規約は、PUZZMI（以下「当社」といいます）が運営するメイト同行サービスの利用条件、手続き、当社と利用者との権利・義務および責任事項を定めることを目的とします。
+      </p>
+
+      <!-- 목차 -->
+      <div class="table-of-contents">
+        <h3>📑 目次</h3>
+        <ul>
+          <li><a href="#chapter1">第1章 総則</a></li>
+          <li><a href="#chapter2">第2章 サービス提供および利用</a></li>
+          <li><a href="#chapter3">第3章 予約・決済・申込撤回・返金</a></li>
+          <li><a href="#chapter4">第4章 コンテンツ・知的財産・行動規範</a></li>
+          <li><a href="#chapter5">第5章 義務・責任・損害賠償</a></li>
+          <li><a href="#chapter6">第6章 その他</a></li>
+        </ul>
+      </div>
+
+      <hr class="divider">
+
+      <!-- 제1장 총칙 -->
+      <h2 id="chapter1" class="chapter-title">第1章 総則</h2>
+
+      <h3 class="article-title">第1条（目的）</h3>
+      <p>本規約は、PUZZMI（以下「当社」といいます）が運営するウェブ/モバイルおよびLINE連携チャネル（以下「当サイト」といいます）において提供するメイト同行サービス（以下「サービス」といいます）の利用条件、手続き、当社と利用者との権利・義務および責任事項を定めることを目的とします。</p>
+
+      <h3 class="article-title">第2条（規約の効力と変更）</h3>
+      <ol>
+        <li>利用者が本規約に同意した場合、当社はサービスを提供します。本規約はサービス利用に優先的に適用されます。</li>
+        <li>当社は関連法令を違反しない範囲で規約を改定でき、適用日・改定理由を明示し、実施7日前（利用者に不利益となる変更は30日前）から告知します。</li>
+        <li>利用者が施行日までに明示的に拒否せずサービスを継続利用する場合、改定後の規約に同意したものとみなします。</li>
+        <li>利用者が改定規約に同意しない場合、会員退会により利用契約を解約できます。</li>
+      </ol>
+
+      <h3 class="article-title">第3条（規約外準則）</h3>
+      <p>本規約に定めのない事項は「電子商取引法」「約款の規制に関する法律」「電子金融取引法」「個人情報保護法」等の関係法令および公正取引委員会の標準約款の趣旨並びに一般商慣例に従います。</p>
+
+      <h3 class="article-title">第4条（用語の定義）</h3>
+      <ul>
+        <li><strong>「利用者」：</strong>本規約に同意しサービスを利用する者</li>
+        <li><strong>「会員」：</strong>登録手続きを完了しサービスを利用できる者</li>
+        <li><strong>「ID」：</strong>会員識別のための文字・数字の組合せ</li>
+        <li><strong>「パスワード」：</strong>本人確認のための文字・数字・記号の組合せ</li>
+        <li><strong>「メイト」：</strong>当社の審査・確認を経て同行サービスを提供するパートナー</li>
+        <li><strong>「予約状態」：</strong>Pending（待機）、Confirm（確定）、Canceled（取消）、Completed（完了）</li>
+        <li><strong>「LINE決済リンク」：</strong>当社がLINE Business APIを通じて送信する決済要求メッセージ（有効期限あり）</li>
+      </ul>
+
+      <hr class="divider">
+
+      <!-- 제2장 서비스 제공 및 이용 -->
+      <h2 id="chapter2" class="chapter-title">第2章 サービス提供および利用</h2>
+
+      <h3 class="article-title">第5条（利用契約の成立および本人確認）</h3>
+      <ol>
+        <li>利用契約は、利用者が登録手続きを完了し本規約に同意することで成立します。会員登録後、LINE ID連携は必須であり、18歳以上のみが登録可能です。</li>
+        <li>当社は、安全なサービス提供、未成年者の利用防止および信頼性確保のため、会員がサービス予約を行う際、<strong>決済要求直前にLINE等の別チャネルを通じてパスポート等の身分証明書による本人確認（KYC）</strong>を要求することがあります。</li>
+        <li>会員は決済要求前に当社が指定する方法に従い本人確認手続きを誠実に履行しなければならず、これを拒否または不誠実に履行した場合、予約は制限または取消されることがあります。</li>
+        <li>本人確認のため収集された個人情報は「個人情報保護法」等の関連法令に基づき処理され、確認目的以外には使用されません。当社は確認完了後、パスポート画像等の原本データを直ちに廃棄し、必要最小限の情報（氏名・生年月日・国籍・性別）のみを保管します。</li>
+        <li>以下の場合、利用申請を拒否または取消すことができます。
+          <ul>
+            <li>他人名義や虚偽情報の使用</li>
+            <li>公序良俗を害する目的</li>
+            <li>他人情報の盗用やサービス妨害</li>
+            <li>法令・規約違反の経歴</li>
+            <li>当社が定める要件未達</li>
+          </ul>
+        </li>
+      </ol>
+
+      <div class="important-box">
+        <h4><i class="fas fa-exclamation-triangle"></i> 重要事項</h4>
+        <p>本人確認（KYC）は安全なサービス提供のための必須 절차입니다. 확인을 거부하거나 허위 정보를 제공할 경우 서비스 이용이 제한될 수 있습니다.</p>
+      </div>
+
+      <h3 class="article-title">第6条（会員情報の収集・利用・保護）</h3>
+      <p>会員の個人情報処理に関する事項は、個人情報処理方針に従い、会員は最新の情報を維持する責任を負います。</p>
+
+      <h3 class="article-title">第7条（情報セキュリティ）</h3>
+      <p>会員はID・パスワードの管理責任を有し、不正使用を認識した場合、直ちに当社に通知しなければなりません。</p>
+
+      <h3 class="article-title">第8条（サービス利用時間）</h3>
+      <p>原則として年中無休24時間提供します。ただし、点検・障害等により中断することがあり、可能な限り事前告知します。</p>
+
+      <h3 class="article-title">第9条（サービスの中断・情報の保存）</h3>
+      <p>天災地変、通信障害、第三者（PG・プラットフォーム等）の障害等不可抗力によるデータ損失・遅延について、当社は故意または重大な過失がない限り責任を負いません。</p>
+
+      <h3 class="article-title">第10条（サービスの変更・解約）</h3>
+      <p>当社は運営上・技術上の必要によりサービスを修正・変更・終了できます。会員はいつでも退会できます。</p>
+
+      <hr class="divider">
+
+      <!-- 제3장 예약·결제·청약철회·환불 -->
+      <h2 id="chapter3" class="chapter-title">第3章 予約・決済・申込撤回・返金</h2>
+
+      <h3 class="article-title">第11条（申込撤回および制限）</h3>
+      <ol>
+        <li>「電子商取引法」に基づき、契約内容通知を受領した日から7日以内は申込撤回が可能です。</li>
+        <li>ただし、本サービスは特定日時に提供される予約型サービスであるため、同法施行令第21条により申込撤回が制限される場合があります。</li>
+        <li><strong>返金・取消ポリシー：</strong>
+          <ul>
+            <li><span style="color: #28a745; font-weight: 700;">利用24時間前：全額返金</span></li>
+            <li><span style="color: #ffc107; font-weight: 700;">利用24時間～4時間前：50％返金</span></li>
+            <li><span style="color: #dc3545; font-weight: 700;">利用4時間以内・無断キャンセル：返金不可</span></li>
+          </ul>
+        </li>
+      </ol>
+
+      <h3 class="article-title">第12条（予約および決済手続：LINE決済リンク）</h3>
+      <div class="highlight-box">
+        <h4>📋 予約・決済の流れ</h4>
+        <p>利用者が日付・時間選択 → 管理者確認 → メイトスケジュール確認 → Confirm（確定） → LINE決済リンク送信 → 決済完了</p>
+        <p><strong>リンク有効時間：</strong>通常12時間／緊急予約2時間</p>
+      </div>
+
+      <h3 class="article-title">第13条（料金および決済）</h3>
+      <ol>
+        <li>料金・税金の有無・オプションはサービス画面の告知に従います。</li>
+        <li>決済はPG/クレジットカード/電子ウォレット/海外決済で処理されます。환율変動・手数料により返金額が変わることがあります。</li>
+      </ol>
+
+      <h3 class="article-title">第14条（取消・返金）</h3>
+      <ol>
+        <li><strong>予約確定前（Pending）：</strong>自由に取消可能</li>
+        <li><strong>予約確定後～決済前：</strong>取消可能</li>
+        <li><strong>決済後：</strong>第11条の返金基準を適用</li>
+      </ol>
+
+      <h3 class="article-title">第15条（日程変更）</h3>
+      <p><strong>決済後～利用12時間前：</strong>1回無料変更可</p>
+      <p>利用12時間以内の変更は第14条の返金基準に従います。</p>
+
+      <hr class="divider">
+
+      <!-- 제4장 콘텐츠·지적재산·행동규범 -->
+      <h2 id="chapter4" class="chapter-title">第4章 コンテンツ・知的財産・行動規範</h2>
+
+      <h3 class="article-title">第16条（当社・メイト責任の場合の措置）</h3>
+      <ul>
+        <li><strong>メイト遅刻15分超：</strong>遅延分時間延長または遅延分金額返金</li>
+        <li><strong>メイト無断欠席・途中離脱・重大不備：</strong>全額返金または交代</li>
+        <li><strong>システム障害：</strong>全額返金または無償再予約</li>
+      </ul>
+
+      <h3 class="article-title">第17条（天候・安全・現場費用）</h3>
+      <ul>
+        <li><strong>気象特報・安全リスク：</strong>無料日程変更または返金</li>
+        <li><strong>一般的な雨天は返金対象外</strong>（代替コース提案可）</li>
+        <li><strong>交通費・入場料・飲食費等現場費用は利用者負担</strong></li>
+      </ul>
+
+      <h3 class="article-title">第18条（投稿物の著作権）</h3>
+      <p>利用者が投稿したコンテンツの権利は利用者に帰属します。当社はサービス運営・広報目的に限り無償・非独占的に利用できます。</p>
+
+      <h3 class="article-title">第19条（行動規範およびサービス制限）</h3>
+      <ol>
+        <li><strong>禁止行為：</strong>アカウント・決済手段の盗用、虚偽情報提供、暴言・暴行・ストーキング、性的要求、違法撮影・録音、ハッキング・クローリング、スパム・レビュー操作等</li>
+        <li>違反時、当社はサービス制限、アカウント停止、投稿削除、契約解除、法的措置を取ることがあります。</li>
+        <li><strong>安全な運営のため、女性メイトは女性会員のみ予約可能であり、当社は異性間のマッチングを提供しません。</strong></li>
+      </ol>
+
+      <div class="warning-box">
+        <h4><i class="fas fa-shield-alt"></i> 安全ポリシー</h4>
+        <p>当サービスは健全な友人関係に基づく交流を目的としており、恋愛・性的な関係は禁止されています。安全で快適な環境づくりにご協力ください。</p>
+      </div>
+
+      <hr class="divider">
+
+      <!-- 제5장 의무·책임·손해배상 -->
+      <h2 id="chapter5" class="chapter-title">第5章 義務・責任・損害賠償</h2>
+
+      <h3 class="article-title">第20条（当社の義務）</h3>
+      <p>当社は関連法令および本規約を遵守し、安定したサービス提供に努めます。</p>
+
+      <h3 class="article-title">第21条（利用者の義務）</h3>
+      <p>会員は正確な情報を提供・更新し、アカウントを善良な管理者の注意義務で管理するものとします。</p>
+
+      <h3 class="article-title">第22条（免責事項）</h3>
+      <p>当社は、天災、通信障害、第三者サービスの障害、환율変動等不可抗力による損害について、故意・重大な過失がない限り責任を負いません。</p>
+
+      <h3 class="article-title">第23条（損害賠償および責任制限）</h3>
+      <p>当社の損害賠償責任は、故意または重大な過失がない限り、紛争発生前3か月内に利用者が実際に支払ったサービス料金の合計または100万円のいずれか低い額を上限とします。</p>
+
+      <hr class="divider">
+
+      <!-- 제6장 기타 -->
+      <h2 id="chapter6" class="chapter-title">第6章 その他</h2>
+
+      <h3 class="article-title">第24条（譲渡禁止）</h3>
+      <p>会員はサービス利用権限および契約上の地位を第三者に譲渡・贈与または担保提供できません。</p>
+
+      <h3 class="article-title">第25条（通知）</h3>
+      <p>当社はサービス内告知、メール、SMS、LINEメッセージ等で会員に通知できます。</p>
+
+      <h3 class="article-title">第26条（準拠法および裁判管轄）</h3>
+      <ol>
+        <li>本規約およびサービス利用に関する紛争の準拠法は大韓民国法とします。</li>
+        <li><strong>韓国内在住の消費者：</strong>民事訴訟法上の管轄裁判所（消費者住所地管轄含む）</li>
+        <li><strong>海外居住の消費者：</strong>当社本店所在地を管轄するソウル中央地方法院を第一審専属管轄とします。ただし、消費者に有利な強行規定がある場合はそれを優先適用します。</li>
+      </ol>
+
+      <h3 class="article-title">第27条（年齢制限および未成年者利用）</h3>
+      <ol>
+        <li>本サービスは原則として18歳以上を対象とします。</li>
+        <li>16歳以上～18歳未満は、法定代理人の同意および安全ガイドライン遵守時に限定的に利用可能です。</li>
+        <li>14歳未満は、法定代理人の同意なしに登録・予約・決済できず、確認されない場合は制限・取消されます。</li>
+      </ol>
+
+      <hr class="divider">
+
+      <!-- 부칙 -->
+      <h2 class="chapter-title">付則</h2>
+      <ol>
+        <li>本規約は2025年9月19日から施行します。</li>
+        <li>個人情報処理方針、返金・取消ポリシー等の細則は本規約と同一の効力を持ち、抵触時は消費者に有利な基準を優先適用します。</li>
+        <li>会社情報（商号/代表者/事業者登録番号/通信販売業申告番号/住所/連絡先）は当サイト下部に常時掲示します。</li>
+      </ol>
+
+      <!-- 연락처 정보 -->
+      <div class="contact-info" style="margin-top: 40px;">
+        <h4>📞 お問い合わせ</h4>
+        <div class="contact-details">
+          <span class="contact-label">会社名：</span>
+          <span class="contact-value">PUZZMI</span>
+          <span class="contact-label">代表者：</span>
+          <span class="contact-value">崔書準（チェ・ソジュン）</span>
+          <span class="contact-label">事業者番号：</span>
+          <span class="contact-value">716-10-02780</span>
+          <span class="contact-label">住所：</span>
+          <span class="contact-value">서울특별시 영등포구 디지털로 48길 23-1</span>
+          <span class="contact-label">メール：</span>
+          <span class="contact-value">puzzmi0721@gmail.com</span>
+        </div>
+      </div>
+
+      <div class="highlight-box" style="margin-top: 40px;">
+        <h4>📢 お知らせ</h4>
+        <p style="margin: 0;">
+          本利用規約に関してご質問がございましたら、上記の連絡先までお気軽にお問い合わせください。
+        </p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
