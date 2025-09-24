@@ -1240,6 +1240,7 @@
     const favoriteBtn = document.getElementById('favoriteBtn');
     const reviewForm = document.getElementById('reviewForm');
     const reviewsList = document.getElementById('reviewsList');
+    const toggleReviewsBtn = document.getElementById('toggleReviewsBtn');
 
     // 사진 갤러리 상태
     let currentPhotoIndex = 0;
@@ -1622,11 +1623,6 @@
       }
     };
 
-    // 리뷰 더보기 버튼 이벤트 리스너 수정
-    if (toggleReviewsBtn) {
-      toggleReviewsBtn.addEventListener('click', toggleAllReviews);
-    }
-
     // 리뷰 작성 권한 확인 (완료된 예약이 있는 경우에만)
     async function checkReviewPermission() {
       if (isOwnProfile) {
@@ -1887,19 +1883,6 @@
 
     // 리뷰 더보기/접기 토글
     const reviewsContainer = document.getElementById('reviewsContainer');
-    const toggleReviewsBtn = document.getElementById('toggleReviewsBtn');
-
-    toggleReviewsBtn?.addEventListener('click', () => {
-      const isExpanded = reviewsContainer.classList.contains('expanded');
-      
-      if (isExpanded) {
-        reviewsContainer.classList.remove('expanded');
-        toggleReviewsBtn.innerHTML = '<i class="fas fa-chevron-down"></i><span>더 보기</span>';
-      } else {
-        reviewsContainer.classList.add('expanded');
-        toggleReviewsBtn.innerHTML = '<i class="fas fa-chevron-up"></i><span>접기</span>';
-      }
-    });
 
     // 초기 로드
     async function initialize() {
@@ -1923,6 +1906,31 @@
         await initializeReviewForm();
         
         console.log('✅ 모든 초기화 완료');
+        
+        // 더보기/접기 버튼 이벤트 (초기화 후 설정)
+        if (toggleReviewsBtn) {
+          toggleReviewsBtn.addEventListener('click', () => {
+            const hiddenReviews = reviewsContainer.querySelectorAll('.review-item[style*="display: none"]');
+            const isExpanded = hiddenReviews.length === 0;
+            
+            if (isExpanded) {
+              // 접기: 처음 3개만 보이게
+              const allReviews = reviewsContainer.querySelectorAll('.review-item');
+              allReviews.forEach((card, index) => {
+                if (index >= 3) {
+                  card.style.display = 'none';
+                }
+              });
+              toggleReviewsBtn.innerHTML = '<i class="fas fa-chevron-down"></i> 더보기';
+            } else {
+              // 펼치기: 모든 리뷰 보이게
+              hiddenReviews.forEach(card => {
+                card.style.display = 'block';
+              });
+              toggleReviewsBtn.innerHTML = '<i class="fas fa-chevron-up"></i> 접기';
+            }
+          });
+        }
         
       } catch (error) {
         console.error('❌ 페이지 초기화 실패:', error);
