@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>PUZZMI - 로그인 / 회원가입</title>
+  <title>PUZZMI - ログイン / 会員登録</title>
   <link rel="stylesheet" href="styles.css"/>
   <link rel="stylesheet" href="pages.css"/>
   <link rel="stylesheet" href="pages-theme.css"/>
@@ -395,30 +395,30 @@
       
       const submitBtn = e.target.querySelector('button[type="submit"]');
       submitBtn.disabled = true;
-      submitBtn.innerHTML = '<div class="loading"></div> 로그인 중...';
+      submitBtn.innerHTML = '<div class="loading"></div> ログイン中...';
       
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       
       if (error) {
         document.getElementById('login_result').innerHTML = '<div class="error">' + error.message + '</div>';
         submitBtn.disabled = false;
-        submitBtn.innerHTML = '로그인';
+        submitBtn.innerHTML = 'ログイン';
       } else {
         // 이메일 인증 상태 확인
         const { data: { user } } = await supabase.auth.getUser();
         
         if (user && !user.email_confirmed_at) {
           // 이메일 미인증 사용자
-          document.getElementById('login_result').innerHTML = '<div class="error">이메일 인증이 필요합니다. 인증 메일을 확인해주세요.</div>';
+          document.getElementById('login_result').innerHTML = '<div class="error">メール認証が必要です。 認証メールをご確認ください。</div>';
           submitBtn.disabled = false;
-          submitBtn.innerHTML = '로그인';
+          submitBtn.innerHTML = 'ログイン';
           
           setTimeout(() => {
             location.href = `email_verification_pending.html?email=${encodeURIComponent(user.email)}`;
           }, 2000);
         } else {
           // 인증 완료된 사용자
-          document.getElementById('login_result').innerHTML = '<div class="success">로그인 성공</div>';
+          document.getElementById('login_result').innerHTML = '<div class="success">ログイン成功</div>';
           setTimeout(() => location.href = getRedirect(), 600);
         }
       }
