@@ -1,0 +1,34 @@
+/* === styles_hero_zoom_tune.css ===
+   Goal: Reduce perceived zoom (crop) of hero background by lowering hero height.
+   You can tweak the custom properties below to taste. */
+
+:root{
+  --hero-min-h-mobile: 56svh;  /* was around ~70svh → 줄여서 크롭 완화 */
+  --hero-min-h-tablet: 60vh;
+  --hero-min-h-desktop: 58vh;
+}
+
+/* 모바일 우선 */
+.hero{
+  min-height: var(--hero-min-h-mobile);
+}
+
+/* 화면비가 아주 넓은(가로가 긴) 경우 더 낮춤 → 크롭 완화 */
+@media (min-aspect-ratio: 16/10){
+  .hero{ min-height: calc(var(--hero-min-h-mobile) - 6svh); }
+}
+
+/* 태블릿 이상 */
+@media (min-width: 768px){
+  .hero{ min-height: var(--hero-min-h-tablet); }
+}
+
+/* 데스크탑 이상 */
+@media (min-width: 1024px){
+  .hero{ min-height: var(--hero-min-h-desktop); }
+}
+
+/* 초광폭 화면 보정 */
+@media (min-width: 1440px) and (min-aspect-ratio: 16/9){
+  .hero{ min-height: 52vh; }
+}
