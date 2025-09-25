@@ -325,7 +325,6 @@ const heroBackgrounds = [
     'bg1.png',
     'bg2.png',
     'bg3.png',
-    'bg4.png'
 ];
 // 페이지 로드 시 초기화
 document.addEventListener('DOMContentLoaded', function() {
