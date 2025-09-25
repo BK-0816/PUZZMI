@@ -5,7 +5,7 @@
 :root{
   --hero-min-h-mobile: 56svh;  /* was around ~70svh → 줄여서 크롭 완화 */
   --hero-min-h-tablet: 60vh;
-  --hero-min-h-desktop: 40vh;
+  --hero-min-h-desktop: 10vh;
 }
 
 /* 모바일 우선 */
