@@ -1,0 +1,31 @@
+/* === styles_hero_desktop_fit.css ===
+   Goal: On desktop, reduce hero height and show the entire background image (no crop).
+   Mobile remains immersive (cover). Load this AFTER other hero CSS to override. */
+
+/* Desktop and up */
+@media (min-width: 1024px){
+  .hero{
+    min-height: 44vh; /* reduce section height on desktop */
+  }
+  .hero-bg{
+    background-size: contain !important;   /* show full image */
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
+    background-color: #f8fafc; /* subtle backdrop if letterboxed; adjust to brand color */
+  }
+  .hero-content{
+    max-width: min(62ch, 560px);
+    padding: 24px 26px;
+  }
+}
+
+/* Wider desktops: slightly smaller section for less perceived zoom */
+@media (min-width: 1280px){
+  .hero{ min-height: 40vh; }
+}
+@media (min-width: 1440px){
+  .hero{ min-height: 38vh; }
+}
+@media (min-width: 1920px){
+  .hero{ min-height: 34vh; }
+}
