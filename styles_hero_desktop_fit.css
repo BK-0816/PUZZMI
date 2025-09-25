@@ -5,7 +5,7 @@
 /* Base desktop */
 @media (min-width: 1024px){
   .hero{
-    min-height: 54vh; /* was 44vh → 더 큼 */
+    min-height: 58vh; /* was 44vh → 더 큼 */
   }
   .hero-bg{
     background-size: contain !important;
@@ -21,13 +21,13 @@
 
 /* 큰 데스크탑: 약간만 낮춤 (너무 커지지 않게) */
 @media (min-width: 1280px){
-  .hero{ min-height: 52vh; } /* was 40vh */
+  .hero{ min-height: 56vh; } /* was 40vh */
 }
 @media (min-width: 1440px){
-  .hero{ min-height: 48vh; } /* was 38vh */
+  .hero{ min-height: 52vh; } /* was 38vh */
 }
 @media (min-width: 1920px){
-  .hero{ min-height: 46vh; } /* was 34vh */
+  .hero{ min-height: 50vh; } /* was 34vh */
 }
 
 /* 초광폭 + 낮은 높이 화면 보호 (예: 2560x1080) */
