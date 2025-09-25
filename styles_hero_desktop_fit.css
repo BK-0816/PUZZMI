@@ -6,7 +6,7 @@
 @media (min-width: 1024px){
   .hero{
     aspect-ratio: 16 / 9;
-    min-height: 70vh; /* was 44vh → 더 큼 */
+    min-height: 54vh; /* was 44vh → 더 큼 */
   }
   .hero-bg{
     background-size: contain !important;
