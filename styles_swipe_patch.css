@@ -1,0 +1,30 @@
+/* === Swipe UI for hero === */
+.hero-dots {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 4;
+  pointer-events: none; /* dots don't block swipes */
+}
+.hero-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.6);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  transition: transform .25s ease, background-color .25s ease, opacity .25s ease;
+  opacity: .7;
+}
+.hero-dot.is-active {
+  transform: scale(1.5);
+  background: rgba(255,255,255,0.95);
+  opacity: 1;
+}
+
+.hero.is-dragging * {
+  cursor: grabbing !important;
+  user-select: none;
+}
