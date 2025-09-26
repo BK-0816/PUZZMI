@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>特定商取引法に基づく表記 - PUZZMI</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="pages.css"/>
+  <link rel="stylesheet" href="pages-theme.css"/>
+  <link rel="stylesheet" href="nav.css"/>
+  <script type="module" src="nav.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <style>
+    body.bg-cream { 
+      background: var(--bg-cream); 
+      background-repeat: no-repeat; 
+      background-size: cover; 
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+    
+    /* 배경 장식 요소 */
+    .decorative-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    
+    .decorative-element {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.2;
+      animation: float 12s ease-in-out infinite;
+    }
+    
+    .decorative-element:nth-child(1) {
+      width: 200px;
+      height: 200px;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      top: 10%;
+      left: 5%;
+      animation-delay: 0s;
+    }
+    
+    .decorative-element:nth-child(2) {
+      width: 150px;
+      height: 150px;
+      background: linear-gradient(45deg, #f093fb, #f5576c);
+      top: 60%;
+      right: 10%;
+      animation-delay: 4s;
+    }
+    
+    .decorative-element:nth-child(3) {
+      width: 120px;
+      height: 120px;
+      background: linear-gradient(45deg, #4facfe, #00f2fe);
+      bottom: 20%;
+      left: 15%;
+      animation-delay: 8s;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      33% { transform: translateY(-20px) rotate(120deg); }
+      66% { transform: translateY(10px) rotate(240deg); }
+    }
+    
+    /* 메인 컨테이너 */
+    .tokusho-wrap { 
+      max-width: 900px; 
+      margin: 40px auto; 
+      padding: 0 20px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    /* 페이지 헤더 */
+    .page-header {
+      background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
+      backdrop-filter: blur(25px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 28px;
+      padding: 50px;
+      margin-bottom: 40px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.04);
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+    }
+    
+    .page-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 20%, #f093fb 40%, #f5576c 60%, #4facfe 80%, #00f2fe 100%);
+      animation: shimmer 4s ease-in-out infinite;
+    }
+    
+    @keyframes shimmer {
+      0%, 100% { opacity: 1; transform: translateX(0); }
+      50% { opacity: 0.8; transform: translateX(8px); }
+    }
+    
+    .page-title {
+      font-size: 3rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 20px 0;
+      letter-spacing: -0.03em;
+      position: relative;
+    }
+    
+    .page-title::after {
+      content: '';
+      position: absolute;
+      bottom: -16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 5px;
+      background: linear-gradient(90deg, #667eea 0%, #f093fb 50%, #4facfe 100%);
+      border-radius: 3px;
+    }
+    
+    .page-subtitle {
+      color: var(--text-secondary);
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 0;
+    }
+    
+    /* 뒤로가기 버튼 */
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 16px;
+      color: var(--text-primary);
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      margin-bottom: 32px;
+    }
+    
+    .back-btn:hover {
+      background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 100%);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+      border-color: rgba(102, 126, 234, 0.3);
+    }
+    
+    /* 콘텐츠 카드 */
+    .content-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 24px;
+      padding: 50px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.04);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .content-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 33%, #f093fb 66%, #f5576c 100%);
+      opacity: 0.8;
+    }
+    
+    /* 특정상거래법 그리드 */
+    .tokusho-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin: 32px 0;
+    }
+    
+    .tokusho-item {
+      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+      border: 2px solid rgba(255,255,255,0.4);
+      border-radius: 16px;
+      padding: 24px;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .tokusho-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+      transition: left 0.5s ease;
+    }
+    
+    .tokusho-item:hover::before {
+      left: 100%;
+    }
+    
+    .tokusho-item:hover {
+      background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 100%);
+      border-color: rgba(102, 126, 234, 0.4);
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+    }
+    
+    .tokusho-item dt {
+      font-weight: 800;
+      color: var(--text-primary);
+      font-size: 1rem;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .tokusho-item dd {
+      margin: 0;
+      color: var(--text-primary);
+      font-size: 1.1rem;
+      font-weight: 600;
+      line-height: 1.6;
+    }
+    
+    /* 연락처 정보 강조 */
+    .contact-highlight {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(240, 147, 251, 0.05) 100%);
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 20px;
+      padding: 32px;
+      margin: 32px 0;
+      text-align: center;
+    }
+    
+    .contact-highlight h4 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 16px 0;
+    }
+    
+    .contact-details {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px 20px;
+      align-items: center;
+      max-width: 400px;
+      margin: 0 auto;
+      text-align: left;
+    }
+    
+    .contact-label {
+      font-weight: 700;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+    
+    .contact-value {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+    
+    /* 반응형 디자인 */
+    @media (max-width: 768px) {
+      .tokusho-wrap {
+        margin: 20px auto;
+        padding: 0 16px;
+      }
+      
+      .page-header {
+        padding: 32px 24px;
+        border-radius: 20px;
+      }
+      
+      .page-title {
+        font-size: 2.2rem;
+      }
+      
+      .content-card {
+        padding: 32px 24px;
+        border-radius: 20px;
+      }
+      
+      .tokusho-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      
+      .tokusho-item {
+        padding: 20px;
+      }
+      
+      .contact-details {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body class="bg-cream">
+  <!-- 배경 장식 요소 -->
+  <div class="decorative-bg">
+    <div class="decorative-element"></div>
+    <div class="decorative-element"></div>
+    <div class="decorative-element"></div>
+  </div>
+
+  <div id="app-nav"></div>
+  
+  <main class="tokusho-wrap">
+    <!-- 뒤로가기 버튼 -->
+    <a href="index.html" class="back-btn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="m12 19-7-7 7-7"/>
+        <path d="m19 12H5"/>
+      </svg>
+      ホームに戻る
+    </a>
+
+    <!-- 페이지 헤더 -->
+    <section class="page-header">
+      <h1 class="page-title">📋 特定商取引法に基づく表記</h1>
+      <p class="page-subtitle">法律に基づく事業者情報の表示</p>
+    </section>
+
+    <!-- 메인 콘텐츠 -->
+    <section class="content-card">
+      <div class="tokusho-grid">
+        <div class="tokusho-item">
+          <dt>販売業者</dt>
+          <dd>株式会社KG Inicis Japan</dd>
+        </div>
+        
+        <div class="tokusho-item">
+          <dt>責任者</dt>
+          <dd>キム・ジュンウ</dd>
+        </div>
+        
+        <div class="tokusho-item">
+          <dt>住所</dt>
+          <dd>東京都港区新橋２丁目１番１０号</dd>
+        </div>
+        
+        <div class="tokusho-item">
+          <dt>電話番号</dt>
+          <dd>03-6825-5531</dd>
+        </div>
+        
+        <div class="tokusho-item">
+          <dt>メールアドレス</dt>
+          <dd>puzzmi0721@gmail.com</dd>
+        </div>
+        
+        <div class="tokusho-item">
+          <dt>ホームページ</dt>
+          <dd>https://puzzmi.com/</dd>
+        </div>
+        
+        <div class="tokusho-item">
+          <dt>サイト名</dt>
+          <dd>PUZZMI（パズミー）</dd>
+        </div>
+        
+        <div class="tokusho-item">
+          <dt>商品の販売価格</dt>
+          <dd>各サービスページに表示</dd>
+        </div>
+        
+        <div class="tokusho-item">
+          <dt>商品以外の必要料金</dt>
+          <dd>なし（サービス利用料に含まれます）</dd>
+        </div>
+        
+        <div class="tokusho-item">
+          <dt>支払方法</dt>
+          <dd>クレジットカード / コンビニ決済</dd>
+        </div>
+        
+        <div class="tokusho-item">
+          <dt>支払時期</dt>
+          <dd>予約と同時に決済が確定いたします。</dd>
+        </div>
+        
+        <div class="tokusho-item">
+          <dt>商品の引渡時期</dt>
+          <dd>ご予約の確定後、即時にサービスを提供いたします。</dd>
+        </div>
+        
+        <div class="tokusho-item">
+          <dt>返品・交換</dt>
+          <dd>サービスの性質上、原則として返品・交換はできません。<br>ただし、弊社の不手際による場合は全額返金いたします。</dd>
+        </div>
+      </div>
+
+      <!-- 연락처 정보 강조 -->
+      <div class="contact-highlight">
+        <h4>📞 お問い合わせ</h4>
+        <div class="contact-details">
+          <span class="contact-label">電話：</span>
+          <span class="contact-value">03-6825-5531</span>
+          <span class="contact-label">メール：</span>
+          <span class="contact-value">puzzmi0721@gmail.com</span>
+          <span class="contact-label">営業時間：</span>
+          <span class="contact-value">平日 9:00-18:00</span>
+        </div>
+      </div>
+
+      <div style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(240, 147, 251, 0.05) 100%); border: 2px solid rgba(102, 126, 234, 0.2); border-radius: 16px; padding: 24px; margin-top: 40px;">
+        <h4 style="color: #667eea; font-weight: 800; margin: 0 0 12px 0;">📢 お知らせ</h4>
+        <p style="margin: 0; color: var(--text-primary); line-height: 1.6;">
+          特定商取引法に関してご質問がございましたら、上記の連絡先までお気軽にお問い合わせください。
+        </p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
