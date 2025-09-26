@@ -2111,6 +2111,126 @@ section:not(:first-child)::before {
 }
 
 /* ===== 푸터 ===== */
+/* 특정상거래법 섹션 */
+.tokusho-section {
+  background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 20px;
+  padding: 40px;
+  margin-bottom: 40px;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+.tokusho-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 33%, #f093fb 66%, #f5576c 100%);
+  opacity: 0.8;
+}
+
+.tokusho-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-align: center;
+  margin: 0 0 32px 0;
+  letter-spacing: -0.01em;
+  position: relative;
+}
+
+.tokusho-title::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  border-radius: 2px;
+}
+
+.tokusho-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.tokusho-item {
+  background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+}
+
+.tokusho-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  border-color: rgba(102, 126, 234, 0.3);
+}
+
+.tokusho-item dt {
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 0.3px;
+}
+
+.tokusho-item dd {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+  .tokusho-section {
+    padding: 24px;
+    border-radius: 16px;
+  }
+  
+  .tokusho-title {
+    font-size: 1.4rem;
+  }
+  
+  .tokusho-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .tokusho-item {
+    padding: 16px;
+  }
+  
+  .tokusho-item dt {
+    font-size: 0.9rem;
+  }
+  
+  .tokusho-item dd {
+    font-size: 0.85rem;
+  }
+}
+
 .footer {
   background: var(--gray-900);
   color: var(--gray-300);
