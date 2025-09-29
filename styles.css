@@ -1438,47 +1438,67 @@ section:not(:first-child)::before {
   }
 }
 
-/* ===== ABOUT 섹션 반응형 그리드 ===== */
+/* ===== ABOUT 섹션 ===== */
+.about {
+  padding: var(--space-20) 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.2) 100%);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.about::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="%23667eea" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="%23f093fb" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+  opacity: 0.3;
+  pointer-events: none;
+}
+
 .about-grid {
   display: grid;
-  gap: 32px;
-  margin-top: 48px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--space-8);
+  margin-top: var(--space-12);
 }
 
-/* 모바일: 1열 세로 정렬 */
-@media (max-width: 767px) {
-  .about-grid {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-}
-
-/* 태블릿: 2열 가로 정렬 */
-@media (min-width: 768px) and (max-width: 1023px) {
-  .about-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 28px;
-  }
-}
-
-/* PC: 4열 가로 정렬 */
+/* PC에서 4열 정렬 */
 @media (min-width: 1024px) {
   .about-grid {
     grid-template-columns: repeat(4, 1fr);
-    gap: 32px;
+    gap: var(--space-6);
+  }
+}
+
+/* 태블릿에서 2열 정렬 */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .about-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-6);
+  }
+}
+
+/* 모바일에서 1열 정렬 */
+@media (max-width: 767px) {
+  .about-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
   }
 }
 
 .about-card {
-  background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255,255,255,0.4);
-  border-radius: 24px;
-  padding: 32px;
-  box-shadow: 0 16px 40px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04);
-  transition: all 0.4s ease;
-  position: relative;
+  background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: var(--radius-2xl);
   overflow: hidden;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-lg);
+  position: relative;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -1490,38 +1510,40 @@ section:not(:first-child)::before {
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 33%, #f093fb 66%, #f5576c 100%);
+  height: 3px;
+  background: var(--gradient-rainbow);
   opacity: 0.8;
 }
 
 .about-card:hover {
   transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 24px 60px rgba(0,0,0,0.12), 0 8px 24px rgba(0,0,0,0.08);
-  border-color: rgba(102, 126, 234, 0.3);
+  box-shadow: var(--shadow-xl);
+  border-color: rgba(102, 126, 234, 0.4);
 }
 
 .about-card:hover::before {
   opacity: 1;
-  height: 5px;
+  height: 4px;
 }
 
 .about-card-image {
-  width: 100%;
-  height: 180px;
-  border-radius: 16px;
-  overflow: hidden;
-  margin-bottom: 24px;
   position: relative;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
 .about-card-image img {
   width: 100%;
-  height: 100%;
+  height: 200px;
   object-fit: cover;
-  transition: transform 0.4s ease;
-  border-radius: 16px;
+  transition: transform var(--transition-base);
+}
+
+/* 모바일에서 이미지 크기 증가 */
+@media (max-width: 767px) {
+  .about-card-image img {
+    height: 250px;
+  }
 }
 
 .about-card:hover .about-card-image img {
@@ -1529,83 +1551,95 @@ section:not(:first-child)::before {
 }
 
 .about-card-content {
+  padding: var(--space-6);
   flex: 1;
   display: flex;
   flex-direction: column;
 }
 
 .about-card-content h3 {
-  font-size: 1.3rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin: 0 0 16px 0;
-  line-height: 1.4;
-  letter-spacing: -0.01em;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-3);
+  line-height: var(--line-height-tight);
 }
 
 .about-card-content p {
   color: var(--text-secondary);
-  font-size: 1rem;
-  line-height: 1.7;
-  margin: 0;
-  font-weight: 500;
+  line-height: var(--line-height-relaxed);
+  font-size: var(--font-size-base);
   flex: 1;
 }
 
-/* ===== SAFETY 섹션 반응형 그리드 ===== */
-.safety-grid {
-  display: grid;
-  gap: 32px;
-  margin-top: 48px;
+/* ===== SAFETY 섹션 ===== */
+.safety {
+  padding: var(--space-20) 0;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(240, 147, 251, 0.03) 100%);
+  position: relative;
 }
 
-/* 모바일: 1열 세로 정렬 */
-@media (max-width: 767px) {
+.safety::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="safety-pattern" width="50" height="50" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="2" fill="%23667eea" opacity="0.05"/></pattern></defs><rect width="100" height="100" fill="url(%23safety-pattern)"/></svg>');
+  pointer-events: none;
+}
+
+.safety-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--space-8);
+  margin-top: var(--space-12);
+}
+
+/* PC에서 3열 정렬 */
+@media (min-width: 1024px) {
   .safety-grid {
-    grid-template-columns: 1fr;
-    gap: 24px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-8);
   }
 }
 
-/* 태블릿: 2열 가로 정렬 */
+/* 태블릿에서 2열 정렬 (마지막 카드 중앙 정렬) */
 @media (min-width: 768px) and (max-width: 1023px) {
   .safety-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 28px;
+    gap: var(--space-6);
   }
   
-  .safety-grid .safety-card:last-child {
+  .safety-card:nth-child(3) {
     grid-column: 1 / -1;
-    max-width: 50%;
+    max-width: 400px;
     margin: 0 auto;
   }
 }
 
-/* PC: 3열 가로 정렬 */
-@media (min-width: 1024px) {
+/* 모바일에서 1열 정렬 */
+@media (max-width: 767px) {
   .safety-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 32px;
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
   }
 }
 
 .safety-card {
-  background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255,255,255,0.4);
-  border-radius: 24px;
-  padding: 40px 32px;
-  box-shadow: 0 16px 40px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04);
-  transition: all 0.4s ease;
+  background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: var(--radius-2xl);
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-lg);
   position: relative;
-  overflow: hidden;
   height: 100%;
   display: flex;
   flex-direction: column;
   text-align: center;
+  padding: var(--space-8);
 }
 
 .safety-card::before {
@@ -1614,87 +1648,68 @@ section:not(:first-child)::before {
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #28a745 0%, #20c997 33%, #667eea 66%, #f093fb 100%);
+  height: 3px;
+  background: var(--gradient-rainbow);
   opacity: 0.8;
 }
 
 .safety-card:hover {
   transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 24px 60px rgba(0,0,0,0.12), 0 8px 24px rgba(0,0,0,0.08);
-  border-color: rgba(102, 126, 234, 0.3);
+  box-shadow: var(--shadow-xl);
+  border-color: rgba(102, 126, 234, 0.4);
 }
 
 .safety-card:hover::before {
   opacity: 1;
-  height: 5px;
+  height: 4px;
+}
+
+.safety-icon {
+  width: 80px;
+  height: 80px;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--space-6) auto;
+  box-shadow: var(--shadow-lg);
+  transition: all var(--transition-base);
+}
+
+.safety-icon i {
+  font-size: 2rem;
+  color: white;
+}
+
+.safety-card:hover .safety-icon {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: var(--shadow-xl);
 }
 
 .safety-card-content {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
 }
 
 .safety-card-content h3 {
-  font-size: 1.4rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, #28a745 0%, #20c997 50%, #667eea 100%);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-4);
+  line-height: var(--line-height-tight);
+  background: var(--gradient-primary);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  margin: 0 0 20px 0;
-  line-height: 1.4;
-  letter-spacing: -0.01em;
 }
 
 .safety-card-content p {
   color: var(--text-secondary);
-  font-size: 1.1rem;
-  line-height: 1.7;
-  margin: 0;
-  font-weight: 500;
-}
-
-/* 모바일에서 카드 패딩 조정 */
-@media (max-width: 768px) {
-  .about-card,
-  .safety-card {
-    padding: 28px 24px;
-    border-radius: 20px;
-  }
-  
-  .about-card-image {
-    height: 160px;
-    margin-bottom: 20px;
-  }
-  
-  .about-card-content h3,
-  .safety-card-content h3 {
-    font-size: 1.2rem;
-  }
-  
-  .about-card-content p,
-  .safety-card-content p {
-    font-size: 1rem;
-  }
-}
-
-/* 태블릿에서 카드 높이 균등화 */
-@media (min-width: 768px) and (max-width: 1023px) {
-  .about-grid,
-  .safety-grid {
-    align-items: stretch;
-  }
-}
-
-/* ===== 어바웃 섹션 ===== */
-.about {
-  padding: var(--space-20) 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(248,250,252,0.9) 100%);
-  position: relative;
-  overflow: hidden;
+  line-height: var(--line-height-relaxed);
+  font-size: var(--font-size-base);
+  flex: 1;
 }
 
 .about-content {
@@ -3471,6 +3486,31 @@ section:not(:first-child)::before {
 .review-card,
 .step,
 .feature,
+/* Safety Grid Layout */
+.safety-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-8);
+  margin-top: var(--space-12);
+}
+
+@media (min-width: 768px) {
+  .safety-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-10);
+  }
+}
+
+@media (min-width: 1024px) {
+  .safety-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-8);
+  }
+}
+
 .safety-card {
   transform: translateZ(0);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
