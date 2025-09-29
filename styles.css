@@ -1904,6 +1904,7 @@ section:not(:first-child)::before {
 
 .swipe-wrapper {
   display: flex;
+}
 /* About Grid Layout */
 .about-grid {
   display: grid;
@@ -1925,11 +1926,6 @@ section:not(:first-child)::before {
     gap: var(--space-8);
   }
 }
-
-  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  width: 100%;
-}
-
 .swipe-slide {
   flex: 0 0 100%;
   width: 100%;
@@ -2788,7 +2784,7 @@ section:not(:first-child)::before {
   text-align: center;
   background: linear-gradient(135deg, #e4405f 0%, #c13584 100%);
 }
-}
+
 
 /* ===== 메시지 컴포넌트 ===== */
 .alert {
@@ -3491,4 +3487,69 @@ section:not(:first-child)::before {
   height: 100%;
   display: flex;
   flex-direction: column;
+}
+
+/* === [HOTFIX] About/Safety 카드 레이아웃 정정 === */
+/* 카드 내부: 항상 세로 스택(위 사진, 아래 텍스트) */
+.about-card,
+.safety-card {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch;
+}
+
+/* 이미지 래퍼들을 항상 먼저, 텍스트는 그 다음 */
+.about-card-image,
+.safety-card-image,
+.safety-media { order: 0; }
+
+.about-card-content,
+.safety-card-content,
+.safety-copy { order: 1; }
+
+/* grid 관련 잔여 속성 무시 */
+.about-card,
+.safety-card { grid-template-columns: none !important; }
+
+/* 이미지 크기 안정화 */
+.about-card-image img,
+.safety-card-image img,
+.safety-media img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+/* 카드 목록: PC 가로(여러 열) / 모바일 세로(1열) 유지 */
+.about-grid { display: grid; gap: var(--space-8); }
+.safety-grid { display: grid; gap: var(--space-8); }
+
+/* 모바일 1열 */
+@media (max-width: 767px) {
+  .about-grid,
+  .safety-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* 태블릿 2열 */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .about-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .safety-grid { grid-template-columns: repeat(2, 1fr) !important; }
+}
+
+/* PC 다열 */
+@media (min-width: 1024px) {
+  .about-grid { grid-template-columns: repeat(4, 1fr) !important; }
+  .safety-grid { grid-template-columns: repeat(3, 1fr) !important; }
+}
+
+/* 안전 카드의 다른 변형(가끔 섞여 있는 클래스들)도 세로 스택 강제 */
+.safety-card .safety-card-image,
+.safety-card .safety-card-content,
+.safety-card .safety-icon { width: 100%; }
+
+/* 배지 그라디언트 오타 수정(135d -> 135deg) */
+.badge-primary {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.05) 100%) !important;
 }
