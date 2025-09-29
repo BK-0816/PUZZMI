@@ -172,11 +172,10 @@ export async function renderNavbar(rootId = 'app-nav') {
   const navLeft = createElement('div', { class: 'nav-left' });
   const commonMenus = [
     { href: 'index.html#home', text: 'ホーム' },
-    { href: 'index.html#about', text: 'サービス紹介' },
-    { href: 'index.html#how-it-works', text: 'ご利用流れ' },
+    { href: 'service_intro.html', text: 'サービス紹介' },
     { href: 'index.html#friends', text: 'メイト予約' },
     { href: 'index.html#reviews', text: '口コミ' },
-    { href: 'index.html#contact', text: 'FAQ' }
+    { href: 'qna.html', text: 'お問い合わせ' }
   ];
   
   commonMenus.forEach(menu => {
