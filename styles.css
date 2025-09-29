@@ -3580,3 +3580,44 @@ section:not(:first-child)::before {
     margin-bottom: var(--space-3) !important;
   }
 }
+:root {
+  /* 숫자만 살짝 바꿔 빠르게 튜닝 가능 */
+  --about-pc-max-h: 360px;   /* PC에서 이미지 최대 높이 */
+  --about-mobile-min-h: 240px; /* 모바일에서 이미지 최소 높이 */
+}
+
+/* 기본: 가로는 꽉, 세로는 이미지 비율대로(크롭 없음) */
+.about-card-image {
+  width: 100% !important;
+  height: auto !important;
+  max-width: none !important;
+  aspect-ratio: auto !important; /* 이전 강제 비율 초기화 */
+}
+.about-card-image img {
+  width: 100% !important;
+  height: auto !important;
+  object-fit: contain !important;   /* 크롭 방지 */
+  object-position: center !important;
+}
+
+/* PC(>=1024px): 크롭 없이 보이되, 과도한 세로 확장만 상한으로 제어 */
+@media (min-width: 1024px) {
+  .about-card-image {
+    max-height: var(--about-pc-max-h) !important;
+  }
+  .about-card-image img {
+    max-height: var(--about-pc-max-h) !important;
+  }
+}
+
+/* 모바일(<=768px): 이미지를 더 크게(가로 100% + 4:3 박스 + 최소 높이) */
+@media (max-width: 768px) {
+  .about-card-image {
+    width: 100% !important;
+    min-height: var(--about-mobile-min-h) !important;
+    aspect-ratio: 4 / 3 !important;    /* 안정적인 박스 비율 */
+  }
+  .about-card-image img {
+    height: 100% !important;           /* 박스 채우기 (contain 유지) */
+  }
+}
