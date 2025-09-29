@@ -472,73 +472,40 @@
       <p class="section-subtitle">あなたの"⼀緒に⾏きたい"という気持ちを叶えるサービス！</p>
     </div>
 
-    <!-- 스와이프 카드 컨테이너 -->
-    <div class="swipe-container" id="aboutSwipeContainer">
-      <div class="swipe-wrapper">
-        <div class="swipe-slide active">
-          <div class="about-card">
-            <div class="about-card-image">
-              <img src="about1.png" alt="PUZZMI 소개 사진 1" />
-            </div>
-            <div class="about-card-content">
-              <h3>一人では行けない、お店、グルメやカフェを楽しもう！</h3>
-              <p>現地の友達と一緒なら、ローカルグルメも安心！言葉の壁を気にせず、韓国を思いっきり楽しもう！</p>
-            </div>
-          </div>
+    <!-- 반응형 그리드 컨테이너 -->
+    <div class="about-grid">
+      <div class="about-card">
+        <div class="about-card-image">
+          <img src="about1.png" alt="PUZZMI 소개 사진 1" />
         </div>
-        
-        <div class="swipe-slide">
-          <div class="about-card">
-            <div class="about-card-image">
-              <img src="about2.png" alt="PUZZMI 소개 사진 2" />
-            </div>
-            <div class="about-card-content">
-              <h3>ガイドブックに載っていない、あなただけの韓国を見つけよう！</h3>
-              <p>ガイドブックには載っていない、地元の人だけが知っている隠れた名店もご紹介します。人気観光地とあわせて、韓国の魅力を存分にお楽しみください。</p>
-            </div>
-          </div>
-        </div>
-        
-        <div class="swipe-slide">
-          <div class="about-card">
-            <div class="about-card-image">
-              <img src="about3.png" alt="PUZZMI 소개 사진 3" />
-            </div>
-            <div class="about-card-content">
-              <h3>周りと差がつく韓国旅行を！</h3>
-              <p>現地韓国女子と、韓国の最新トレンドをリアルに体験できます！ファッションやコスメ、話題のカフェや最新スポットまで韓国の「今」を満喫しよう！</p>
-            </div>
-          </div>
-        </div>
-        
-        <div class="swipe-slide">
-          <div class="about-card">
-            <div class="about-card-image">
-              <img src="safety1.png" alt="언어 지원 일러스트" />
-            </div>
-            <div class="about-card-content">
-              <h3>言葉の壁も心配なし!</h3>
-              <p>韓国語が不安でも大丈夫！注文や交通、ショッピング、道案内など、しっかりサポートいたします。安心して旅行を楽しめます！</p>
-            </div>
-          </div>
+        <div class="about-card-content">
+          <h3>一人では行けない、お店、グルメやカフェを楽しもう！</h3>
+          <p>現地の友達と一緒なら、ローカルグルメも安心！言葉の壁を気にせず、韓国を思いっきり楽しもう！</p>
         </div>
       </div>
       
-      <!-- 네비게이션 버튼 -->
-      
-      
-      <!-- 인디케이터 -->
-      <div class="swipe-indicators">
-        <span class="indicator active" onclick="goToSlide('aboutSwipeContainer', 0)"></span>
-        <span class="indicator" onclick="goToSlide('aboutSwipeContainer', 1)"></span>
-        <span class="indicator" onclick="goToSlide('aboutSwipeContainer', 2)"></span>
-        <span class="indicator" onclick="goToSlide('aboutSwipeContainer', 3)"></span>
+      <div class="about-card">
+        <div class="about-card-image">
+          <img src="about2.png" alt="PUZZMI 소개 사진 2" />
+        </div>
+        <div class="about-card-content">
+          <h3>ガイドブックに載っていない、あなただけの韓国を見つけよう！</h3>
+          <p>ガイドブックには載っていない、地元の人だけが知っている隠れた名店もご紹介します。人気観光地とあわせて、韓国の魅力を存分にお楽しみください。</p>
+        </div>
       </div>
-    </div>
-  </div>
+      
+      <div class="about-card">
+        <div class="about-card-image">
+          <img src="about3.png" alt="PUZZMI 소개 사진 3" />
+        </div>
+        <div class="about-card-content">
+          <h3>周りと差がつく韓国旅行を！</h3>
+          <p>現地韓国女子と、韓国の最新トレンドをリアルに体験できます！ファッションやコスメ、話題のカフェや最新スポットまで韓国の「今」を満喫しよう！</p>
+        </div>
+      </div>
+      
 </section>
 
-<!-- ✅ NEW: SAFETY SECTION -->
 <section id="safety" class="safety">
   <div class="container">
     <div class="section-header" data-eyebrow="SAFETY">
@@ -546,59 +513,33 @@
       <p class="section-subtitle">はじめてでも安心の3つのポイント</p>
     </div>
 
-    <!-- 스와이프 카드 컨테이너 -->
-    <div class="swipe-container" id="safetySwipeContainer">
-      <div class="swipe-wrapper">
-        <div class="swipe-slide active">
-          <div class="safety-card">
-            <div class="safety-card-image">
-              <img src="safety1.png" alt="메이트 본인확인 일러스트" />
-            </div>
-            <div class="safety-card-content">
-              <h3>メイト全員の本人確認</h3>
-              <p>メイト全員が身分証による本人確認に加え、<strong>面接</strong>で対応力やマナーをチェックしております。信頼できるメイトと、安全で楽しい時間を提供いたします。</p>
-            </div>
-          </div>
-        </div>
-        
-        <div class="swipe-slide">
-          <div class="safety-card">
-            <div class="safety-card-image">
-              <img src="safety2.png" alt="일본인 스태프 상주 일러스트" />
-            </div>
-            <div class="safety-card-content">
-              <h3>日本人スタッフの常駐</h3>
-              <p>日本人スタッフが常駐しているため、<strong>言語·文化</strong>の壁を気にせず、初めての方も安心してご利用いただけます。</p>
-            </div>
-          </div>
-        </div>
-        
-        <div class="swipe-slide">
-          <div class="safety-card">
-            <div class="safety-card-image">
-              <img src="safety3.png" alt="지원 및 상담 운영 일러스트" />
-            </div>
-            <div class="safety-card-content">
-              <h3>安全・安心のサポート・相談体制</h3>
-              <p>万が一ご利用中に問題が起きても、<strong>迅速な対応</strong>でサポートいたします。いつでもお気軽にご相談くださいませ。</p>
-            </div>
-          </div>
+    <!-- 반응형 그리드 컨테이너 -->
+    <div class="safety-grid">
+      <div class="safety-card">
+        <div class="safety-card-content">
+          <h3>メイト全員の本人確認</h3>
+          <p>メイト全員が身分証による本人確認に加え、<strong>面接</strong>で対応力やマナーをチェックしております。信頼できるメイトと、安全で楽しい時間を提供いたします。</p>
         </div>
       </div>
       
-      <!-- 네비게이션 버튼 -->
+      <div class="safety-card">
+       
+        <div class="safety-card-content">
+          <h3>日本人スタッフの常駐</h3>
+          <p>日本人スタッフが常駐しているため、<strong>言語·文化</strong>の壁を気にせず、初めての方も安心してご利用いただけます。</p>
+        </div>
+      </div>
       
-      <!-- 인디케이터 -->
-      <div class="swipe-indicators">
-        <span class="indicator active" onclick="goToSlide('safetySwipeContainer', 0)"></span>
-        <span class="indicator" onclick="goToSlide('safetySwipeContainer', 1)"></span>
-        <span class="indicator" onclick="goToSlide('safetySwipeContainer', 2)"></span>
+      <div class="safety-card">
+        
+        <div class="safety-card-content">
+          <h3>安全・安心のサポート・相談体制</h3>
+          <p>万が一ご利用中に問題が起きても、<strong>迅速な対応</strong>でサポートいたします。いつでもお気軽にご相談くださいませ。</p>
+        </div>
       </div>
     </div>
   </div>
 </section>
-
-
 
     <section id="friends" class="friends">
       <div class="container">
@@ -624,45 +565,6 @@
       </div>
     </section>
 
-    <section id="how-it-works" class="how-it-works">
-        <div class="container">
-            <div class="section-header" data-eyebrow="HOW IT WORKS">
-                <h2 class="section-title" data-key="how-title">ご利用流れ</h2>
-                <p class="section-subtitle" data-key="how-subtitle">ソウルでの一日が、かけがえのない思い出になりますように</p>
-            </div>
-            
-            <div class="steps">
-                <div class="step">
-                    <div class="step-number">01</div>
-                    <div class="step-content">
-                        <h3 class="step-title" data-key="step1-title">メイトの選択</h3>
-                        <p class="step-description" data-key="step1-desc">プロフィールをチェックして、好みに合う友達を見つけよう。言語や趣味、専門分野も確認できます。
-</p>
-                    </div>
-
-                </div>
-                
-                <div class="step">
-                    <div class="step-number">02</div>
-                    <div class="step-content">
-                        <h3 class="step-title" data-key="step2-title">日程の予約</h3>
-                        <p class="step-description" data-key="step2-desc">ご希望の日程・時間・内容を選んで予約をしてください。メイトとは事前にチャットで計画を立てることができます
-</p>
-                    </div>
-                </div>
-                
-                <div class="step">
-                    <div class="step-number">03</div>
-                    <div class="step-content">
-                        <h3 class="step-title" data-key="step3-title">会って楽しむ</h3>
-                        <p class="step-description" data-key="step3-desc">約束の場所でメイトと合流したら、あなただけのソウル旅行がスタートします！ 一生忘れられない思い出を作りましょう！</p>
-                    </div>
-                    
-                </div>
-            </div>
-        </div>
-    </section>
-
     <section id="reviews" class="reviews">
         <div class="container">
             <div class="section-header" data-eyebrow="REVIEWS">
@@ -672,226 +574,6 @@
             
             <div class="reviews-grid" id="reviewsGrid">
                 <!-- 실제 리뷰 데이터가 여기에 로드됩니다 -->
-            </div>
-        </div>
-    </section>
-
-    <!-- 기존 문의하기 섹션 주석 처리
-    <section id="contact" class="contact">
-        <div class="container">
-            <div class="contact-content">
-                <div class="contact-info">
-                    <h2 class="section-title" data-key="contact-title">문의하기</h2>
-                    <p class="contact-description" data-key="contact-desc">궁금한 점이 있으시거나 특별한 요청이 있으시면 언제든 연락주세요. 24시간 고객지원팀이 도와드려요.</p>
-                    
-                    <div class="contact-details">
-                        <div class="contact-item">
-                            <i class="fas fa-envelope"></i>
-                            <div>
-                                <h4 data-key="contact-email-title">이메일</h4>
-                                <p>hello@seoulddays.com</p>
-                            </div>
-                        </div>
-                        
-                        <div class="contact-item">
-                            <i class="fas fa-phone"></i>
-                            <div>
-                                <h4 data-key="contact-phone-title">전화</h4>
-                                <p>+82-2-1234-5678</p>
-                            </div>
-                        </div>
-                        
-                        <div class="contact-item">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <div>
-                                <h4 data-key="contact-address-title">주소</h4>
-                                <p data-key="contact-address">서울특별시 강남구 테헤란로 123</p>
-                            </div>
-                        </div>
-                        
-                        <div class="contact-item">
-                            <i class="fas fa-clock"></i>
-                            <div>
-                                <h4 data-key="contact-hours-title">운영시간</h4>
-                                <p data-key="contact-hours">24시간 연중무휴</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="social-links">
-                        <a href="#" class="social-link">
-                            <i class="fab fa-instagram"></i>
-                        </a>
-                        <a href="#" class="social-link">
-                            <i class="fab fa-facebook"></i>
-                        </a>
-                        <a href="#" class="social-link">
-                            <i class="fab fa-twitter"></i>
-                        </a>
-                        <a href="#" class="social-link">
-                            <i class="fab fa-youtube"></i>
-                        </a>
-                    </div>
-                </div>
-                
-                <div class="contact-form-container">
-                    <form class="contact-form">
-                        <div class="form-group">
-                            <input type="text" placeholder="이름" data-placeholder-key="form-name" required>
-                        </div>
-                        <div class="form-group">
-                            <input type="email" placeholder="이메일 주소" data-placeholder-key="form-email" required>
-                        </div>
-                        <div class="form-group">
-                            <input type="text" placeholder="제목" data-placeholder-key="form-subject" required>
-                        </div>
-                        <div class="form-group">
-                            <textarea placeholder="메시지를 입력해주세요" data-placeholder-key="form-message" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary" data-key="form-submit">메시지 보내기</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
-    -->
-
-    <section id="contact" class="contact">
-        <div class="container">
-            <div class="section-header" data-eyebrow="FAQ">
-                <h2 class="section-title">よくあるご質問 (FAQ)</h2>
-                <p class="section-subtitle">PUZZMIサービスに関するよくあるご質問</p>
-            </div>
-            
-            <div class="faq-content">
-                <!-- 서비스 소개 -->
-                <div class="faq-category reveal">
-                    <h3 class="faq-category-title">
-                        <i class="fas fa-info-circle"></i>
-                        サービスのご紹介
-                    </h3>
-                    
-                    <div class="faq-item reveal">
-                        <div class="faq-question">
-                            <i class="fas fa-question-circle"></i>
-                            <span>Q1. レンタル友達とは何ですか？</span>
-                            <i class="fas fa-chevron-down faq-toggle"></i>
-                        </div>
-                        <div class="faq-answer">
-                            <p>一緒に観光やご飯に行ってくれる「友達」を一定時間レンタルできるサービスです。恋愛目的ではなく、気軽に友人としての交流を楽しむためのサービスです。
-</p>
-                        </div>
-                    </div>
-                    
-                    <div class="faq-item reveal">
-                        <div class="faq-question">
-                            <i class="fas fa-question-circle"></i>
-                            <span>Q2. 恋愛や出会い目的で利用できますか？</span>
-                            <i class="fas fa-chevron-down faq-toggle"></i>
-                        </div>
-                        <div class="faq-answer">
-                            <p>いいえ。当サービスは健全な友人関係に基づく交流を目的としており、恋愛・性的な関係は禁止させていただいております。みなさまが気持ちよく交流できる環境づくりにご協力ください。
-</p>
-                        </div>
-                    </div>
-                    
-                    <div class="faq-item reveal">
-                        <div class="faq-question">
-                            <i class="fas fa-question-circle"></i>
-                            <span>Q3. 誰が利用できますか？</span>
-                            <i class="fas fa-chevron-down faq-toggle"></i>
-                        </div>
-                        <div class="faq-answer">
-                            <p>原則として18歳以上の方が対象ですが、18歳未満の方は、保護者（成人）の同伴があればご利用いただけます。
-<br>また、利用規約を守っていただける方であれば、どなたでもご利用可能です。</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- 예약, 요금 -->
-                <div class="faq-category reveal">
-                    <h3 class="faq-category-title">
-                        <i class="fas fa-credit-card"></i>
-                        予約・料金について
-                    </h3>
-                    
-                    <div class="faq-item reveal">
-                        <div class="faq-question">
-                            <i class="fas fa-question-circle"></i>
-                            <span>Q1. 支払い方法は何ですか？</span>
-                            <i class="fas fa-chevron-down faq-toggle"></i>
-                        </div>
-                        <div class="faq-answer">
-                            <p>お支払いはクレジットカードのみ対応しております。<br>(Visa / MasterCard / JCB / AMEX など)</p>
-                        </div>
-                    </div>
-                    
-                    <div class="faq-item reveal">
-                        <div class="faq-question">
-                            <i class="fas fa-question-circle"></i>
-                            <span>Q2. 当日予約できますか？</span>
-                            <i class="fas fa-chevron-down faq-toggle"></i>
-                        </div>
-                        <div class="faq-answer">
-                            <p>ご予約状況によりますが、当日のご予約にもできる限り対応いたします。<br>なるべく前日までのご予約をおすすめしております。
-</p>
-                        </div>
-                    </div>
-                    
-                    <div class="faq-item reveal">
-                        <div class="faq-question">
-                            <i class="fas fa-question-circle"></i>
-                            <span>Q3. 食事代や交通費はどうなりますか？</span>
-                            <i class="fas fa-chevron-down faq-toggle"></i>
-                        </div>
-                        <div class="faq-answer">
-                            <p>原則として、レンタル友達の食事代・交通費はお客様のご負担となります</p>
-                        </div>
-                    </div>
-                    
-                    <div class="faq-item reveal">
-                        <div class="faq-question">
-                            <i class="fas fa-question-circle"></i>
-                            <span>Q4. 追加料金が発生することはありますか？</span>
-                            <i class="fas fa-chevron-down faq-toggle"></i>
-                        </div>
-                        <div class="faq-answer">
-                            <p>基本的に、表示されている料金以外の追加費用は発生しません。<br>利用時間の延長をご希望の場合も、どうぞお気軽にご相談ください。
-<br>できる限り柔軟に対応させていただきます。</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- 안심·안전 -->
-                <div class="faq-category reveal">
-                    <h3 class="faq-category-title">
-                        <i class="fas fa-shield-alt"></i>
-                        安心・安全について
-                    </h3>
-                    
-                    <div class="faq-item reveal">
-                        <div class="faq-question">
-                            <i class="fas fa-question-circle"></i>
-                            <span>Q1. メイトの本人確認は行われていますか？</span>
-                            <i class="fas fa-chevron-down faq-toggle"></i>
-                        </div>
-                        <div class="faq-answer">
-                            <p>はい、ご安心ください。<br>当サービスでは、ご登録いただく全てのメイトに、身分証による本人確認を必ず行っております。さらに、スタッフとのめんせつを実施し、安全面や信頼性をしっかりと確認しております。<br>お客様が安心して楽しい時間を過ごしていただける体制を整えております。</p>
-                        </div>
-                    </div>
-                    
-                    <div class="faq-item reveal">
-                        <div class="faq-question">
-                            <i class="fas fa-question-circle"></i>
-                            <span>Q2. トラブルが発生した場合はどうすればよいですか？</span>
-                            <i class="fas fa-chevron-down faq-toggle"></i>
-                        </div>
-                        <div class="faq-answer">
-                            <p>ご利用中に問題が発生した場合は、いつでも運営までご連絡ください。日本人スタッフが迅速かつ丁寧に対応し、状況に応じて返金や適切な対応をご案内いたします。
-</p>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </section>
@@ -940,7 +622,10 @@
       <a href="https://x.com/puzzmi19889" target="_blank" class="floating-btn x" aria-label="X (Twitter)">
         <i class="fa-brands fa-x-twitter" aria-hidden="true"></i><span>X</span>
       </a>
-      <a href="qna.html" class="floating-btn book" aria-label="お問い合わせ">
+      <a href="service_intro.html" class="floating-btn book" aria-label="サービス紹介">
+        <i class="fas fa-info-circle" aria-hidden="true"></i><span>サービス紹介</span>
+      </a>
+      <a href="qna.html" class="floating-btn book" aria-label="お問い合わせ" style="bottom: 140px;">
         <i class="fas fa-question-circle" aria-hidden="true"></i><span>お問い合わせ</span>
       </a>
     </div>

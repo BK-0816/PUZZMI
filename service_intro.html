@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>サービス紹介 - PUZZMI</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="pages.css"/>
+  <link rel="stylesheet" href="pages-theme.css"/>
+  <link rel="stylesheet" href="nav.css"/>
+  <script type="module" src="nav.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <style>
+    body.bg-cream { 
+      background: var(--bg-cream); 
+      background-repeat: no-repeat; 
+      background-size: cover; 
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+    
+    /* 배경 장식 요소 */
+    .decorative-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    
+    .decorative-element {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.25;
+      animation: float 10s ease-in-out infinite;
+    }
+    
+    .decorative-element:nth-child(1) {
+      width: 250px;
+      height: 250px;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      top: 15%;
+      left: -5%;
+      animation-delay: 0s;
+    }
+    
+    .decorative-element:nth-child(2) {
+      width: 200px;
+      height: 200px;
+      background: linear-gradient(45deg, #f093fb, #f5576c);
+      top: 50%;
+      right: -8%;
+      animation-delay: 3s;
+    }
+    
+    .decorative-element:nth-child(3) {
+      width: 180px;
+      height: 180px;
+      background: linear-gradient(45deg, #4facfe, #00f2fe);
+      bottom: 20%;
+      left: 10%;
+      animation-delay: 6s;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      33% { transform: translateY(-25px) rotate(120deg); }
+      66% { transform: translateY(15px) rotate(240deg); }
+    }
+    
+    /* 메인 컨테이너 */
+    .service-wrap { 
+      max-width: 1200px; 
+      margin: 40px auto; 
+      padding: 0 20px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    /* 페이지 헤더 */
+    .page-header {
+      background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
+      backdrop-filter: blur(25px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 32px;
+      padding: 60px 40px;
+      margin-bottom: 40px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.04);
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+    }
+    
+    .page-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 20%, #f093fb 40%, #f5576c 60%, #4facfe 80%, #00f2fe 100%);
+      animation: shimmer 4s ease-in-out infinite;
+    }
+    
+    @keyframes shimmer {
+      0%, 100% { opacity: 1; transform: translateX(0); }
+      50% { opacity: 0.8; transform: translateX(8px); }
+    }
+    
+    .page-title {
+      font-size: 3.5rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 24px 0;
+      letter-spacing: -0.03em;
+      position: relative;
+    }
+    
+    .page-title::after {
+      content: '';
+      position: absolute;
+      bottom: -16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 5px;
+      background: linear-gradient(90deg, #667eea 0%, #f093fb 50%, #4facfe 100%);
+      border-radius: 3px;
+    }
+    
+    .page-subtitle {
+      color: var(--text-secondary);
+      font-size: 1.4rem;
+      line-height: 1.7;
+      max-width: 700px;
+      margin: 0 auto;
+      font-weight: 500;
+    }
+    
+    /* 뒤로가기 버튼 */
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 16px;
+      color: var(--text-primary);
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      margin-bottom: 32px;
+    }
+    
+    .back-btn:hover {
+      background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 100%);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+      border-color: rgba(102, 126, 234, 0.3);
+    }
+    
+    /* 섹션 카드 */
+    .section-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 28px;
+      padding: 50px 40px;
+      margin-bottom: 40px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.04);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .section-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 33%, #f093fb 66%, #f5576c 100%);
+      opacity: 0.8;
+    }
+    
+    .section-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 32px 80px rgba(0,0,0,0.12), 0 12px 32px rgba(0,0,0,0.08);
+    }
+    
+    .section-card:hover::before {
+      opacity: 1;
+      height: 5px;
+    }
+    
+    /* 섹션 제목 */
+    .section-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 32px 0;
+      letter-spacing: -0.02em;
+      text-align: center;
+      position: relative;
+    }
+    
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 3px;
+      background: linear-gradient(90deg, #667eea 0%, #f093fb 100%);
+      border-radius: 2px;
+    }
+    
+    /* How it works 스타일 */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 40px;
+      margin: 40px 0;
+    }
+    
+    .step {
+      background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
+      backdrop-filter: blur(15px);
+      border: 2px solid rgba(255,255,255,0.4);
+      border-radius: 24px;
+      padding: 40px 32px;
+      text-align: center;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.06);
+    }
+    
+    .step::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      opacity: 0.8;
+    }
+    
+    .step:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 20px 48px rgba(0,0,0,0.12);
+      border-color: rgba(102, 126, 234, 0.4);
+    }
+    
+    .step:hover::before {
+      opacity: 1;
+      height: 4px;
+    }
+    
+    .step-number {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: 800;
+      margin: 0 auto 24px auto;
+      box-shadow: 0 12px 32px rgba(102, 126, 234, 0.4);
+      position: relative;
+    }
+    
+    .step-number::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      z-index: -1;
+      opacity: 0.3;
+    }
+    
+    .step-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin: 0 0 16px 0;
+      letter-spacing: -0.01em;
+    }
+    
+    .step-description {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      line-height: 1.7;
+      margin: 0;
+      font-weight: 500;
+    }
+    
+    /* FAQ 스타일 */
+    .faq-content {
+      margin: 40px 0;
+    }
+    
+    .faq-category {
+      margin-bottom: 40px;
+    }
+    
+    .faq-category-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 24px 0;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 20px 0;
+      border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+      position: relative;
+    }
+    
+    .faq-category-title::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .faq-category-title i {
+      color: #667eea;
+      font-size: 1.5rem;
+    }
+    
+    .faq-item {
+      background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
+      backdrop-filter: blur(15px);
+      border: 2px solid rgba(255,255,255,0.4);
+      border-radius: 20px;
+      margin-bottom: 16px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    }
+    
+    .faq-item:hover {
+      border-color: rgba(102, 126, 234, 0.3);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+    }
+    
+    .faq-question {
+      padding: 24px 32px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: var(--text-primary);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .faq-question::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.05), transparent);
+      transition: left 0.5s ease;
+    }
+    
+    .faq-question:hover::before {
+      left: 100%;
+    }
+    
+    .faq-question:hover {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(240, 147, 251, 0.03) 100%);
+    }
+    
+    .faq-question i:first-child {
+      color: #667eea;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    
+    .faq-question span {
+      flex: 1;
+    }
+    
+    .faq-toggle {
+      color: #667eea;
+      font-size: 1rem;
+      transition: transform 0.3s ease;
+      flex-shrink: 0;
+    }
+    
+    .faq-item.active .faq-toggle {
+      transform: rotate(180deg);
+    }
+    
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s ease, padding 0.3s ease;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.03) 0%, rgba(240, 147, 251, 0.02) 100%);
+    }
+    
+    .faq-item.active .faq-answer {
+      max-height: 500px;
+      padding: 0 32px 32px 32px;
+    }
+    
+    .faq-answer p {
+      color: var(--text-primary);
+      font-size: 1.1rem;
+      line-height: 1.8;
+      margin: 16px 0 0 0;
+      font-weight: 500;
+    }
+    
+    /* CTA 섹션 */
+    .cta-section {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(240, 147, 251, 0.05) 100%);
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 32px;
+      padding: 60px 40px;
+      text-align: center;
+      margin: 60px 0;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 20px 60px rgba(102, 126, 234, 0.15);
+    }
+    
+    .cta-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 20px 0;
+      letter-spacing: -0.02em;
+    }
+    
+    .cta-subtitle {
+      color: var(--text-secondary);
+      font-size: 1.3rem;
+      line-height: 1.6;
+      margin: 0 0 40px 0;
+      font-weight: 500;
+    }
+    
+    .cta-buttons {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .btn {
+      padding: 18px 36px;
+      border-radius: 16px;
+      font-weight: 700;
+      font-size: 1.2rem;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      letter-spacing: 0.3px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s ease;
+    }
+    
+    .btn:hover::before {
+      left: 100%;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      color: white;
+      box-shadow: 0 12px 32px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 16px 40px rgba(102, 126, 234, 0.5);
+    }
+    
+    .btn-secondary {
+      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+      color: var(--text-primary);
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+    
+    .btn-secondary:hover {
+      background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 100%);
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+      border-color: rgba(102, 126, 234, 0.4);
+    }
+    
+    /* 반응형 디자인 */
+    @media (max-width: 1024px) {
+      .service-wrap {
+        margin: 24px auto;
+        padding: 0 16px;
+      }
+      
+      .page-header {
+        padding: 40px 28px;
+        border-radius: 24px;
+      }
+      
+      .page-title {
+        font-size: 2.8rem;
+      }
+      
+      .section-card {
+        padding: 32px 24px;
+        border-radius: 20px;
+      }
+      
+      .steps {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .page-title {
+        font-size: 2.2rem;
+      }
+      
+      .section-title {
+        font-size: 2rem;
+      }
+      
+      .step {
+        padding: 28px 20px;
+      }
+      
+      .step-number {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+      }
+      
+      .faq-question {
+        padding: 20px 24px;
+        font-size: 1.1rem;
+      }
+      
+      .faq-item.active .faq-answer {
+        padding: 0 24px 24px 24px;
+      }
+      
+      .cta-buttons {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body class="bg-cream">
+  <!-- 배경 장식 요소 -->
+  <div class="decorative-bg">
+    <div class="decorative-element"></div>
+    <div class="decorative-element"></div>
+    <div class="decorative-element"></div>
+  </div>
+
+  <div id="app-nav"></div>
+  
+  <main class="service-wrap">
+    <!-- 뒤로가기 버튼 -->
+    <a href="index.html" class="back-btn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="m12 19-7-7 7-7"/>
+        <path d="m19 12H5"/>
+      </svg>
+      ホームに戻る
+    </a>
+
+    <!-- 페이지 헤더 -->
+    <section class="page-header">
+      <h1 class="page-title">🌟 サービス紹介</h1>
+      <p class="page-subtitle">
+        PUZZMIのご利用方法とよくあるご質問を<br>
+        わかりやすくご案内いたします
+      </p>
+    </section>
+
+    <!-- How it works 섹션 -->
+    <section class="section-card">
+      <h2 class="section-title">📋 ご利用流れ</h2>
+      <p style="text-align: center; color: var(--text-secondary); font-size: 1.2rem; margin-bottom: 40px; font-weight: 500;">
+        ソウルでの一日が、かけがえのない思い出になりますように
+      </p>
+      
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">01</div>
+          <div class="step-content">
+            <h3 class="step-title">メイトの選択</h3>
+            <p class="step-description">
+              プロフィールをチェックして、好みに合う友達を見つけよう。言語や趣味、専門分野も確認できます。
+            </p>
+          </div>
+        </div>
+        
+        <div class="step">
+          <div class="step-number">02</div>
+          <div class="step-content">
+            <h3 class="step-title">日程の予約</h3>
+            <p class="step-description">
+              ご希望の日程・時間・内容を選んで予約をしてください。メイトとは事前にチャットで計画を立てることができます。
+            </p>
+          </div>
+        </div>
+        
+        <div class="step">
+          <div class="step-number">03</div>
+          <div class="step-content">
+            <h3 class="step-title">会って楽しむ</h3>
+            <p class="step-description">
+              約束の場所でメイトと合流したら、あなただけのソウル旅行がスタートします！ 一生忘れられない思い出を作りましょう！
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ 섹션 -->
+    <section class="section-card">
+      <h2 class="section-title">❓ よくあるご質問 (FAQ)</h2>
+      <p style="text-align: center; color: var(--text-secondary); font-size: 1.2rem; margin-bottom: 40px; font-weight: 500;">
+        PUZZMIサービスに関するよくあるご質問
+      </p>
+      
+      <div class="faq-content">
+        <!-- 서비스 소개 -->
+        <div class="faq-category">
+          <h3 class="faq-category-title">
+            <i class="fas fa-info-circle"></i>
+            サービスのご紹介
+          </h3>
+          
+          <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-question-circle"></i>
+              <span>Q1. レンタル友達とは何ですか？</span>
+              <i class="fas fa-chevron-down faq-toggle"></i>
+            </div>
+            <div class="faq-answer">
+              <p>一緒に観光やご飯に行ってくれる「友達」を一定時間レンタルできるサービスです。恋愛目的ではなく、気軽に友人としての交流を楽しむためのサービスです。</p>
+            </div>
+          </div>
+          
+          <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-question-circle"></i>
+              <span>Q2. 恋愛や出会い目的で利用できますか？</span>
+              <i class="fas fa-chevron-down faq-toggle"></i>
+            </div>
+            <div class="faq-answer">
+              <p>いいえ。当サービスは健全な友人関係に基づく交流を目的としており、恋愛・性的な関係は禁止させていただいております。みなさまが気持ちよく交流できる環境づくりにご協力ください。</p>
+            </div>
+          </div>
+          
+          <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-question-circle"></i>
+              <span>Q3. 誰が利用できますか？</span>
+              <i class="fas fa-chevron-down faq-toggle"></i>
+            </div>
+            <div class="faq-answer">
+              <p>原則として18歳以上の方が対象ですが、18歳未満の方は、保護者（成人）の同伴があればご利用いただけます。<br>また、利用規約を守っていただける方であれば、どなたでもご利用可能です。</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 예약, 요금 -->
+        <div class="faq-category">
+          <h3 class="faq-category-title">
+            <i class="fas fa-credit-card"></i>
+            予約・料金について
+          </h3>
+          
+          <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-question-circle"></i>
+              <span>Q1. 支払い方法は何ですか？</span>
+              <i class="fas fa-chevron-down faq-toggle"></i>
+            </div>
+            <div class="faq-answer">
+              <p>お支払いはクレジットカードのみ対応しております。<br>(Visa / MasterCard / JCB / AMEX など)</p>
+            </div>
+          </div>
+          
+          <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-question-circle"></i>
+              <span>Q2. 当日予約できますか？</span>
+              <i class="fas fa-chevron-down faq-toggle"></i>
+            </div>
+            <div class="faq-answer">
+              <p>ご予約状況によりますが、当日のご予約にもできる限り対応いたします。<br>なるべく前日までのご予約をおすすめしております。</p>
+            </div>
+          </div>
+          
+          <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-question-circle"></i>
+              <span>Q3. 食事代や交通費はどうなりますか？</span>
+              <i class="fas fa-chevron-down faq-toggle"></i>
+            </div>
+            <div class="faq-answer">
+              <p>原則として、レンタル友達の食事代・交通費はお客様のご負担となります。</p>
+            </div>
+          </div>
+          
+          <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-question-circle"></i>
+              <span>Q4. 追加料金が発生することはありますか？</span>
+              <i class="fas fa-chevron-down faq-toggle"></i>
+            </div>
+            <div class="faq-answer">
+              <p>基本的に、表示されている料金以外の追加費用は発生しません。<br>利用時間の延長をご希望の場合も、どうぞお気軽にご相談ください。<br>できる限り柔軟に対応させていただきます。</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 안심·안전 -->
+        <div class="faq-category">
+          <h3 class="faq-category-title">
+            <i class="fas fa-shield-alt"></i>
+            安心・安全について
+          </h3>
+          
+          <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-question-circle"></i>
+              <span>Q1. メイトの本人確認は行われていますか？</span>
+              <i class="fas fa-chevron-down faq-toggle"></i>
+            </div>
+            <div class="faq-answer">
+              <p>はい、ご安心ください。<br>当サービスでは、ご登録いただく全てのメイトに、身分証による本人確認を必ず行っております。さらに、スタッフとの面接を実施し、安全面や信頼性をしっかりと確認しております。<br>お客様が安心して楽しい時間を過ごしていただける体制を整えております。</p>
+            </div>
+          </div>
+          
+          <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-question-circle"></i>
+              <span>Q2. トラブルが発生した場合はどうすればよいですか？</span>
+              <i class="fas fa-chevron-down faq-toggle"></i>
+            </div>
+            <div class="faq-answer">
+              <p>ご利用中に問題が発生した場合は、いつでも運営までご連絡ください。日本人スタッフが迅速かつ丁寧に対応し、状況に応じて返金や適切な対応をご案内いたします。</p>
+            </div>
+          </div>
+          
+          <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-question-circle"></i>
+              <span>Q3. 個人情報の取り扱いは安全ですか？</span>
+              <i class="fas fa-chevron-down faq-toggle"></i>
+            </div>
+            <div class="faq-answer">
+              <p>はい。当サービスでは個人情報保護法に基づき、お客様の個人情報を厳重に管理しております。第三者への提供は一切行わず、サービス提供に必要な範囲内でのみ利用いたします。</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 취소·환불 -->
+        <div class="faq-category">
+          <h3 class="faq-category-title">
+            <i class="fas fa-undo-alt"></i>
+            キャンセル・返金について
+          </h3>
+          
+          <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-question-circle"></i>
+              <span>Q1. キャンセルはいつまで可能ですか？</span>
+              <i class="fas fa-chevron-down faq-toggle"></i>
+            </div>
+            <div class="faq-answer">
+              <p>
+                <strong>利用24時間前まで：</strong> 全額返金<br>
+                <strong>利用24時間～4時間前：</strong> 50%返金<br>
+                <strong>利用4時間以内・当日キャンセル：</strong> 返金不可
+              </p>
+            </div>
+          </div>
+          
+          <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-question-circle"></i>
+              <span>Q2. 返金はいつ頃されますか？</span>
+              <i class="fas fa-chevron-down faq-toggle"></i>
+            </div>
+            <div class="faq-answer">
+              <p>お支払い方法により異なりますが、クレジットカードの場合は3～10営業日程度でご返金いたします。詳細は決済会社のポリシーに従います。</p>
+            </div>
+          </div>
+          
+          <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-question-circle"></i>
+              <span>Q3. 天候不良の場合はどうなりますか？</span>
+              <i class="fas fa-chevron-down faq-toggle"></i>
+            </div>
+            <div class="faq-answer">
+              <p>気象特報や安全上のリスクがある場合は、1回無料変更または全額返金をお選びいただけます。通常の雨や曇りの場合は、屋内コースへの変更をご提案いたします。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA 섹션 -->
+    <section class="cta-section">
+      <h2 class="cta-title">🎉 今すぐ始めよう！</h2>
+      <p class="cta-subtitle">
+        特別な韓国旅行を体験してみませんか？<br>
+        素敵なメイトがあなたを待っています
+      </p>
+      
+      <div class="cta-buttons">
+        <a href="index.html#friends" class="btn btn-primary">
+          <i class="fas fa-users"></i>
+          メイトを探す
+        </a>
+        <a href="qna.html" class="btn btn-secondary">
+          <i class="fas fa-question-circle"></i>
+          お問い合わせ
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // FAQ 아코디언 기능
+    document.addEventListener('DOMContentLoaded', function() {
+      const faqItems = document.querySelectorAll('.faq-item');
+      
+      faqItems.forEach(item => {
+        const question = item.querySelector('.faq-question');
+        
+        question.addEventListener('click', () => {
+          const isActive = item.classList.contains('active');
+          
+          // 다른 모든 FAQ 아이템 닫기
+          faqItems.forEach(otherItem => {
+            if (otherItem !== item) {
+              otherItem.classList.remove('active');
+            }
+          });
+          
+          // 현재 아이템 토글
+          item.classList.toggle('active', !isActive);
+        });
+      });
+    });
+  </script>
+</body>
+</html>
