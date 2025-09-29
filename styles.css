@@ -1485,9 +1485,8 @@ section:not(:first-child)::before {
   height: 100%;
   display: flex;
   flex-direction: column;
-}
-
-.about-card::before {
+  display: flex;
+  flex-direction: column;
   content: '';
   position: absolute;
   top: 0;
@@ -1848,16 +1847,9 @@ section:not(:first-child)::before {
 }
 
 .benefits .icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  background: var(--gradient-primary);
-  color: var(--text-inverse);
-  border-radius: var(--radius-full);
   font-weight: var(--font-weight-bold);
-  flex-shrink: 0;
+  width: 100%;
+  overflow: hidden;
   margin-top: var(--space-1);
   box-shadow: var(--shadow-md);
 }
@@ -1996,6 +1988,7 @@ section:not(:first-child)::before {
 
 .about-card-image img {
   width: 100%;
+  height: 200px;
   height: 100%;
   object-fit: contain;
   object-position: center;
@@ -2707,6 +2700,7 @@ section:not(:first-child)::before {
 .faq-toggle {
   margin-left: auto;
   transition: transform var(--transition-base);
+  display: block;
   color: var(--primary-500);
 }
 
@@ -2767,20 +2761,18 @@ section:not(:first-child)::before {
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-base);
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  white-space: nowrap;
-  opacity: 0;
-  transform: translateX(10px);
-  transition: all var(--transition-base);
-  pointer-events: none;
-  background: rgba(0, 0, 0, 0.4);
-  padding: 12px 24px;
-  border-radius: 20px;
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  max-width: 90%;
-  overflow: hidden;
-  text-overflow: ellipsis;
+/* 모바일에서 이미지 더 크게 */
+@media (max-width: 767px) {
+  .about-card-image img {
+    height: 250px;
+  }
+}
+
+/* 태블릿에서 이미지 크기 */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .about-card-image img {
+    height: 180px;
+  }
 }
 
 .floating-btn:hover span {
@@ -2788,25 +2780,14 @@ section:not(:first-child)::before {
   transform: translateX(0);
 }
 
-.floating-btn.insta {
+  padding: var(--space-6);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
   background: linear-gradient(135deg, #e4405f 0%, #c13584 100%);
 }
-
-.floating-btn.line {
-  background: linear-gradient(135deg, #00c300 0%, #00b900 100%);
-}
-
-.floating-btn.x {
-  background: linear-gradient(135deg, #1da1f2 0%, #0d8bd9 100%);
-}
-
-.floating-btn.book {
-  background: var(--gradient-primary);
-}
-
-.floating-btn:hover {
-  transform: translateY(-2px) scale(1.1);
-  box-shadow: var(--shadow-2xl);
 }
 
 /* ===== 메시지 컴포넌트 ===== */
