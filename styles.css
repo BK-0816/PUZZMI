@@ -3553,3 +3553,30 @@ section:not(:first-child)::before {
 .badge-primary {
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.05) 100%) !important;
 }
+
+/* PC에서 about 카드: 4열 → 3열 (가로폭 ↑ 높이 안정화) */
+@media (min-width: 1024px) {
+  .about-grid {
+    grid-template-columns: repeat(3, 1fr) !important; /* 가로폭 넓게 */
+    gap: var(--space-10) !important; /* 카드 간 여유 */
+  }
+
+  /* 이미지 영역을 얕은 종횡비로 고정해서 카드 세로 길이 억제 */
+  .about-card-image {
+    aspect-ratio: 16 / 9 !important; /* 필요시 3/2 또는 21/9로 조절 가능 */
+    width: 100% !important;
+  }
+  .about-card-image img {
+    width: 100% !important;
+    height: 100% !important;          /* aspect-ratio 박스에 딱 맞춤 */
+    object-fit: cover !important;      /* 과도한 세로 확장/여백 방지 */
+  }
+
+  /* 여백 미세 조정으로 전체 높이 절약 */
+  .about-card { 
+    padding: var(--space-6) !important;
+  }
+  .about-card-content h3 {
+    margin-bottom: var(--space-3) !important;
+  }
+}
