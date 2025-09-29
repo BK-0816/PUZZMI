@@ -1656,6 +1656,28 @@ section:not(:first-child)::before {
 
 .swipe-wrapper {
   display: flex;
+/* About Grid Layout */
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-8);
+  margin-top: var(--space-12);
+}
+
+@media (min-width: 768px) {
+  .about-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-10);
+  }
+}
+
+@media (min-width: 1024px) {
+  .about-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-8);
+  }
+}
+
   transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   width: 100%;
 }
@@ -1677,7 +1699,7 @@ section:not(:first-child)::before {
   grid-template-columns: 1fr 1fr;
   gap: 40px;
   align-items: center;
-  padding: 40px;
+  padding: var(--space-6);
   background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255,255,255,0.4);
@@ -1685,6 +1707,9 @@ section:not(:first-child)::before {
   position: relative;
   overflow: hidden;
   min-height: 400px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .about-card::before {
@@ -2240,14 +2265,15 @@ section:not(:first-child)::before {
 .footer-content {
   display: grid;
   gap: var(--space-8);
-  margin-bottom: var(--space-12);
+  margin-bottom: var(--space-4);
 }
 
+  flex-shrink: 0;
 @media (min-width: 768px) {
   .footer-content {
     grid-template-columns: 1fr 2fr;
   }
-}
+  height: 180px;
 
 .footer-brand {
   margin-bottom: var(--space-8);
@@ -2257,27 +2283,25 @@ section:not(:first-child)::before {
   .footer-brand {
     margin-bottom: 0;
   }
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.safety-card-content h3 {
 }
 
 .footer-brand .nav-brand {
-  font-size: var(--font-size-2xl);
+  margin: 0 0 var(--space-3) 0;
   font-weight: var(--font-weight-bold);
   color: var(--text-inverse);
   margin-bottom: var(--space-4);
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
-
-.footer-brand .nav-brand img {
-  height: 40px;
-  width: auto;
-}
-
 .footer-description {
   color: var(--gray-400);
   line-height: var(--line-height-relaxed);
   margin: 0;
+  flex: 1;
+  font-size: var(--font-size-base);
 }
 
 .footer-links {
@@ -2381,7 +2405,7 @@ section:not(:first-child)::before {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space-4);
   padding-bottom: var(--space-3);
   border-bottom: 2px solid rgba(102, 126, 234, 0.2);
 }
@@ -2992,11 +3016,12 @@ section:not(:first-child)::before {
   flex-direction: column;
   gap: var(--space-4);
 }
+  flex-shrink: 0;
 
 .row {
   display: flex;
   gap: var(--space-4);
-  height: 200px;
+  height: 180px;
 }
 
 .row.single {
@@ -3012,24 +3037,22 @@ section:not(:first-child)::before {
 }
 
 .label {
-  display: block;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.about-card-content h3 {
+  margin: 0 0 var(--space-3) 0;
   font-weight: var(--font-weight-semibold);
   color: var(--text-primary);
   margin-bottom: var(--space-2);
-  font-size: var(--font-size-sm);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.input,
 .select,
 .textarea {
   width: 100%;
   padding: var(--space-4) var(--space-5);
+  flex: 1;
+  font-size: var(--font-size-base);
   border: 2px solid rgba(102, 126, 234, 0.2);
   border-radius: var(--radius-lg);
   background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
@@ -3221,6 +3244,31 @@ section:not(:first-child)::before {
 .review-card,
 .step,
 .feature,
+/* Safety Grid Layout */
+.safety-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-8);
+  margin-top: var(--space-12);
+}
+
+@media (min-width: 768px) {
+  .safety-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-10);
+  }
+}
+
+@media (min-width: 1024px) {
+  .safety-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-8);
+  padding: var(--space-6);
+}
+
 .safety-card {
   transform: translateZ(0);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
