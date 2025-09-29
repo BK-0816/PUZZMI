@@ -173,7 +173,9 @@ export async function renderNavbar(rootId = 'app-nav') {
   const commonMenus = [
     { href: 'index.html#home', text: 'ホーム' },
     { href: 'service_intro.html', text: 'サービス紹介' },
-    { href: 'index.html#friends', text: 'メイト予約' }
+    { href: 'index.html#friends', text: 'メイト予約' },
+    { href: 'index.html#reviews', text: '口コミ' },
+    { href: 'qna.html', text: 'お問い合わせ' }
   ];
   
   commonMenus.forEach(menu => {
