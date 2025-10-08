@@ -834,7 +834,7 @@
           
           <div class="form-row">
             <div class="form-field">
-              <label class="form-label" for="duration_hours">⏰ 利用時間</label>
+              <label class="form-label" for="duration_hours">⏰ ご利用時間</label>
               <select class="form-select" id="duration_hours" required>
                 <option value="">時間を選択してください</option>
                 <option value="2">2時間</option>
@@ -859,19 +859,19 @@
           
           <div class="form-row">
             <div class="form-field">
-              <label class="form-label" for="customer_name">👤 予約者のお名前</label>
-              <input class="form-input" type="text" id="customer_name" placeholder="예: Yuki Tanaka" required/>
+              <label class="form-label" for="customer_name">👤 ご予約者名</label>
+              <input class="form-input" type="text" id="customer_name" placeholder="例: Yuki Tanaka" required/>
             </div>
             <div class="form-field">
               <label class="form-label" for="customer_contact">📞 連絡先</label>
-              <input class="form-input" type="text" id="customer_contact" placeholder="E-mail" required/>
+              <input class="form-input" type="text" id="customer_contact" placeholder="電話番号" required/>
             </div>
           </div>
           
           <div class="form-row single">
             <div class="form-field">
-              <label class="form-label" for="notes">💭 要請事項</label>
-              <textarea class="form-textarea" id="notes" placeholder="行きたいカフェや飲食店、好きな地域、関心事、その他の要請事項を自由に書いてください。 メイトが確認し、よりカスタマイズされた体験を準備できます！ ✨"></textarea>
+              <label class="form-label" for="notes">💭 ご要望</label>
+              <textarea class="form-textarea" id="notes" placeholder="やってみたいこと、行きたい場所、カフェや飲食店、訪れたいエリアなど、その他のご希望もどうぞ自由にご記入ください。メイトが内容を確認し、希望に沿ってサポートいたします。✨"></textarea>
             </div>
           </div>
           
@@ -880,7 +880,8 @@
             <div class="policy-header" onclick="togglePolicy()">
               <h4 class="policy-title">
                 <i class="fas fa-shield-alt"></i>
-                PUZZMI 払戻·取消ポリシー
+                PUZZMI 払い戻し・キャンセルポリシー
+
                 <i class="fas fa-chevron-down policy-toggle"></i>
               </h4>
             </div>
@@ -892,21 +893,21 @@
                   <div class="highlight-icon">⏰</div>
                   <div class="highlight-text">
                     <strong>24時間前まで</strong><br>
-                    <span>全額払戻</span>
+                    <span>全額払い戻し</span>
                   </div>
                 </div>
                 <div class="highlight-item">
                   <div class="highlight-icon">🕐</div>
                   <div class="highlight-text">
-                    <strong>24~4時間前</strong><br>
-                    <span>50% 払戻</span>
+                    <strong>24時間~4時間前</strong><br>
+                    <span>50％払い戻し</span>
                   </div>
                 </div>
                 <div class="highlight-item">
                   <div class="highlight-icon">❌</div>
                   <div class="highlight-text">
                     <strong>4時間以内</strong><br>
-                    <span>払い戻し不可</span>
+                    <span>返金不可</span>
                   </div>
                 </div>
               </div>
@@ -914,36 +915,36 @@
               <!-- 상세 정책 -->
               <div class="policy-details">
                 <div class="policy-section-item">
-                  <h5>📋 予約·決済進行過程</h5>
+                  <h5>📋 予約・決済の流れ</h5>
                   <ol>
-                    <li>お客様が日付と時間を選択</li>
-                    <li>管理者がスケジュール確認後、メイトとスケジュール調整</li>
-                    <li>時間確認の後、予約確定</li>
-                    <li>決済要請をLINEにて発送</li>
+                    <li>ご希望の日時をお選びください</li>
+                    <li>スタッフが内容を確認し、メイトと日程を調整します</li>
+                    <li>日程が決まり次第、予約確定のご連絡をお送りします</li>
+                    <li>確定後、LINEにて決済のご案内をお送りします</li>
                   </ol>
                 </div>
                 
                 <div class="policy-section-item">
-                  <h5>💳 キャンセル·払い戻しポリシー(お客様の理由)</h5>
+                  <h5>💳 キャンセル・返金ポリシー（お客様都合の場合）</h5>
                   <ul>
-                    <li><strong>予約確定前:</strong> 自由取り消し</li>
-                    <li><strong>予約確定後、~決済前:</strong> 自由取り消し</li>
-                    <li><strong>결제 후:</strong>
+                    <li><strong>予約確定前:</strong> キャンセル可能です</li>
+                    <li><strong>予約確定後〜決済前:</strong> キャンセル可能です</li>
+                    <li><strong>決済後:</strong>
                       <ul>
-                        <li>ご利用の24時間前まで: <span class="text-success">全額払戻</span></li>
-                        <li>利用24~4時間前: <span class="text-warning">50% 払戻</span></li>
-                        <li>ご利用4時間以内/当日キャンセル、ノーショー: <span class="text-danger">払い戻し不可</span></li>
-                        <li>ご利用中に個人の事由により早期終了: <br><span class="text-danger">払い戻し不可</span></li>
+                        <li>ご利用の24時間前まで: <span class="text-success">全額払い戻し</span></li>
+                        <li>24時間~4時間前: <span class="text-warning">50％払い戻し50% 払戻</span></li>
+                        <li>ご利用4時間以内／当日キャンセル、無断キャンセル: <span class="text-danger">返金不可</span></li>
+                        <li>ご利用途中でお客様都合により終了された場合: <br><span class="text-danger">返金不可</span></li>
                       </ul>
                     </li>
                   </ul>
                 </div>
                 
                 <div class="policy-section-item">
-                  <h5>🛠️ PUZZMI/メイト問題時の補償</h5>
+                  <h5>🛠️ PUZZMI / メイトに関する補償について</h5>
                   <ul>
-                    <li><strong>メイト遅刻15分超過:</strong> 遅延分の時間延長または遅延分の払い戻し</li>
-                    <li><strong>メイトノーショー·中途離脱·重大なサービス問題:</strong> 全額払い戻しまたは他のメイトに交換</li>
+                    <li><strong>メイトが15分以上遅れた場合:</strong> 遅れた分の時間を延長、またはその分の料金をご返金いたします</li>
+                    <li><strong>メイトが無断で来なかった場合、途中で提供を中断した場合、またはサービスに問題があった場合:</strong> 全額返金、または別のメイトに変更して対応いたします</li>
                   </ul>
                 </div>
                 
@@ -1100,7 +1101,7 @@
         avatarEl.src = coverPhoto;
         nameEl.textContent = p.full_name || '이름 비공개';
         
-        const age = p.age ? `${p.age}세` : '';
+        const age = p.age ? `${p.age}歳` : '';
         const gender = p.gender || '';
         const rating = data.rating ? `⭐ ${data.rating}` : '';
         const langs = Array.isArray(p.languages) ? p.languages.join(', ') : '';
