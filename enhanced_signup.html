@@ -1505,11 +1505,44 @@
             emailConfirmation: false
           }
         });
-        
-        if (error) throw error;
-        
+
+        if (error) {
+          if (error.message.includes('User already registered')) {
+            const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+              email: userData.email,
+              password: userData.password
+            });
+
+            if (signInError) {
+              throw new Error('このメールアドレスは既に登録されています。パスワードが正しくありません。');
+            }
+
+            if (!signInData.user) {
+              throw new Error('ログインに失敗しました。');
+            }
+
+            const { data: existingProfile } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', signInData.user.id)
+              .maybeSingle();
+
+            if (existingProfile) {
+              verificationResult.innerHTML = '<div class="success">✅ 既に登録済みです。ログインしました。</div>';
+              setTimeout(() => {
+                window.location.href = '/my_profile.html';
+              }, 1500);
+              return;
+            }
+
+            data.user = signInData.user;
+          } else {
+            throw error;
+          }
+        }
+
         if (!data.user) {
-          throw new Error('계정 생성에 실패했습니다.');
+          throw new Error('計定 생성에 실패했습니다.');
         }
         
         // 2. 프로필 생성
