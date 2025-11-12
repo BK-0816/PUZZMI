@@ -172,6 +172,10 @@ Deno.serve(async (req) => {
           </html>
         `;
 
+        if (email !== 'choi.seojun0721@gmail.com') {
+          throw new Error('테스트 모드: choi.seojun0721@gmail.com으로만 이메일을 받을 수 있습니다. 프로덕션 배포를 위해 Resend에서 도메인을 인증해주세요.');
+        }
+
         const resendResponse = await fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: {
@@ -179,7 +183,7 @@ Deno.serve(async (req) => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            from: 'PUZZMI <choi.seojun0721@gmail.com>',
+            from: 'PUZZMI <onboarding@resend.dev>',
             to: [email],
             subject: '[PUZZMI] 이메일 인증번호를 확인해주세요',
             html: emailHtml,
