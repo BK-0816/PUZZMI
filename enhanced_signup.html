@@ -1519,6 +1519,8 @@
     // 회원가입 완료 처리
     async function completeSignup() {
       try {
+        console.log('🔐 Starting signup process...', { email: userData.email });
+
         // 1. Supabase 계정 생성
         const { data, error } = await supabase.auth.signUp({
           email: userData.email,
@@ -1530,13 +1532,20 @@
           }
         });
 
+        console.log('📝 SignUp response:', { data, error });
+
         if (error) {
-          if (error.message.includes('User already registered')) {
+          console.error('❌ SignUp error:', error);
+
+          if (error.message.includes('User already registered') || error.message.includes('already been registered')) {
+            console.log('⚠️ User already exists, attempting sign in...');
             try {
               const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
                 email: userData.email,
                 password: userData.password
               });
+
+              console.log('🔐 SignIn response:', { signInData, signInError });
 
               if (signInError) {
                 throw new Error('このメールアドレスは既に登録されています。パスワードが正しくありません。ログインページに移動してください。');
@@ -1552,6 +1561,8 @@
                 .eq('id', signInData.user.id)
                 .maybeSingle();
 
+              console.log('👤 Existing profile:', existingProfile);
+
               if (existingProfile) {
                 verificationResult.innerHTML = '<div class="success">✅ 既に登録済みです。ログインしました。</div>';
                 setTimeout(() => {
@@ -1560,7 +1571,7 @@
                 return;
               }
 
-              data.user = signInData.user;
+              data = { user: signInData.user, session: signInData.session };
             } catch (loginError) {
               throw loginError;
             }
@@ -1570,8 +1581,11 @@
         }
 
         if (!data || !data.user) {
-          throw new Error('アカウント作成に失敗しました。');
+          console.error('❌ No user data received');
+          throw new Error('アカウント作成に失敗しました。Supabaseの設定でメール確認が有効になっている可能性があります。');
         }
+
+        console.log('✅ User created/authenticated:', data.user.id);
         
         // 2. 프로필 생성
         const profileData = {
@@ -1617,8 +1631,11 @@
         }, 1500);
         
       } catch (error) {
-        console.error('회원가입 완료 실패:', error);
+        console.error('❌ 회원가입 완료 실패:', error);
         verificationResult.innerHTML = `<div class="error">❌ 会員登録失敗: ${error.message}</div>`;
+
+        completionSection.classList.remove('show');
+        emailVerificationSection.style.display = 'block';
       }
     }
 
