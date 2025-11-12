@@ -12,7 +12,7 @@ interface EmailVerificationRequest {
   code?: string;
 }
 
-const RESEND_API_KEY = 're_XgrRiKHt_J6iU4t7ygXHXoQdoSfmyeHub';
+const RESEND_API_KEY = 're_CKSF4GHU_sbmBaFkK3bxCvxLS1e351Cvg';
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -179,7 +179,7 @@ Deno.serve(async (req) => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            from: 'PUZZMI <onboarding@resend.dev>',
+            from: 'PUZZMI <choi.seojun0721@gmail.com>',
             to: [email],
             subject: '[PUZZMI] 이메일 인증번호를 확인해주세요',
             html: emailHtml,
