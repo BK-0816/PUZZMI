@@ -1522,7 +1522,7 @@
         console.log('🔐 Starting signup process...', { email: userData.email });
 
         // 1. Supabase 계정 생성
-        const { data, error } = await supabase.auth.signUp({
+        let { data, error } = await supabase.auth.signUp({
           email: userData.email,
           password: userData.password,
           options: {
