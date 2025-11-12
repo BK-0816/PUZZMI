@@ -1594,14 +1594,6 @@
       }
     }
 
-    // 인증번호 입력 시 자동 검증 (6자리 입력 완료 시)
-        // 6자리 입력 완료 시 자동으로 인증 시도
-        setTimeout(() => {
-          verifyCodeBtn.click();
-        }, 500);
-      
-    
-
     // LINE 연동 (선택사항)
     document.getElementById('lineConnectBtn').addEventListener('click', async () => {
       const btn = document.getElementById('lineConnectBtn');
