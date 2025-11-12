@@ -1323,12 +1323,40 @@
         residence: document.getElementById('residence').value.trim() || null,
         languages: selectedLanguages
       };
-      
+
       const submitBtn = document.getElementById('signupBtn');
       submitBtn.disabled = true;
-      submitBtn.innerHTML = '<div class="loading"></div> Eメール認証番号送信中...';
-      
+      submitBtn.innerHTML = '<div class="loading"></div> 重複確認中...';
+
       try {
+        const { data: existingEmail } = await supabase
+          .from('profiles')
+          .select('email')
+          .eq('email', email)
+          .maybeSingle();
+
+        if (existingEmail) {
+          signupResult.innerHTML = '<div class="error">❌ このメールアドレスは既に登録されています。</div>';
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '✉️ Eメール認証番号受信';
+          return;
+        }
+
+        const { data: existingPhone } = await supabase
+          .from('profiles')
+          .select('phone_number')
+          .eq('phone_number', phoneNumber)
+          .maybeSingle();
+
+        if (existingPhone) {
+          signupResult.innerHTML = '<div class="error">❌ この電話番号は既に登録されています。</div>';
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '✉️ Eメール認証番号受信';
+          return;
+        }
+
+        submitBtn.innerHTML = '<div class="loading"></div> Eメール認証番号送信中...';
+
         // 서버에서 6자리 OTP 생성 및 이메일 발송
         const response = await fetch(`${SUPABASE_URL}/functions/v1/email-verification`, {
           method: 'POST',
@@ -1504,41 +1532,45 @@
 
         if (error) {
           if (error.message.includes('User already registered')) {
-            const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-              email: userData.email,
-              password: userData.password
-            });
+            try {
+              const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+                email: userData.email,
+                password: userData.password
+              });
 
-            if (signInError) {
-              throw new Error('このメールアドレスは既に登録されています。パスワードが正しくありません。');
+              if (signInError) {
+                throw new Error('このメールアドレスは既に登録されています。パスワードが正しくありません。ログインページに移動してください。');
+              }
+
+              if (!signInData.user) {
+                throw new Error('ログインに失敗しました。');
+              }
+
+              const { data: existingProfile } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', signInData.user.id)
+                .maybeSingle();
+
+              if (existingProfile) {
+                verificationResult.innerHTML = '<div class="success">✅ 既に登録済みです。ログインしました。</div>';
+                setTimeout(() => {
+                  window.location.href = '/my_profile.html';
+                }, 1500);
+                return;
+              }
+
+              data.user = signInData.user;
+            } catch (loginError) {
+              throw loginError;
             }
-
-            if (!signInData.user) {
-              throw new Error('ログインに失敗しました。');
-            }
-
-            const { data: existingProfile } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('id', signInData.user.id)
-              .maybeSingle();
-
-            if (existingProfile) {
-              verificationResult.innerHTML = '<div class="success">✅ 既に登録済みです。ログインしました。</div>';
-              setTimeout(() => {
-                window.location.href = '/my_profile.html';
-              }, 1500);
-              return;
-            }
-
-            data.user = signInData.user;
           } else {
             throw error;
           }
         }
 
-        if (!data.user) {
-          throw new Error('計定 생성에 실패했습니다.');
+        if (!data || !data.user) {
+          throw new Error('アカウント作成に失敗しました。');
         }
         
         // 2. 프로필 생성
