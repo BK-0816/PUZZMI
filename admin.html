@@ -72,6 +72,7 @@
               <th>언어</th>
               <th>메이트</th>
               <th>요청사항</th>
+              <th>LINE 연동</th>
               <th>조치</th>
             </tr>
           </thead>
@@ -104,6 +105,7 @@
 
     let rows = [];
     let matesMap = new Map();
+    let lineAccountsMap = new Map();
 
     async function ensureAdmin() {
       const { data: { user } } = await supabase.auth.getUser();
@@ -123,6 +125,15 @@
       }
     }
 
+    async function loadLineAccountsMap() {
+      const { data, error } = await supabase
+        .from('user_line_accounts')
+        .select('user_id, line_user_id, line_display_name');
+      if (!error && data) {
+        lineAccountsMap = new Map(data.map(r => [r.user_id, r]));
+      }
+    }
+
     function render() {
       const q = (search.value || '').toLowerCase();
       const st = statusFilter.value;
@@ -138,6 +149,11 @@
       tbody.innerHTML = filtered.map(r => {
         const mateName = matesMap.get(r.mate_id) || r.mate_id;
         const dt = `${r.date} ${r.start_time}`;
+        const lineAccount = r.customer_id ? lineAccountsMap.get(r.customer_id) : null;
+        const lineStatus = lineAccount
+          ? `<span style="color: #28a745;">✓ ${lineAccount.line_display_name}</span>`
+          : '<span style="color: #999;">미연동</span>';
+
         return `
           <tr>
             <td>${r.id}</td>
@@ -148,7 +164,16 @@
             <td>${r.language || '-'}</td>
             <td>${mateName}</td>
             <td style="max-width:320px">${(r.notes||'').replace(/</g,'&lt;')}</td>
+            <td>${lineStatus}</td>
             <td class="actions">
+              ${lineAccount ? `
+                <button class="btn btn-success" data-id="${r.id}" data-action="send-passport" title="여권 인증 요청">
+                  🛂 여권
+                </button>
+                <button class="btn btn-success" data-id="${r.id}" data-action="send-payment" title="결제 요청">
+                  💳 결제
+                </button>
+              ` : ''}
               ${['confirmed','completed','cancelled'].map(s => `
                 <button class="btn btn-secondary" data-id="${r.id}" data-status="${s}">${s}</button>
               `).join('')}
@@ -162,12 +187,133 @@
         btn.addEventListener('click', async () => {
           const id = btn.getAttribute('data-id');
           const status = btn.getAttribute('data-status');
+          const action = btn.getAttribute('data-action');
           const ok = await ensureAdmin();
           if (!ok) return alert('관리자 권한이 없습니다.');
-          const { error } = await supabase.from('bookings').update({ status }).eq('id', id);
-          if (error) alert('상태 변경 실패: ' + error.message);
+
+          if (action === 'send-passport') {
+            await sendPassportVerification(id);
+          } else if (action === 'send-payment') {
+            await sendPaymentRequest(id);
+          } else if (status) {
+            const { error } = await supabase.from('bookings').update({ status }).eq('id', id);
+            if (error) alert('상태 변경 실패: ' + error.message);
+          }
         });
       });
+    }
+
+    async function sendPassportVerification(bookingId) {
+      const booking = rows.find(r => r.id == bookingId);
+      if (!booking || !booking.customer_id) {
+        alert('예약 정보를 찾을 수 없습니다.');
+        return;
+      }
+
+      if (!confirm('여권 인증 링크를 LINE으로 발송하시겠습니까?')) return;
+
+      try {
+        const passportUrl = `${window.location.origin}/passport_verification.html?booking_id=${bookingId}`;
+
+        const { data: { session } } = await supabase.auth.getSession();
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/send-line-notification`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`
+          },
+          body: JSON.stringify({
+            userId: booking.customer_id,
+            bookingId: bookingId,
+            type: 'passport_verification',
+            passportVerificationUrl: passportUrl
+          })
+        });
+
+        const result = await response.json();
+        if (result.success) {
+          alert('✓ LINE 메시지가 발송되었습니다!');
+        } else {
+          alert('발송 실패: ' + result.error);
+        }
+      } catch (error) {
+        console.error('Send error:', error);
+        alert('발송 실패: ' + error.message);
+      }
+    }
+
+    async function sendPaymentRequest(bookingId) {
+      const booking = rows.find(r => r.id == bookingId);
+      if (!booking || !booking.customer_id) {
+        alert('예약 정보를 찾을 수 없습니다.');
+        return;
+      }
+
+      const amountStr = prompt('결제 금액을 입력하세요 (원):', '40000');
+      if (!amountStr) return;
+
+      const amount = parseInt(amountStr);
+      if (isNaN(amount) || amount <= 0) {
+        alert('올바른 금액을 입력하세요.');
+        return;
+      }
+
+      try {
+        const { data: payment, error: paymentError } = await supabase
+          .from('kg_inicis_payments')
+          .insert({
+            booking_id: bookingId,
+            user_id: booking.customer_id,
+            mate_id: booking.mate_id,
+            amount: amount,
+            currency: 'KRW',
+            payment_status: 'pending',
+            oid: `PUZZMI_${bookingId}_${Date.now()}`
+          })
+          .select()
+          .single();
+
+        if (paymentError) throw paymentError;
+
+        const paymentUrl = `${window.location.origin}/kg_inicis_payment.html?payment_id=${payment.id}`;
+
+        const { data: { session } } = await supabase.auth.getSession();
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/send-line-notification`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`
+          },
+          body: JSON.stringify({
+            userId: booking.customer_id,
+            bookingId: bookingId,
+            type: 'payment_request',
+            paymentUrl: paymentUrl,
+            amount: amount
+          })
+        });
+
+        const result = await response.json();
+
+        await supabase
+          .from('kg_inicis_payments')
+          .update({
+            payment_status: 'sent',
+            line_message_sent: true,
+            line_message_sent_at: new Date().toISOString(),
+            payment_url: paymentUrl
+          })
+          .eq('id', payment.id);
+
+        if (result.success) {
+          alert(`✓ 결제 요청이 LINE으로 발송되었습니다!\n금액: ${amount.toLocaleString()}원`);
+        } else {
+          alert('발송 실패: ' + result.error);
+        }
+      } catch (error) {
+        console.error('Payment request error:', error);
+        alert('발송 실패: ' + error.message);
+      }
     }
 
     async function load() {
@@ -196,6 +342,7 @@
 
     // initial
     await loadMatesMap();
+    await loadLineAccountsMap();
     await load();
   </script>
 </body>
