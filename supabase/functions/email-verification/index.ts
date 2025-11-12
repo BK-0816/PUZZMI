@@ -12,14 +12,14 @@ interface EmailVerificationRequest {
   code?: string;
 }
 
+const RESEND_API_KEY = 're_XgrRiKHt_J6iU4t7ygXHXoQdoSfmyeHub';
+
 Deno.serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
 
   try {
-    // 환경변수 확인
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
     
@@ -53,13 +53,11 @@ Deno.serve(async (req) => {
     console.log('Request received:', { email, action, hasCode: !!code });
 
     if (action === 'send') {
-      // 6자리 OTP 생성
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
-      const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10분 후 만료
+      const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
       console.log('Generated OTP:', { otp, expiresAt: expiresAt.toISOString() });
 
-      // 기존 미인증 코드 삭제
       const { error: deleteError } = await supabase
         .from('email_verifications')
         .delete()
@@ -70,7 +68,6 @@ Deno.serve(async (req) => {
         console.error('Delete old codes error:', deleteError);
       }
 
-      // 새 인증 코드 저장
       const { data: insertData, error: insertError } = await supabase
         .from('email_verifications')
         .insert({
@@ -90,11 +87,9 @@ Deno.serve(async (req) => {
 
       console.log('Verification code saved:', insertData);
 
-      // 이메일 발송 시도
       try {
-        console.log('Attempting to send email...');
-        
-        // 커스텀 이메일 템플릿
+        console.log('Sending email via Resend...');
+
         const emailHtml = `
           <!DOCTYPE html>
           <html>
@@ -102,36 +97,44 @@ Deno.serve(async (req) => {
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <style>
-              body { 
-                font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif; 
-                margin: 0; padding: 0; 
+              body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                margin: 0; padding: 0;
                 background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
                 line-height: 1.6;
               }
-              .container { 
-                max-width: 600px; margin: 40px auto; 
+              .container {
+                max-width: 600px; margin: 40px auto;
                 background: white; border-radius: 20px;
                 overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.1);
               }
-              .header { 
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); 
+              .header {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
                 padding: 40px 20px; text-align: center; color: white;
               }
               .logo { font-size: 2.5rem; font-weight: 800; margin-bottom: 8px; }
               .subtitle { font-size: 1.1rem; opacity: 0.9; }
               .content { padding: 40px 30px; text-align: center; }
               .welcome-text { font-size: 1.3rem; color: #333; margin-bottom: 30px; font-weight: 600; }
-              .otp-box { 
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                color: white; padding: 40px 30px; border-radius: 20px; 
+              .otp-box {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white; padding: 40px 30px; border-radius: 20px;
                 margin: 30px 0; box-shadow: 0 12px 32px rgba(102, 126, 234, 0.3);
               }
-              .otp-code { 
-                font-size: 3.5rem; font-weight: 800; letter-spacing: 12px; 
+              .otp-code {
+                font-size: 3.5rem; font-weight: 800; letter-spacing: 12px;
                 margin: 20px 0; font-family: 'Courier New', monospace;
               }
-              .footer { 
-                background: #f8f9fa; padding: 30px 20px; 
+              .info-box {
+                background: rgba(102, 126, 234, 0.05);
+                border: 2px solid rgba(102, 126, 234, 0.2);
+                border-radius: 16px;
+                padding: 24px;
+                margin: 30px 0;
+                text-align: left;
+              }
+              .footer {
+                background: #f8f9fa; padding: 30px 20px;
                 text-align: center; color: #666; font-size: 0.9rem;
               }
             </style>
@@ -139,7 +142,7 @@ Deno.serve(async (req) => {
           <body>
             <div class="container">
               <div class="header">
-                <div class="logo">PUZZMI</div>
+                <div class="logo">🧩 PUZZMI</div>
                 <div class="subtitle">이메일 인증번호</div>
               </div>
               <div class="content">
@@ -151,7 +154,7 @@ Deno.serve(async (req) => {
                   <div class="otp-code">${otp}</div>
                   <div style="font-size: 1rem; opacity: 0.9;">⏰ 유효시간: 10분</div>
                 </div>
-                <div style="background: rgba(102, 126, 234, 0.05); border: 2px solid rgba(102, 126, 234, 0.2); border-radius: 16px; padding: 24px; margin: 30px 0; text-align: left;">
+                <div class="info-box">
                   <h4 style="color: #667eea; margin: 0 0 16px 0;">📋 인증 방법</h4>
                   <ul style="margin: 0; padding-left: 20px; color: #555;">
                     <li>위의 <strong>6자리 숫자</strong>를 회원가입 페이지에 입력해주세요</li>
@@ -169,63 +172,39 @@ Deno.serve(async (req) => {
           </html>
         `;
 
-        // Supabase Auth를 통한 이메일 발송
-        const { data: emailData, error: emailError } = await supabase.auth.admin.generateLink({
-          type: 'magiclink',
-          email: email,
-          options: {
-            data: {
-              verification_code: otp,
-              expires_at: expiresAt.toISOString()
-            }
-          }
+        const resendResponse = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${RESEND_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            from: 'PUZZMI <onboarding@resend.dev>',
+            to: [email],
+            subject: '[PUZZMI] 이메일 인증번호를 확인해주세요',
+            html: emailHtml,
+          }),
         });
 
-        if (emailError) {
-          console.error('Supabase email send error:', emailError);
-          
-          // SMTP 설정 문제일 가능성이 높음
-          return new Response(
-            JSON.stringify({
-              success: false,
-              error: 'SMTP 설정 오류로 이메일 발송에 실패했습니다.',
-              debug: {
-                smtpError: emailError.message,
-                suggestion: 'Supabase Dashboard → Settings → Auth → SMTP Settings를 확인해주세요.',
-                otpGenerated: otp, // 개발용으로 OTP 반환
-                troubleshooting: [
-                  '1. Gmail 앱 비밀번호 설정 확인',
-                  '2. SMTP 서버 정보 재확인',
-                  '3. 발신자 이메일 인증 상태 확인',
-                  '4. Supabase Dashboard에서 Test SMTP 실행'
-                ]
-              }
-            }),
-            {
-              status: 500,
-              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            }
-          );
+        if (!resendResponse.ok) {
+          const errorData = await resendResponse.text();
+          console.error('Resend API error:', errorData);
+          throw new Error(`Resend API 오류: ${resendResponse.status} - ${errorData}`);
         }
 
-        console.log('Email sent successfully via Supabase Auth');
+        const resendData = await resendResponse.json();
+        console.log('Email sent successfully via Resend:', resendData);
 
       } catch (emailSendError) {
         console.error('Email sending failed:', emailSendError);
-        
+
         return new Response(
           JSON.stringify({
             success: false,
-            error: 'SMTP 설정 문제로 이메일 발송에 실패했습니다.',
+            error: '이메일 발송에 실패했습니다.',
             debug: {
               emailError: emailSendError.message,
-              otpGenerated: otp, // 개발용으로 OTP 반환
-              smtpTroubleshooting: [
-                '1. Supabase Dashboard → Settings → Auth → SMTP Settings 확인',
-                '2. Gmail 2단계 인증 및 앱 비밀번호 설정',
-                '3. SMTP 서버: smtp.gmail.com, 포트: 587',
-                '4. 발신자 이메일이 SMTP 계정과 일치하는지 확인'
-              ]
+              suggestion: 'Resend API 키를 확인해주세요.'
             }
           }),
           {
@@ -253,7 +232,6 @@ Deno.serve(async (req) => {
 
       console.log('Verifying code:', { email, code });
 
-      // 인증 코드 조회
       const { data: verification, error: selectError } = await supabase
         .from('email_verifications')
         .select('*')
@@ -280,26 +258,22 @@ Deno.serve(async (req) => {
         attempts: verification.attempts
       });
 
-      // 만료 시간 확인
       if (new Date() > new Date(verification.expires_at)) {
         console.log('Verification expired');
         throw new Error('인증번호가 만료되었습니다. 새로운 인증번호를 요청해주세요.');
       }
 
-      // 시도 횟수 확인
       if (verification.attempts >= 5) {
         console.log('Too many attempts');
         throw new Error('인증 시도 횟수를 초과했습니다. 새로운 인증번호를 요청해주세요.');
       }
 
-      // 인증번호 확인
       if (verification.verification_code !== code) {
         console.log('Code mismatch:', {
           expected: verification.verification_code,
           received: code
         });
         
-        // 시도 횟수 증가
         await supabase
           .from('email_verifications')
           .update({ attempts: verification.attempts + 1 })
@@ -308,7 +282,6 @@ Deno.serve(async (req) => {
         throw new Error(`인증번호가 올바르지 않습니다. (${verification.attempts + 1}/5)`);
       }
 
-      // 인증 성공 처리
       const { error: updateError } = await supabase
         .from('email_verifications')
         .update({ 
