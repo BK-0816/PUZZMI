@@ -1657,10 +1657,43 @@
       btn.innerHTML = '<div class="loading"></div> LINE連動中...';
       
       try {
-        // 실제 LINE OAuth URL 생성
-        const { LINE_CONFIG } = await import('./line_config.js');
-        const lineUrl = await LINE_CONFIG.generateLoginUrl(userData.userId);
-        
+        // 실제 LINE OAuth URL 생성 (Edge Function 사용)
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          throw new Error('ログインセッションがありません。 再度ログインしてください。');
+        }
+
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/line-auth/generate-url`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+            'Origin': window.location.origin,
+            'Referer': window.location.href
+          },
+          body: JSON.stringify({
+            requestOrigin: window.location.origin
+          })
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Edge Function 호출 실패:', {
+            status: response.status,
+            error: errorText
+          });
+          throw new Error(`Edge Function 호출 실패: ${response.status} - ${errorText}`);
+        }
+
+        const result = await response.json();
+
+        if (!result.success) {
+          throw new Error(result.error || 'LINE URL 生成失敗');
+        }
+
+        const lineUrl = result.loginUrl;
+        console.log('✅ 실제 LINE URL 생성 성공:', lineUrl);
+
         // 팝업을 실제 LINE OAuth URL로 리다이렉트
         popup.location.href = lineUrl;
         
