@@ -179,7 +179,7 @@ Deno.serve(async (req) => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            from: 'PUZZMI <noreply@puzzmi.com>',
+            from: 'PUZZMI <onboarding@resend.dev>',
             to: [email],
             subject: '[PUZZMI] 이메일 인증번호를 확인해주세요',
             html: emailHtml,
