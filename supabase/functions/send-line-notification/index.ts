@@ -6,8 +6,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Client-Info, Apikey',
 };
 
-// LINE 설정은 Supabase Secret에서 가져옴
-const LINE_CHANNEL_ACCESS_TOKEN = Deno.env.get('LINE_CHANNEL_ACCESS_TOKEN') || Deno.env.get('LINE_CHANNEL_SECRET');
+// LINE 설정은 Supabase Secret에서 가져옴 (fallback으로 하드코딩된 토큰 사용)
+const LINE_CHANNEL_ACCESS_TOKEN = Deno.env.get('LINE_CHANNEL_ACCESS_TOKEN') || 'f2oNcXpy05dyx5oLEE95RNnl17qqHNLD7gUWA9ipEyPsfF/qf2t7UfG2Op0NKJBL0UJwb6uuXyg7e6nd5scu7odozNFUpQ9uK7bBBp8mZjCLUdUFDIvfC1LMWDPaFQ3xjJ1DeQPHRk1X+AwM3Nkg1wdB04t89/1O/w1cDnyilFU=';
 
 interface SendNotificationRequest {
   userId: string;
