@@ -1670,7 +1670,7 @@
         if (error) throw error;
 
         // 관리자에게 LINE 알림 (Edge Function 호출)
-        const uploadUrl = `https://eevvgbbokenpjnvtmztk.supabase.co/functions/v1/passport-upload/${token}`;
+        const uploadUrl = `${window.location.origin}/passport_upload_token.html?token=${token}`;
 
         const { data: { session } } = await supabase.auth.getSession();
 

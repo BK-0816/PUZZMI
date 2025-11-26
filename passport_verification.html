@@ -258,10 +258,10 @@
     async function init() {
       const urlParams = new URLSearchParams(window.location.search);
 
-      // 토큰이 있으면 Edge Function으로 리다이렉트
+      // 토큰이 있으면 토큰 기반 업로드 페이지로 리다이렉트
       const token = urlParams.get('token');
       if (token) {
-        window.location.href = `https://eevvgbbokenpjnvtmztk.supabase.co/functions/v1/passport-upload/${token}`;
+        window.location.href = `${window.location.origin}/passport_upload_token.html?token=${token}`;
         return;
       }
 
