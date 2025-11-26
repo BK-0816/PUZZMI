@@ -1680,20 +1680,33 @@
           token: session?.access_token?.substring(0, 20) + '...'
         });
 
-        const lineResponse = await fetch(`${SUPABASE_URL}/functions/v1/send-line-notification`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session.access_token}`
-          },
-          body: JSON.stringify({
-            userId: user.id,
-            type: 'identity_verification_request',
-            uploadUrl: uploadUrl
-          })
-        });
+        let lineResponse;
+        try {
+          lineResponse = await fetch(`${SUPABASE_URL}/functions/v1/send-line-notification`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session.access_token}`
+            },
+            body: JSON.stringify({
+              userId: user.id,
+              type: 'identity_verification_request',
+              uploadUrl: uploadUrl
+            })
+          });
+        } catch (fetchError) {
+          console.error('❌ Fetch 에러:', fetchError);
+          throw new Error('ネットワークエラー: サーバーに接続できません');
+        }
 
-        const lineResult = await lineResponse.json();
+        let lineResult;
+        try {
+          lineResult = await lineResponse.json();
+        } catch (jsonError) {
+          console.error('❌ JSON 파싱 에러:', jsonError);
+          throw new Error('サーバー応答の解析に失敗しました');
+        }
+
         console.log('📨 LINE 메시지 발송 결과:', lineResult);
 
         if (!lineResponse.ok || !lineResult.success) {
