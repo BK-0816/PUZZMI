@@ -6,7 +6,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Client-Info, Apikey',
 };
 
-const LINE_CHANNEL_ACCESS_TOKEN = 'e743b9de9cd4ecc5b1d44f8d4c34d9d3';
+// LINE 설정은 Supabase Secret에서 가져옴
+const LINE_CHANNEL_ACCESS_TOKEN = Deno.env.get('LINE_CHANNEL_ACCESS_TOKEN') || Deno.env.get('LINE_CHANNEL_SECRET');
 
 interface SendNotificationRequest {
   userId: string;
@@ -29,10 +30,16 @@ Deno.serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-    
+
     if (!supabaseUrl || !supabaseServiceKey) {
       throw new Error('Supabase 환경변수가 설정되지 않았습니다.');
     }
+
+    if (!LINE_CHANNEL_ACCESS_TOKEN) {
+      throw new Error('LINE_CHANNEL_ACCESS_TOKEN 또는 LINE_CHANNEL_SECRET이 설정되지 않았습니다.');
+    }
+
+    console.log('🔑 LINE 토큰 확인:', LINE_CHANNEL_ACCESS_TOKEN ? '설정됨' : '미설정');
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const { userId, bookingId, type, passportVerificationUrl, uploadUrl, paymentUrl, amount }: SendNotificationRequest = await req.json();
