@@ -388,8 +388,13 @@
       location.replace('auth_combo.html?redirect=admin_dashboard.html');
     }
 
-    const { data: isAdmin } = await supabase.from('admin_users').select('user_id').eq('user_id', user.id).maybeSingle();
-    if (!isAdmin) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if (!profile?.is_admin) {
       alert('관리자 권한이 필요합니다.');
       location.replace('index.html');
     }
