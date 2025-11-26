@@ -241,6 +241,13 @@ Deno.serve(async (req) => {
     }
 
     console.log('📤 LINE API 호출 중...');
+    console.log('📍 대상 LINE User ID:', lineAccount.line_user_id);
+
+    const requestBody = {
+      to: lineAccount.line_user_id,
+      messages: [message]
+    };
+    console.log('📦 요청 본문:', JSON.stringify(requestBody, null, 2));
 
     const lineResponse = await fetch('https://api.line.me/v2/bot/message/push', {
       method: 'POST',
@@ -248,16 +255,16 @@ Deno.serve(async (req) => {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${LINE_CHANNEL_ACCESS_TOKEN}`,
       },
-      body: JSON.stringify({
-        to: lineAccount.line_user_id,
-        messages: [message]
-      }),
+      body: JSON.stringify(requestBody),
     });
 
+    const responseText = await lineResponse.text();
+    console.log('📨 LINE API 응답 상태:', lineResponse.status);
+    console.log('📨 LINE API 응답 본문:', responseText);
+
     if (!lineResponse.ok) {
-      const errorData = await lineResponse.text();
-      console.error('❌ LINE API 오류:', errorData);
-      throw new Error(`LINE API 오류: ${lineResponse.status} - ${errorData}`);
+      console.error('❌ LINE API 오류:', responseText);
+      throw new Error(`LINE API 오류: ${lineResponse.status} - ${responseText}`);
     }
 
     console.log('✅ LINE 메시지 전송 성공');
