@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>本人認証管理 - PUZZMI Admin</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="pages.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { background: #f8f9fa; }
+    .container { max-width: 1400px; margin: 40px auto; padding: 20px; }
+    h1 { color: #333; margin-bottom: 32px; }
+    .requests-grid { display: grid; gap: 24px; }
+    .request-card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+    .request-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    .status-badge {
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .status-pending { background: #fff3cd; color: #856404; }
+    .status-uploaded { background: #d1ecf1; color: #0c5460; }
+    .status-approved { background: #d4edda; color: #155724; }
+    .status-rejected { background: #f8d7da; color: #721c24; }
+    .passport-preview {
+      width: 100%;
+      max-width: 600px;
+      border-radius: 12px;
+      margin: 20px 0;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .passport-preview:hover { transform: scale(1.02); }
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-weight: 600; margin-bottom: 8px; color: #333; }
+    .form-input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+    .btn-group { display: flex; gap: 12px; margin-top: 20px; }
+    .btn {
+      flex: 1;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-approve { background: #28a745; color: white; }
+    .btn-reject { background: #dc3545; color: white; }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.9);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+      cursor: zoom-out;
+    }
+    .modal.active { display: flex; }
+    .modal img { max-width: 90%; max-height: 90vh; }
+    .filter-tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .filter-tab {
+      padding: 12px 24px;
+      background: white;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .filter-tab.active {
+      background: #667eea;
+      color: white;
+      border-color: #667eea;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><i class="fas fa-id-card"></i> 本人認証管理</h1>
+
+    <div class="filter-tabs">
+      <div class="filter-tab active" data-filter="all">すべて</div>
+      <div class="filter-tab" data-filter="pending">アップロード待ち</div>
+      <div class="filter-tab" data-filter="passport_uploaded">審査待ち</div>
+      <div class="filter-tab" data-filter="approved">承認済み</div>
+      <div class="filter-tab" data-filter="rejected">拒否済み</div>
+    </div>
+
+    <div id="requestsContainer" class="requests-grid">
+      読み込み中...
+    </div>
+  </div>
+
+  <div id="imageModal" class="modal">
+    <img id="modalImage" src="" alt="Passport">
+  </div>
+
+  <script type="module">
+    const SUPABASE_URL = 'https://eevvgbbokenpjnvtmztk.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let currentFilter = 'all';
+
+    // 로그인 체크
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      location.replace('auth_combo.html');
+    }
+
+    // 필터 탭
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentFilter = tab.dataset.filter;
+        loadRequests();
+      });
+    });
+
+    // 요청 목록 로드
+    async function loadRequests() {
+      const container = document.getElementById('requestsContainer');
+      container.innerHTML = '読み込み中...';
+
+      try {
+        let query = supabase
+          .from('identity_verification_requests')
+          .select(`
+            *,
+            profiles!identity_verification_requests_user_id_fkey(full_name, email, phone_number, birth_date)
+          `)
+          .order('created_at', { ascending: false });
+
+        if (currentFilter !== 'all') {
+          query = query.eq('status', currentFilter);
+        }
+
+        const { data: requests, error } = await query;
+
+        if (error) throw error;
+
+        if (!requests || requests.length === 0) {
+          container.innerHTML = '<p style="text-align: center; color: #666; padding: 60px;">リクエストがありません。</p>';
+          return;
+        }
+
+        container.innerHTML = requests.map(req => renderRequestCard(req)).join('');
+      } catch (error) {
+        console.error('Error loading requests:', error);
+        container.innerHTML = '<p style="color: red;">エラーが発生しました: ' + error.message + '</p>';
+      }
+    }
+
+    function renderRequestCard(req) {
+      const statusMap = {
+        pending: { label: 'アップロード待ち', class: 'status-pending' },
+        passport_uploaded: { label: '審査待ち', class: 'status-uploaded' },
+        approved: { label: '承認済み', class: 'status-approved' },
+        rejected: { label: '拒否済み', class: 'status-rejected' }
+      };
+
+      const status = statusMap[req.status] || { label: req.status, class: '' };
+      const profile = req.profiles || {};
+
+      return `
+        <div class="request-card">
+          <div class="request-header">
+            <div>
+              <h3 style="margin-bottom: 8px;">${profile.full_name || 'Unknown User'}</h3>
+              <div style="color: #666; font-size: 0.9rem;">
+                <i class="fas fa-envelope"></i> ${profile.email || 'N/A'}<br>
+                <i class="fas fa-phone"></i> ${profile.phone_number || 'N/A'}<br>
+                <i class="fas fa-birthday-cake"></i> ${profile.birth_date || 'N/A'}
+              </div>
+            </div>
+            <span class="status-badge ${status.class}">${status.label}</span>
+          </div>
+
+          ${req.passport_image_url ? `
+            <img src="${req.passport_image_url}"
+                 class="passport-preview"
+                 onclick="showImage('${req.passport_image_url}')"
+                 alt="Passport">
+          ` : '<p style="color: #666; padding: 40px; text-align: center; background: #f8f9fa; border-radius: 12px;">パスポート未アップロード</p>'}
+
+          ${req.status === 'passport_uploaded' ? `
+            <form onsubmit="approveRequest(event, '${req.id}')">
+              <div class="form-group">
+                <label class="form-label">名前（パスポート記載）</label>
+                <input type="text" name="verified_name" class="form-input" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">生年月日</label>
+                <input type="date" name="verified_birth_date" class="form-input" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">国籍</label>
+                <input type="text" name="verified_nationality" class="form-input" value="日本" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">管理者メモ</label>
+                <textarea name="admin_notes" class="form-input" rows="2"></textarea>
+              </div>
+              <div class="btn-group">
+                <button type="submit" class="btn btn-approve">
+                  <i class="fas fa-check"></i> 承認
+                </button>
+                <button type="button" class="btn btn-reject" onclick="rejectRequest('${req.id}')">
+                  <i class="fas fa-times"></i> 拒否
+                </button>
+              </div>
+            </form>
+          ` : ''}
+
+          ${req.status === 'approved' ? `
+            <div style="background: #d4edda; padding: 16px; border-radius: 8px; margin-top: 16px;">
+              <strong>承認情報:</strong><br>
+              名前: ${req.verified_name}<br>
+              生年月日: ${req.verified_birth_date}<br>
+              年齢: ${req.verified_age}歳<br>
+              国籍: ${req.verified_nationality}<br>
+              ${req.admin_notes ? `メモ: ${req.admin_notes}` : ''}
+            </div>
+          ` : ''}
+
+          ${req.status === 'rejected' ? `
+            <div style="background: #f8d7da; padding: 16px; border-radius: 8px; margin-top: 16px;">
+              <strong>拒否理由:</strong><br>
+              ${req.rejected_reason || 'なし'}
+            </div>
+          ` : ''}
+
+          <div style="color: #999; font-size: 0.85rem; margin-top: 16px; padding-top: 16px; border-top: 1px solid #f0f0f0;">
+            申請日時: ${new Date(req.created_at).toLocaleString('ja-JP')}
+          </div>
+        </div>
+      `;
+    }
+
+    window.showImage = function(url) {
+      document.getElementById('modalImage').src = url;
+      document.getElementById('imageModal').classList.add('active');
+    };
+
+    document.getElementById('imageModal').addEventListener('click', function() {
+      this.classList.remove('active');
+    });
+
+    window.approveRequest = async function(event, requestId) {
+      event.preventDefault();
+      const form = event.target;
+      const formData = new FormData(form);
+
+      const verified_name = formData.get('verified_name');
+      const verified_birth_date = formData.get('verified_birth_date');
+      const verified_nationality = formData.get('verified_nationality');
+      const admin_notes = formData.get('admin_notes');
+
+      // 나이 계산
+      const birthDate = new Date(verified_birth_date);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+
+      if (!confirm(`${verified_name}様の本人認証を承認しますか？`)) return;
+
+      try {
+        // 1. 요청 업데이트
+        const { error: reqError } = await supabase
+          .from('identity_verification_requests')
+          .update({
+            status: 'approved',
+            verified_name,
+            verified_birth_date,
+            verified_age: age,
+            verified_nationality,
+            admin_notes,
+            approved_by: user.id,
+            approved_at: new Date().toISOString()
+          })
+          .eq('id', requestId);
+
+        if (reqError) throw reqError;
+
+        // 2. 프로필 업데이트
+        const { data: request } = await supabase
+          .from('identity_verification_requests')
+          .select('user_id')
+          .eq('id', requestId)
+          .single();
+
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({
+            full_name: verified_name,
+            birth_date: verified_birth_date,
+            age: age,
+            nationality: verified_nationality,
+            identity_verified: true,
+            age_verified: true,
+            verification_source: 'passport',
+            verification_level: 'premium'
+          })
+          .eq('id', request.user_id);
+
+        if (profileError) throw profileError;
+
+        alert('✅ 承認が完了しました！');
+        loadRequests();
+      } catch (error) {
+        console.error('Approval error:', error);
+        alert('❌ エラー: ' + error.message);
+      }
+    };
+
+    window.rejectRequest = async function(requestId) {
+      const reason = prompt('拒否理由を入力してください:');
+      if (!reason) return;
+
+      try {
+        const { error } = await supabase
+          .from('identity_verification_requests')
+          .update({
+            status: 'rejected',
+            rejected_reason: reason,
+            approved_by: user.id
+          })
+          .eq('id', requestId);
+
+        if (error) throw error;
+
+        alert('✅ 拒否しました。');
+        loadRequests();
+      } catch (error) {
+        console.error('Rejection error:', error);
+        alert('❌ エラー: ' + error.message);
+      }
+    };
+
+    // 초기 로드
+    loadRequests();
+  </script>
+</body>
+</html>

@@ -876,12 +876,28 @@
           LINEアカウント連動
 
         </h4>
-        
+
         <div id="lineConnectionStatus" class="help-text" style="margin-bottom: 16px;">
           連動状態を確認中...
         </div>
-        
+
         <div class="action-group" id="lineActions">
+          <!-- 버튼들이 동적으로 추가됩니다 -->
+        </div>
+      </div>
+
+      <!-- 신원인증 관리 -->
+      <div class="identity-verification-section" style="margin-bottom: 32px; padding: 24px; background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); border-radius: 16px; border: 2px solid rgba(102, 126, 234, 0.1);">
+        <h4 style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+          <i class="fas fa-id-card" style="color: #667eea;"></i>
+          本人認証
+        </h4>
+
+        <div id="identityVerificationStatus" class="help-text" style="margin-bottom: 16px;">
+          認証状態を確認中...
+        </div>
+
+        <div class="action-group" id="identityVerificationActions">
           <!-- 버튼들이 동적으로 추가됩니다 -->
         </div>
       </div>
@@ -1452,9 +1468,208 @@
       setTimeout(() => toast.remove(), 3000);
     }
 
+    // 신원인증 상태 확인
+    async function checkIdentityVerification() {
+      const statusEl = document.getElementById('identityVerificationStatus');
+      const actionsEl = document.getElementById('identityVerificationActions');
+
+      try {
+        // 프로필 인증 상태 확인
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('identity_verified, verification_level, age')
+          .eq('id', user.id)
+          .single();
+
+        // 최신 인증 요청 확인
+        const { data: request } = await supabase
+          .from('identity_verification_requests')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        actionsEl.innerHTML = '';
+
+        if (profile?.identity_verified) {
+          statusEl.innerHTML = `
+            <div style="padding: 16px; background: linear-gradient(135deg, rgba(40, 167, 69, 0.1) 0%, rgba(40, 167, 69, 0.05) 100%); border-radius: 12px; border-left: 4px solid #28a745;">
+              <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                <i class="fas fa-check-circle" style="color: #28a745; font-size: 1.5rem;"></i>
+                <strong style="color: #28a745; font-size: 1.1rem;">認証完了</strong>
+              </div>
+              <div style="color: #666; font-size: 0.95rem;">
+                本人確認が完了しました。予約サービスをご利用いただけます。
+              </div>
+            </div>
+          `;
+        } else if (request) {
+          if (request.status === 'pending') {
+            statusEl.innerHTML = `
+              <div style="padding: 16px; background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 193, 7, 0.05) 100%); border-radius: 12px; border-left: 4px solid #ffc107;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                  <i class="fas fa-clock" style="color: #ffc107; font-size: 1.5rem;"></i>
+                  <strong style="color: #ffc107; font-size: 1.1rem;">パスポート写真のアップロード待ち</strong>
+                </div>
+                <div style="color: #666; font-size: 0.95rem; margin-bottom: 12px;">
+                  LINEでパスポートアップロードリンクが送信されました。
+                </div>
+              </div>
+            `;
+            actionsEl.innerHTML = `
+              <button class="btn btn-secondary" onclick="showUploadLink('${request.verification_token}')" style="background: #6c757d;">
+                <i class="fas fa-link"></i> アップロードリンク表示
+              </button>
+            `;
+          } else if (request.status === 'passport_uploaded') {
+            statusEl.innerHTML = `
+              <div style="padding: 16px; background: linear-gradient(135deg, rgba(23, 162, 184, 0.1) 0%, rgba(23, 162, 184, 0.05) 100%); border-radius: 12px; border-left: 4px solid #17a2b8;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                  <i class="fas fa-hourglass-half" style="color: #17a2b8; font-size: 1.5rem;"></i>
+                  <strong style="color: #17a2b8; font-size: 1.1rem;">管理者審査中</strong>
+                </div>
+                <div style="color: #666; font-size: 0.95rem;">
+                  パスポートが正常にアップロードされました。管理者の確認をお待ちください。
+                </div>
+              </div>
+            `;
+          } else if (request.status === 'rejected') {
+            statusEl.innerHTML = `
+              <div style="padding: 16px; background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(220, 53, 69, 0.05) 100%); border-radius: 12px; border-left: 4px solid #dc3545;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                  <i class="fas fa-times-circle" style="color: #dc3545; font-size: 1.5rem;"></i>
+                  <strong style="color: #dc3545; font-size: 1.1rem;">認証拒否</strong>
+                </div>
+                <div style="color: #666; font-size: 0.95rem; margin-bottom: 8px;">
+                  ${request.rejected_reason || '認証要求が拒否されました。'}
+                </div>
+              </div>
+            `;
+            actionsEl.innerHTML = `
+              <button class="btn btn-primary" onclick="requestIdentityVerification()">
+                <i class="fas fa-redo"></i> 再申請
+              </button>
+            `;
+          }
+        } else {
+          statusEl.innerHTML = `
+            <div style="padding: 16px; background: white; border-radius: 12px; border: 2px dashed #ddd;">
+              <div style="color: #666; font-size: 0.95rem; margin-bottom: 12px;">
+                予約サービスをご利用いただくには、本人認証が必要です。<br>
+                認証を申請すると、LINEでパスポートアップロードリンクが送信されます。
+              </div>
+            </div>
+          `;
+          actionsEl.innerHTML = `
+            <button class="btn btn-primary" onclick="requestIdentityVerification()">
+              <i class="fas fa-id-card"></i> 本人認証を申請
+            </button>
+          `;
+        }
+      } catch (error) {
+        console.error('신원인증 상태 확인 실패:', error);
+        statusEl.textContent = '認証状態を確認できませんでした。';
+      }
+    }
+
+    // 신원인증 요청
+    window.requestIdentityVerification = async function() {
+      try {
+        // LINE 연동 확인
+        const { data: lineAccount } = await supabase
+          .from('user_line_accounts')
+          .select('line_user_id')
+          .eq('user_id', user.id)
+          .eq('is_verified', true)
+          .maybeSingle();
+
+        if (!lineAccount) {
+          showToast('❌ LINE連動が必要です。先にLINEアカウントを連動してください。');
+          return;
+        }
+
+        if (!confirm('本人認証を申請しますか？\n\nLINEでパスポートアップロードリンクが送信されます。')) {
+          return;
+        }
+
+        const token = crypto.randomUUID();
+
+        // 인증 요청 생성
+        const { error } = await supabase
+          .from('identity_verification_requests')
+          .insert({
+            user_id: user.id,
+            status: 'pending',
+            verification_token: token
+          });
+
+        if (error) throw error;
+
+        // 관리자에게 LINE 알림 (Edge Function 호출)
+        const uploadUrl = `${SUPABASE_URL}/passport-upload/${token}`;
+
+        const { data: { session } } = await supabase.auth.getSession();
+        await fetch(`${SUPABASE_URL}/functions/v1/send-line-notification`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`
+          },
+          body: JSON.stringify({
+            userId: user.id,
+            type: 'identity_verification_request',
+            uploadUrl: uploadUrl
+          })
+        });
+
+        showToast('✅ 認証申請が完了しました！LINEでアップロードリンクが送信されました。');
+        await checkIdentityVerification();
+      } catch (error) {
+        console.error('신원인증 요청 실패:', error);
+        showToast('❌ 認証申請に失敗しました: ' + error.message);
+      }
+    };
+
+    // 업로드 링크 표시
+    window.showUploadLink = function(token) {
+      const uploadUrl = `${SUPABASE_URL}/passport-upload/${token}`;
+      const modal = document.createElement('div');
+      modal.style.cssText = `
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.5); display: flex; align-items: center;
+        justify-content: center; z-index: 10000;
+      `;
+      modal.innerHTML = `
+        <div style="background: white; padding: 32px; border-radius: 16px; max-width: 500px; width: 90%;">
+          <h3 style="margin-bottom: 16px;">📷 パスポートアップロードリンク</h3>
+          <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; word-break: break-all; margin-bottom: 16px; font-size: 0.9rem;">
+            ${uploadUrl}
+          </div>
+          <div style="display: flex; gap: 12px;">
+            <button onclick="navigator.clipboard.writeText('${uploadUrl}').then(() => alert('コピーしました！'))"
+                    style="flex: 1; padding: 12px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;">
+              <i class="fas fa-copy"></i> コピー
+            </button>
+            <button onclick="window.open('${uploadUrl}', '_blank')"
+                    style="flex: 1; padding: 12px; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer;">
+              <i class="fas fa-external-link-alt"></i> 開く
+            </button>
+            <button onclick="this.parentElement.parentElement.parentElement.remove()"
+                    style="padding: 12px 20px; background: #6c757d; color: white; border: none; border-radius: 8px; cursor: pointer;">
+              閉じる
+            </button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+    };
+
     // 초기 로드
     await loadProfile();
     await checkLineConnection();
+    await checkIdentityVerification();
   })();
 </script>
 
