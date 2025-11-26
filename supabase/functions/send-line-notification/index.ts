@@ -40,7 +40,9 @@ Deno.serve(async (req) => {
     }
 
     console.log('🔑 LINE 토큰 확인:', LINE_CHANNEL_ACCESS_TOKEN ? '설정됨' : '미설정');
-    
+    console.log('🔍 토큰 길이:', LINE_CHANNEL_ACCESS_TOKEN?.length);
+    console.log('🔍 토큰 시작:', LINE_CHANNEL_ACCESS_TOKEN?.substring(0, 30) + '...');
+
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const { userId, bookingId, type, passportVerificationUrl, uploadUrl, paymentUrl, amount }: SendNotificationRequest = await req.json();
 
