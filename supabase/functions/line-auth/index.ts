@@ -272,26 +272,47 @@ Deno.serve(async (req) => {
           return json({ success: false, error: `LINE 계정 저장 실패: ${saveError.message}` }, 400, CORS);
         }
 
-        // 7) 신원확인 기록
-        const { error: verificationError } = await supabase
+        // 7) 신원확인 기록 (기존 데이터가 있으면 업데이트)
+        const { data: existingVerification } = await supabase
           .from('line_identity_verifications')
-          .upsert({
-            user_id: user.id,
-            line_user_id: profileData.userId,
-            verified_name: lineDisplayName || profileData.displayName,
-            verified_age: verifiedAge,
-            verified_birth_date: verifiedBirthDate,
-            verification_level: verificationLevel,
-            verified_at: new Date().toISOString(),
-            expires_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
-            verification_data: {
-              line_display_name: profileData.displayName,
-              line_picture_url: profileData.pictureUrl,
-              name_match: nameMatch,
-              age_match: ageMatch,
-              birth_date_match: birthDateMatch,
-            },
-          }, { onConflict: 'user_id' });
+          .select('id')
+          .or(`user_id.eq.${user.id},line_user_id.eq.${profileData.userId}`)
+          .maybeSingle();
+
+        const verificationData = {
+          user_id: user.id,
+          line_user_id: profileData.userId,
+          verified_name: lineDisplayName || profileData.displayName,
+          verified_age: verifiedAge,
+          verified_birth_date: verifiedBirthDate,
+          verification_level: verificationLevel,
+          verified_at: new Date().toISOString(),
+          expires_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+          verification_data: {
+            line_display_name: profileData.displayName,
+            line_picture_url: profileData.pictureUrl,
+            name_match: nameMatch,
+            age_match: ageMatch,
+            birth_date_match: birthDateMatch,
+          },
+        };
+
+        let verificationError;
+        if (existingVerification) {
+          // 기존 레코드 업데이트
+          const { error } = await supabase
+            .from('line_identity_verifications')
+            .update(verificationData)
+            .eq('id', existingVerification.id);
+          verificationError = error;
+        } else {
+          // 새 레코드 삽입
+          const { error } = await supabase
+            .from('line_identity_verifications')
+            .insert(verificationData);
+          verificationError = error;
+        }
+
         if (verificationError) {
           return json({ success: false, error: `신원확인 저장 실패: ${verificationError.message}` }, 400, CORS);
         }
