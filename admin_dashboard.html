@@ -673,7 +673,10 @@
         const filter = document.getElementById('identityFilter').value;
         let query = supabase
           .from('identity_verification_requests')
-          .select('*, profiles(full_name, email, phone_number, birth_date)')
+          .select(`
+            *,
+            profiles!identity_verification_requests_user_id_fkey(full_name, email, phone_number, birth_date)
+          `)
           .order('created_at', { ascending: false });
 
         if (filter !== 'all') {
