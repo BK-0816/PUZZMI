@@ -394,23 +394,35 @@ export class LineIdentityService {
    */
   async checkBookingEligibility(userId) {
     try {
-      const { data, error } = await supabase
-        .rpc('get_user_verification_status', { p_user_id: userId });
-      
+      // 프로필 정보 조회
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('age, age_verified, identity_verified, verification_level, birth_date')
+        .eq('id', userId)
+        .single();
+
       if (error) throw error;
-      
-      const restrictions = data.restrictions;
-      const recommendations = data.recommendations;
-      
+
+      // 나이 확인
+      let age = profile.age;
+      if (!age && profile.birth_date) {
+        age = this.calculateAge(profile.birth_date);
+      }
+
+      // 18세 미만 체크
+      const isMinor = age && age < 18;
+      const isAdult = age && age >= 18;
+
       return {
-        canBook: restrictions.can_book,
-        requiresGuardian: restrictions.requires_guardian,
-        verificationRequired: restrictions.verification_required,
-        ageVerificationRequired: restrictions.age_verification_required,
-        recommendations: recommendations,
-        verificationLevel: data.profile.verification_level
+        canBook: isAdult,
+        requiresGuardian: isMinor,
+        verificationRequired: !profile.identity_verified,
+        ageVerificationRequired: !profile.age_verified,
+        recommendations: isMinor ? ['보호자 동의가 필요합니다'] : [],
+        verificationLevel: profile.verification_level || 'none',
+        age: age
       };
-      
+
     } catch (error) {
       console.error('예약 자격 확인 실패:', error);
       throw error;
