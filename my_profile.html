@@ -1607,10 +1607,17 @@
         if (error) throw error;
 
         // 관리자에게 LINE 알림 (Edge Function 호출)
-        const uploadUrl = `${SUPABASE_URL}/passport-upload/${token}`;
+        const uploadUrl = `${window.location.origin}/passport_verification.html?token=${token}`;
 
         const { data: { session } } = await supabase.auth.getSession();
-        await fetch(`${SUPABASE_URL}/functions/v1/send-line-notification`, {
+
+        console.log('📤 LINE 메시지 발송 요청:', {
+          userId: user.id,
+          uploadUrl,
+          token: session?.access_token?.substring(0, 20) + '...'
+        });
+
+        const lineResponse = await fetch(`${SUPABASE_URL}/functions/v1/send-line-notification`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -1622,6 +1629,13 @@
             uploadUrl: uploadUrl
           })
         });
+
+        const lineResult = await lineResponse.json();
+        console.log('📨 LINE 메시지 발송 결과:', lineResult);
+
+        if (!lineResponse.ok || !lineResult.success) {
+          throw new Error(lineResult.error || 'LINE 메시지 발송 실패');
+        }
 
         showToast('✅ 認証申請が完了しました！LINEでアップロードリンクが送信されました。');
         await checkIdentityVerification();
