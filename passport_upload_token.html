@@ -161,11 +161,17 @@
       try {
         const { data, error } = await supabaseClient
           .from('identity_verification_requests')
-          .select('*, profiles!inner(full_name)')
+          .select('*, profiles(full_name)')
           .eq('verification_token', token)
           .maybeSingle();
 
-        if (error || !data) {
+        if (error) {
+          console.error('Query error:', error);
+          showError('無効なリンクです: ' + error.message);
+          return;
+        }
+
+        if (!data) {
           showError('無効なリンクです');
           return;
         }
@@ -176,11 +182,12 @@
         }
 
         requestData = data;
-        document.getElementById('userName').textContent = data.profiles.full_name;
+        document.getElementById('userName').textContent = data.profiles?.full_name || 'ユーザー';
 
         document.getElementById('loadingScreen').classList.remove('active');
         document.getElementById('uploadScreen').style.display = 'block';
       } catch (err) {
+        console.error('Exception:', err);
         showError('エラーが発生しました: ' + err.message);
       }
     }
