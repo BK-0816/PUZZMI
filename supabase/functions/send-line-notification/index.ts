@@ -6,7 +6,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Client-Info, Apikey',
 };
 
-const LINE_CHANNEL_ACCESS_TOKEN = 'YOUR_LINE_CHANNEL_ACCESS_TOKEN';
+const LINE_CHANNEL_ACCESS_TOKEN = 'e743b9de9cd4ecc5b1d44f8d4c34d9d3';
 
 interface SendNotificationRequest {
   userId: string;
