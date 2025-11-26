@@ -257,6 +257,14 @@
 
     async function init() {
       const urlParams = new URLSearchParams(window.location.search);
+
+      // 토큰이 있으면 Edge Function으로 리다이렉트
+      const token = urlParams.get('token');
+      if (token) {
+        window.location.href = `https://eevvgbbokenpjnvtmztk.supabase.co/functions/v1/passport-upload/${token}`;
+        return;
+      }
+
       bookingId = urlParams.get('booking_id');
 
       if (!bookingId) {
