@@ -1156,7 +1156,14 @@
           // 시뮬레이션 성공 처리
           if (data.type === 'LINE_AUTH_SUCCESS') {
             console.log('LINE 연동 성공 메시지 받음:', data);
-            showToast('✅ LINE 계정이 성공적으로 연동되었습니다!');
+
+            // Bot 친구 추가 안내 모달 표시
+            if (data.addFriend) {
+              showAddBotFriendModal();
+            } else {
+              showToast('✅ LINE 계정이 성공적으로 연동되었습니다!');
+            }
+
             await checkLineConnection();
             if (popup && !popup.closed) popup.close();
             window.removeEventListener('message', messageHandler);
@@ -1644,6 +1651,51 @@
         showToast('❌ 認証申請に失敗しました: ' + error.message);
       }
     };
+
+    // Bot 친구 추가 안내 모달
+    function showAddBotFriendModal() {
+      const modal = document.createElement('div');
+      modal.style.cssText = `
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.7); display: flex; align-items: center;
+        justify-content: center; z-index: 10000; animation: fadeIn 0.3s;
+      `;
+      modal.innerHTML = `
+        <div style="background: white; padding: 32px; border-radius: 20px; max-width: 480px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+          <div style="text-align: center; margin-bottom: 24px;">
+            <div style="font-size: 3.5rem; margin-bottom: 16px;">🎉</div>
+            <h3 style="font-size: 1.5rem; font-weight: 800; color: #333; margin-bottom: 8px;">LINE連動完了！</h3>
+            <p style="color: #666; font-size: 0.95rem; line-height: 1.6;">
+              メッセージ通知を受け取るには<br>
+              <strong style="color: #00C300;">PUZZMI Bot</strong>を友だち追加してください
+            </p>
+          </div>
+
+          <div style="background: linear-gradient(135deg, #00C300 0%, #00B900 100%); padding: 20px; border-radius: 12px; margin-bottom: 20px; text-align: center;">
+            <a href="https://line.me/R/ti/p/@puzzmi" target="_blank"
+               style="display: inline-block; background: white; color: #00C300; padding: 14px 28px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 1.05rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: all 0.3s;">
+              <i class="fab fa-line"></i> PUZZMI Bot 友だち追加
+            </a>
+          </div>
+
+          <div style="background: #f8f9fa; padding: 16px; border-radius: 10px; margin-bottom: 20px;">
+            <div style="font-size: 0.9rem; color: #666; line-height: 1.7;">
+              <strong style="color: #333;">📱 受け取れる通知：</strong><br>
+              • 本人認証リクエスト<br>
+              • 予約確定の通知<br>
+              • お支払いリクエスト
+            </div>
+          </div>
+
+          <button onclick="this.parentElement.parentElement.remove()"
+                  style="width: 100%; padding: 14px; background: #667eea; color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 1rem; transition: all 0.3s;">
+            閉じる
+          </button>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+    }
 
     // 업로드 링크 표시
     window.showUploadLink = function(token) {

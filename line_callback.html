@@ -121,10 +121,17 @@
         if (!result.success) throw new Error(result.error || 'LINE 인증 처리 실패');
 
         if (window.opener) {
-          window.opener.postMessage({ type: 'LINE_AUTH_SUCCESS', message: result.message || '연동 완료' }, '*');
+          window.opener.postMessage({ type: 'LINE_AUTH_SUCCESS', message: result.message || '연동 완료', addFriend: true }, '*');
         }
-        statusEl.innerHTML = `<div class="success">✅ 연동 성공! 잠시 후 창이 닫힙니다.</div>`;
-        setTimeout(() => window.close(), 600);
+        statusEl.innerHTML = `
+          <div class="success">
+            <strong>✅ LINE 연동 성공!</strong><br>
+            <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(10,97,71,0.2);">
+              메시지를 받으려면 PUZZMI Bot을 친구 추가해주세요!
+            </div>
+          </div>
+        `;
+        setTimeout(() => window.close(), 2000);
       } catch (e) {
         if (window.opener) {
           window.opener.postMessage({ type: 'LINE_AUTH_ERROR', error: String(e && e.message ? e.message : e) }, '*');
