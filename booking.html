@@ -1185,8 +1185,11 @@
       // 나이 제한 확인
       try {
         const { checkAgeRestrictionForBooking } = await import('./line_identity_service.js');
-        await checkAgeRestrictionForBooking(user.id);
+        console.log('나이 제한 확인 시작:', user.id);
+        const ageCheck = await checkAgeRestrictionForBooking(user.id);
+        console.log('나이 제한 확인 결과:', ageCheck);
       } catch (ageError) {
+        console.error('나이 제한 확인 오류:', ageError);
         result.innerHTML = `
           <div class="result-message result-error">
             <div style="font-size: 2rem; margin-bottom: 12px;">🔞</div>
