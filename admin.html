@@ -259,6 +259,34 @@
       }
 
       try {
+        const oid = `PUZZMI_${bookingId}_${Date.now()}`;
+        const timestamp = Date.now();
+        const token = crypto.randomUUID();
+
+        const signatureData = `oid=${oid}&price=${amount}&timestamp=${timestamp}`;
+        const signatureBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(signatureData));
+        const signature = Array.from(new Uint8Array(signatureBuffer))
+          .map(b => b.toString(16).padStart(2, '0'))
+          .join('');
+
+        const INICIS_SIGN_KEY = 'SU5JTElURV9UUklQTEVERVNfS0VZU1RS';
+        const verificationData = `oid=${oid}&price=${amount}&signKey=${INICIS_SIGN_KEY}&timestamp=${timestamp}`;
+        const verificationBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verificationData));
+        const verification = Array.from(new Uint8Array(verificationBuffer))
+          .map(b => b.toString(16).padStart(2, '0'))
+          .join('');
+
+        const mKeyBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(INICIS_SIGN_KEY));
+        const mKey = Array.from(new Uint8Array(mKeyBuffer))
+          .map(b => b.toString(16).padStart(2, '0'))
+          .join('');
+
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('full_name, email, phone_number')
+          .eq('id', booking.customer_id)
+          .maybeSingle();
+
         const { data: payment, error: paymentError } = await supabase
           .from('kg_inicis_payments')
           .insert({
@@ -268,14 +296,23 @@
             amount: amount,
             currency: 'KRW',
             payment_status: 'pending',
-            oid: `PUZZMI_${bookingId}_${Date.now()}`
+            oid: oid,
+            payment_token: token,
+            inicis_signature: signature,
+            inicis_verification: verification,
+            inicis_timestamp: timestamp,
+            buyer_name: profile?.full_name || booking.customer_name,
+            buyer_tel: profile?.phone_number || booking.customer_contact,
+            buyer_email: profile?.email || '',
+            good_name: '렌탈친구 서비스',
+            metadata: { mKey }
           })
           .select()
           .single();
 
         if (paymentError) throw paymentError;
 
-        const paymentUrl = `${window.location.origin}/kg_inicis_payment.html?payment_id=${payment.id}`;
+        const paymentUrl = `${SUPABASE_URL}/functions/v1/inicis-payment-page/${token}`;
 
         const { data: { session } } = await supabase.auth.getSession();
         const response = await fetch(`${SUPABASE_URL}/functions/v1/send-line-notification`, {
@@ -306,7 +343,7 @@
           .eq('id', payment.id);
 
         if (result.success) {
-          alert(`✓ 결제 요청이 LINE으로 발송되었습니다!\n금액: ${amount.toLocaleString()}원`);
+          alert(`✓ 결제 요청이 LINE으로 발송되었습니다!\n금액: ${amount.toLocaleString()}원\n\n링크: ${paymentUrl}`);
         } else {
           alert('발송 실패: ' + result.error);
         }
