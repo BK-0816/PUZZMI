@@ -1547,7 +1547,8 @@
 
         actionsEl.innerHTML = '';
 
-        if (profile?.identity_verified) {
+        // 여권 인증 시스템: request.status === 'approved'일 때만 인증 완료로 표시
+        if (request?.status === 'approved') {
           statusEl.innerHTML = `
             <div style="padding: 16px; background: linear-gradient(135deg, rgba(40, 167, 69, 0.1) 0%, rgba(40, 167, 69, 0.05) 100%); border-radius: 12px; border-left: 4px solid #28a745;">
               <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
@@ -1556,6 +1557,13 @@
               </div>
               <div style="color: #666; font-size: 0.95rem;">
                 本人確認が完了しました。予約サービスをご利用いただけます。
+              </div>
+              <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(40, 167, 69, 0.2); font-size: 0.9rem; color: #666;">
+                <strong>認証情報:</strong><br>
+                氏名: ${request.verified_name}<br>
+                生年月日: ${request.verified_birth_date}<br>
+                年齢: ${request.verified_age}歳<br>
+                国籍: ${request.verified_nationality}
               </div>
             </div>
           `;
