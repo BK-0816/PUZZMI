@@ -673,10 +673,7 @@
         const filter = document.getElementById('identityFilter').value;
         let query = supabase
           .from('identity_verification_requests')
-          .select(`
-            *,
-            profiles!identity_verification_requests_user_id_fkey(full_name, email, phone_number, birth_date)
-          `)
+          .select('*')
           .order('created_at', { ascending: false });
 
         if (filter !== 'all') {
@@ -684,6 +681,22 @@
         }
 
         const { data: requests, error } = await query;
+
+        if (error) throw error;
+
+        // 프로필 정보 별도로 가져오기
+        if (requests && requests.length > 0) {
+          const userIds = requests.map(r => r.user_id);
+          const { data: profiles } = await supabase
+            .from('profiles')
+            .select('id, full_name, email, phone_number, birth_date')
+            .in('id', userIds);
+
+          // 프로필 정보를 requests에 병합
+          requests.forEach(req => {
+            req.profiles = profiles?.find(p => p.id === req.user_id);
+          });
+        }
         if (error) throw error;
 
         if (!requests || !requests.length) {
