@@ -243,41 +243,27 @@
       submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> アップロード中...';
 
       try {
-        const file = fileInput.files[0];
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${requestData.user_id}/${Date.now()}.${fileExt}`;
+        const formData = new FormData();
+        formData.append('passport', fileInput.files[0]);
+        formData.append('token', token);
 
-        // Upload to storage
-        const { data: uploadData, error: uploadError } = await supabaseClient.storage
-          .from('passports')
-          .upload(fileName, file, {
-            contentType: file.type,
-            upsert: false
-          });
+        const response = await fetch(`${supabaseUrl}/functions/v1/passport-upload/${token}`, {
+          method: 'POST',
+          body: formData
+        });
 
-        if (uploadError) throw uploadError;
-
-        // Get public URL
-        const { data: { publicUrl } } = supabaseClient.storage
-          .from('passports')
-          .getPublicUrl(fileName);
-
-        // Update request
-        const { error: updateError } = await supabaseClient
-          .from('identity_verification_requests')
-          .update({
-            status: 'passport_uploaded',
-            passport_image_url: publicUrl
-          })
-          .eq('verification_token', token);
-
-        if (updateError) throw updateError;
+        if (!response.ok) {
+          const error = await response.text();
+          throw new Error(error || 'アップロードに失敗しました');
+        }
 
         document.getElementById('uploadScreen').style.display = 'none';
         document.getElementById('successScreen').style.display = 'block';
       } catch (error) {
         console.error('Upload error:', error);
         showError(error.message);
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-upload"></i> アップロード';
       }
     });
 
