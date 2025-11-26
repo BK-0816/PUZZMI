@@ -161,7 +161,7 @@
       try {
         const { data, error } = await supabaseClient
           .from('identity_verification_requests')
-          .select('*, profiles(full_name)')
+          .select('id, user_id, status, verification_token, created_at')
           .eq('verification_token', token)
           .maybeSingle();
 
@@ -181,8 +181,14 @@
           return;
         }
 
+        const { data: profile, error: profileError } = await supabaseClient
+          .from('profiles')
+          .select('full_name')
+          .eq('id', data.user_id)
+          .single();
+
         requestData = data;
-        document.getElementById('userName').textContent = data.profiles?.full_name || 'ユーザー';
+        document.getElementById('userName').textContent = profile?.full_name || 'ユーザー';
 
         document.getElementById('loadingScreen').classList.remove('active');
         document.getElementById('uploadScreen').style.display = 'block';
