@@ -256,7 +256,7 @@ export async function renderNavbar(rootId = 'app-nav') {
     
     // 관리자 메뉴
     if (isAdmin) {
-      userMenu.appendChild(createElement('a', { class: 'dropdown-item', href: 'admin_plus.html' }, [
+      userMenu.appendChild(createElement('a', { class: 'dropdown-item', href: 'admin_dashboard.html' }, [
         createElement('i', { class: 'fas fa-tachometer-alt' }),
         createElement('span', {}, '관리자')
       ]));
@@ -428,7 +428,7 @@ function createMobileMenu(root, commonMenus, user, isAdmin, isMate) {
       
       adminSection.appendChild(createElement('a', { 
         class: 'mobile-menu-link', 
-        href: 'admin_plus.html',
+        href: 'admin_dashboard.html',
         onclick: closeMobileMenu
       }, [
         createElement('i', { class: 'fas fa-tachometer-alt' }),
