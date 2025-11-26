@@ -45,15 +45,16 @@ export const LINE_CONFIG = {
       }
       
       const result = await response.json();
-      
+
       if (!result.success) {
         throw new Error(result.error || 'LINE URL 생성 실패');
       }
-      
+
       console.log('✅ Edge Function으로 LINE URL 생성 성공');
       return result.loginUrl;
-      
-      // Edge Function 호출 실패 시 에러 표시
+
+    } catch (error) {
+      console.error('LINE URL 생성 실패:', error);
       throw error;
     }
   },
