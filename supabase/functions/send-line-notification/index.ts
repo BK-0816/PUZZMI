@@ -10,9 +10,10 @@ const LINE_CHANNEL_ACCESS_TOKEN = 'YOUR_LINE_CHANNEL_ACCESS_TOKEN';
 
 interface SendNotificationRequest {
   userId: string;
-  bookingId: number;
-  type: 'passport_verification' | 'payment_request';
+  bookingId?: number;
+  type: 'passport_verification' | 'payment_request' | 'identity_verification_request';
   passportVerificationUrl?: string;
+  uploadUrl?: string;
   paymentUrl?: string;
   amount?: number;
 }
@@ -34,7 +35,7 @@ Deno.serve(async (req) => {
     }
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    const { userId, bookingId, type, passportVerificationUrl, paymentUrl, amount }: SendNotificationRequest = await req.json();
+    const { userId, bookingId, type, passportVerificationUrl, uploadUrl, paymentUrl, amount }: SendNotificationRequest = await req.json();
 
     console.log('📨 LINE 메시지 발송 요청:', { userId, bookingId, type });
 
@@ -51,10 +52,11 @@ Deno.serve(async (req) => {
     console.log('✅ LINE 계정 찾음:', lineAccount.line_display_name);
 
     let message;
-    if (type === 'passport_verification') {
+    if (type === 'passport_verification' || type === 'identity_verification_request') {
+      const verificationUrl = uploadUrl || passportVerificationUrl;
       message = {
         type: 'flex',
-        altText: '🛂 PUZZMI - 여권 인증 요청',
+        altText: '🛂 PUZZMI - 本人認証リクエスト',
         contents: {
           type: 'bubble',
           hero: {
@@ -63,7 +65,7 @@ Deno.serve(async (req) => {
             contents: [
               {
                 type: 'text',
-                text: '🛂 여권 인증',
+                text: '🛂 本人認証',
                 weight: 'bold',
                 size: 'xl',
                 align: 'center',
@@ -79,14 +81,14 @@ Deno.serve(async (req) => {
             contents: [
               {
                 type: 'text',
-                text: '예약하신 서비스를 이용하시려면 여권 인증이 필요합니다.',
+                text: 'サービスをご利用いただくには本人認証が必要です。',
                 wrap: true,
                 size: 'md',
                 margin: 'md'
               },
               {
                 type: 'text',
-                text: '아래 버튼을 눌러 여권 사진을 업로드해주세요.',
+                text: '下のボタンからパスポート写真をアップロードしてください。',
                 wrap: true,
                 size: 'sm',
                 color: '#999999',
@@ -100,8 +102,8 @@ Deno.serve(async (req) => {
                     type: 'button',
                     action: {
                       type: 'uri',
-                      label: '✅ 여권 인증하기',
-                      uri: passportVerificationUrl
+                      label: '✅ パスポートをアップロード',
+                      uri: verificationUrl
                     },
                     style: 'primary',
                     color: '#667eea'
@@ -175,7 +177,7 @@ Deno.serve(async (req) => {
               },
               {
                 type: 'text',
-                text: '아래 버튼을 눌러 안전하게 결제를 진행해주세요.',
+                text: '아래 버튼을 누르대 안전하게 결제를 진행해주세요.',
                 wrap: true,
                 size: 'sm',
                 color: '#666666',
