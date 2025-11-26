@@ -1181,7 +1181,7 @@
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      
+
       // 나이 제한 확인
       try {
         const { checkAgeRestrictionForBooking } = await import('./line_identity_service.js');
@@ -1197,6 +1197,7 @@
             </a>
           </div>
         `;
+        submitBtn.disabled = false;
         return;
       }
       
