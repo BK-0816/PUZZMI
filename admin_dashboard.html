@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PUZZMI 관리자 대시보드</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="pages.css"/>
+  <link rel="stylesheet" href="pages-theme.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <style>
+    body { background: #f5f7fa; min-height: 100vh; }
+
+    /* 헤더 */
+    .admin-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 32px 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    .admin-header h1 {
+      max-width: 1400px;
+      margin: 0 auto;
+      font-size: 2rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* 탭 네비게이션 */
+    .tab-nav {
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .tab-nav-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      gap: 0;
+      padding: 0 20px;
+      overflow-x: auto;
+    }
+    .tab-button {
+      padding: 20px 32px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1rem;
+      color: #666;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .tab-button:hover {
+      color: #667eea;
+      background: rgba(102, 126, 234, 0.05);
+    }
+    .tab-button.active {
+      color: #667eea;
+      border-bottom-color: #667eea;
+      background: rgba(102, 126, 234, 0.05);
+    }
+
+    /* 컨텐츠 영역 */
+    .tab-content {
+      display: none;
+      max-width: 1400px;
+      margin: 32px auto;
+      padding: 0 20px;
+    }
+    .tab-content.active {
+      display: block;
+    }
+
+    /* 카드 */
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      margin-bottom: 24px;
+    }
+    .card h2 {
+      margin: 0 0 24px 0;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #333;
+    }
+
+    /* 테이블 */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+    }
+    th {
+      background: #f8f9fa;
+      padding: 16px 12px;
+      text-align: left;
+      font-weight: 700;
+      color: #666;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      border-bottom: 2px solid #e9ecef;
+    }
+    td {
+      padding: 16px 12px;
+      border-bottom: 1px solid #f0f0f0;
+      vertical-align: middle;
+    }
+    tr:hover {
+      background: #f8f9fa;
+    }
+
+    /* 버튼 */
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 0.9rem;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    .btn-success {
+      background: #28a745;
+      color: white;
+    }
+    .btn-success:hover {
+      background: #218838;
+      transform: translateY(-2px);
+    }
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+    }
+    .btn-secondary:hover {
+      background: #5a6268;
+    }
+
+    /* 배지 */
+    .badge {
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: inline-block;
+    }
+    .badge-pending { background: #fff3cd; color: #856404; }
+    .badge-confirmed { background: #d1e7dd; color: #0f5132; }
+    .badge-completed { background: #cfe2ff; color: #084298; }
+    .badge-cancelled { background: #f8d7da; color: #721c24; }
+
+    /* 툴바 */
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .toolbar input, .toolbar select {
+      padding: 10px 16px;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      font-size: 0.95rem;
+    }
+    .toolbar input:focus, .toolbar select:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    /* 로딩 */
+    .loading {
+      text-align: center;
+      padding: 60px 20px;
+      color: #666;
+    }
+    .loading i {
+      font-size: 2rem;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* 반응형 */
+    @media (max-width: 768px) {
+      .admin-header h1 {
+        font-size: 1.5rem;
+      }
+      .tab-button {
+        padding: 16px 20px;
+        font-size: 0.9rem;
+      }
+      .card {
+        padding: 20px;
+      }
+      table {
+        font-size: 0.85rem;
+      }
+      th, td {
+        padding: 12px 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 헤더 -->
+  <header class="admin-header">
+    <h1>
+      <i class="fas fa-crown"></i>
+      PUZZMI 관리자 대시보드
+    </h1>
+  </header>
+
+  <!-- 탭 네비게이션 -->
+  <nav class="tab-nav">
+    <div class="tab-nav-inner">
+      <button class="tab-button active" data-tab="bookings">
+        <i class="fas fa-calendar-check"></i> 예약 관리
+      </button>
+      <button class="tab-button" data-tab="mates">
+        <i class="fas fa-users"></i> 메이트 관리
+      </button>
+      <button class="tab-button" data-tab="identity">
+        <i class="fas fa-id-card"></i> 본인인증 관리
+      </button>
+      <button class="tab-button" data-tab="payments">
+        <i class="fas fa-credit-card"></i> 결제 관리
+      </button>
+    </div>
+  </nav>
+
+  <!-- 예약 관리 탭 -->
+  <div class="tab-content active" id="tab-bookings">
+    <div class="card">
+      <h2>예약 관리</h2>
+
+      <div class="toolbar">
+        <select id="statusFilter">
+          <option value="pending">대기중</option>
+          <option value="confirmed">확정</option>
+          <option value="completed">완료</option>
+          <option value="declined">거절</option>
+          <option value="cancelled">취소</option>
+          <option value="all">전체</option>
+        </select>
+        <input id="searchBooking" placeholder="고객명, 연락처 검색..." style="flex: 1; max-width: 400px;"/>
+        <button class="btn btn-primary" id="refreshBookings">
+          <i class="fas fa-sync-alt"></i> 새로고침
+        </button>
+      </div>
+
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>상태</th>
+              <th>일시</th>
+              <th>고객</th>
+              <th>연락처</th>
+              <th>메이트</th>
+              <th>LINE</th>
+              <th>조치</th>
+            </tr>
+          </thead>
+          <tbody id="bookingsTableBody">
+            <tr><td colspan="8" class="loading"><i class="fas fa-spinner"></i> 로딩 중...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 메이트 관리 탭 -->
+  <div class="tab-content" id="tab-mates">
+    <div class="card">
+      <h2>메이트 관리</h2>
+
+      <div class="toolbar">
+        <select id="verifyFilter">
+          <option value="">검증 상태: 전체</option>
+          <option value="true">검증됨만</option>
+          <option value="false">미검증만</option>
+        </select>
+        <input id="searchMate" placeholder="이름, 태그 검색..." style="flex: 1; max-width: 400px;"/>
+        <button class="btn btn-primary" id="refreshMates">
+          <i class="fas fa-sync-alt"></i> 새로고침
+        </button>
+      </div>
+
+      <div id="matesGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+        <div class="loading"><i class="fas fa-spinner"></i> 로딩 중...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 본인인증 관리 탭 -->
+  <div class="tab-content" id="tab-identity">
+    <div class="card">
+      <h2>본인인증 관리</h2>
+
+      <div class="toolbar">
+        <select id="identityFilter">
+          <option value="all">전체</option>
+          <option value="pending">대기중</option>
+          <option value="passport_uploaded">심사 대기</option>
+          <option value="approved">승인됨</option>
+          <option value="rejected">거부됨</option>
+        </select>
+        <button class="btn btn-primary" id="refreshIdentity">
+          <i class="fas fa-sync-alt"></i> 새로고침
+        </button>
+      </div>
+
+      <div id="identityRequests">
+        <div class="loading"><i class="fas fa-spinner"></i> 로딩 중...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 결제 관리 탭 -->
+  <div class="tab-content" id="tab-payments">
+    <div class="card">
+      <h2>결제 관리</h2>
+
+      <div class="toolbar">
+        <select id="paymentFilter">
+          <option value="all">전체</option>
+          <option value="pending">대기중</option>
+          <option value="sent">발송됨</option>
+          <option value="paid">결제 완료</option>
+          <option value="failed">실패</option>
+          <option value="cancelled">취소</option>
+        </select>
+        <button class="btn btn-primary" id="refreshPayments">
+          <i class="fas fa-sync-alt"></i> 새로고침
+        </button>
+      </div>
+
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>예약 ID</th>
+              <th>고객</th>
+              <th>금액</th>
+              <th>상태</th>
+              <th>생성일</th>
+            </tr>
+          </thead>
+          <tbody id="paymentsTableBody">
+            <tr><td colspan="6" class="loading"><i class="fas fa-spinner"></i> 로딩 중...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+    const SUPABASE_URL = "https://eevvgbbokenpjnvtmztk.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4";
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // 관리자 인증 확인
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      location.replace('auth_combo.html?redirect=admin_dashboard.html');
+    }
+
+    const { data: isAdmin } = await supabase.from('admin_users').select('user_id').eq('user_id', user.id).maybeSingle();
+    if (!isAdmin) {
+      alert('관리자 권한이 필요합니다.');
+      location.replace('index.html');
+    }
+
+    // 탭 전환
+    document.querySelectorAll('.tab-button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tabName = btn.dataset.tab;
+
+        document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+        btn.classList.add('active');
+        document.getElementById(`tab-${tabName}`).classList.add('active');
+
+        // 탭 전환 시 데이터 로드
+        if (tabName === 'bookings') loadBookings();
+        else if (tabName === 'mates') loadMates();
+        else if (tabName === 'identity') loadIdentity();
+        else if (tabName === 'payments') loadPayments();
+      });
+    });
+
+    // ========== 예약 관리 ==========
+    let allBookings = [];
+    let matesMap = new Map();
+    let lineAccountsMap = new Map();
+
+    async function loadBookings() {
+      const tbody = document.getElementById('bookingsTableBody');
+      tbody.innerHTML = '<tr><td colspan="8" class="loading"><i class="fas fa-spinner"></i> 로딩 중...</td></tr>';
+
+      try {
+        // 메이트 정보 로드
+        const { data: mates } = await supabase
+          .from('mate_profiles')
+          .select('user_id, profiles(full_name)');
+        if (mates) {
+          matesMap = new Map(mates.map(m => [m.user_id, m.profiles?.full_name || m.user_id]));
+        }
+
+        // LINE 계정 정보 로드
+        const { data: lineAccounts } = await supabase
+          .from('user_line_accounts')
+          .select('user_id, line_display_name');
+        if (lineAccounts) {
+          lineAccountsMap = new Map(lineAccounts.map(l => [l.user_id, l.line_display_name]));
+        }
+
+        // 예약 정보 로드
+        const { data: bookings, error } = await supabase
+          .from('bookings')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(200);
+
+        if (error) throw error;
+        allBookings = bookings || [];
+        renderBookings();
+      } catch (error) {
+        console.error('예약 로드 실패:', error);
+        tbody.innerHTML = `<tr><td colspan="8" style="color: red; text-align: center; padding: 40px;">❌ 로드 실패: ${error.message}</td></tr>`;
+      }
+    }
+
+    function renderBookings() {
+      const tbody = document.getElementById('bookingsTableBody');
+      const statusFilter = document.getElementById('statusFilter').value;
+      const search = document.getElementById('searchBooking').value.toLowerCase();
+
+      let filtered = allBookings.filter(b => {
+        if (statusFilter !== 'all' && b.status !== statusFilter) return false;
+        if (search && !b.customer_name?.toLowerCase().includes(search) && !b.customer_contact?.toLowerCase().includes(search)) return false;
+        return true;
+      });
+
+      if (!filtered.length) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: #666;">검색 결과가 없습니다.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(b => {
+        const mateName = matesMap.get(b.mate_id) || b.mate_id;
+        const lineName = lineAccountsMap.get(b.customer_id);
+        const lineStatus = lineName ? `<span style="color: #28a745;">✓ ${lineName}</span>` : '<span style="color: #999;">미연동</span>';
+
+        return `
+          <tr>
+            <td>#${b.id}</td>
+            <td><span class="badge badge-${b.status}">${b.status}</span></td>
+            <td>${b.date} ${b.start_time}</td>
+            <td>${b.customer_name}</td>
+            <td>${b.customer_contact}</td>
+            <td>${mateName}</td>
+            <td>${lineStatus}</td>
+            <td>
+              ${lineName ? `
+                <button class="btn btn-success" onclick="sendPassportRequest('${b.id}')" style="font-size: 0.8rem; padding: 6px 12px;">
+                  🛂 여권
+                </button>
+                <button class="btn btn-success" onclick="sendPaymentRequest('${b.id}')" style="font-size: 0.8rem; padding: 6px 12px;">
+                  💳 결제
+                </button>
+              ` : ''}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    window.sendPassportRequest = async function(bookingId) {
+      if (!confirm('여권 인증 링크를 LINE으로 발송하시겠습니까?')) return;
+
+      const booking = allBookings.find(b => b.id == bookingId);
+      if (!booking) return alert('예약 정보를 찾을 수 없습니다.');
+
+      try {
+        const passportUrl = `${location.origin}/passport_verification.html?booking_id=${bookingId}`;
+        const { data: { session } } = await supabase.auth.getSession();
+
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/send-line-notification`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`
+          },
+          body: JSON.stringify({
+            userId: booking.customer_id,
+            bookingId: bookingId,
+            type: 'passport_verification',
+            passportVerificationUrl: passportUrl
+          })
+        });
+
+        const result = await response.json();
+        if (result.success) {
+          alert('✓ LINE 메시지가 발송되었습니다!');
+        } else {
+          alert('발송 실패: ' + result.error);
+        }
+      } catch (error) {
+        alert('발송 실패: ' + error.message);
+      }
+    };
+
+    window.sendPaymentRequest = async function(bookingId) {
+      const amount = prompt('결제 금액을 입력하세요 (원):', '40000');
+      if (!amount) return;
+
+      const booking = allBookings.find(b => b.id == bookingId);
+      if (!booking) return alert('예약 정보를 찾을 수 없습니다.');
+
+      try {
+        const oid = `PUZZMI_${bookingId}_${Date.now()}`;
+        const token = crypto.randomUUID();
+
+        const { data: payment } = await supabase
+          .from('kg_inicis_payments')
+          .insert({
+            booking_id: bookingId,
+            user_id: booking.customer_id,
+            mate_id: booking.mate_id,
+            amount: parseInt(amount),
+            currency: 'KRW',
+            payment_status: 'pending',
+            oid: oid,
+            payment_token: token,
+            buyer_name: booking.customer_name,
+            buyer_tel: booking.customer_contact,
+            good_name: '렌탈친구 서비스'
+          })
+          .select()
+          .single();
+
+        const paymentUrl = `${SUPABASE_URL}/functions/v1/inicis-payment-page/${token}`;
+        const { data: { session } } = await supabase.auth.getSession();
+
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/send-line-notification`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`
+          },
+          body: JSON.stringify({
+            userId: booking.customer_id,
+            bookingId: bookingId,
+            type: 'payment_request',
+            paymentUrl: paymentUrl,
+            amount: parseInt(amount)
+          })
+        });
+
+        const result = await response.json();
+        if (result.success) {
+          alert(`✓ 결제 요청이 LINE으로 발송되었습니다!\n금액: ${parseInt(amount).toLocaleString()}원`);
+        } else {
+          alert('발송 실패: ' + result.error);
+        }
+      } catch (error) {
+        alert('발송 실패: ' + error.message);
+      }
+    };
+
+    document.getElementById('statusFilter').addEventListener('change', renderBookings);
+    document.getElementById('searchBooking').addEventListener('input', renderBookings);
+    document.getElementById('refreshBookings').addEventListener('click', loadBookings);
+
+    // ========== 메이트 관리 ==========
+    async function loadMates() {
+      const grid = document.getElementById('matesGrid');
+      grid.innerHTML = '<div class="loading"><i class="fas fa-spinner"></i> 로딩 중...</div>';
+
+      try {
+        const { data: mates, error } = await supabase
+          .from('mate_profiles')
+          .select('user_id, is_verified, rating, profiles(full_name, avatar_url)')
+          .order('rating', { ascending: false })
+          .limit(100);
+
+        if (error) throw error;
+
+        if (!mates || !mates.length) {
+          grid.innerHTML = '<div style="text-align: center; color: #666; padding: 40px;">메이트가 없습니다.</div>';
+          return;
+        }
+
+        grid.innerHTML = mates.map(mate => `
+          <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+            <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 16px;">
+              <img src="${mate.profiles?.avatar_url || 'https://picsum.photos/80'}"
+                   style="width: 80px; height: 80px; border-radius: 12px; object-fit: cover;" />
+              <div>
+                <div style="font-weight: 700; font-size: 1.1rem; margin-bottom: 4px;">${mate.profiles?.full_name || '이름없음'}</div>
+                <div style="color: #666; font-size: 0.9rem;">⭐ ${(mate.rating || 0).toFixed(1)}</div>
+                <span class="badge ${mate.is_verified ? 'badge-confirmed' : 'badge-pending'}">
+                  ${mate.is_verified ? '✅ 검증됨' : '⏳ 미검증'}
+                </span>
+              </div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <a href="mate_like.html?mate_id=${mate.user_id}" target="_blank" class="btn btn-secondary" style="flex: 1; text-align: center; text-decoration: none; font-size: 0.85rem;">
+                프로필 보기
+              </a>
+              <button class="btn btn-primary" onclick="toggleVerify('${mate.user_id}', ${mate.is_verified})" style="flex: 1; font-size: 0.85rem;">
+                ${mate.is_verified ? '검증 해제' : '검증 처리'}
+              </button>
+            </div>
+          </div>
+        `).join('');
+      } catch (error) {
+        grid.innerHTML = `<div style="color: red; text-align: center; padding: 40px;">❌ 로드 실패: ${error.message}</div>`;
+      }
+    }
+
+    window.toggleVerify = async function(mateId, currentStatus) {
+      const newStatus = !currentStatus;
+      if (!confirm(newStatus ? '검증 처리하시겠습니까?' : '검증 해제하시겠습니까?')) return;
+
+      try {
+        const { error } = await supabase
+          .from('mate_profiles')
+          .update({ is_verified: newStatus })
+          .eq('user_id', mateId);
+
+        if (error) throw error;
+        alert(newStatus ? '✅ 검증 처리되었습니다!' : '❌ 검증이 해제되었습니다!');
+        loadMates();
+      } catch (error) {
+        alert('실패: ' + error.message);
+      }
+    };
+
+    document.getElementById('refreshMates').addEventListener('click', loadMates);
+
+    // ========== 본인인증 관리 ==========
+    async function loadIdentity() {
+      const container = document.getElementById('identityRequests');
+      container.innerHTML = '<div class="loading"><i class="fas fa-spinner"></i> 로딩 중...</div>';
+
+      try {
+        const filter = document.getElementById('identityFilter').value;
+        let query = supabase
+          .from('identity_verification_requests')
+          .select('*, profiles(full_name, email)')
+          .order('created_at', { ascending: false });
+
+        if (filter !== 'all') {
+          query = query.eq('status', filter);
+        }
+
+        const { data: requests, error } = await query;
+        if (error) throw error;
+
+        if (!requests || !requests.length) {
+          container.innerHTML = '<div style="text-align: center; color: #666; padding: 40px;">요청이 없습니다.</div>';
+          return;
+        }
+
+        container.innerHTML = requests.map(req => `
+          <div style="background: white; padding: 24px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
+              <div>
+                <div style="font-weight: 700; font-size: 1.1rem;">${req.profiles?.full_name || 'Unknown'}</div>
+                <div style="color: #666; font-size: 0.9rem;">${req.profiles?.email || ''}</div>
+              </div>
+              <span class="badge badge-${req.status}">${req.status}</span>
+            </div>
+            ${req.passport_image_url ? `
+              <img src="${req.passport_image_url}" style="max-width: 400px; width: 100%; border-radius: 8px; margin: 12px 0;" />
+            ` : '<div style="padding: 40px; background: #f8f9fa; border-radius: 8px; text-align: center; color: #666;">여권 미업로드</div>'}
+            <div style="font-size: 0.85rem; color: #999; margin-top: 12px;">
+              생성일: ${new Date(req.created_at).toLocaleString('ko-KR')}
+            </div>
+          </div>
+        `).join('');
+      } catch (error) {
+        container.innerHTML = `<div style="color: red; text-align: center; padding: 40px;">❌ 로드 실패: ${error.message}</div>`;
+      }
+    }
+
+    document.getElementById('identityFilter').addEventListener('change', loadIdentity);
+    document.getElementById('refreshIdentity').addEventListener('click', loadIdentity);
+
+    // ========== 결제 관리 ==========
+    async function loadPayments() {
+      const tbody = document.getElementById('paymentsTableBody');
+      tbody.innerHTML = '<tr><td colspan="6" class="loading"><i class="fas fa-spinner"></i> 로딩 중...</td></tr>';
+
+      try {
+        const { data: payments, error } = await supabase
+          .from('kg_inicis_payments')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(100);
+
+        if (error) throw error;
+
+        if (!payments || !payments.length) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: #666;">결제 내역이 없습니다.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = payments.map(p => `
+          <tr>
+            <td>#${p.id}</td>
+            <td>#${p.booking_id}</td>
+            <td>${p.buyer_name}</td>
+            <td style="font-weight: 700;">₩${(p.amount || 0).toLocaleString()}</td>
+            <td><span class="badge badge-${p.payment_status}">${p.payment_status}</span></td>
+            <td>${new Date(p.created_at).toLocaleDateString('ko-KR')}</td>
+          </tr>
+        `).join('');
+      } catch (error) {
+        tbody.innerHTML = `<tr><td colspan="6" style="color: red; text-align: center; padding: 40px;">❌ 로드 실패: ${error.message}</td></tr>`;
+      }
+    }
+
+    document.getElementById('refreshPayments').addEventListener('click', loadPayments);
+
+    // 초기 로드
+    loadBookings();
+  </script>
+</body>
+</html>
