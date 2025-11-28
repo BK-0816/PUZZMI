@@ -314,7 +314,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-  <script src="https://cbt.inicis.com/js/INIStdPayExt.js" charset="UTF-8"></script>
   <script>
     const SUPABASE_URL = 'https://eevvgbbokenpjnvtmztk.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4';
@@ -459,13 +458,16 @@
           return;
         }
 
-        if (typeof INIStdPay !== 'undefined') {
-          INIStdPay.pay('SendPayForm_id');
-        } else {
-          alert('決済モジュールの読み込みに失敗しました。ページを再読み込みしてください。');
-          payBtn.disabled = false;
-          payBtn.innerHTML = 'お支払いに進む';
-        }
+        const payform = document.getElementById('SendPayForm_id');
+
+        const width = 600;
+        const height = 700;
+        const left = (screen.width - width) / 2;
+        const top = (screen.height - height) / 2;
+
+        window.open('', 'inicisPopup', `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`);
+        payform.target = 'inicisPopup';
+        payform.submit();
 
       } catch (err) {
         console.error('Error:', err);
