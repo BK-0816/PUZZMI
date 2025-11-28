@@ -437,12 +437,16 @@
         }
 
         // LINE 계정 정보 로드
-        const { data: lineAccounts } = await supabase
+        const { data: lineAccounts, error: lineError } = await supabase
           .from('user_line_accounts')
           .select('user_id, line_display_name, is_verified')
           .eq('is_verified', true);
+
+        console.log('📊 LINE 계정 로드:', { lineAccounts, lineError });
+
         if (lineAccounts) {
           lineAccountsMap = new Map(lineAccounts.map(l => [l.user_id, l.line_display_name]));
+          console.log('📊 LINE 계정 맵 생성:', lineAccountsMap);
         }
 
         // 예약 정보 로드
@@ -480,6 +484,14 @@
       tbody.innerHTML = filtered.map(b => {
         const mateName = matesMap.get(b.mate_id) || b.mate_id;
         const lineName = lineAccountsMap.get(b.customer_id);
+
+        console.log(`📋 예약 #${b.id}:`, {
+          customer_id: b.customer_id,
+          customer_name: b.customer_name,
+          lineName: lineName,
+          mapHasKey: lineAccountsMap.has(b.customer_id)
+        });
+
         const lineStatus = lineName ? `<span style="color: #28a745;">✓ ${lineName}</span>` : '<span style="color: #999;">미연동</span>';
 
         return `
