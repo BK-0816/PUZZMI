@@ -65,9 +65,13 @@ Deno.serve(async (req) => {
       closeUrl,
     });
 
-    return new Response(html, {
+    // UTF-8 인코딩을 명시적으로 처리
+    const encoder = new TextEncoder();
+    const encodedHtml = encoder.encode(html);
+
+    return new Response(encodedHtml, {
       headers: {
-        'Content-Type': 'text/html; charset=UTF-8',
+        'Content-Type': 'text/html; charset=utf-8',
       },
     });
   } catch (error) {
