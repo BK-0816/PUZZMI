@@ -667,7 +667,10 @@
 
         const result = await response.json();
         if (result.success) {
-          alert(`✓ 결제 요청이 LINE으로 발송되었습니다!\n금액: ${parseInt(amount).toLocaleString()}원`);
+          const openNow = confirm(`✓ 결제 요청이 LINE으로 발송되었습니다!\n금액: ${parseInt(amount).toLocaleString()}원\n\n결제 페이지를 지금 새 창에서 열어보시겠습니까?`);
+          if (openNow) {
+            window.open(paymentUrl, '_blank', 'width=600,height=800');
+          }
         } else {
           alert('발송 실패: ' + result.error);
         }

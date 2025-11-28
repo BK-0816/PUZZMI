@@ -86,6 +86,26 @@ function getPaymentHTML(params: any): string {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PUZZMI - 결제하기</title>
   <script language="javascript" type="text/javascript" src="https://stgstdpay.inicis.com/stdjs/INIStdPay.js" charset="UTF-8"></script>
+  <script>
+    // LINE WebView 감지
+    function isLineApp() {
+      return /Line/i.test(navigator.userAgent);
+    }
+
+    // 외부 브라우저로 열기 안내
+    if (isLineApp()) {
+      document.addEventListener('DOMContentLoaded', function() {
+        var btn = document.querySelector('.btn-pay');
+        if (btn) {
+          btn.textContent = '⚠️ 외부 브라우저에서 열어주세요';
+          btn.onclick = function() {
+            alert('LINE 앱에서는 결제가 불가능합니다.\\n\\n오른쪽 상단 [...] 메뉴를 누르고\\n"외부 브라우저에서 열기"를 선택해주세요.');
+            return false;
+          };
+        }
+      });
+    }
+  </script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
