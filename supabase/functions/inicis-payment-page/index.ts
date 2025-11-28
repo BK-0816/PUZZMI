@@ -38,7 +38,10 @@ Deno.serve(async (req) => {
 
     if (payment.payment_status === 'paid') {
       return new Response(getAlreadyPaidHTML(), {
-        headers: { 'Content-Type': 'text/html; charset=UTF-8' },
+        headers: {
+          'Content-Type': 'text/html; charset=UTF-8',
+          'Content-Security-Policy': "default-src 'self'; style-src 'unsafe-inline';",
+        },
       });
     }
 
@@ -63,7 +66,11 @@ Deno.serve(async (req) => {
     });
 
     return new Response(html, {
-      headers: { ...corsHeaders, 'Content-Type': 'text/html; charset=UTF-8' },
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'text/html; charset=UTF-8',
+        'Content-Security-Policy': "default-src 'self'; script-src 'unsafe-inline' 'unsafe-eval' https://stgstdpay.inicis.com; style-src 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://stgstdpay.inicis.com; frame-src https://stgstdpay.inicis.com;",
+      },
     });
   } catch (error) {
     console.error('Payment page error:', error);
