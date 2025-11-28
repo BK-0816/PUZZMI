@@ -363,6 +363,11 @@
           document.getElementById('buyerEmail').value = user.email || '';
         }
       }
+
+      // 페이지 로드 시 자동으로 결제 팝업 실행
+      setTimeout(() => {
+        initiatePayment();
+      }, 500);
     }
 
     function generateHash(apikey, mid, timestamp, amount, orderId) {
@@ -403,21 +408,19 @@
       const form = document.getElementById('customerForm');
       const payBtn = document.getElementById('payBtn');
 
-      if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
-      }
-
-      payBtn.disabled = true;
-      payBtn.innerHTML = '<span class="loading"></span> 処理中...';
-
-      const buyerName = document.getElementById('buyerName').value;
-      const buyerTel = document.getElementById('buyerTel').value;
-      const buyerEmail = document.getElementById('buyerEmail').value;
+      // 폼 필드가 비어있으면 기본값 설정
+      const buyerName = document.getElementById('buyerName').value || 'Guest';
+      const buyerTel = document.getElementById('buyerTel').value || '000-0000-0000';
+      const buyerEmail = document.getElementById('buyerEmail').value || 'guest@example.com';
 
       document.getElementById('hiddenBuyerName').value = buyerName;
       document.getElementById('hiddenBuyerTel').value = buyerTel;
       document.getElementById('hiddenBuyerEmail').value = buyerEmail;
+
+      if (payBtn) {
+        payBtn.disabled = true;
+        payBtn.innerHTML = '<span class="loading"></span> 処理中...';
+      }
 
       const mid = document.getElementById('mid').value;
       const timestamp = document.getElementById('timestamp').value;
@@ -454,8 +457,10 @@
         if (error) {
           console.error('Error saving payment request:', error);
           alert('決済リクエストの保存に失敗しました。');
-          payBtn.disabled = false;
-          payBtn.innerHTML = 'お支払いに進む';
+          if (payBtn) {
+            payBtn.disabled = false;
+            payBtn.innerHTML = 'お支払いに進む';
+          }
           return;
         }
 
@@ -473,8 +478,10 @@
       } catch (err) {
         console.error('Error:', err);
         alert('エラーが発生しました。');
-        payBtn.disabled = false;
-        payBtn.innerHTML = 'お支払いに進む';
+        if (payBtn) {
+          payBtn.disabled = false;
+          payBtn.innerHTML = 'お支払いに進む';
+        }
       }
     }
 
