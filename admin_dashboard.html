@@ -584,6 +584,28 @@
       try {
         const oid = `PUZZMI_${bookingId}_${Date.now()}`;
         const token = crypto.randomUUID();
+        const timestamp = Date.now();
+
+        // KG이니시스 설정
+        const INICIS_MID = 'INIpayTest';
+        const INICIS_SIGN_KEY = 'SU5JTElURV9UUklQTEVERVNfS0VZU1RS';
+
+        // SHA-256 해시 생성 함수
+        async function sha256(message) {
+          const msgBuffer = new TextEncoder().encode(message);
+          const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+          const hashArray = Array.from(new Uint8Array(hashBuffer));
+          return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        // mKey 생성
+        const mKey = await sha256(INICIS_SIGN_KEY);
+
+        // signature 생성: SHA256(oid + price + timestamp)
+        const signature = await sha256(`oid=${oid}&price=${amount}&timestamp=${timestamp}`);
+
+        // verification 생성: SHA256(oid + price + signKey + timestamp)
+        const verification = await sha256(`oid=${oid}&price=${amount}&signKey=${INICIS_SIGN_KEY}&timestamp=${timestamp}`);
 
         const { data: payment } = await supabase
           .from('kg_inicis_payments')
@@ -598,7 +620,15 @@
             payment_token: token,
             buyer_name: booking.customer_name,
             buyer_tel: booking.customer_contact,
-            good_name: '렌탈친구 서비스'
+            buyer_email: booking.customer_email || 'customer@puzzmi.com',
+            good_name: '렌탈친구 서비스',
+            inicis_timestamp: timestamp.toString(),
+            inicis_signature: signature,
+            inicis_verification: verification,
+            metadata: {
+              mKey: mKey,
+              mid: INICIS_MID
+            }
           })
           .select()
           .single();
@@ -628,6 +658,7 @@
           alert('발송 실패: ' + result.error);
         }
       } catch (error) {
+        console.error('결제 요청 오류:', error);
         alert('발송 실패: ' + error.message);
       }
     };
