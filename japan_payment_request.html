@@ -340,7 +340,8 @@
       document.getElementById('amountDisplay').textContent = `¥${totalAmount.toLocaleString()}`;
 
       const timestamp = Math.floor(Date.now() / 1000);
-      const orderId = `${MID}_${timestamp}`;
+      const randomSuffix = Math.random().toString(36).substring(2, 8);
+      const orderId = `${MID}_${timestamp}_${randomSuffix}`;
 
       document.getElementById('timestamp').value = timestamp;
       document.getElementById('orderId').value = orderId;
