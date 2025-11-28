@@ -62,7 +62,7 @@ async function loadPaymentInfo() {
     document.getElementById('buyername').value = payment.buyer_name || '';
     document.getElementById('buyertel').value = payment.buyer_tel || '';
     document.getElementById('buyeremail').value = payment.buyer_email || '';
-    document.getElementById('returnUrl').value = `${SUPABASE_URL}/functions/v1/inicis-payment-callback`;
+    document.getElementById('returnUrl').value = `${window.location.origin}/inicis-payment-callback.html`;
     document.getElementById('closeUrl').value = `${window.location.origin}/inicis-payment-close.html`;
 
     document.getElementById('loading').style.display = 'none';
