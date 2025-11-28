@@ -8,6 +8,8 @@
   <link rel="stylesheet" href="pages.css"/>
   <link rel="stylesheet" href="pages-theme.css"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cbt.inicis.com/js/stdpay_ui.js" charset="UTF-8"></script>
   <style>
     body.bg-cream {
       background: var(--bg-cream);
@@ -458,9 +460,23 @@
         }
 
         const payform = document.getElementById('payform');
-        payform.action = "https://cbt.inicis.com/cbtauth";
-        payform.target = "_self";
-        payform.submit();
+
+        // KG이니시스 결제 모듈 창 호출
+        if (typeof AUTHNICE !== 'undefined') {
+          AUTHNICE.requestPay({
+            form: payform,
+            closeCallback: function() {
+              console.log('결제 창이 닫혔습니다.');
+              payBtn.disabled = false;
+              payBtn.innerHTML = 'お支払いに進む';
+            }
+          });
+        } else {
+          // 폴백: 직접 submit
+          payform.action = "https://cbt.inicis.com/cbtauth";
+          payform.target = "_blank";
+          payform.submit();
+        }
 
       } catch (err) {
         console.error('Error:', err);
