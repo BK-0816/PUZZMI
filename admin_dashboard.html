@@ -619,7 +619,6 @@
           .insert({
             booking_id: bookingId,
             user_id: booking.customer_id,
-            mate_id: booking.mate_id,
             amount: parseInt(amount),
             currency: 'KRW',
             payment_status: 'pending',
@@ -629,12 +628,13 @@
             buyer_tel: booking.customer_contact,
             buyer_email: booking.customer_email || 'customer@puzzmi.com',
             good_name: '렌탈친구 서비스',
-            inicis_timestamp: timestamp.toString(),
+            inicis_timestamp: timestamp,
             inicis_signature: signature,
             inicis_verification: verification,
             metadata: {
               mKey: mKey,
-              mid: INICIS_MID
+              mid: INICIS_MID,
+              mate_id: booking.mate_id
             }
           })
           .select()
