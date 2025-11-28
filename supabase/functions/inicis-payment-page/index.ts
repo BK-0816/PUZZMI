@@ -67,10 +67,7 @@ Deno.serve(async (req) => {
 
     return new Response(html, {
       headers: {
-        ...corsHeaders,
         'Content-Type': 'text/html; charset=UTF-8',
-        'Content-Security-Policy': "default-src 'self'; script-src 'unsafe-inline' 'unsafe-eval' https://stgstdpay.inicis.com; style-src 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://stgstdpay.inicis.com; frame-src https://stgstdpay.inicis.com; frame-ancestors 'none';",
-        'X-Frame-Options': 'DENY',
       },
     });
   } catch (error) {
@@ -86,27 +83,6 @@ function getPaymentHTML(params: any): string {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PUZZMI - 결제하기</title>
-  <script language="javascript" type="text/javascript" src="https://stgstdpay.inicis.com/stdjs/INIStdPay.js" charset="UTF-8"></script>
-  <script>
-    // LINE WebView 감지
-    function isLineApp() {
-      return /Line/i.test(navigator.userAgent);
-    }
-
-    // 외부 브라우저로 열기 안내
-    if (isLineApp()) {
-      document.addEventListener('DOMContentLoaded', function() {
-        var btn = document.querySelector('.btn-pay');
-        if (btn) {
-          btn.textContent = '⚠️ 외부 브라우저에서 열어주세요';
-          btn.onclick = function() {
-            alert('LINE 앱에서는 결제가 불가능합니다.\\n\\n오른쪽 상단 [...] 메뉴를 누르고\\n"외부 브라우저에서 열기"를 선택해주세요.');
-            return false;
-          };
-        }
-      });
-    }
-  </script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -211,7 +187,7 @@ function getPaymentHTML(params: any): string {
       <input type="hidden" name="acceptmethod" value="below1000">
     </form>
 
-    <button type="button" class="btn-pay" onclick="INIStdPay.pay('SendPayForm_id')">
+    <button type="button" class="btn-pay" id="payBtn">
       🔒 안전결제 실행
     </button>
 
@@ -219,6 +195,13 @@ function getPaymentHTML(params: any): string {
       ✅ KG이니시스 안전결제
     </div>
   </div>
+
+  <script src="https://stgstdpay.inicis.com/stdjs/INIStdPay.js"></script>
+  <script>
+    document.getElementById('payBtn').addEventListener('click', function() {
+      INIStdPay.pay('SendPayForm_id');
+    });
+  </script>
 </body>
 </html>`;
 }
