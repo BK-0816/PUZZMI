@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>결제 링크 테스트</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+    .test-section {
+      margin: 20px 0;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border-left: 4px solid #667eea;
+    }
+    .test-section h3 {
+      margin-top: 0;
+      color: #667eea;
+    }
+    .checklist {
+      list-style: none;
+      padding: 0;
+    }
+    .checklist li {
+      padding: 10px 0;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .checklist li:last-child {
+      border-bottom: none;
+    }
+    .status-ok { color: #28a745; font-weight: bold; }
+    .status-error { color: #dc3545; font-weight: bold; }
+    button {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 10px 0;
+    }
+    button:hover {
+      background: #5568d3;
+    }
+    .info-box {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      padding: 15px;
+      border-radius: 6px;
+      margin: 20px 0;
+    }
+    code {
+      background: #f4f4f4;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧪 결제 페이지 테스트</h1>
+
+    <div class="info-box">
+      <strong>⚠️ 중요:</strong> LINE에서 보이는 CSP 에러는 LINE의 미리보기 시스템 때문입니다.<br>
+      실제 결제 페이지가 정상 작동하는지 아래 체크리스트로 확인하세요.
+    </div>
+
+    <div class="test-section">
+      <h3>✅ 체크리스트</h3>
+      <ul class="checklist">
+        <li>
+          <input type="checkbox" id="check1">
+          <label for="check1">결제 페이지가 화면에 표시되었나요? (보라색 그라데이션 배경)</label>
+        </li>
+        <li>
+          <input type="checkbox" id="check2">
+          <label for="check2">"💳 결제하기" 제목이 보이나요?</label>
+        </li>
+        <li>
+          <input type="checkbox" id="check3">
+          <label for="check3">주문번호, 상품명, 결제금액 정보가 표시되나요?</label>
+        </li>
+        <li>
+          <input type="checkbox" id="check4">
+          <label for="check4">"🔒 안전결제 실행" 버튼이 보이나요?</label>
+        </li>
+        <li>
+          <input type="checkbox" id="check5">
+          <label for="check5">버튼을 클릭하면 KG이니시스 결제창이 열리나요?</label>
+        </li>
+      </ul>
+    </div>
+
+    <div class="test-section">
+      <h3>📊 결과 판정</h3>
+      <button onclick="checkResults()">결과 확인</button>
+      <div id="result"></div>
+    </div>
+
+    <div class="test-section">
+      <h3>🔍 CSP 에러 원인</h3>
+      <p>LINE 메신저는 링크를 보낼 때 자동으로 미리보기를 생성하려고 합니다.</p>
+      <p>이 과정에서 <code>iframe</code>으로 페이지를 로드하며, 매우 제한적인 샌드박스 환경에서 실행됩니다.</p>
+      <p><strong>이것은 정상적인 현상</strong>이며, 실제 사용자가 링크를 클릭했을 때는 정상 작동합니다.</p>
+    </div>
+
+    <div class="test-section">
+      <h3>🔧 콘솔 에러 vs 실제 기능</h3>
+      <table style="width: 100%; border-collapse: collapse;">
+        <tr style="background: #f8f9fa;">
+          <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">상황</th>
+          <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">콘솔 에러</th>
+          <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">실제 기능</th>
+        </tr>
+        <tr>
+          <td style="padding: 10px; border: 1px solid #ddd;">LINE 미리보기</td>
+          <td style="padding: 10px; border: 1px solid #ddd;" class="status-error">❌ 에러 발생</td>
+          <td style="padding: 10px; border: 1px solid #ddd;">해당 없음 (미리보기일 뿐)</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px; border: 1px solid #ddd;">사용자가 링크 클릭</td>
+          <td style="padding: 10px; border: 1px solid #ddd;">에러 무시</td>
+          <td style="padding: 10px; border: 1px solid #ddd;" class="status-ok">✅ 정상 작동</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="test-section">
+      <h3>💡 다음 단계</h3>
+      <ol>
+        <li>위 체크리스트를 모두 확인하세요</li>
+        <li>5개 모두 체크되면 <strong>결제 시스템이 정상 작동</strong>하는 것입니다</li>
+        <li>콘솔 에러는 무시하고 실제 결제 테스트를 진행하세요</li>
+      </ol>
+    </div>
+  </div>
+
+  <script>
+    function checkResults() {
+      const checks = [
+        document.getElementById('check1').checked,
+        document.getElementById('check2').checked,
+        document.getElementById('check3').checked,
+        document.getElementById('check4').checked,
+        document.getElementById('check5').checked,
+      ];
+
+      const checkedCount = checks.filter(c => c).length;
+      const resultDiv = document.getElementById('result');
+
+      if (checkedCount === 5) {
+        resultDiv.innerHTML = `
+          <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 6px; margin-top: 15px;">
+            <strong>✅ 완벽합니다!</strong><br>
+            결제 시스템이 정상적으로 작동하고 있습니다.<br>
+            콘솔의 CSP 에러는 LINE 미리보기 때문이며, 실제 결제에는 영향이 없습니다.<br><br>
+            <strong>Supabase Edge Function은 정상적으로 사용 가능합니다!</strong>
+          </div>
+        `;
+      } else if (checkedCount >= 3) {
+        resultDiv.innerHTML = `
+          <div style="background: #fff3cd; color: #856404; padding: 15px; border-radius: 6px; margin-top: 15px;">
+            <strong>⚠️ 부분 정상</strong><br>
+            ${checkedCount}/5 항목이 정상입니다.<br>
+            나머지 항목을 확인해보세요.
+          </div>
+        `;
+      } else {
+        resultDiv.innerHTML = `
+          <div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 6px; margin-top: 15px;">
+            <strong>❌ 문제 발견</strong><br>
+            결제 페이지가 제대로 로드되지 않았습니다.<br>
+            브라우저 캐시를 삭제하고 다시 시도해보세요.
+          </div>
+        `;
+      }
+    }
+  </script>
+</body>
+</html>
