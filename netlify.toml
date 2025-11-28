@@ -1,0 +1,18 @@
+# Build settings
+[build]
+  publish = "."
+  command = "echo 'No build command needed'
+
+# Headers for all pages
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+
+# Make sure .html files are accessible
+[[redirects]]
+  from = "/*.html"
+  to = "/:splat.html"
+  status = 200
