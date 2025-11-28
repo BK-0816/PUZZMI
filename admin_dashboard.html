@@ -439,7 +439,8 @@
         // LINE 계정 정보 로드
         const { data: lineAccounts } = await supabase
           .from('user_line_accounts')
-          .select('user_id, line_display_name');
+          .select('user_id, line_display_name, is_verified')
+          .eq('is_verified', true);
         if (lineAccounts) {
           lineAccountsMap = new Map(lineAccounts.map(l => [l.user_id, l.line_display_name]));
         }
