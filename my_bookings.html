@@ -405,8 +405,8 @@
           </div>
           ${bk.payment_status === 'pending' && (bk.status === 'confirmed' || bk.status === 'pending') ? `
             <div class="booking-actions">
-              <button class="btn-payment" onclick="goToPayment(${bk.id}, ${bk.total_price || 0})" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 24px; border-radius: 12px; border: none; cursor: pointer; font-weight: 600; width: 100%; transition: all 0.3s ease;">
-                💳 決済する (¥${bk.total_price || 0})
+              <button class="btn-payment" onclick="goToPayment(${bk.id}, ${bk.total_amount || 0})" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 24px; border-radius: 12px; border: none; cursor: pointer; font-weight: 600; width: 100%; transition: all 0.3s ease;">
+                💳 決済する (¥${bk.total_amount || 0})
               </button>
             </div>
           ` : ''}
@@ -444,7 +444,7 @@
       // 내 예약
       const { data, error } = await supabase
         .from('bookings')
-        .select('id, mate_id, customer_id, date, start_time, duration_hours, status, notes, payment_status, total_price, currency')
+        .select('id, mate_id, customer_id, date, start_time, duration_hours, status, notes, payment_status, total_amount, currency')
         .eq('customer_id', user.id)
         .order('created_at', { ascending:false });
 

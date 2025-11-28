@@ -1262,18 +1262,20 @@
         result.innerHTML = `
           <div class="result-message result-success">
             <div style="font-size: 3rem; margin-bottom: 16px;">🎉</div>
-            <div style="font-size: 1.3rem; font-weight: 800; margin-bottom: 12px;">예약 신청이 완료되었습니다!</div>
+            <div style="font-size: 1.3rem; font-weight: 800; margin-bottom: 12px;">予約申請が完了しました！</div>
             <div style="font-size: 1rem; margin-bottom: 8px;">
-              관리자가 여권 인증을 요청하면 LINE으로 링크가 전송됩니다.
+              決済ページに移動します...
             </div>
             <div style="font-size: 0.95rem; color: #666; margin-bottom: 20px;">
-              여권 인증 승인 후 결제 링크가 전송됩니다.
+              お支払いを完了すると予約が確定されます。
             </div>
-            <a href="my_bookings.html" style="display: inline-block; padding: 12px 32px; background: #667eea; color: white; text-decoration: none; border-radius: 12px; font-weight: 600;">
-              내 예약 확인하기
-            </a>
           </div>
         `;
+
+        // 3초 후 결제 페이지로 자동 이동
+        setTimeout(() => {
+          window.location.href = `japan_payment_request.html?booking_id=${data.id}&amount=${totalAmount}`;
+        }, 3000);
 
       } catch (error) {
         console.error('예약 실패:', error);
