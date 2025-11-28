@@ -863,7 +863,78 @@
 
         if (profileError) throw profileError;
 
-        alert('✅ 승인이 완료되었습니다!');
+        // 3. 예약 정보 조회 (결제 링크 전송용)
+        const { data: bookings } = await supabase
+          .from('bookings')
+          .select('*')
+          .eq('customer_id', request.user_id)
+          .eq('status', 'pending')
+          .order('created_at', { ascending: false });
+
+        // 4. 승인 완료 알림 + 결제 링크 자동 전송
+        if (bookings && bookings.length > 0) {
+          const booking = bookings[0];
+          const amount = prompt('결제 금액을 입력하세요 (원):', '40000');
+
+          if (amount) {
+            try {
+              const oid = `PUZZMI_${booking.id}_${Date.now()}`;
+              const token = crypto.randomUUID();
+
+              const { data: payment } = await supabase
+                .from('kg_inicis_payments')
+                .insert({
+                  booking_id: booking.id,
+                  user_id: booking.customer_id,
+                  mate_id: booking.mate_id,
+                  amount: parseInt(amount),
+                  currency: 'KRW',
+                  payment_status: 'pending',
+                  oid: oid,
+                  payment_token: token,
+                  buyer_name: booking.customer_name,
+                  buyer_tel: booking.customer_contact,
+                  buyer_email: (await supabase.from('profiles').select('email').eq('id', booking.customer_id).single()).data?.email,
+                  good_name: '렌탈친구 서비스'
+                })
+                .select()
+                .single();
+
+              const paymentUrl = `${SUPABASE_URL}/functions/v1/inicis-payment-page/${token}`;
+              const { data: { session } } = await supabase.auth.getSession();
+
+              const response = await fetch(`${SUPABASE_URL}/functions/v1/send-line-notification`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${session.access_token}`
+                },
+                body: JSON.stringify({
+                  userId: booking.customer_id,
+                  bookingId: booking.id,
+                  type: 'payment_request',
+                  paymentUrl: paymentUrl,
+                  amount: parseInt(amount)
+                })
+              });
+
+              const result = await response.json();
+              if (result.success) {
+                alert(`✅ 승인이 완료되었습니다!\n결제 링크가 LINE으로 자동 발송되었습니다.\n금액: ${parseInt(amount).toLocaleString()}원`);
+              } else {
+                alert(`✅ 승인은 완료되었습니다.\n⚠️ 결제 링크 발송 실패: ${result.error}`);
+              }
+            } catch (paymentError) {
+              console.error('결제 링크 전송 오류:', paymentError);
+              alert(`✅ 승인은 완료되었습니다.\n⚠️ 결제 링크 발송 실패: ${paymentError.message}`);
+            }
+          } else {
+            alert('✅ 승인이 완료되었습니다! (결제 링크는 수동으로 전송해주세요)');
+          }
+        } else {
+          alert('✅ 승인이 완료되었습니다!');
+        }
+
         loadIdentity();
       } catch (error) {
         console.error('승인 오류:', error);
