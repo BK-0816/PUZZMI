@@ -102,7 +102,8 @@
     <script>
         const supabaseUrl = 'https://eevvgbbokenpjnvtmztk.supabase.co';
         const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4';
-        const supabase = supabase.createClient(supabaseUrl, supabaseAnonKey);
+        const { createClient } = supabase;
+        const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
 
         async function processPaymentReturn() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -130,7 +131,7 @@
 
                     const approvalResult = await response.json();
 
-                    const { data: paymentRequest, error: findError } = await supabase
+                    const { data: paymentRequest, error: findError } = await supabaseClient
                         .from('japan_payment_requests')
                         .select('*')
                         .eq('order_id', orderID)
@@ -142,7 +143,7 @@
                         return;
                     }
 
-                    const { error: resultError } = await supabase
+                    const { error: resultError } = await supabaseClient
                         .from('japan_payment_results')
                         .insert({
                             payment_request_id: paymentRequest.id,
@@ -164,13 +165,13 @@
                     }
 
                     const newStatus = approvalResult.resultCode === '00' ? 'completed' : 'failed';
-                    await supabase
+                    await supabaseClient
                         .from('japan_payment_requests')
                         .update({ status: newStatus, updated_at: new Date().toISOString() })
                         .eq('id', paymentRequest.id);
 
                     if (paymentRequest.booking_id && newStatus === 'completed') {
-                        await supabase
+                        await supabaseClient
                             .from('bookings')
                             .update({ payment_status: 'completed' })
                             .eq('id', paymentRequest.booking_id);
