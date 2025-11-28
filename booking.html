@@ -1225,28 +1225,16 @@
         `;
         return;
       }
-      
-      // 토스페이먼츠 초기화 확인
-      if (!tossPayments) {
-        result.innerHTML = `
-          <div class="result-message result-error">
-            <div style="font-size: 2rem; margin-bottom: 12px;">⚠️</div>
-            <div style="font-size: 1.2rem; font-weight: 800; margin-bottom: 8px;">결제 시스템 로딩 중</div>
-            <div style="font-size: 0.95rem;">잠시 후 다시 시도해주세요.</div>
-          </div>
-        `;
-        return;
-      }
-      
+
       // 버튼 로딩 상태
       submitBtn.disabled = true;
-      submitBtn.innerHTML = '<div class="loading"></div> 예약 처리 중...';
+      submitBtn.innerHTML = '<div class="loading"></div> 예약 신청 중...';
 
       try {
         const duration = parseInt(document.getElementById('duration_hours').value, 10);
         const hourlyRate = window.mateHourlyRate || 4000;
         const totalAmount = duration * hourlyRate;
-        
+
         const formData = {
           mate_id: mateId,
           customer_id: user.id,
@@ -1262,7 +1250,7 @@
           currency: 'JPY'
         };
 
-        // 1단계: 예약 데이터 먼저 저장
+        // 예약 데이터 저장
         const { data, error } = await supabase
           .from('bookings')
           .insert(formData)
@@ -1270,28 +1258,22 @@
           .single();
 
         if (error) throw error;
-        
-        // 2단계: 토스페이먼츠 결제 진행
-        const orderId = `PUZZMI_${data.id}_${Date.now()}`;
-        const orderName = `PUZZMI 메이트 예약 (${duration}시간)`;
-        
-        submitBtn.innerHTML = '<div class="loading"></div> 결제 페이지로 이동 중...';
-        
-        // 토스페이먼츠 결제 요청
-        await tossPayments.requestPayment('카드', {
-          amount: totalAmount,
-          orderId: orderId,
-          orderName: orderName,
-          customerName: formData.customer_name,
-          customerEmail: formData.customer_contact.includes('@') ? formData.customer_contact : null,
-          successUrl: `${window.location.origin}/payment_success.html?booking_id=${data.id}`,
-          failUrl: `${window.location.origin}/payment_fail.html?booking_id=${data.id}`,
-          metadata: {
-            booking_id: data.id,
-            mate_id: mateId,
-            customer_id: user.id
-          }
-        });
+
+        result.innerHTML = `
+          <div class="result-message result-success">
+            <div style="font-size: 3rem; margin-bottom: 16px;">🎉</div>
+            <div style="font-size: 1.3rem; font-weight: 800; margin-bottom: 12px;">예약 신청이 완료되었습니다!</div>
+            <div style="font-size: 1rem; margin-bottom: 8px;">
+              관리자가 여권 인증을 요청하면 LINE으로 링크가 전송됩니다.
+            </div>
+            <div style="font-size: 0.95rem; color: #666; margin-bottom: 20px;">
+              여권 인증 승인 후 결제 링크가 전송됩니다.
+            </div>
+            <a href="my_bookings.html" style="display: inline-block; padding: 12px 32px; background: #667eea; color: white; text-decoration: none; border-radius: 12px; font-weight: 600;">
+              내 예약 확인하기
+            </a>
+          </div>
+        `;
 
       } catch (error) {
         console.error('예약 실패:', error);

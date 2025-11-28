@@ -1609,26 +1609,18 @@
                 </div>
               </div>
             `;
-            actionsEl.innerHTML = `
-              <button class="btn btn-primary" onclick="requestIdentityVerification()">
-                <i class="fas fa-redo"></i> 再申請
-              </button>
-            `;
+            actionsEl.innerHTML = '';
           }
         } else {
           statusEl.innerHTML = `
             <div style="padding: 16px; background: white; border-radius: 12px; border: 2px dashed #ddd;">
               <div style="color: #666; font-size: 0.95rem; margin-bottom: 12px;">
                 予約サービスをご利用いただくには、本人認証が必要です。<br>
-                認証を申請すると、LINEでパスポートアップロードリンクが送信されます。
+                <strong style="color: #667eea;">予約を申請すると、管理者がLINEでパスポートアップロードリンクを送信します。</strong>
               </div>
             </div>
           `;
-          actionsEl.innerHTML = `
-            <button class="btn btn-primary" onclick="requestIdentityVerification()">
-              <i class="fas fa-id-card"></i> 本人認証を申請
-            </button>
-          `;
+          actionsEl.innerHTML = '';
         }
       } catch (error) {
         console.error('신원인증 상태 확인 실패:', error);
