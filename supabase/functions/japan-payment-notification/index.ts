@@ -10,6 +10,9 @@ const corsHeaders = {
 const PG_IP_PREFIX_1 = "203.238.37";
 const PG_IP_PREFIX_2 = "39.115.212";
 
+const INICIS_KEY = "2wU7xOZd8gewsDyP";
+const INICIS_IV = "1nyKt9Wq9EMbLV==";
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, {

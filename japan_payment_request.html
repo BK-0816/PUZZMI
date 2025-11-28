@@ -318,8 +318,8 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const APIKEY = "5AL5Djb1Ipualn0F";
-    const MID = "CBTTEST001";
+    const APIKEY = "2wU7xOZd8gewsDyP";
+    const MID = "puzzmi01jp";
 
     let bookingId = null;
     let totalAmount = 0;
@@ -458,7 +458,7 @@
         }
 
         const payform = document.getElementById('payform');
-        payform.action = "https://devcbt.inicis.com/cbtauth";
+        payform.action = "https://cbt.inicis.com/cbtauth";
         payform.target = "_self";
         payform.submit();
 
