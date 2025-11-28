@@ -345,8 +345,8 @@
       document.getElementById('orderId').value = orderId;
       document.getElementById('amount').value = totalAmount;
 
-      const currentUrl = window.location.origin;
-      document.getElementById('returnUrl').value = `${currentUrl}/japan_payment_return.html`;
+      const supabaseUrl = supabaseClient.supabaseUrl;
+      document.getElementById('returnUrl').value = `${supabaseUrl}/functions/v1/japan-payment-return`;
 
       const { data: { user } } = await supabaseClient.auth.getUser();
       if (user) {
