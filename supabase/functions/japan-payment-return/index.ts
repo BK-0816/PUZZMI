@@ -31,13 +31,13 @@ Deno.serve(async (req: Request) => {
       <html>
       <head>
         <meta charset="UTF-8">
-        <title>결제 처리중...</title>
+        <title>結済処理中...</title>
       </head>
       <body>
         <script>
           window.location.href = "${redirectUrl}";
         </script>
-        <p>결제 처리중입니다. 잠시만 기다려주세요...</p>
+        <p>結済処理中です。少々お待ちください...</p>
       </body>
       </html>
     `;
@@ -52,7 +52,7 @@ Deno.serve(async (req: Request) => {
   } catch (error) {
     console.error("Error processing payment return:", error);
 
-    const errorUrl = "https://puzzmi.netlify.app/japan_payment_return.html?error=처리실패";
+    const errorUrl = "https://puzzmi.netlify.app/japan_payment_return.html?error=処理失敗";
 
     return new Response(`
       <!DOCTYPE html>
