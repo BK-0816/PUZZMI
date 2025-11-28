@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>日本決済 - SeoulDays</title>
+    <link rel="stylesheet" href="payment_samples/japan/style.css">
+    <link rel="stylesheet" href="payment_samples/japan/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+</head>
+<body class="wrap">
+    <main class="col-8 cont" id="bill-01">
+        <section class="mb-5">
+            <div class="tit">
+                <h2>日本決済</h2>
+                <p>KGイニシス決済窓口を呼び出してCBT決済を提供するサービス</p>
+            </div>
+        </section>
+
+        <section class="menu_cont mb-5">
+            <div class="card">
+                <div class="card_tit">
+                    <h3>CBT決済</h3>
+                </div>
+
+                <form name="payform" id="payform" method="post" class="mt-5">
+                    <div class="row g-3 justify-content-between" style="--bs-gutter-x:0rem;">
+
+                        <label class="col-10 col-sm-2 input param" style="border:none;">cbtType</label>
+                        <label class="col-10 col-sm-9 input">
+                            <input type="text" name="cbtType" id="cbtType" value="JPPG" readonly>
+                        </label>
+
+                        <label class="col-10 col-sm-2 input param" style="border:none;">mid</label>
+                        <label class="col-10 col-sm-9 input">
+                            <input type="text" name="mid" id="mid" value="CBTTEST001" readonly>
+                        </label>
+
+                        <label class="col-10 col-sm-2 input param" style="border:none;">timestamp</label>
+                        <label class="col-10 col-sm-9 input">
+                            <input type="text" name="timestamp" id="timestamp" readonly>
+                        </label>
+
+                        <label class="col-10 col-sm-2 input param" style="border:none;">orderId</label>
+                        <label class="col-10 col-sm-9 input">
+                            <input type="text" name="orderId" id="orderId" readonly>
+                        </label>
+
+                        <label class="col-10 col-sm-2 input param" style="border:none;">goodName</label>
+                        <label class="col-10 col-sm-9 input">
+                            <input type="text" name="goodName" id="goodName" value="SeoulDays レンタル友達サービス" required>
+                        </label>
+
+                        <label class="col-10 col-sm-2 input param" style="border:none;">amount</label>
+                        <label class="col-10 col-sm-9 input">
+                            <input type="number" name="amount" id="amount" value="" placeholder="金額を入力してください" required>
+                        </label>
+
+                        <label class="col-10 col-sm-2 input param" style="border:none;">buyerName</label>
+                        <label class="col-10 col-sm-9 input">
+                            <input type="text" name="buyerName" id="buyerName" value="" placeholder="購入者名を入力してください" required>
+                        </label>
+
+                        <label class="col-10 col-sm-2 input param" style="border:none;">buyerTel</label>
+                        <label class="col-10 col-sm-9 input">
+                            <input type="tel" name="buyerTel" id="buyerTel" value="" placeholder="電話番号を入力してください" required>
+                        </label>
+
+                        <label class="col-10 col-sm-2 input param" style="border:none;">buyerEmail</label>
+                        <label class="col-10 col-sm-9 input">
+                            <input type="email" name="buyerEmail" id="buyerEmail" value="" placeholder="メールアドレスを入力してください" required>
+                        </label>
+
+                        <input type="hidden" name="returnUrl" id="returnUrl" value="">
+
+                        <label class="col-10 col-sm-2 input param" style="border:none;">hashData</label>
+                        <label class="col-10 col-sm-9 input">
+                            <input type="text" name="hashData" id="hashData" readonly>
+                        </label>
+
+                        <input type="hidden" name="extraData" id="extraData" value="">
+                    </div>
+                </form>
+
+                <button onclick="initiatePayment()" class="btn_solid_pri col-6 mx-auto btn_lg" style="margin-top:50px">決済リクエスト</button>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const supabaseUrl = 'https://eevvgbbokenpjnvtmztk.supabase.co';
+        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4';
+        const supabase = supabase.createClient(supabaseUrl, supabaseAnonKey);
+
+        const APIKEY = "5AL5Djb1Ipualn0F";
+        const MID = "CBTTEST001";
+
+        async function initializePage() {
+            const timestamp = Math.floor(Date.now() / 1000);
+            const mid = MID;
+            const orderId = `${mid}_${timestamp}`;
+
+            document.getElementById('timestamp').value = timestamp;
+            document.getElementById('orderId').value = orderId;
+
+            const currentUrl = window.location.origin;
+            document.getElementById('returnUrl').value = `${currentUrl}/japan_payment_return.html`;
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const bookingId = urlParams.get('booking_id');
+            const amount = urlParams.get('amount');
+
+            if (amount) {
+                document.getElementById('amount').value = amount;
+            }
+
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', user.id)
+                    .single();
+
+                if (profile) {
+                    document.getElementById('buyerName').value = profile.full_name || '';
+                    document.getElementById('buyerEmail').value = user.email || '';
+                }
+            }
+        }
+
+        function generateHash(apikey, mid, timestamp, amount, orderId) {
+            const data = apikey + mid + timestamp + amount + orderId;
+            return CryptoJS.SHA512(data).toString();
+        }
+
+        function generateExtraData() {
+            const currentUrl = window.location.origin;
+            return {
+                "paymentUI": {
+                    "language": "ja",
+                    "logoUrl": "",
+                    "colorTheme": ""
+                },
+                "payment": {
+                    "paymethod": ["CARD", "CVS", "PAYpay", "LINEpay"],
+                    "isMobile": "true",
+                    "card": {
+                        "payType": ["one", "installments"],
+                        "installMonth": [3, 5, 6, 10, 12]
+                    },
+                    "cvs": {
+                        "notiUrl": `${currentUrl}/supabase/functions/v1/japan-payment-notification`,
+                        "contactInfo": "SeoulDays Support",
+                        "contactTelNum": "080-1234-5678",
+                        "contactHours": "09:00-18:00",
+                        "paymentTermDay": 5
+                    },
+                    "linepay": {
+                        "productImageUrl": `${currentUrl}/PUZZMI.png`
+                    }
+                }
+            };
+        }
+
+        async function initiatePayment() {
+            const form = document.getElementById('payform');
+
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const mid = document.getElementById('mid').value;
+            const timestamp = document.getElementById('timestamp').value;
+            const orderId = document.getElementById('orderId').value;
+            const amount = document.getElementById('amount').value;
+            const goodName = document.getElementById('goodName').value;
+            const buyerName = document.getElementById('buyerName').value;
+            const buyerTel = document.getElementById('buyerTel').value;
+            const buyerEmail = document.getElementById('buyerEmail').value;
+
+            const hashData = generateHash(APIKEY, mid, timestamp, amount, orderId);
+            document.getElementById('hashData').value = hashData;
+
+            const extraData = generateExtraData();
+            document.getElementById('extraData').value = JSON.stringify(extraData);
+
+            const { data: { user } } = await supabase.auth.getUser();
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const bookingId = urlParams.get('booking_id');
+
+            try {
+                const { data, error } = await supabase
+                    .from('japan_payment_requests')
+                    .insert({
+                        user_id: user?.id,
+                        booking_id: bookingId ? parseInt(bookingId) : null,
+                        mid: mid,
+                        order_id: orderId,
+                        amount: parseFloat(amount),
+                        good_name: goodName,
+                        buyer_name: buyerName,
+                        buyer_tel: buyerTel,
+                        buyer_email: buyerEmail,
+                        hash_data: hashData,
+                        timestamp: parseInt(timestamp),
+                        status: 'pending'
+                    })
+                    .select();
+
+                if (error) {
+                    console.error('Error saving payment request:', error);
+                    alert('決済リクエストの保存に失敗しました。');
+                    return;
+                }
+
+                form.action = "https://devcbt.inicis.com/cbtauth";
+                form.target = "_self";
+                form.submit();
+
+            } catch (err) {
+                console.error('Error:', err);
+                alert('エラーが発生しました。');
+            }
+        }
+
+        window.onload = initializePage;
+    </script>
+</body>
+</html>
