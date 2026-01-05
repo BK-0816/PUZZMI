@@ -43,7 +43,7 @@ export function createPaymentParams(options) {
     payMethod = 'CARD', // 결제수단 (기본: 카드)
     customer = {},    // 구매자 정보
     customData = {},  // 추가 데이터
-    locale = 'ja'     // 언어 (일본어 기본)
+    locale = 'ko'     // 언어 (한국어 기본)
   } = options;
 
   return {
