@@ -65,7 +65,8 @@ export function createPaymentParams(options) {
       storeName: 'PUZZMI',
       storeNameShort: 'PUZZMI',
       storeNameEn: 'PUZZMI',
-      storeNameKana: 'パズミ'
+      storeNameKana: 'パズミ',
+      contactName: 'LINE: @puzzmi'
     },
     // 결제 완료 후 리디렉션 URL (모바일)
     redirectUrl: `${window.location.origin}/payment_complete.html`,
