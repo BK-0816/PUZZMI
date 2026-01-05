@@ -64,7 +64,8 @@ export function createPaymentParams(options) {
     storeDetails: {
       storeName: 'SeoulDdays',
       storeNameEn: 'SeoulDdays',
-      storeNameKana: 'セウルディズ'
+      storeNameKana: 'セウルディズ',
+      storeNameShort: 'SeoulD'
     },
     // 결제 완료 후 리디렉션 URL (모바일)
     redirectUrl: `${window.location.origin}/payment_complete.html`,
