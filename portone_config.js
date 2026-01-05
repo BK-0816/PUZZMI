@@ -8,7 +8,7 @@ export const PORTONE_CONFIG = {
   // API_SECRET은 서버사이드에서만 사용
 
   // KG이니시스 일본 결제 채널 키
-  CHANNEL_KEY: 'channel-key-bc88659d-daa8-4a6f-8998-36e25a0dce3a',
+  CHANNEL_KEY: 'channel-key-104b9122-a3c5-4206-bb92-1235cc021587',
 
   // 결제 수단
   PAY_METHODS: {
