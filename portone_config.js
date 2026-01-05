@@ -70,8 +70,8 @@ export function createPaymentParams(options) {
       email: 'choi.seojun0721@gmail.com',
       phoneNumber: '01094376167',
       openingHours: {
-        start: '09:00',
-        end: '18:00'
+        open: '09:00',
+        close: '18:00'
       }
     },
     // 결제 완료 후 리디렉션 URL (모바일)
