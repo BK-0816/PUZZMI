@@ -1008,28 +1008,10 @@
 
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-    import {
-      initPortOne,
-      requestPayment,
-      generateMerchantUid,
-      createPaymentParams
-    } from './portone_config.js';
 
     const SUPABASE_URL = "https://eevvgbbokenpjnvtmztk.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4";
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    // 포트원 초기화
-    let IMP = null;
-    async function initPayment() {
-      try {
-        IMP = await initPortOne();
-        console.log('포트원 초기화 완료');
-      } catch (error) {
-        console.error('포트원 초기화 실패:', error);
-      }
-    }
-    initPayment();
 
     // 로그인 체크
     const { data: { user } } = await supabase.auth.getUser();
@@ -1157,13 +1139,16 @@
         
         amountEl.innerHTML = `
           <div style="font-size: 1.1rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px;">
-            💰 결제 예정 금액
+            💰 ご利用予定金額
           </div>
           <div style="font-size: 2rem; font-weight: 800; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
             ${yenFormatter.format(totalAmount)}
           </div>
           <div style="font-size: 0.95rem; color: var(--text-secondary); margin-top: 8px;">
-            ${yenFormatter.format(hourlyRate)} × ${duration}시간
+            ${yenFormatter.format(hourlyRate)} × ${duration}時間
+          </div>
+          <div style="font-size: 0.85rem; color: #999; margin-top: 8px;">
+            ※ 最終金額は確定後にLINEでご案内します
           </div>
         `;
         
@@ -1182,28 +1167,6 @@
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      // 나이 제한 확인
-      try {
-        const { checkAgeRestrictionForBooking } = await import('./line_identity_service.js');
-        console.log('나이 제한 확인 시작:', user.id);
-        const ageCheck = await checkAgeRestrictionForBooking(user.id);
-        console.log('나이 제한 확인 결과:', ageCheck);
-      } catch (ageError) {
-        console.error('나이 제한 확인 오류:', ageError);
-        result.innerHTML = `
-          <div class="result-message result-error">
-            <div style="font-size: 2rem; margin-bottom: 12px;">🔞</div>
-            <div style="font-size: 1.2rem; font-weight: 800; margin-bottom: 8px;">예약 제한</div>
-            <div style="font-size: 0.95rem; margin-bottom: 16px;">${ageError.message}</div>
-            <a href="my_profile.html" style="color: #667eea; text-decoration: none; font-weight: 600;">
-              프로필에서 신원확인하기 →
-            </a>
-          </div>
-        `;
-        submitBtn.disabled = false;
-        return;
-      }
-      
       // LINE 연동 확인
       const { data: lineAccount, error: lineError } = await supabase
         .from('user_line_accounts')
@@ -1211,7 +1174,7 @@
         .eq('user_id', user.id)
         .eq('is_verified', true)
         .maybeSingle();
-      
+
       if (lineError || !lineAccount) {
         result.innerHTML = `
           <div class="result-message result-error">
@@ -1247,7 +1210,8 @@
           notes: document.getElementById('notes').value.trim(),
           status: 'pending',
           total_amount: totalAmount,
-          currency: 'JPY'
+          currency: 'JPY',
+          payment_status: 'pending'
         };
 
         // 예약 데이터 저장
@@ -1259,125 +1223,37 @@
 
         if (error) throw error;
 
-        // 결제 ID 생성
-        const paymentId = generateMerchantUid('PUZZMI');
-
-        // 결제 파라미터 생성 (V2)
-        const paymentParams = createPaymentParams({
-          paymentId: paymentId,
-          orderName: `PUZZMI (${duration}時間)`,
-          totalAmount: totalAmount,
-          currency: 'JPY',
-          payMethod: 'CARD', // 기본: 카드
-          customer: {
-            name: formData.customer_name,
-            tel: formData.customer_contact,
-            email: user.email || 'guest@puzzmi.com'
-          },
-          customData: {
-            booking_id: bookingData.id,
-            user_id: user.id,
-            mate_id: mateId
-          }
-        });
-
+        // 성공 메시지
         result.innerHTML = `
           <div class="result-message result-success">
-            <div style="font-size: 3rem; margin-bottom: 16px;">💳</div>
-            <div style="font-size: 1.3rem; font-weight: 800; margin-bottom: 12px;">決済ページに移動中...</div>
-            <div style="font-size: 0.95rem; color: #666;">
-              しばらくお待ちください
+            <div style="font-size: 3rem; margin-bottom: 16px;">✨</div>
+            <div style="font-size: 1.3rem; font-weight: 800; margin-bottom: 12px;">予約リクエストが送信されました！</div>
+            <div style="font-size: 1rem; margin-bottom: 12px;">
+              スタッフが内容を確認し、LINEにてご連絡いたします。
+            </div>
+            <div style="font-size: 0.95rem; color: #666; margin-bottom: 16px;">
+              本人確認と決済のご案内をお送りしますので、しばらくお待ちください。
+            </div>
+            <div style="font-size: 0.9rem; color: #666;">
+              3秒後に予約リストに移動します...
             </div>
           </div>
         `;
 
-        // 포트원 V2 결제 요청
-        try {
-          const paymentResult = await requestPayment(paymentParams);
-
-          // 결제 성공 - 데이터베이스에 결제 정보 저장
-          const { error: paymentError } = await supabase
-            .from('portone_payments')
-            .insert({
-              booking_id: bookingData.id,
-              user_id: user.id,
-              imp_uid: paymentResult.payment_id, // V2는 payment_id 사용
-              merchant_uid: paymentResult.payment_id,
-              amount: paymentResult.paid_amount,
-              currency: paymentResult.currency || 'JPY',
-              status: 'paid',
-              pg_provider: 'portone_v2_inicis',
-              pay_method: paymentResult.method || 'CARD',
-              pg_tid: paymentResult.transaction_id,
-              receipt_url: paymentResult.receipt_url,
-              paid_at: paymentResult.paid_at || new Date().toISOString()
-            });
-
-          if (paymentError) {
-            console.error('결제 정보 저장 실패:', paymentError);
-          }
-
-          // 예약 상태 업데이트
-          await supabase
-            .from('bookings')
-            .update({
-              status: 'confirmed',
-              payment_status: 'paid',
-              payment_method: 'portone_inicis'
-            })
-            .eq('id', bookingData.id);
-
-          // 성공 메시지
-          result.innerHTML = `
-            <div class="result-message result-success">
-              <div style="font-size: 3rem; margin-bottom: 16px;">🎉</div>
-              <div style="font-size: 1.3rem; font-weight: 800; margin-bottom: 12px;">お支払いが完了しました！</div>
-              <div style="font-size: 1rem; margin-bottom: 12px;">
-                予約が確定されました。
-              </div>
-              <div style="font-size: 0.9rem; color: #666;">
-                3秒後に予約リストに移動します...
-              </div>
-            </div>
-          `;
-
-          // 3초 후 예약 목록으로 이동
-          setTimeout(() => {
-            window.location.href = 'my_bookings.html';
-          }, 3000);
-
-        } catch (paymentError) {
-          console.error('결제 실패:', paymentError);
-
-          // 예약 취소
-          await supabase
-            .from('bookings')
-            .update({ status: 'cancelled' })
-            .eq('id', bookingData.id);
-
-          throw paymentError;
-        }
+        // 3초 후 예약 목록으로 이동
+        setTimeout(() => {
+          window.location.href = 'my_bookings.html';
+        }, 3000);
 
       } catch (error) {
         console.error('예약 실패:', error);
-
-        if (error.error_code === 'F400' || error.error_msg?.includes('사용자')) {
-          result.innerHTML = `
-            <div class="result-message result-error">
-              <div style="font-size: 2rem; margin-bottom: 12px;">💳</div>
-              <div style="font-size: 1.2rem; font-weight: 800; margin-bottom: 8px;">お支払いがキャンセルされました</div>
-              <div style="font-size: 0.95rem;">再度お試しいただくか、別の決済方法をご利用ください。</div>
-            </div>
-          `;
-        } else {
-          result.innerHTML = `
-            <div class="result-message result-error">
-              <div style="font-size: 2rem; margin-bottom: 12px;">😔</div>
-              <div style="font-size: 1.2rem; font-weight: 800; margin-bottom: 8px;">予約処理中にエラーが発生しました</div>
-              <div style="font-size: 0.95rem;">${error.error_msg || error.message || 'しばらく後に再度お試しください。'}</div>
-            </div>
-          `;
-        }
+        result.innerHTML = `
+          <div class="result-message result-error">
+            <div style="font-size: 2rem; margin-bottom: 12px;">😔</div>
+            <div style="font-size: 1.2rem; font-weight: 800; margin-bottom: 8px;">予約処理中にエラーが発生しました</div>
+            <div style="font-size: 0.95rem;">${error.message || 'しばらく後に再度お試しください。'}</div>
+          </div>
+        `;
       } finally {
         submitBtn.disabled = false;
         submitBtn.innerHTML = '🎉 予約する';
