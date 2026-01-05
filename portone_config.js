@@ -1,16 +1,14 @@
 // PortOne V2 설정 파일
 
 export const PORTONE_CONFIG = {
-  // PortOne V2 Store ID (실제 사용시 본인의 코드로 변경 필요)
-  // 형식: store-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-  STORE_ID: 'store-test-inicis-jp', // TODO: 실제 Store ID로 변경
+  // PortOne V2 Store ID
+  STORE_ID: 'store-79c6a0c1-e7e2-486c-aa42-914242b9ff69',
 
   // V2 API Secret (환경변수로 관리 권장)
   // API_SECRET은 서버사이드에서만 사용
 
   // KG이니시스 일본 결제 채널 키
-  // 포트원 콘솔에서 KG이니시스 일본 채널 생성 후 발급받은 키
-  CHANNEL_KEY: 'channel-key-inicis-jp', // TODO: 실제 채널 키로 변경
+  CHANNEL_KEY: 'channel-key-bc88659d-daa8-4a6f-8998-36e25a0dce3a',
 
   // 결제 수단
   PAY_METHODS: {
