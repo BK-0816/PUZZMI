@@ -1008,28 +1008,28 @@
 
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-    // 토스페이먼츠 SDK 로드
-    const script = document.createElement('script');
-    script.src = 'https://js.tosspayments.com/v1/payment';
-    document.head.appendChild(script);
-    
+    import {
+      initPortOne,
+      requestPayment,
+      generateMerchantUid,
+      createPaymentParams
+    } from './portone_config.js';
+
     const SUPABASE_URL = "https://eevvgbbokenpjnvtmztk.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4";
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    
-    // 토스페이먼츠 클라이언트 키 (테스트용)
-    const TOSS_CLIENT_KEY = 'test_ck_D5GePWvyJnrK0W0k6q8gLzN97Eoq';
-    let tossPayments = null;
-    
-    // 토스페이먼츠 초기화
-    function initTossPayments() {
-      if (window.TossPayments) {
-        tossPayments = window.TossPayments(TOSS_CLIENT_KEY);
-      } else {
-        setTimeout(initTossPayments, 100);
+
+    // 포트원 초기화
+    let IMP = null;
+    async function initPayment() {
+      try {
+        IMP = await initPortOne();
+        console.log('포트원 초기화 완료');
+      } catch (error) {
+        console.error('포트원 초기화 실패:', error);
       }
     }
-    initTossPayments();
+    initPayment();
 
     // 로그인 체크
     const { data: { user } } = await supabase.auth.getUser();
@@ -1251,7 +1251,7 @@
         };
 
         // 예약 데이터 저장
-        const { data, error } = await supabase
+        const { data: bookingData, error } = await supabase
           .from('bookings')
           .insert(formData)
           .select()
@@ -1259,47 +1259,127 @@
 
         if (error) throw error;
 
+        // 주문번호 생성
+        const merchantUid = generateMerchantUid('PUZZMI');
+
+        // 결제 파라미터 생성
+        const paymentParams = createPaymentParams({
+          merchantUid: merchantUid,
+          amount: totalAmount,
+          name: `SeoulDays メイト予約 (${duration}時間)`,
+          buyerName: formData.customer_name,
+          buyerTel: formData.customer_contact,
+          buyerEmail: user.email || 'guest@puzzmi.com',
+          payMethod: 'card', // 기본: 카드 (CVS, PayPay, LINE Pay도 선택 가능)
+          currency: 'JPY',
+          customData: {
+            booking_id: bookingData.id,
+            user_id: user.id,
+            mate_id: mateId
+          }
+        });
+
         result.innerHTML = `
           <div class="result-message result-success">
-            <div style="font-size: 3rem; margin-bottom: 16px;">🎉</div>
-            <div style="font-size: 1.3rem; font-weight: 800; margin-bottom: 12px;">予約申請が完了しました！</div>
-            <div style="font-size: 1rem; margin-bottom: 8px;">
-              決済ページに移動します...
-            </div>
-            <div style="font-size: 0.95rem; color: #666; margin-bottom: 20px;">
-              お支払いを完了すると予約が確定されます。
+            <div style="font-size: 3rem; margin-bottom: 16px;">💳</div>
+            <div style="font-size: 1.3rem; font-weight: 800; margin-bottom: 12px;">決済ページに移動中...</div>
+            <div style="font-size: 0.95rem; color: #666;">
+              しばらくお待ちください
             </div>
           </div>
         `;
 
-        // 3초 후 결제 페이지로 자동 이동
-        setTimeout(() => {
-          window.location.href = `japan_payment_request.html?booking_id=${data.id}&amount=${totalAmount}`;
-        }, 3000);
+        // 포트원 결제 요청
+        try {
+          const paymentResult = await requestPayment(paymentParams);
+
+          // 결제 성공 - 데이터베이스에 결제 정보 저장
+          const { error: paymentError } = await supabase
+            .from('portone_payments')
+            .insert({
+              booking_id: bookingData.id,
+              user_id: user.id,
+              imp_uid: paymentResult.imp_uid,
+              merchant_uid: paymentResult.merchant_uid,
+              amount: paymentResult.paid_amount,
+              currency: 'JPY',
+              status: 'paid',
+              pg_provider: 'inicis_v2',
+              pay_method: 'card',
+              apply_num: paymentResult.apply_num,
+              pg_tid: paymentResult.pg_tid,
+              receipt_url: paymentResult.receipt_url,
+              paid_at: new Date().toISOString()
+            });
+
+          if (paymentError) {
+            console.error('결제 정보 저장 실패:', paymentError);
+          }
+
+          // 예약 상태 업데이트
+          await supabase
+            .from('bookings')
+            .update({
+              status: 'confirmed',
+              payment_status: 'paid',
+              payment_method: 'portone_inicis'
+            })
+            .eq('id', bookingData.id);
+
+          // 성공 메시지
+          result.innerHTML = `
+            <div class="result-message result-success">
+              <div style="font-size: 3rem; margin-bottom: 16px;">🎉</div>
+              <div style="font-size: 1.3rem; font-weight: 800; margin-bottom: 12px;">お支払いが完了しました！</div>
+              <div style="font-size: 1rem; margin-bottom: 12px;">
+                予約が確定されました。
+              </div>
+              <div style="font-size: 0.9rem; color: #666;">
+                3秒後に予約リストに移動します...
+              </div>
+            </div>
+          `;
+
+          // 3초 후 예약 목록으로 이동
+          setTimeout(() => {
+            window.location.href = 'my_bookings.html';
+          }, 3000);
+
+        } catch (paymentError) {
+          console.error('결제 실패:', paymentError);
+
+          // 예약 취소
+          await supabase
+            .from('bookings')
+            .update({ status: 'cancelled' })
+            .eq('id', bookingData.id);
+
+          throw paymentError;
+        }
 
       } catch (error) {
         console.error('예약 실패:', error);
-        
-        if (error.code === 'USER_CANCEL') {
+
+        if (error.error_code === 'F400' || error.error_msg?.includes('사용자')) {
           result.innerHTML = `
             <div class="result-message result-error">
               <div style="font-size: 2rem; margin-bottom: 12px;">💳</div>
-              <div style="font-size: 1.2rem; font-weight: 800; margin-bottom: 8px;">결제가 취소되었습니다</div>
-              <div style="font-size: 0.95rem;">다시 시도하시거나 다른 결제 수단을 이용해주세요.</div>
+              <div style="font-size: 1.2rem; font-weight: 800; margin-bottom: 8px;">お支払いがキャンセルされました</div>
+              <div style="font-size: 0.95rem;">再度お試しいただくか、別の決済方法をご利用ください。</div>
             </div>
           `;
         } else {
           result.innerHTML = `
             <div class="result-message result-error">
               <div style="font-size: 2rem; margin-bottom: 12px;">😔</div>
-              <div style="font-size: 1.2rem; font-weight: 800; margin-bottom: 8px;">예약 처리 중 오류가 발생했습니다</div>
-              <div style="font-size: 0.95rem;">${error.message || '잠시 후 다시 시도해주세요.'}</div>
+              <div style="font-size: 1.2rem; font-weight: 800; margin-bottom: 8px;">予約処理中にエラーが発生しました</div>
+              <div style="font-size: 0.95rem;">${error.error_msg || error.message || 'しばらく後に再度お試しください。'}</div>
             </div>
           `;
         }
       } finally {
         submitBtn.disabled = false;
-        submitBtn.innerHTML = '🎉 예약 신청하기';
+        submitBtn.innerHTML = '🎉 予約する';
       }
     });
 
