@@ -582,73 +582,30 @@
       if (!booking) return alert('예약 정보를 찾을 수 없습니다.');
 
       try {
-        // 관리자 권한 확인
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) {
           alert('로그인이 필요합니다.');
           return;
         }
 
-        const oid = `PUZZMI_${bookingId}_${Date.now()}`;
         const token = crypto.randomUUID();
-        const timestamp = Date.now();
 
-        // KG이니시스 설정
-        const INICIS_MID = 'INIpayTest';
-        const INICIS_SIGN_KEY = 'SU5JTElURV9UUklQTEVERVNfS0VZU1RS';
-
-        // SHA-256 해시 생성 함수
-        async function sha256(message) {
-          const msgBuffer = new TextEncoder().encode(message);
-          const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-          const hashArray = Array.from(new Uint8Array(hashBuffer));
-          return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-
-        // mKey 생성
-        const mKey = await sha256(INICIS_SIGN_KEY);
-
-        // signature 생성: SHA256(oid + price + timestamp)
-        const signature = await sha256(`oid=${oid}&price=${amount}&timestamp=${timestamp}`);
-
-        // verification 생성: SHA256(oid + price + signKey + timestamp)
-        const verification = await sha256(`oid=${oid}&price=${amount}&signKey=${INICIS_SIGN_KEY}&timestamp=${timestamp}`);
-
-        const { data: payment, error: insertError } = await supabase
-          .from('kg_inicis_payments')
-          .insert({
-            booking_id: bookingId,
-            user_id: booking.customer_id,
-            amount: parseInt(amount),
-            currency: 'KRW',
-            payment_status: 'pending',
-            oid: oid,
+        const { error: updateError } = await supabase
+          .from('bookings')
+          .update({
             payment_token: token,
-            buyer_name: booking.customer_name,
-            buyer_tel: booking.customer_contact,
-            buyer_email: booking.customer_email || 'customer@puzzmi.com',
-            good_name: '렌탈친구 서비스',
-            inicis_timestamp: timestamp,
-            inicis_signature: signature,
-            inicis_verification: verification,
-            metadata: {
-              mKey: mKey,
-              mid: INICIS_MID,
-              mate_id: booking.mate_id
-            }
+            payment_status: 'pending'
           })
-          .select()
-          .single();
+          .eq('id', bookingId);
 
-        if (insertError) {
-          console.error('결제 정보 저장 실패:', insertError);
-          throw new Error(`결제 정보 저장 실패: ${insertError.message}`);
+        if (updateError) {
+          console.error('결제 토큰 저장 실패:', updateError);
+          throw new Error(`결제 토큰 저장 실패: ${updateError.message}`);
         }
 
-        console.log('결제 정보 저장 성공:', payment);
-        console.log('결제 토큰:', token);
+        console.log('결제 토큰 생성 성공:', token);
 
-        const paymentUrl = `${SUPABASE_URL}/functions/v1/inicis-payment-page/${token}`;
+        const paymentUrl = `${window.location.origin}/payment_page.html?token=${token}`;
 
         const response = await fetch(`${SUPABASE_URL}/functions/v1/send-line-notification`, {
           method: 'POST',
@@ -960,29 +917,22 @@
 
           if (amount) {
             try {
-              const oid = `PUZZMI_${booking.id}_${Date.now()}`;
               const token = crypto.randomUUID();
 
-              const { data: payment } = await supabase
-                .from('kg_inicis_payments')
-                .insert({
-                  booking_id: booking.id,
-                  user_id: booking.customer_id,
-                  mate_id: booking.mate_id,
-                  amount: parseInt(amount),
-                  currency: 'KRW',
-                  payment_status: 'pending',
-                  oid: oid,
+              const { error: updateError } = await supabase
+                .from('bookings')
+                .update({
                   payment_token: token,
-                  buyer_name: booking.customer_name,
-                  buyer_tel: booking.customer_contact,
-                  buyer_email: (await supabase.from('profiles').select('email').eq('id', booking.customer_id).single()).data?.email,
-                  good_name: '렌탈친구 서비스'
+                  payment_status: 'pending'
                 })
-                .select()
-                .single();
+                .eq('id', booking.id);
 
-              const paymentUrl = `${SUPABASE_URL}/functions/v1/inicis-payment-page/${token}`;
+              if (updateError) {
+                console.error('결제 토큰 저장 실패:', updateError);
+                throw new Error(`결제 토큰 저장 실패: ${updateError.message}`);
+              }
+
+              const paymentUrl = `${window.location.origin}/payment_page.html?token=${token}`;
               const { data: { session } } = await supabase.auth.getSession();
 
               const response = await fetch(`${SUPABASE_URL}/functions/v1/send-line-notification`, {

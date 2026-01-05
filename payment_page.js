@@ -1,14 +1,18 @@
-// Supabase 설정
+import { PORTONE_CONFIG, createPaymentParams, requestPayment } from './portone_config.js';
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
 const SUPABASE_URL = 'https://eevvgbbokenpjnvtmztk.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4';
 
-// URL에서 결제 토큰 가져오기
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let bookingData = null;
+
 function getPaymentToken() {
   const params = new URLSearchParams(window.location.search);
   return params.get('token');
 }
 
-// 결제 정보 로드
 async function loadPaymentInfo() {
   const token = getPaymentToken();
 
@@ -21,49 +25,31 @@ async function loadPaymentInfo() {
   document.getElementById('payBtn').disabled = true;
 
   try {
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/kg_inicis_payments?payment_token=eq.${token}&select=*,bookings!inner(*)`, {
-      headers: {
-        'apikey': SUPABASE_ANON_KEY,
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-      }
-    });
+    const { data, error } = await supabase
+      .from('bookings')
+      .select('*')
+      .eq('payment_token', token)
+      .maybeSingle();
 
-    if (!response.ok) {
-      throw new Error('결제 정보를 찾을 수 없습니다.');
-    }
+    if (error) throw error;
+    if (!data) throw new Error('결제 정보를 찾을 수 없습니다.');
 
-    const data = await response.json();
+    bookingData = data;
 
-    if (data.length === 0) {
-      throw new Error('결제 정보를 찾을 수 없습니다.');
-    }
-
-    const payment = data[0];
-
-    if (payment.payment_status === 'paid') {
+    if (data.payment_status === 'paid') {
       showError('이미 결제가 완료되었습니다.');
       return;
     }
 
-    // 화면에 정보 표시
-    document.getElementById('oid').textContent = payment.oid;
-    document.getElementById('goodname').textContent = payment.good_name || '렌탈친구 서비스';
-    document.getElementById('price').textContent = parseInt(payment.amount).toLocaleString() + '원';
+    const yenFormatter = new Intl.NumberFormat('ja-JP', {
+      style: 'currency',
+      currency: 'JPY',
+      maximumFractionDigits: 0
+    });
 
-    // 폼 데이터 설정
-    document.getElementById('mid').value = payment.mid || 'INIpayTest';
-    document.getElementById('form_oid').value = payment.oid;
-    document.getElementById('form_price').value = payment.amount;
-    document.getElementById('timestamp').value = payment.inicis_timestamp || '';
-    document.getElementById('signature').value = payment.inicis_signature || '';
-    document.getElementById('verification').value = payment.inicis_verification || '';
-    document.getElementById('mKey').value = payment.metadata?.mKey || '';
-    document.getElementById('form_goodname').value = payment.good_name || '렌탈친구 서비스';
-    document.getElementById('buyername').value = payment.buyer_name || '';
-    document.getElementById('buyertel').value = payment.buyer_tel || '';
-    document.getElementById('buyeremail').value = payment.buyer_email || '';
-    document.getElementById('returnUrl').value = `${window.location.origin}/inicis-payment-callback.html`;
-    document.getElementById('closeUrl').value = `${window.location.origin}/inicis-payment-close.html`;
+    document.getElementById('booking_id').textContent = `#${data.id}`;
+    document.getElementById('goodname').textContent = `PUZZMI メイト予約 (${data.duration_hours || 0}時間)`;
+    document.getElementById('price').textContent = yenFormatter.format(data.total_amount || 0);
 
     document.getElementById('loading').style.display = 'none';
     document.getElementById('payBtn').disabled = false;
@@ -74,26 +60,85 @@ async function loadPaymentInfo() {
   }
 }
 
-// 에러 메시지 표시
 function showError(message) {
-  const container = document.querySelector('.container');
-  const errorDiv = document.createElement('div');
-  errorDiv.className = 'error-message';
+  const errorDiv = document.getElementById('error-message');
   errorDiv.textContent = message;
-  container.insertBefore(errorDiv, container.firstChild);
+  errorDiv.style.display = 'block';
 
   document.getElementById('loading').style.display = 'none';
   document.getElementById('payBtn').disabled = true;
 }
 
-// 결제 실행
-document.getElementById('payBtn').addEventListener('click', function() {
-  if (typeof INIStdPay !== 'undefined') {
-    INIStdPay.pay('SendPayForm_id');
-  } else {
-    alert('결제 모듈을 불러오는데 실패했습니다. 페이지를 새로고침해주세요.');
+document.getElementById('payBtn').addEventListener('click', async function() {
+  if (!bookingData) {
+    alert('결제 정보를 불러오지 못했습니다.');
+    return;
+  }
+
+  this.disabled = true;
+  this.innerHTML = '결제 처리 중...';
+
+  try {
+    const paymentId = `PUZZMI_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+
+    const paymentParams = createPaymentParams({
+      paymentId: paymentId,
+      orderName: `PUZZMI メイト予約 (${bookingData.duration_hours || 0}時間)`,
+      totalAmount: bookingData.total_amount,
+      currency: 'JPY',
+      payMethod: 'CARD',
+      customer: {
+        name: bookingData.customer_name || 'Guest',
+        tel: bookingData.customer_contact || '',
+        email: 'guest@puzzmi.com'
+      },
+      customData: {
+        booking_id: bookingData.id,
+        user_id: bookingData.customer_id,
+        mate_id: bookingData.mate_id
+      }
+    });
+
+    const paymentResult = await requestPayment(paymentParams);
+
+    const { error: insertError } = await supabase
+      .from('portone_payments')
+      .insert({
+        booking_id: bookingData.id,
+        user_id: bookingData.customer_id,
+        imp_uid: paymentResult.payment_id,
+        merchant_uid: paymentResult.payment_id,
+        amount: paymentResult.paid_amount,
+        currency: paymentResult.currency || 'JPY',
+        status: 'paid',
+        pg_provider: 'portone_v2_inicis',
+        pay_method: paymentResult.method || 'CARD',
+        pg_tid: paymentResult.transaction_id,
+        receipt_url: paymentResult.receipt_url,
+        paid_at: paymentResult.paid_at || new Date().toISOString()
+      });
+
+    if (insertError) {
+      console.error('결제 정보 저장 실패:', insertError);
+    }
+
+    await supabase
+      .from('bookings')
+      .update({
+        payment_status: 'paid',
+        payment_method: 'portone_inicis'
+      })
+      .eq('id', bookingData.id);
+
+    alert('결제가 완료되었습니다!');
+    window.location.href = 'payment_complete.html';
+
+  } catch (error) {
+    console.error('Payment error:', error);
+    alert(error.error_msg || error.message || '결제에 실패했습니다.');
+    this.disabled = false;
+    this.innerHTML = '🔒 안전결제 실행';
   }
 });
 
-// 페이지 로드 시 결제 정보 가져오기
 window.addEventListener('DOMContentLoaded', loadPaymentInfo);

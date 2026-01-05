@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://stgstdpay.inicis.com https://stdux.inicis.com 'unsafe-inline' 'unsafe-eval'; style-src 'self' https://stgstdpay.inicis.com https://stdux.inicis.com 'unsafe-inline'; img-src 'self' https://stgstdpay.inicis.com https://stdux.inicis.com data:; connect-src 'self' https://stgstdpay.inicis.com https://stdux.inicis.com https://*.supabase.co; frame-src https://stgstdpay.inicis.com https://stdux.inicis.com; form-action https://stgstdpay.inicis.com https://stdux.inicis.com https://*.supabase.co;">
   <title>PUZZMI - 결제하기</title>
   <link rel="stylesheet" href="payment_page.css">
+  <script src="https://cdn.portone.io/v2/browser-sdk.js"></script>
 </head>
 <body>
   <div class="container">
@@ -13,11 +13,11 @@
 
     <div class="info-box">
       <div class="info-row">
-        <span class="info-label">주문번호</span>
-        <span class="info-value" id="oid">-</span>
+        <span class="info-label">예약번호</span>
+        <span class="info-value" id="booking_id">-</span>
       </div>
       <div class="info-row">
-        <span class="info-label">상품명</span>
+        <span class="info-label">서비스명</span>
         <span class="info-value" id="goodname">-</span>
       </div>
       <div class="info-row">
@@ -26,41 +26,21 @@
       </div>
     </div>
 
-    <form name="SendPayForm_id" id="SendPayForm_id" method="post">
-      <input type="hidden" name="version" value="1.0">
-      <input type="hidden" name="gopaymethod" value="Card:VBank">
-      <input type="hidden" name="mid" id="mid">
-      <input type="hidden" name="oid" id="form_oid">
-      <input type="hidden" name="price" id="form_price">
-      <input type="hidden" name="timestamp" id="timestamp">
-      <input type="hidden" name="use_chkfake" value="Y">
-      <input type="hidden" name="signature" id="signature">
-      <input type="hidden" name="verification" id="verification">
-      <input type="hidden" name="mKey" id="mKey">
-      <input type="hidden" name="currency" value="WON">
-      <input type="hidden" name="goodname" id="form_goodname">
-      <input type="hidden" name="buyername" id="buyername">
-      <input type="hidden" name="buyertel" id="buyertel">
-      <input type="hidden" name="buyeremail" id="buyeremail">
-      <input type="hidden" name="returnUrl" id="returnUrl">
-      <input type="hidden" name="closeUrl" id="closeUrl">
-      <input type="hidden" name="acceptmethod" value="below1000">
-    </form>
-
-    <button type="button" class="btn-pay" id="payBtn">
+    <button type="button" class="btn-pay" id="payBtn" disabled>
       🔒 안전결제 실행
     </button>
 
     <div class="secure-badge">
-      ✅ KG이니시스 안전결제
+      ✅ 포트원 안전결제
     </div>
 
     <div id="loading" style="display:none; text-align:center; margin-top:20px;">
       <p>결제 정보를 불러오는 중...</p>
     </div>
+
+    <div id="error-message" style="display:none; margin-top:20px; padding:20px; background:#fee; border-radius:12px; color:#c00; text-align:center;"></div>
   </div>
 
-  <script src="https://stgstdpay.inicis.com/stdjs/INIStdPay.js"></script>
-  <script src="payment_page.js"></script>
+  <script type="module" src="payment_page.js"></script>
 </body>
 </html>
