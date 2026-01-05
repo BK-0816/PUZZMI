@@ -63,7 +63,8 @@ export function createPaymentParams(options) {
     // 일본 결제를 위한 상점 정보 (필수)
     storeDetails: {
       storeName: 'SeoulDdays',
-      storeNameEn: 'SeoulDdays'
+      storeNameEn: 'SeoulDdays',
+      storeNameKana: 'セウルディズ'
     },
     // 결제 완료 후 리디렉션 URL (모바일)
     redirectUrl: `${window.location.origin}/payment_complete.html`,
