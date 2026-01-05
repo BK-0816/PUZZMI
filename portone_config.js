@@ -60,6 +60,10 @@ export function createPaymentParams(options) {
       email: customer.email || ''
     },
     customData: JSON.stringify(customData),
+    // 일본 결제를 위한 상점 정보 (필수)
+    storeDetails: {
+      storeName: 'SeoulDdays'
+    },
     // 결제 완료 후 리디렉션 URL (모바일)
     redirectUrl: `${window.location.origin}/payment_complete.html`,
     // 결제 창 닫기 시 호출될 콜백은 requestPayment에서 처리
