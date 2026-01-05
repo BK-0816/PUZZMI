@@ -20,13 +20,29 @@ Deno.serve(async (req: Request) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // 포트원 웹훅 데이터 파싱
+    // 포트원 V2 웹훅 데이터 파싱
     const webhookData = await req.json();
-    console.log("Received webhook:", webhookData);
+    console.log("Received V2 webhook:", webhookData);
 
-    const { imp_uid, merchant_uid, status } = webhookData;
+    // V2 웹훅 페이로드 구조
+    const { type, data } = webhookData;
 
-    if (!imp_uid || !merchant_uid) {
+    // 결제 상태 변경 웹훅만 처리
+    if (type !== "Transaction.StatusChanged") {
+      return new Response(
+        JSON.stringify({ message: "Ignored non-payment webhook" }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    const paymentId = data?.paymentId;
+    const transactionId = data?.transactionId;
+    const status = data?.status;
+
+    if (!paymentId || !transactionId) {
       return new Response(
         JSON.stringify({ error: "Missing required fields" }),
         {
@@ -36,71 +52,54 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    // 포트원 REST API를 통한 결제 정보 검증
-    // TODO: 실제 환경에서는 포트원 REST API Key를 환경변수로 설정 필요
-    const portoneApiKey = Deno.env.get("PORTONE_API_KEY") || "";
+    // 포트원 V2 REST API를 통한 결제 정보 검증
     const portoneApiSecret = Deno.env.get("PORTONE_API_SECRET") || "";
 
-    // 포트원 액세스 토큰 발급
-    let accessToken = "";
-    if (portoneApiKey && portoneApiSecret) {
-      const tokenResponse = await fetch("https://api.iamport.kr/users/getToken", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          imp_key: portoneApiKey,
-          imp_secret: portoneApiSecret,
-        }),
-      });
-
-      const tokenData = await tokenResponse.json();
-      if (tokenData.code === 0) {
-        accessToken = tokenData.response.access_token;
-      } else {
-        console.error("Failed to get access token:", tokenData);
-      }
-    }
-
-    // 포트원에서 결제 정보 조회
     let paymentData = null;
-    if (accessToken) {
-      const paymentResponse = await fetch(
-        `https://api.iamport.kr/payments/${imp_uid}`,
-        {
-          headers: {
-            "Authorization": accessToken,
-          },
-        }
-      );
+    if (portoneApiSecret) {
+      try {
+        const paymentResponse = await fetch(
+          `https://api.portone.io/payments/${paymentId}`,
+          {
+            headers: {
+              "Authorization": `PortOne ${portoneApiSecret}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
-      const paymentResult = await paymentResponse.json();
-      if (paymentResult.code === 0) {
-        paymentData = paymentResult.response;
+        if (paymentResponse.ok) {
+          paymentData = await paymentResponse.json();
+        } else {
+          console.error("Failed to fetch payment:", await paymentResponse.text());
+        }
+      } catch (error) {
+        console.error("Error fetching payment:", error);
       }
     }
 
     // 데이터베이스 업데이트
     const updateData: any = {
-      status: status,
+      status: mapV2Status(status),
       webhook_verified: true,
       updated_at: new Date().toISOString(),
     };
 
     // 포트원 API에서 조회한 데이터로 추가 정보 업데이트
     if (paymentData) {
-      updateData.amount = paymentData.amount;
-      updateData.pg_provider = paymentData.pg_provider;
-      updateData.pay_method = paymentData.pay_method;
-      updateData.apply_num = paymentData.apply_num;
-      updateData.pg_tid = paymentData.pg_tid;
-      updateData.receipt_url = paymentData.receipt_url;
+      updateData.amount = paymentData.amount?.total || data.amount;
+      updateData.currency = paymentData.currency || data.currency;
+      updateData.pg_provider = "portone_v2_inicis";
+      updateData.pay_method = paymentData.method?.type || data.method;
+      updateData.pg_tid = transactionId;
+      updateData.receipt_url = paymentData.receiptUrl;
 
-      if (status === "paid") {
-        updateData.paid_at = new Date(paymentData.paid_at * 1000).toISOString();
-      } else if (status === "failed") {
-        updateData.fail_reason = paymentData.fail_reason;
+      if (status === "PAID") {
+        updateData.paid_at = paymentData.paidAt || new Date().toISOString();
+      } else if (status === "FAILED") {
+        updateData.fail_reason = paymentData.failureReason || data.failureReason;
         updateData.failed_at = new Date().toISOString();
-      } else if (status === "cancelled") {
+      } else if (status === "CANCELLED") {
         updateData.cancelled_at = new Date().toISOString();
       }
     }
@@ -109,7 +108,7 @@ Deno.serve(async (req: Request) => {
     const { data: payment, error: updateError } = await supabase
       .from("portone_payments")
       .update(updateData)
-      .eq("imp_uid", imp_uid)
+      .eq("imp_uid", paymentId)
       .select()
       .maybeSingle();
 
@@ -129,13 +128,13 @@ Deno.serve(async (req: Request) => {
       let bookingStatus = "pending";
       let paymentStatus = "pending";
 
-      if (status === "paid") {
+      if (status === "PAID") {
         bookingStatus = "confirmed";
         paymentStatus = "paid";
-      } else if (status === "failed") {
+      } else if (status === "FAILED") {
         bookingStatus = "cancelled";
         paymentStatus = "failed";
-      } else if (status === "cancelled") {
+      } else if (status === "CANCELLED") {
         bookingStatus = "cancelled";
         paymentStatus = "cancelled";
       }
@@ -145,7 +144,7 @@ Deno.serve(async (req: Request) => {
         .update({
           status: bookingStatus,
           payment_status: paymentStatus,
-          payment_method: "portone_inicis",
+          payment_method: "portone_v2_inicis",
         })
         .eq("id", payment.booking_id);
     }
@@ -168,3 +167,15 @@ Deno.serve(async (req: Request) => {
     );
   }
 });
+
+// V2 상태를 내부 상태로 매핑
+function mapV2Status(v2Status: string): string {
+  const statusMap: { [key: string]: string } = {
+    "READY": "ready",
+    "PAID": "paid",
+    "FAILED": "failed",
+    "CANCELLED": "cancelled",
+    "PARTIAL_CANCELLED": "refunded",
+  };
+  return statusMap[v2Status] || "ready";
+}

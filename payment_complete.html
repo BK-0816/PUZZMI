@@ -157,30 +157,31 @@
 
     async function checkPaymentStatus() {
       const urlParams = new URLSearchParams(window.location.search);
-      const impUid = urlParams.get('imp_uid');
-      const merchantUid = urlParams.get('merchant_uid');
-      const impSuccess = urlParams.get('imp_success');
+      // V2는 paymentId와 code를 파라미터로 반환
+      const paymentId = urlParams.get('paymentId');
+      const code = urlParams.get('code');
+      const message = urlParams.get('message');
 
       const resultCard = document.getElementById('resultCard');
 
-      if (!impUid || !merchantUid) {
+      if (!paymentId) {
         showError('決済情報が見つかりません。');
         return;
       }
 
-      // 결제 실패
-      if (impSuccess === 'false') {
-        const errorMsg = urlParams.get('error_msg') || '決済に失敗しました。';
+      // 결제 실패 (code가 있으면 에러)
+      if (code) {
+        const errorMsg = message || '決済に失敗しました。';
         showError(errorMsg);
         return;
       }
 
       try {
-        // 포트원 결제 정보 조회
+        // 포트원 결제 정보 조회 (V2는 payment_id로 조회)
         const { data: payment, error } = await supabase
           .from('portone_payments')
           .select('*, bookings(*)')
-          .eq('imp_uid', impUid)
+          .eq('imp_uid', paymentId)
           .maybeSingle();
 
         if (error || !payment) {

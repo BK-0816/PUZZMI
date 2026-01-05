@@ -1,22 +1,26 @@
-// PortOne (구 아임포트) 설정 파일
+// PortOne V2 설정 파일
 
 export const PORTONE_CONFIG = {
-  // PortOne 가맹점 식별코드 (실제 사용시 본인의 코드로 변경 필요)
-  // 테스트용: imp00000000 (테스트 가맹점 코드)
-  IMP_CODE: 'imp00000000', // TODO: 실제 가맹점 코드로 변경
+  // PortOne V2 Store ID (실제 사용시 본인의 코드로 변경 필요)
+  // 형식: store-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+  STORE_ID: 'store-test-inicis-jp', // TODO: 실제 Store ID로 변경
 
-  // KG이니시스 일본 결제 PG 설정
-  PG_PROVIDER: 'inicis_v2', // KG이니시스
+  // V2 API Secret (환경변수로 관리 권장)
+  // API_SECRET은 서버사이드에서만 사용
+
+  // KG이니시스 일본 결제 채널 키
+  // 포트원 콘솔에서 KG이니시스 일본 채널 생성 후 발급받은 키
+  CHANNEL_KEY: 'channel-key-inicis-jp', // TODO: 실제 채널 키로 변경
 
   // 결제 수단
   PAY_METHODS: {
-    CARD: 'card',           // 신용카드
-    TRANS: 'trans',         // 실시간 계좌이체
-    VBANK: 'vbank',         // 가상계좌
-    PHONE: 'phone',         // 휴대폰 소액결제
-    CVS: 'cvs',             // 편의점 결제 (일본)
-    PAYPAY: 'paypay',       // PayPay (일본)
-    LINEPAY: 'linepay'      // LINE Pay (일본)
+    CARD: 'CARD',           // 신용카드
+    VIRTUAL_ACCOUNT: 'VIRTUAL_ACCOUNT', // 가상계좌
+    TRANSFER: 'TRANSFER',   // 실시간 계좌이체
+    MOBILE: 'MOBILE',       // 휴대폰 소액결제
+    CONVENIENCE_STORE: 'CONVENIENCE_STORE', // 편의점 (일본)
+    PAYPAY: 'PAYPAY',       // PayPay (일본)
+    LINEPAY: 'LINEPAY'      // LINE Pay (일본)
   },
 
   // 통화 코드
@@ -28,67 +32,78 @@ export const PORTONE_CONFIG = {
 };
 
 /**
- * 포트원 결제 요청 파라미터 생성
+ * 포트원 V2 결제 요청 파라미터 생성
  * @param {Object} options - 결제 옵션
- * @returns {Object} 포트원 결제 파라미터
+ * @returns {Object} 포트원 V2 결제 파라미터
  */
 export function createPaymentParams(options) {
   const {
-    merchantUid,      // 주문번호 (고유값)
-    amount,           // 결제금액
-    name,             // 상품명
-    buyerName,        // 구매자명
-    buyerTel,         // 구매자 전화번호
-    buyerEmail,       // 구매자 이메일
-    payMethod = 'card', // 결제수단 (기본: 카드)
-    currency = 'JPY',   // 통화 (기본: 엔화)
-    customData = {}     // 추가 데이터
+    paymentId,        // 결제 ID (고유값)
+    orderName,        // 주문명
+    totalAmount,      // 총 결제금액
+    currency = 'JPY', // 통화 (기본: 엔화)
+    payMethod = 'CARD', // 결제수단 (기본: 카드)
+    customer = {},    // 구매자 정보
+    customData = {},  // 추가 데이터
+    locale = 'ja'     // 언어 (일본어 기본)
   } = options;
 
   return {
-    pg: PORTONE_CONFIG.PG_PROVIDER, // KG이니시스
-    pay_method: payMethod,
-    merchant_uid: merchantUid,
-    name: name,
-    amount: amount,
+    storeId: PORTONE_CONFIG.STORE_ID,
+    channelKey: PORTONE_CONFIG.CHANNEL_KEY,
+    paymentId: paymentId,
+    orderName: orderName,
+    totalAmount: totalAmount,
     currency: currency,
-    buyer_name: buyerName,
-    buyer_tel: buyerTel,
-    buyer_email: buyerEmail,
-    custom_data: customData,
-    // 모바일 대응
-    m_redirect_url: `${window.location.origin}/payment_complete.html`,
-    // 팝업 닫기 URL
-    popup: true
+    payMethod: payMethod,
+    customer: {
+      fullName: customer.name || '',
+      phoneNumber: customer.tel || '',
+      email: customer.email || ''
+    },
+    customData: JSON.stringify(customData),
+    locale: locale,
+    // 결제 완료 후 리디렉션 URL (모바일)
+    redirectUrl: `${window.location.origin}/payment_complete.html`,
+    // 결제 창 닫기 시 호출될 콜백은 requestPayment에서 처리
   };
 }
 
 /**
- * 주문번호 생성
+ * 결제 ID 생성 (V2에서는 payment_id로 변경)
  * @param {string} prefix - 접두사
- * @returns {string} 고유한 주문번호
+ * @returns {string} 고유한 결제 ID
  */
-export function generateMerchantUid(prefix = 'PUZZMI') {
+export function generatePaymentId(prefix = 'PUZZMI') {
   const timestamp = Date.now();
   const random = Math.random().toString(36).substring(2, 9);
   return `${prefix}_${timestamp}_${random}`;
 }
 
 /**
- * 포트원 SDK 로드 확인
+ * 주문번호 생성 (하위호환)
+ * @param {string} prefix - 접두사
+ * @returns {string} 고유한 주문번호
+ */
+export function generateMerchantUid(prefix = 'PUZZMI') {
+  return generatePaymentId(prefix);
+}
+
+/**
+ * 포트원 V2 SDK 로드 확인
  * @returns {Promise<boolean>} SDK 로드 여부
  */
 export function ensurePortOneSDK() {
   return new Promise((resolve) => {
     // 이미 로드되어 있는 경우
-    if (window.IMP) {
+    if (window.PortOne) {
       resolve(true);
       return;
     }
 
-    // SDK 스크립트 추가
+    // V2 SDK 스크립트 추가
     const script = document.createElement('script');
-    script.src = 'https://cdn.iamport.kr/v1/iamport.js';
+    script.src = 'https://cdn.portone.io/v2/browser-sdk.js';
     script.onload = () => resolve(true);
     script.onerror = () => resolve(false);
     document.head.appendChild(script);
@@ -96,51 +111,58 @@ export function ensurePortOneSDK() {
 }
 
 /**
- * 포트원 초기화
- * @returns {Promise<Object>} 초기화된 IMP 객체
+ * 포트원 V2 초기화 (V2는 별도 초기화 불필요, SDK만 로드)
+ * @returns {Promise<Object>} PortOne 객체
  */
 export async function initPortOne() {
   const loaded = await ensurePortOneSDK();
 
-  if (!loaded || !window.IMP) {
-    throw new Error('포트원 SDK 로드 실패');
+  if (!loaded || !window.PortOne) {
+    throw new Error('포트원 V2 SDK 로드 실패');
   }
 
-  // 포트원 초기화
-  window.IMP.init(PORTONE_CONFIG.IMP_CODE);
-
-  return window.IMP;
+  return window.PortOne;
 }
 
 /**
- * 결제 요청
+ * 포트원 V2 결제 요청
  * @param {Object} paymentParams - 결제 파라미터
  * @returns {Promise<Object>} 결제 결과
  */
 export async function requestPayment(paymentParams) {
-  const IMP = await initPortOne();
+  const PortOne = await initPortOne();
 
-  return new Promise((resolve, reject) => {
-    IMP.request_pay(paymentParams, (response) => {
-      if (response.success) {
-        // 결제 성공
-        resolve({
-          success: true,
-          imp_uid: response.imp_uid,           // 포트원 거래 고유번호
-          merchant_uid: response.merchant_uid, // 주문번호
-          paid_amount: response.paid_amount,   // 결제금액
-          apply_num: response.apply_num,       // 카드 승인번호
-          pg_tid: response.pg_tid,             // PG사 거래번호
-          receipt_url: response.receipt_url    // 영수증 URL
-        });
-      } else {
-        // 결제 실패
-        reject({
-          success: false,
-          error_code: response.error_code,
-          error_msg: response.error_msg
-        });
-      }
-    });
-  });
+  try {
+    const response = await PortOne.requestPayment(paymentParams);
+
+    // V2는 response 자체가 결제 결과
+    if (response.code != null) {
+      // 에러 발생
+      throw {
+        success: false,
+        error_code: response.code,
+        error_msg: response.message
+      };
+    }
+
+    // 결제 성공
+    return {
+      success: true,
+      payment_id: response.paymentId,
+      transaction_id: response.transactionId,
+      paid_amount: response.amount,
+      currency: response.currency,
+      method: response.method,
+      receipt_url: response.receiptUrl,
+      requested_at: response.requestedAt,
+      paid_at: response.paidAt
+    };
+  } catch (error) {
+    // 결제 실패 또는 취소
+    throw {
+      success: false,
+      error_code: error.code || error.error_code || 'PAYMENT_FAILED',
+      error_msg: error.message || error.error_msg || '결제에 실패했습니다.'
+    };
+  }
 }

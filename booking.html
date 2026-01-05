@@ -1259,24 +1259,27 @@
 
         if (error) throw error;
 
-        // 주문번호 생성
-        const merchantUid = generateMerchantUid('PUZZMI');
+        // 결제 ID 생성
+        const paymentId = generateMerchantUid('PUZZMI');
 
-        // 결제 파라미터 생성
+        // 결제 파라미터 생성 (V2)
         const paymentParams = createPaymentParams({
-          merchantUid: merchantUid,
-          amount: totalAmount,
-          name: `SeoulDays メイト予約 (${duration}時間)`,
-          buyerName: formData.customer_name,
-          buyerTel: formData.customer_contact,
-          buyerEmail: user.email || 'guest@puzzmi.com',
-          payMethod: 'card', // 기본: 카드 (CVS, PayPay, LINE Pay도 선택 가능)
+          paymentId: paymentId,
+          orderName: `SeoulDays メイト予約 (${duration}時間)`,
+          totalAmount: totalAmount,
           currency: 'JPY',
+          payMethod: 'CARD', // 기본: 카드
+          customer: {
+            name: formData.customer_name,
+            tel: formData.customer_contact,
+            email: user.email || 'guest@puzzmi.com'
+          },
           customData: {
             booking_id: bookingData.id,
             user_id: user.id,
             mate_id: mateId
-          }
+          },
+          locale: 'ja' // 일본어 UI
         });
 
         result.innerHTML = `
@@ -1289,7 +1292,7 @@
           </div>
         `;
 
-        // 포트원 결제 요청
+        // 포트원 V2 결제 요청
         try {
           const paymentResult = await requestPayment(paymentParams);
 
@@ -1299,17 +1302,16 @@
             .insert({
               booking_id: bookingData.id,
               user_id: user.id,
-              imp_uid: paymentResult.imp_uid,
-              merchant_uid: paymentResult.merchant_uid,
+              imp_uid: paymentResult.payment_id, // V2는 payment_id 사용
+              merchant_uid: paymentResult.payment_id,
               amount: paymentResult.paid_amount,
-              currency: 'JPY',
+              currency: paymentResult.currency || 'JPY',
               status: 'paid',
-              pg_provider: 'inicis_v2',
-              pay_method: 'card',
-              apply_num: paymentResult.apply_num,
-              pg_tid: paymentResult.pg_tid,
+              pg_provider: 'portone_v2_inicis',
+              pay_method: paymentResult.method || 'CARD',
+              pg_tid: paymentResult.transaction_id,
               receipt_url: paymentResult.receipt_url,
-              paid_at: new Date().toISOString()
+              paid_at: paymentResult.paid_at || new Date().toISOString()
             });
 
           if (paymentError) {
