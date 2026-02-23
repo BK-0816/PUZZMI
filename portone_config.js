@@ -60,6 +60,7 @@ export function createPaymentParams(options) {
     },
     storeDetails: {
       storeName: 'PUZZMI',
+      storeNameShort: 'PUZZMI',
       storeNameKana: 'パズミ',
       storeNameEn: 'PUZZMI',
       phoneNumber: '01094376167',
