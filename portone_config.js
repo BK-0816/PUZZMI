@@ -62,7 +62,8 @@ export function createPaymentParams(options) {
     customData: customData,
     storeDetails: {
       storeName: 'PUZZMI',
-      contactName: 'PUZZMI'
+      contactName: 'PUZZMI',
+      email: 'support@puzzmi.com'
     }
   };
 }
