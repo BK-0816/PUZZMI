@@ -58,6 +58,13 @@ export function createPaymentParams(options) {
       phoneNumber: customer.tel || '',
       email: customer.email || ''
     },
+    storeDetails: {
+      storeName: 'PUZZMI',
+      storeNameKana: 'パズミ',
+      storeNameEn: 'PUZZMI',
+      phoneNumber: '01094376167',
+      email: 'choi.seojun0721@gmail.com'
+    },
     customData: customData,
     redirectUrl: `${window.location.origin}/payment_complete.html`
   };
