@@ -108,7 +108,10 @@ export function createPaymentParams(options) {
       contactName: 'PUZZMI',
       phoneNumber: '02-1234-5678',
       email: 'support@puzzmi.com',
-      openingHours: '10:00-22:00',
+      openingHours: {
+        open: '10:00',
+        close: '22:00'
+      },
       isEscrow: isEscrow,
       isCulturalExpense: isCulturalExpense
     },
