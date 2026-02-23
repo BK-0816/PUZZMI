@@ -51,28 +51,13 @@ export function createPaymentParams(options) {
     paymentId: paymentId,
     orderName: orderName,
     totalAmount: totalAmount,
-    currency: 'CURRENCY_JPY',
-    payMethod: payMethod,
+    currency: 'JPY',
     customer: {
-      fullName: customer.name || 'Guest',
-      phoneNumber: customer.tel || '',
-      email: customer.email || ''
+      fullName: customer.name || 'Guest Customer',
+      phoneNumber: customer.tel || '000-0000-0000',
+      email: customer.email || 'guest@puzzmi.com'
     },
-    storeDetails: {
-      storeName: 'PUZZMI',
-      storeNameShort: 'PUZZMI',
-      storeNameKana: 'パズミ',
-      storeNameEn: 'PUZZMI',
-      contactName: 'PUZZMI',
-      phoneNumber: '01094376167',
-      email: 'choi.seojun0721@gmail.com',
-      openingHours: {
-        open: '09:00',
-        close: '18:00'
-      }
-    },
-    customData: customData,
-    redirectUrl: `${window.location.origin}/payment_complete.html`
+    customData: customData
   };
 }
 
