@@ -114,6 +114,12 @@ document.getElementById('payBtn').addEventListener('click', async function() {
         amount: Math.round(bookingData.total_amount || 0),
         quantity: 1
       }],
+      storeDetails: {
+        storeName: 'PUZZMI',
+        contactName: 'PUZZMI',
+        phoneNumber: '02-1234-5678',
+        email: 'support@puzzmi.com'
+      },
       noticeUrls: [
         `${SUPABASE_URL}/functions/v1/portone-webhook`
       ],
