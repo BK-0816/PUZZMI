@@ -59,7 +59,10 @@ export function createPaymentParams(options) {
       phoneNumber: customer.tel || '000-0000-0000',
       email: customer.email || 'guest@puzzmi.com'
     },
-    customData: customData
+    customData: customData,
+    storeDetails: {
+      storeName: 'PUZZMI'
+    }
   };
 }
 
