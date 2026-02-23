@@ -119,15 +119,15 @@ export function createPaymentParams(options) {
     appScheme: window.location.origin,
     bypass: {
       inicis_jp: {
-        MallName: 'PUZZMI',
-        MallNameEn: 'PUZZMI',
-        MallNameKana: 'パズミ',
-        MallNameShort: 'PUZZMI',
-        ContactName: 'PUZZMI',
-        ContactTel: '010-9437-6167',
-        ContactEmail: 'puzzmi0721@gmail.com',
-        BizOpen: '10:00',
-        BizClose: '22:00'
+        mallname: 'PUZZMI',
+        mallname_en: 'PUZZMI',
+        mallname_kana: 'パズミ',
+        mallname_short: 'PUZZMI',
+        contact_name: 'PUZZMI',
+        contact_tel: '01094376167',
+        contact_email: 'puzzmi0721@gmail.com',
+        biz_open: '10:00',
+        biz_close: '22:00'
       }
     }
   };
