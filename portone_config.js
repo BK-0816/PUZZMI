@@ -104,6 +104,20 @@ export function createPaymentParams(options) {
     locale: locale,
     country: country,
     appScheme: window.location.origin,
+    storeDetails: {
+      storeName: 'PUZZMI',
+      businessName: 'PUZZMI',
+      phoneNumber: '01094376167',
+      email: 'puzzmi0721@gmail.com',
+      storeNameEn: 'PUZZMI',
+      storeNameKana: 'パズミ',
+      storeNameShort: 'PUZZMI',
+      openingHours: {
+        open: '10:00',
+        close: '22:00'
+      },
+      contactName: 'PUZZMI'
+    },
     bypass: {
       inicis_jp: {
         mallname: 'PUZZMI',
