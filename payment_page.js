@@ -79,12 +79,12 @@ function showError(message) {
 
 document.getElementById('payBtn').addEventListener('click', async function() {
   if (!bookingData) {
-    alert('결제 정보를 불러오지 못했습니다.');
+    alert('結済情報を読み込めませんでした。');
     return;
   }
 
   this.disabled = true;
-  this.innerHTML = '결제 처리 중...';
+  this.innerHTML = '決済処理中...';
 
   try {
     const paymentId = `PUZZMI_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
@@ -94,7 +94,7 @@ document.getElementById('payBtn').addEventListener('click', async function() {
       channelKey: PORTONE_CONFIG.CHANNEL_KEY,
       paymentId: paymentId,
       orderName: `PUZZMI メイト予約 (${bookingData.duration_hours || 0}時間)`,
-      totalAmount: bookingData.total_amount,
+      totalAmount: Math.round(bookingData.total_amount || 0),
       currency: 'JPY',
       payMethod: 'CARD',
       redirectUrl: `${window.location.origin}/payment_complete.html`,
@@ -108,18 +108,20 @@ document.getElementById('payBtn').addEventListener('click', async function() {
         user_id: bookingData.customer_id,
         mate_id: bookingData.mate_id
       },
-      storeDetails: {
-        storeName: 'PUZZMI',
-        storeNameEn: 'PUZZMI',
-        storeNameKana: 'パズミ',
-        storeNameShort: 'PUZZMI',
-        contactName: 'PUZZMI',
-        email: 'support@puzzmi.com',
-        phoneNumber: '02-1234-5678'
-      }
+      products: [{
+        id: `booking_${bookingData.id}`,
+        name: `メイトサービス予約`,
+        amount: Math.round(bookingData.total_amount || 0),
+        quantity: 1
+      }],
+      noticeUrls: [
+        `${SUPABASE_URL}/functions/v1/portone-webhook`
+      ],
+      locale: 'JA_JP',
+      appScheme: window.location.origin
     };
 
-    console.log('결제 파라미터:', paymentParams);
+    console.log('決済パラメータ:', paymentParams);
     const paymentResult = await requestPayment(paymentParams);
 
     const { error: insertError } = await supabase
@@ -156,8 +158,8 @@ document.getElementById('payBtn').addEventListener('click', async function() {
       console.error('예약 상태 업데이트 실패:', updateError);
     }
 
-    alert('결제가 완료되었습니다!');
-    window.location.href = 'payment_complete.html';
+    alert('決済が完了しました!');
+    window.location.href = `payment_complete.html?payment_id=${paymentResult.payment_id}`;
 
   } catch (error) {
     console.error('Payment error:', error);

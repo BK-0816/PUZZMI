@@ -36,36 +36,54 @@ export const PORTONE_CONFIG = {
  */
 export function createPaymentParams(options) {
   const {
-    paymentId,        // 결제 ID (고유값)
-    orderName,        // 주문명
-    totalAmount,      // 총 결제금액
-    currency = 'JPY', // 통화 (기본: 엔화)
-    payMethod = 'CARD', // 결제수단 (기본: 카드)
-    customer = {},    // 구매자 정보
-    customData = {}   // 추가 데이터
+    paymentId,
+    orderName,
+    totalAmount,
+    currency = 'JPY',
+    payMethod = 'CARD',
+    customer = {},
+    customData = {},
+    taxFreeAmount,
+    vatAmount,
+    products = [],
+    noticeUrls = []
   } = options;
 
-  return {
+  const params = {
     storeId: PORTONE_CONFIG.STORE_ID,
     channelKey: PORTONE_CONFIG.CHANNEL_KEY,
     paymentId: paymentId,
     orderName: orderName,
     totalAmount: totalAmount,
-    currency: 'JPY',
+    currency: currency,
     payMethod: payMethod,
-    redirectUrl: `${window.location.origin}/payment_complete.html`,
     customer: {
-      fullName: customer.name || 'Guest Customer',
-      phoneNumber: customer.tel || '000-0000-0000',
+      fullName: customer.fullName || customer.name || 'Guest Customer',
+      phoneNumber: customer.phoneNumber || customer.tel || '000-0000-0000',
       email: customer.email || 'guest@puzzmi.com'
     },
     customData: customData,
-    storeDetails: {
-      storeName: 'PUZZMI',
-      contactName: 'PUZZMI',
-      email: 'support@puzzmi.com'
-    }
+    redirectUrl: `${window.location.origin}/payment_complete.html`,
+    appScheme: window.location.origin
   };
+
+  if (taxFreeAmount !== undefined) {
+    params.taxFreeAmount = taxFreeAmount;
+  }
+
+  if (vatAmount !== undefined) {
+    params.vatAmount = vatAmount;
+  }
+
+  if (products && products.length > 0) {
+    params.products = products;
+  }
+
+  if (noticeUrls && noticeUrls.length > 0) {
+    params.noticeUrls = noticeUrls;
+  }
+
+  return params;
 }
 
 /**
