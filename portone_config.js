@@ -53,6 +53,7 @@ export function createPaymentParams(options) {
     totalAmount: totalAmount,
     currency: 'JPY',
     payMethod: payMethod,
+    redirectUrl: `${window.location.origin}/payment_complete.html`,
     customer: {
       fullName: customer.name || 'Guest Customer',
       phoneNumber: customer.tel || '000-0000-0000',
