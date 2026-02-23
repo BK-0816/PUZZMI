@@ -110,7 +110,8 @@ document.getElementById('payBtn').addEventListener('click', async function() {
       },
       storeDetails: {
         storeName: 'PUZZMI',
-        storeNameEn: 'PUZZMI'
+        storeNameEn: 'PUZZMI',
+        storeNameKana: 'パズミ'
       }
     };
 
