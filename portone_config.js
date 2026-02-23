@@ -52,21 +52,19 @@ export function createPaymentParams(options) {
     paymentId: paymentId,
     orderName: orderName,
     totalAmount: totalAmount,
-    currency: currency,
+    currency: currency === 'JPY' ? 'CURRENCY_JPY' : currency,
     payMethod: payMethod,
     customer: {
-      fullName: customer.name || '',
+      fullName: customer.name || 'Guest',
       phoneNumber: customer.tel || '',
       email: customer.email || ''
     },
-    customData: JSON.stringify(customData),
-    // 일본 결제를 위한 상점 정보 (필수)
     storeDetails: {
       storeName: 'PUZZMI',
-      storeNameShort: 'PUZZMI',
-      storeNameEn: 'PUZZMI',
       storeNameKana: 'パズミ',
-      contactName: 'LINE: @puzzmi',
+      storeNameEn: 'PUZZMI',
+      storeNameShort: 'PUZZMI',
+      contactName: 'PUZZMI Support',
       email: 'choi.seojun0721@gmail.com',
       phoneNumber: '01094376167',
       openingHours: {
@@ -74,9 +72,9 @@ export function createPaymentParams(options) {
         close: '18:00'
       }
     },
-    // 결제 완료 후 리디렉션 URL (모바일)
+    customData: customData,
     redirectUrl: `${window.location.origin}/payment_complete.html`,
-    // 결제 창 닫기 시 호출될 콜백은 requestPayment에서 처리
+    locale: locale
   };
 }
 
@@ -144,11 +142,14 @@ export async function requestPayment(paymentParams) {
   const PortOne = await initPortOne();
 
   try {
+    console.log('포트원 결제 요청:', paymentParams);
     const response = await PortOne.requestPayment(paymentParams);
+    console.log('포트원 결제 응답:', response);
 
     // V2는 response 자체가 결제 결과
     if (response.code != null) {
       // 에러 발생
+      console.error('포트원 에러 응답:', response);
       throw {
         success: false,
         error_code: response.code,
@@ -170,6 +171,7 @@ export async function requestPayment(paymentParams) {
     };
   } catch (error) {
     // 결제 실패 또는 취소
+    console.error('포트원 결제 실패:', error);
     throw {
       success: false,
       error_code: error.code || error.error_code || 'PAYMENT_FAILED',
