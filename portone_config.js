@@ -119,7 +119,7 @@ export function createPaymentParams(options) {
       contactName: 'PUZZMI'
     },
     bypass: {
-      inicis_v2_jp: {
+      inicis_jp: {
         mallname: 'PUZZMI',
         mallname_en: 'PUZZMI',
         mallname_kana: 'パズミ',
@@ -448,12 +448,12 @@ export function validatePaymentParams(params) {
     errors.push('KG이니시스의 경우 이메일은 @와 .만 특수문자로 허용됩니다.');
   }
 
-  if (!params.bypass || !params.bypass.inicis_v2_jp || !params.bypass.inicis_v2_jp.mallname_short) {
-    errors.push('이니시스 일본 결제(JPPG)인 경우 bypass.inicis_v2_jp.mallname_short는 필수입니다.');
+  if (!params.bypass || !params.bypass.inicis_jp || !params.bypass.inicis_jp.mallname_short) {
+    errors.push('이니시스 일본 결제(JPPG)인 경우 bypass.inicis_jp.mallname_short는 필수입니다.');
   }
 
-  if (!params.bypass || !params.bypass.inicis_v2_jp || !params.bypass.inicis_v2_jp.biz_open || !params.bypass.inicis_v2_jp.biz_close) {
-    errors.push('이니시스 일본 결제(JPPG)인 경우 bypass.inicis_v2_jp.biz_open과 biz_close는 필수입니다.');
+  if (!params.bypass || !params.bypass.inicis_jp || !params.bypass.inicis_jp.biz_open || !params.bypass.inicis_jp.biz_close) {
+    errors.push('이니시스 일본 결제(JPPG)인 경우 bypass.inicis_jp.biz_open과 biz_close는 필수입니다.');
   }
 
   return {
