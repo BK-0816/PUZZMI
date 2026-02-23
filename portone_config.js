@@ -116,7 +116,10 @@ export function createPaymentParams(options) {
     redirectUrl: `${window.location.origin}/payment_complete.html`,
     locale: locale,
     country: country,
-    appScheme: window.location.origin
+    appScheme: window.location.origin,
+    bypass: {
+      inicis_jp: {}
+    }
   };
 
   // 구매자 성별 정보 추가
