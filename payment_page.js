@@ -93,7 +93,7 @@ document.getElementById('payBtn').addEventListener('click', async function() {
       paymentId: paymentId,
       orderName: `PUZZMI メイト予約 (${bookingData.duration_hours || 0}時間)`,
       totalAmount: bookingData.total_amount,
-      currency: 'JPY',
+      currency: 'CURRENCY_JPY',
       payMethod: 'CARD',
       customer: {
         name: bookingData.customer_name || 'Guest',

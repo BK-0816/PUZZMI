@@ -51,7 +51,7 @@ export function createPaymentParams(options) {
     paymentId: paymentId,
     orderName: orderName,
     totalAmount: totalAmount,
-    currency: currency,
+    currency: 'CURRENCY_JPY',
     payMethod: payMethod,
     customer: {
       fullName: customer.name || 'Guest',
