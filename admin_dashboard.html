@@ -1153,21 +1153,15 @@
       const user = allUsers.find(u => u.id === userId);
       if (!user) return alert('유저를 찾을 수 없습니다.');
 
-      const hourlyRate = prompt('시간당 요금을 입력하세요 (엔):', '4000');
-      if (!hourlyRate) return;
-
-      const bio = prompt('소개를 입력하세요:', '안녕하세요! 즐거운 시간을 함께하겠습니다.');
-      if (!bio) return;
-
-      if (!confirm(`${user.full_name || user.email}님을 메이트로 전환하시겠습니까?`)) return;
+      if (!confirm(`${user.full_name || user.email}님을 메이트로 전환하시겠습니까?\n\n메이트는 자신의 프로필에서 소개와 정보를 직접 작성할 수 있습니다.`)) return;
 
       try {
         const { error } = await supabase
           .from('mate_profiles')
           .insert({
             user_id: userId,
-            bio: bio,
-            hourly_rate: parseInt(hourlyRate),
+            bio: '',
+            hourly_rate: 4000,
             rating: 0,
             is_verified: false,
             tags: [],
@@ -1178,7 +1172,7 @@
 
         if (error) throw error;
 
-        alert('✅ 메이트로 전환되었습니다!');
+        alert('✅ 메이트로 전환되었습니다!\n\n해당 유저는 이제 메이트 편집 페이지에서 자신의 프로필을 작성할 수 있습니다.');
         loadUsers();
       } catch (error) {
         console.error('메이트 전환 실패:', error);
