@@ -26,6 +26,35 @@ export const PORTONE_CONFIG = {
     KRW: 'KRW',  // 한국 원
     JPY: 'JPY',  // 일본 엔
     USD: 'USD'   // 미국 달러
+  },
+
+  // 언어 설정
+  LOCALE: {
+    KO_KR: 'KO_KR',  // 한국어
+    EN_US: 'EN_US',  // 영어
+    JA_JP: 'JA_JP',  // 일본어
+    ZH_CN: 'ZH_CN'   // 중국어 간체
+  },
+
+  // 상품 유형 (휴대폰 소액결제 필수)
+  PRODUCT_TYPE: {
+    REAL: 'PRODUCT_TYPE_REAL',       // 실물 상품
+    DIGITAL: 'PRODUCT_TYPE_DIGITAL'  // 디지털 상품
+  },
+
+  // 성별
+  GENDER: {
+    MALE: 'MALE',
+    FEMALE: 'FEMALE',
+    OTHER: 'OTHER'
+  },
+
+  // 국가 코드 (ISO 3166-1 alpha-2)
+  COUNTRY: {
+    KR: 'KR',  // 대한민국
+    JP: 'JP',  // 일본
+    US: 'US',  // 미국
+    CN: 'CN'   // 중국
   }
 };
 
@@ -47,7 +76,13 @@ export function createPaymentParams(options) {
     vatAmount,
     products = [],
     noticeUrls = [],
-    locale = 'JA_JP'
+    locale = 'JA_JP',
+    country = 'JP',
+    productType,
+    offerPeriod,
+    address,
+    isEscrow = false,
+    isCulturalExpense = false
   } = options;
 
   const params = {
@@ -59,6 +94,7 @@ export function createPaymentParams(options) {
     currency: currency,
     payMethod: payMethod,
     customer: {
+      customerId: customer.customerId,
       fullName: customer.fullName || customer.name || 'Guest Customer',
       phoneNumber: customer.phoneNumber || customer.tel || '000-0000-0000',
       email: customer.email || 'guest@puzzmi.com'
@@ -71,27 +107,81 @@ export function createPaymentParams(options) {
       storeNameShort: 'PUZZMI',
       contactName: 'PUZZMI',
       phoneNumber: '02-1234-5678',
-      email: 'support@puzzmi.com'
+      email: 'support@puzzmi.com',
+      isEscrow: isEscrow,
+      isCulturalExpense: isCulturalExpense
     },
     redirectUrl: `${window.location.origin}/payment_complete.html`,
     locale: locale,
+    country: country,
     appScheme: window.location.origin
   };
 
-  if (taxFreeAmount !== undefined) {
+  // 구매자 성별 정보 추가
+  if (customer.gender) {
+    params.customer.gender = customer.gender;
+  }
+
+  // 구매자 생년월일 추가
+  if (customer.birthYear) {
+    params.customer.birthYear = customer.birthYear;
+  }
+  if (customer.birthMonth) {
+    params.customer.birthMonth = customer.birthMonth;
+  }
+  if (customer.birthDay) {
+    params.customer.birthDay = customer.birthDay;
+  }
+
+  // 구매자 주소 추가
+  if (address || customer.address) {
+    const addr = address || customer.address;
+    params.customer.address = {
+      country: addr.country,
+      addressLine1: addr.addressLine1,
+      addressLine2: addr.addressLine2,
+      city: addr.city,
+      province: addr.province,
+      zipcode: addr.zipcode
+    };
+  }
+
+  // 면세 금액
+  if (taxFreeAmount !== undefined && taxFreeAmount !== null) {
     params.taxFreeAmount = taxFreeAmount;
   }
 
-  if (vatAmount !== undefined) {
+  // 부가세
+  if (vatAmount !== undefined && vatAmount !== null) {
     params.vatAmount = vatAmount;
   }
 
+  // 상품 정보
   if (products && products.length > 0) {
-    params.products = products;
+    params.products = products.map(product => ({
+      id: product.id,
+      name: product.name,
+      code: product.code,
+      amount: product.amount,
+      quantity: product.quantity,
+      tag: product.tag,
+      link: product.link
+    }));
   }
 
+  // 웹훅 URL
   if (noticeUrls && noticeUrls.length > 0) {
     params.noticeUrls = noticeUrls;
+  }
+
+  // 상품 유형 (휴대폰 소액결제 필수)
+  if (productType) {
+    params.productType = productType;
+  }
+
+  // 서비스 제공 기간
+  if (offerPeriod) {
+    params.offerPeriod = offerPeriod;
   }
 
   return params;
@@ -206,4 +296,148 @@ export async function requestPayment(paymentParams) {
       error_msg: error.message || error.error_msg || '결제에 실패했습니다.'
     };
   }
+}
+
+/**
+ * 포트원 에러 코드 처리
+ * @param {string} code - 에러 코드
+ * @returns {string} 사용자 친화적인 에러 메시지
+ */
+export function getErrorMessage(code) {
+  const errorMessages = {
+    'FAILURE_TYPE_PG': '결제대행사에서 오류가 발생했습니다.',
+    'SDK_NOT_LOADED': '결제 모듈을 불러올 수 없습니다.',
+    'PAYMENT_FAILED': '결제에 실패했습니다.',
+    'USER_CANCELLED': '사용자가 결제를 취소했습니다.',
+    'INVALID_REQUEST': '잘못된 결제 요청입니다.',
+    'INSUFFICIENT_FUNDS': '잔액이 부족합니다.',
+    'CARD_DECLINED': '카드가 거절되었습니다.',
+    'EXPIRED_CARD': '카드 유효기간이 만료되었습니다.',
+    'INVALID_CARD': '유효하지 않은 카드입니다.'
+  };
+
+  return errorMessages[code] || '결제 중 오류가 발생했습니다.';
+}
+
+/**
+ * 통화별 스케일 팩터 적용
+ * @param {number} amount - 원본 금액
+ * @param {string} currency - 통화 코드
+ * @returns {number} 스케일 팩터 적용된 금액
+ */
+export function applyScaleFactor(amount, currency) {
+  const scaleFactors = {
+    'KRW': 1,    // 한국 원 - 1배
+    'JPY': 1,    // 일본 엔 - 1배
+    'USD': 100,  // 미국 달러 - 100배 (센트 단위)
+    'EUR': 100,  // 유로 - 100배
+    'CNY': 100   // 중국 위안 - 100배
+  };
+
+  const factor = scaleFactors[currency] || 1;
+  return Math.round(amount * factor);
+}
+
+/**
+ * 상품 정보 검증
+ * @param {Array} products - 상품 배열
+ * @returns {boolean} 검증 결과
+ */
+export function validateProducts(products) {
+  if (!Array.isArray(products) || products.length === 0) {
+    return false;
+  }
+
+  return products.every(product => {
+    return product.id &&
+           product.name &&
+           typeof product.amount === 'number' &&
+           typeof product.quantity === 'number' &&
+           product.amount >= 0 &&
+           product.quantity > 0;
+  });
+}
+
+/**
+ * KG이니시스 주문명 검증 (최대 40바이트)
+ * @param {string} orderName - 주문명
+ * @returns {string} 검증된 주문명
+ */
+export function validateOrderName(orderName) {
+  if (!orderName) {
+    return 'PUZZMI Order';
+  }
+
+  // 바이트 길이 계산
+  const byteLength = new Blob([orderName]).size;
+
+  if (byteLength <= 40) {
+    return orderName;
+  }
+
+  // 40바이트 초과시 37바이트로 자르고 "..." 추가
+  let truncated = orderName;
+  while (new Blob([truncated]).size > 37) {
+    truncated = truncated.slice(0, -1);
+  }
+
+  return truncated + '...';
+}
+
+/**
+ * 결제 파라미터 검증
+ * @param {Object} params - 결제 파라미터
+ * @returns {Object} 검증 결과 { valid: boolean, errors: string[] }
+ */
+export function validatePaymentParams(params) {
+  const errors = [];
+
+  if (!params.storeId) {
+    errors.push('storeId는 필수입니다.');
+  }
+
+  if (!params.channelKey) {
+    errors.push('channelKey는 필수입니다.');
+  }
+
+  if (!params.paymentId) {
+    errors.push('paymentId는 필수입니다.');
+  } else if (!/^[\x00-\x7F]*$/.test(params.paymentId)) {
+    errors.push('KG이니시스의 경우 paymentId는 ASCII 문자만 허용됩니다.');
+  } else if (params.paymentId.length > 40) {
+    errors.push('KG이니시스의 경우 paymentId는 40자 이하로 입력해야 합니다.');
+  }
+
+  if (!params.orderName) {
+    errors.push('orderName은 필수입니다.');
+  }
+
+  if (typeof params.totalAmount !== 'number' || params.totalAmount <= 0) {
+    errors.push('totalAmount는 0보다 큰 숫자여야 합니다.');
+  }
+
+  if (!params.currency) {
+    errors.push('currency는 필수입니다.');
+  }
+
+  if (!params.payMethod) {
+    errors.push('payMethod는 필수입니다.');
+  }
+
+  if (!params.customer || !params.customer.fullName || !params.customer.phoneNumber || !params.customer.email) {
+    errors.push('PC 환경에서는 구매자 이름, 연락처, 이메일이 필수입니다.');
+  }
+
+  if (params.customer && params.customer.email && !/^[a-zA-Z0-9@.]+$/.test(params.customer.email)) {
+    errors.push('KG이니시스의 경우 이메일은 @와 .만 특수문자로 허용됩니다.');
+  }
+
+  if (!params.storeDetails || !params.storeDetails.storeNameShort) {
+    errors.push('이니시스 일본 결제(JPPG)인 경우 storeDetails.storeNameShort는 필수입니다.');
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors: errors
+  };
 }
