@@ -67,8 +67,8 @@ export function createPaymentParams(options) {
       phoneNumber: '01094376167',
       email: 'choi.seojun0721@gmail.com',
       openingHours: {
-        businessDays: ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'],
-        businessHours: '09:00-18:00'
+        open: '09:00',
+        close: '18:00'
       }
     },
     customData: customData,
