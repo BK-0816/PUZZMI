@@ -42,8 +42,7 @@ export function createPaymentParams(options) {
     currency = 'JPY', // 통화 (기본: 엔화)
     payMethod = 'CARD', // 결제수단 (기본: 카드)
     customer = {},    // 구매자 정보
-    customData = {},  // 추가 데이터
-    locale = 'ko'     // 언어 (한국어 기본)
+    customData = {}   // 추가 데이터
   } = options;
 
   return {
@@ -73,8 +72,7 @@ export function createPaymentParams(options) {
       }
     },
     customData: customData,
-    redirectUrl: `${window.location.origin}/payment_complete.html`,
-    locale: locale
+    redirectUrl: `${window.location.origin}/payment_complete.html`
   };
 }
 

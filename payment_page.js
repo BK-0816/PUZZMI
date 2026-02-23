@@ -104,8 +104,7 @@ document.getElementById('payBtn').addEventListener('click', async function() {
         booking_id: bookingData.id,
         user_id: bookingData.customer_id,
         mate_id: bookingData.mate_id
-      },
-      locale: 'ja'
+      }
     });
 
     console.log('결제 파라미터:', paymentParams);
