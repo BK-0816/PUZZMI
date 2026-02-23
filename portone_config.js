@@ -108,6 +108,7 @@ export function createPaymentParams(options) {
       contactName: 'PUZZMI',
       phoneNumber: '02-1234-5678',
       email: 'support@puzzmi.com',
+      openingHours: '10:00-22:00',
       isEscrow: isEscrow,
       isCulturalExpense: isCulturalExpense
     },
@@ -434,6 +435,10 @@ export function validatePaymentParams(params) {
 
   if (!params.storeDetails || !params.storeDetails.storeNameShort) {
     errors.push('이니시스 일본 결제(JPPG)인 경우 storeDetails.storeNameShort는 필수입니다.');
+  }
+
+  if (!params.storeDetails || !params.storeDetails.openingHours) {
+    errors.push('이니시스 일본 결제(JPPG)인 경우 storeDetails.openingHours는 필수입니다.');
   }
 
   return {
