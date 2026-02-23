@@ -114,7 +114,8 @@ document.getElementById('payBtn').addEventListener('click', async function() {
         storeNameKana: 'パズミ',
         storeNameShort: 'PUZZMI',
         contactName: 'PUZZMI',
-        email: 'support@puzzmi.com'
+        email: 'support@puzzmi.com',
+        phoneNumber: '02-1234-5678'
       }
     };
 
