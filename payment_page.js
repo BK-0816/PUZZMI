@@ -109,7 +109,8 @@ document.getElementById('payBtn').addEventListener('click', async function() {
         mate_id: bookingData.mate_id
       },
       storeDetails: {
-        storeName: 'PUZZMI'
+        storeName: 'PUZZMI',
+        storeNameEn: 'PUZZMI'
       }
     };
 
