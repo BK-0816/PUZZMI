@@ -113,7 +113,8 @@ document.getElementById('payBtn').addEventListener('click', async function() {
         storeNameEn: 'PUZZMI',
         storeNameKana: 'パズミ',
         storeNameShort: 'PUZZMI',
-        contactName: 'PUZZMI'
+        contactName: 'PUZZMI',
+        email: 'support@puzzmi.com'
       }
     };
 
