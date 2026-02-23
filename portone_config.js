@@ -63,6 +63,7 @@ export function createPaymentParams(options) {
       storeNameShort: 'PUZZMI',
       storeNameKana: 'パズミ',
       storeNameEn: 'PUZZMI',
+      contactName: 'PUZZMI',
       phoneNumber: '01094376167',
       email: 'choi.seojun0721@gmail.com'
     },
