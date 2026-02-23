@@ -106,10 +106,6 @@ export function createPaymentParams(options) {
     appScheme: window.location.origin,
     bypass: {
       inicis_jp: {
-        goodname: orderName,
-        buyername: customer.fullName || customer.name || 'Guest',
-        buyertel: customer.phoneNumber || customer.tel || '00000000000',
-        buyeremail: customer.email || 'guest@puzzmi.com',
         mallname: 'PUZZMI',
         mallname_en: 'PUZZMI',
         mallname_kana: 'パズミ',
@@ -117,8 +113,8 @@ export function createPaymentParams(options) {
         contact_name: 'PUZZMI',
         contact_tel: '01094376167',
         contact_email: 'puzzmi0721@gmail.com',
-        biz_open: '10:00',
-        biz_close: '22:00'
+        biz_open: '1000',
+        biz_close: '2200'
       }
     }
   };
