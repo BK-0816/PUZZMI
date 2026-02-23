@@ -46,7 +46,8 @@ export function createPaymentParams(options) {
     taxFreeAmount,
     vatAmount,
     products = [],
-    noticeUrls = []
+    noticeUrls = [],
+    locale = 'JA_JP'
   } = options;
 
   const params = {
@@ -63,7 +64,16 @@ export function createPaymentParams(options) {
       email: customer.email || 'guest@puzzmi.com'
     },
     customData: customData,
+    storeDetails: {
+      storeName: 'PUZZMI',
+      storeNameEn: 'PUZZMI',
+      storeNameKana: 'パズミ',
+      contactName: 'PUZZMI',
+      phoneNumber: '02-1234-5678',
+      email: 'support@puzzmi.com'
+    },
     redirectUrl: `${window.location.origin}/payment_complete.html`,
+    locale: locale,
     appScheme: window.location.origin
   };
 

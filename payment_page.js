@@ -1,4 +1,4 @@
-import { PORTONE_CONFIG, requestPayment } from './portone_config.js';
+import { PORTONE_CONFIG, requestPayment, createPaymentParams, generatePaymentId } from './portone_config.js';
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const SUPABASE_URL = 'https://eevvgbbokenpjnvtmztk.supabase.co';
@@ -87,17 +87,14 @@ document.getElementById('payBtn').addEventListener('click', async function() {
   this.innerHTML = '決済処理中...';
 
   try {
-    const paymentId = `PUZZMI_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    const paymentId = generatePaymentId('PUZZMI');
 
-    const paymentParams = {
-      storeId: PORTONE_CONFIG.STORE_ID,
-      channelKey: PORTONE_CONFIG.CHANNEL_KEY,
+    const paymentParams = createPaymentParams({
       paymentId: paymentId,
       orderName: `PUZZMI メイト予約 (${bookingData.duration_hours || 0}時間)`,
       totalAmount: Math.round(bookingData.total_amount || 0),
       currency: 'JPY',
       payMethod: 'CARD',
-      redirectUrl: `${window.location.origin}/payment_complete.html`,
       customer: {
         fullName: bookingData.customer_name || 'Guest Customer',
         phoneNumber: bookingData.customer_contact || '000-0000-0000',
@@ -114,20 +111,11 @@ document.getElementById('payBtn').addEventListener('click', async function() {
         amount: Math.round(bookingData.total_amount || 0),
         quantity: 1
       }],
-      storeDetails: {
-        storeName: 'PUZZMI',
-        storeNameEn: 'PUZZMI',
-        storeNameKana: 'パズミ',
-        contactName: 'PUZZMI',
-        phoneNumber: '02-1234-5678',
-        email: 'support@puzzmi.com'
-      },
       noticeUrls: [
         `${SUPABASE_URL}/functions/v1/portone-webhook`
       ],
-      locale: 'JA_JP',
-      appScheme: window.location.origin
-    };
+      locale: 'JA_JP'
+    });
 
     console.log('決済パラメータ:', paymentParams);
     const paymentResult = await requestPayment(paymentParams);
