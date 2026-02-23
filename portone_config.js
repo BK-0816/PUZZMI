@@ -51,25 +51,12 @@ export function createPaymentParams(options) {
     paymentId: paymentId,
     orderName: orderName,
     totalAmount: totalAmount,
-    currency: currency === 'JPY' ? 'CURRENCY_JPY' : currency,
+    currency: currency,
     payMethod: payMethod,
     customer: {
       fullName: customer.name || 'Guest',
       phoneNumber: customer.tel || '',
       email: customer.email || ''
-    },
-    storeDetails: {
-      storeName: 'PUZZMI',
-      storeNameKana: 'パズミ',
-      storeNameEn: 'PUZZMI',
-      storeNameShort: 'PUZZMI',
-      contactName: 'PUZZMI Support',
-      email: 'choi.seojun0721@gmail.com',
-      phoneNumber: '01094376167',
-      openingHours: {
-        open: '09:00',
-        close: '18:00'
-      }
     },
     customData: customData,
     redirectUrl: `${window.location.origin}/payment_complete.html`
@@ -137,16 +124,22 @@ export async function initPortOne() {
  * @returns {Promise<Object>} 결제 결과
  */
 export async function requestPayment(paymentParams) {
-  const PortOne = await initPortOne();
+  await ensurePortOneSDK();
+
+  if (!window.PortOne) {
+    throw {
+      success: false,
+      error_code: 'SDK_NOT_LOADED',
+      error_msg: '포트원 SDK를 불러올 수 없습니다.'
+    };
+  }
 
   try {
     console.log('포트원 결제 요청:', paymentParams);
-    const response = await PortOne.requestPayment(paymentParams);
+    const response = await window.PortOne.requestPayment(paymentParams);
     console.log('포트원 결제 응답:', response);
 
-    // V2는 response 자체가 결제 결과
-    if (response.code != null) {
-      // 에러 발생
+    if (response.code !== undefined) {
       console.error('포트원 에러 응답:', response);
       throw {
         success: false,
@@ -155,7 +148,6 @@ export async function requestPayment(paymentParams) {
       };
     }
 
-    // 결제 성공
     return {
       success: true,
       payment_id: response.paymentId,
@@ -168,8 +160,12 @@ export async function requestPayment(paymentParams) {
       paid_at: response.paidAt
     };
   } catch (error) {
-    // 결제 실패 또는 취소
     console.error('포트원 결제 실패:', error);
+
+    if (error.success === false) {
+      throw error;
+    }
+
     throw {
       success: false,
       error_code: error.code || error.error_code || 'PAYMENT_FAILED',
