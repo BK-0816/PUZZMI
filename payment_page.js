@@ -116,6 +116,7 @@ document.getElementById('payBtn').addEventListener('click', async function() {
       }],
       storeDetails: {
         storeName: 'PUZZMI',
+        storeNameEn: 'PUZZMI',
         contactName: 'PUZZMI',
         phoneNumber: '02-1234-5678',
         email: 'support@puzzmi.com'
