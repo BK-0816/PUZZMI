@@ -297,7 +297,7 @@
     </div>
   </div>
 
-  <form name="payform" id="SendPayForm_id" method="post" action="https://cbt.inicis.com/cbtauth">
+  <form name="payform" id="SendPayForm_id" method="post" action="https://devcbt.inicis.com/cbtauth">
     <input type="hidden" name="cbtType" id="cbtType" value="JPPG">
     <input type="hidden" name="mid" id="mid" value="CBTTEST001">
     <input type="hidden" name="timestamp" id="timestamp">
@@ -319,8 +319,8 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const APIKEY = "2wU7xOZd8gewsDyP";
-    const MID = "puzzmi01jp";
+    const APIKEY = "5AL5Djb1Ipualn0F";
+    const MID = "CBTTEST001";
 
     let bookingId = null;
     let totalAmount = 0;
@@ -374,7 +374,6 @@
     }
 
     function generateExtraData() {
-      const currentUrl = window.location.origin;
       return {
         "paymentUI": {
           "language": "ja",
@@ -389,14 +388,14 @@
             "installMonth": [3, 5, 6, 10, 12]
           },
           "cvs": {
-            "notiUrl": `${currentUrl}/supabase/functions/v1/japan-payment-notification`,
+            "notiUrl": `${SUPABASE_URL}/functions/v1/japan-payment-notification`,
             "contactInfo": "SeoulDays Support",
             "contactTelNum": "080-1234-5678",
             "contactHours": "09:00-18:00",
             "paymentTermDay": 5
           },
           "linepay": {
-            "productImageUrl": `${currentUrl}/PUZZMI.png`
+            "productImageUrl": `${window.location.origin}/PUZZMI.png`
           }
         }
       };
