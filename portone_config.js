@@ -100,25 +100,16 @@ export function createPaymentParams(options) {
       email: customer.email || 'guest@puzzmi.com'
     },
     customData: customData,
-    storeDetails: {
-      storeName: 'PUZZMI',
-      storeNameEn: 'PUZZMI',
-      storeNameKana: 'パズミ',
-      storeNameShort: 'PUZZMI',
-      contactName: 'PUZZMI',
-      phoneNumber: '010-9437-6167',
-      email: 'puzzmi0721@gmail.com',
-      openingHours: {
-        open: '10:00',
-        close: '22:00'
-      }
-    },
     redirectUrl: `${window.location.origin}/payment_complete.html`,
     locale: locale,
     country: country,
     appScheme: window.location.origin,
     bypass: {
       inicis_jp: {
+        goodname: orderName,
+        buyername: customer.fullName || customer.name || 'Guest',
+        buyertel: customer.phoneNumber || customer.tel || '00000000000',
+        buyeremail: customer.email || 'guest@puzzmi.com',
         mallname: 'PUZZMI',
         mallname_en: 'PUZZMI',
         mallname_kana: 'パズミ',
@@ -447,12 +438,12 @@ export function validatePaymentParams(params) {
     errors.push('KG이니시스의 경우 이메일은 @와 .만 특수문자로 허용됩니다.');
   }
 
-  if (!params.storeDetails || !params.storeDetails.storeNameShort) {
-    errors.push('이니시스 일본 결제(JPPG)인 경우 storeDetails.storeNameShort는 필수입니다.');
+  if (!params.bypass || !params.bypass.inicis_jp || !params.bypass.inicis_jp.mallname_short) {
+    errors.push('이니시스 일본 결제(JPPG)인 경우 bypass.inicis_jp.mallname_short는 필수입니다.');
   }
 
-  if (!params.storeDetails || !params.storeDetails.openingHours) {
-    errors.push('이니시스 일본 결제(JPPG)인 경우 storeDetails.openingHours는 필수입니다.');
+  if (!params.bypass || !params.bypass.inicis_jp || !params.bypass.inicis_jp.biz_open || !params.bypass.inicis_jp.biz_close) {
+    errors.push('이니시스 일본 결제(JPPG)인 경우 bypass.inicis_jp.biz_open과 biz_close는 필수입니다.');
   }
 
   return {
