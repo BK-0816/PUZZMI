@@ -61,7 +61,8 @@ export function createPaymentParams(options) {
     },
     customData: customData,
     storeDetails: {
-      storeName: 'PUZZMI'
+      storeName: 'PUZZMI',
+      contactName: 'PUZZMI'
     }
   };
 }
