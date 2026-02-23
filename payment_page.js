@@ -89,23 +89,28 @@ document.getElementById('payBtn').addEventListener('click', async function() {
   try {
     const paymentId = `PUZZMI_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
-    const paymentParams = createPaymentParams({
+    const paymentParams = {
+      storeId: PORTONE_CONFIG.STORE_ID,
+      channelKey: PORTONE_CONFIG.CHANNEL_KEY,
       paymentId: paymentId,
       orderName: `PUZZMI メイト予約 (${bookingData.duration_hours || 0}時間)`,
       totalAmount: bookingData.total_amount,
       currency: 'JPY',
-      payMethod: 'CARD',
+      redirectUrl: `${window.location.origin}/payment_complete.html`,
       customer: {
-        name: bookingData.customer_name || 'Guest Customer',
-        tel: bookingData.customer_contact || '000-0000-0000',
+        fullName: bookingData.customer_name || 'Guest Customer',
+        phoneNumber: bookingData.customer_contact || '000-0000-0000',
         email: 'guest@puzzmi.com'
       },
       customData: {
         booking_id: bookingData.id,
         user_id: bookingData.customer_id,
         mate_id: bookingData.mate_id
+      },
+      storeDetails: {
+        storeName: 'PUZZMI'
       }
-    });
+    };
 
     console.log('결제 파라미터:', paymentParams);
     const paymentResult = await requestPayment(paymentParams);
