@@ -1,4 +1,4 @@
-import { PORTONE_CONFIG, createPaymentParams, requestPayment } from './portone_config.js';
+import { PORTONE_CONFIG, requestPayment } from './portone_config.js';
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const SUPABASE_URL = 'https://eevvgbbokenpjnvtmztk.supabase.co';
