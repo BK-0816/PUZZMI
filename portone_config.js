@@ -65,7 +65,8 @@ export function createPaymentParams(options) {
       storeNameEn: 'PUZZMI',
       contactName: 'PUZZMI',
       phoneNumber: '01094376167',
-      email: 'choi.seojun0721@gmail.com'
+      email: 'choi.seojun0721@gmail.com',
+      openingHours: '09:00-18:00'
     },
     customData: customData,
     redirectUrl: `${window.location.origin}/payment_complete.html`
