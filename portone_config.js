@@ -111,9 +111,7 @@ export function createPaymentParams(options) {
       openingHours: {
         open: '10:00',
         close: '22:00'
-      },
-      isEscrow: isEscrow,
-      isCulturalExpense: isCulturalExpense
+      }
     },
     redirectUrl: `${window.location.origin}/payment_complete.html`,
     locale: locale,
