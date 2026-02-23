@@ -8,15 +8,19 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let bookingData = null;
 
-function getPaymentToken() {
+function getPaymentParams() {
   const params = new URLSearchParams(window.location.search);
-  return params.get('token');
+  return {
+    token: params.get('token'),
+    bookingId: params.get('booking_id'),
+    amount: params.get('amount')
+  };
 }
 
 async function loadPaymentInfo() {
-  const token = getPaymentToken();
+  const { token, bookingId } = getPaymentParams();
 
-  if (!token) {
+  if (!token && !bookingId) {
     showError('결제 링크가 올바르지 않습니다.');
     return;
   }
@@ -25,11 +29,15 @@ async function loadPaymentInfo() {
   document.getElementById('payBtn').disabled = true;
 
   try {
-    const { data, error } = await supabase
-      .from('bookings')
-      .select('*')
-      .eq('payment_token', token)
-      .maybeSingle();
+    let query = supabase.from('bookings').select('*');
+
+    if (token) {
+      query = query.eq('payment_token', token);
+    } else if (bookingId) {
+      query = query.eq('id', bookingId);
+    }
+
+    const { data, error } = await query.maybeSingle();
 
     if (error) throw error;
     if (!data) throw new Error('결제 정보를 찾을 수 없습니다.');
@@ -122,13 +130,18 @@ document.getElementById('payBtn').addEventListener('click', async function() {
       console.error('결제 정보 저장 실패:', insertError);
     }
 
-    await supabase
+    const { error: updateError } = await supabase
       .from('bookings')
       .update({
         payment_status: 'paid',
-        payment_method: 'portone_inicis'
+        payment_method: 'portone_inicis',
+        payment_id: paymentResult.payment_id
       })
       .eq('id', bookingData.id);
+
+    if (updateError) {
+      console.error('예약 상태 업데이트 실패:', updateError);
+    }
 
     alert('결제가 완료되었습니다!');
     window.location.href = 'payment_complete.html';
