@@ -74,7 +74,7 @@
 
       db
         .from('bookings')
-        .select('*, profiles!customer_id(email, phone_number)')
+        .select('*')
         .eq('payment_token', token)
         .maybeSingle()
         .then(function(result) {
@@ -90,20 +90,28 @@
             return;
           }
 
-          if (data.profiles) {
-            data._email = data.profiles.email || '';
-            data._phone = data.profiles.phone_number || '';
-          }
-          console.log('[PUZZMI] bookingData loaded:', {
-            id: data.id,
-            customer_name: data.customer_name,
-            customer_contact: data.customer_contact,
-            _email: data._email,
-            _phone: data._phone,
-            total_amount: data.total_amount
-          });
-
           bookingData = data;
+
+          if (data.customer_id) {
+            db.from('profiles')
+              .select('email, phone_number')
+              .eq('id', data.customer_id)
+              .maybeSingle()
+              .then(function(profileResult) {
+                if (profileResult.data) {
+                  bookingData._email = profileResult.data.email || '';
+                  bookingData._phone = profileResult.data.phone_number || '';
+                }
+                console.log('[PUZZMI] bookingData loaded:', {
+                  id: bookingData.id,
+                  customer_name: bookingData.customer_name,
+                  customer_contact: bookingData.customer_contact,
+                  _email: bookingData._email,
+                  _phone: bookingData._phone,
+                  total_amount: bookingData.total_amount
+                });
+              });
+          }
 
           if (data.payment_status === 'paid') {
             showError('이미 결제가 완료되었습니다.');
