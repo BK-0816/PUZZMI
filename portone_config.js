@@ -29,8 +29,7 @@ export function createPaymentParams(options) {
     customer = {},
     customData = {},
     products = [],
-    noticeUrls = [],
-    locale = 'ko'
+    noticeUrls = []
   } = options;
 
   const params = {
@@ -47,19 +46,6 @@ export function createPaymentParams(options) {
       email: customer.email || ''
     },
     customData: typeof customData === 'string' ? customData : JSON.stringify(customData),
-    storeDetails: {
-      storeName: 'PUZZMI',
-      storeNameShort: 'PUZZMI',
-      storeNameEn: 'PUZZMI',
-      storeNameKana: '\u30D1\u30BA\u30DF',
-      contactName: 'LINE: @puzzmi',
-      email: 'choi.seojun0721@gmail.com',
-      phoneNumber: '01094376167',
-      openingHours: {
-        open: '09:00',
-        close: '18:00'
-      }
-    },
     redirectUrl: window.location.origin + '/payment_complete.html'
   };
 
@@ -69,10 +55,6 @@ export function createPaymentParams(options) {
 
   if (noticeUrls && noticeUrls.length > 0) {
     params.noticeUrls = noticeUrls;
-  }
-
-  if (locale) {
-    params.locale = locale;
   }
 
   return params;
