@@ -1,5 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { createHmac } from "node:crypto";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -20,7 +21,31 @@ Deno.serve(async (req: Request) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const webhookData = await req.json();
+    const webhookSecret = Deno.env.get("PORTONE_WEBHOOK_SECRET");
+    const bodyText = await req.text();
+
+    if (webhookSecret) {
+      const signature = req.headers.get("webhook-signature");
+      if (signature) {
+        const hmac = createHmac("sha256", webhookSecret);
+        hmac.update(bodyText);
+        const expectedSignature = hmac.digest("base64");
+
+        if (signature !== expectedSignature) {
+          console.error("Webhook signature verification failed");
+          return new Response(
+            JSON.stringify({ error: "Invalid signature" }),
+            {
+              status: 400,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            }
+          );
+        }
+        console.log("Webhook signature verified successfully");
+      }
+    }
+
+    const webhookData = JSON.parse(bodyText);
     console.log("Received PortOne V2 webhook:", JSON.stringify(webhookData, null, 2));
 
     const { type, data } = webhookData;

@@ -114,36 +114,43 @@ document.getElementById('payBtn').addEventListener('click', async function() {
       }
     });
 
-    const paymentResult = await requestPayment(paymentParams);
-
     const { error: insertError } = await supabase
       .from('portone_payments')
       .insert({
         booking_id: bookingData.id,
         user_id: bookingData.customer_id,
-        imp_uid: paymentResult.payment_id,
-        merchant_uid: paymentResult.payment_id,
-        amount: paymentResult.paid_amount,
-        currency: paymentResult.currency || 'JPY',
-        status: 'paid',
+        imp_uid: paymentId,
+        merchant_uid: paymentId,
+        amount: bookingData.total_amount,
+        currency: 'JPY',
+        status: 'ready',
         pg_provider: 'portone_v2_inicis',
-        pay_method: paymentResult.method || 'CARD',
-        pg_tid: paymentResult.transaction_id,
-        receipt_url: paymentResult.receipt_url,
-        paid_at: paymentResult.paid_at || new Date().toISOString()
+        pay_method: 'CARD'
       });
 
     if (insertError) {
       console.error('결제 정보 저장 실패:', insertError);
+      throw new Error('결제 정보 저장에 실패했습니다.');
     }
 
-    await supabase
-      .from('bookings')
-      .update({
-        payment_status: 'paid',
-        payment_method: 'portone_inicis'
+    const paymentResult = await requestPayment(paymentParams);
+
+    const verifyResponse = await fetch(`${SUPABASE_URL}/functions/v1/payment-complete`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+      },
+      body: JSON.stringify({
+        paymentId: paymentResult.payment_id
       })
-      .eq('id', bookingData.id);
+    });
+
+    const verifyResult = await verifyResponse.json();
+
+    if (!verifyResult.success) {
+      throw new Error(verifyResult.message || '결제 검증에 실패했습니다.');
+    }
 
     alert('결제가 완료되었습니다!');
     window.location.href = 'payment_complete.html';
