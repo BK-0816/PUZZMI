@@ -49,13 +49,26 @@ export function createPaymentParams(options) {
     currency: currency,
     payMethod: payMethod,
     customer: {
-      fullName: customer.fullName || customer.name || '',
-      firstNameKana: customer.firstNameKana || '',
-      lastNameKana: customer.lastNameKana || '',
-      phoneNumber: customer.phoneNumber || customer.tel || '',
-      email: customer.email || ''
+      fullName: customer.fullName || customer.name || 'Guest',
+      firstNameKana: customer.firstNameKana || 'ゲスト',
+      lastNameKana: customer.lastNameKana || 'ゲスト',
+      phoneNumber: customer.phoneNumber || customer.tel || '08000000000',
+      email: customer.email || 'guest@puzzmi.com'
     },
     customData: typeof customData === 'string' ? customData : JSON.stringify(customData),
+    storeDetails: {
+      storeName: 'パズミ',
+      storeNameShort: 'パズミ',
+      storeNameEn: 'PUZZMI',
+      storeNameKana: 'パズミ',
+      contactName: 'PUZZMI Support',
+      email: 'puzzmi0721@gmail.com',
+      phoneNumber: '0312345678',
+      openingHours: {
+        open: '09:00',
+        close: '18:00'
+      }
+    },
     redirectUrl: window.location.href.split('?')[0].replace('payment_page.html', 'payment_complete.html'),
     noticeUrls: ['https://eevvgbbokenpjnvtmztk.supabase.co/functions/v1/portone-webhook']
   };

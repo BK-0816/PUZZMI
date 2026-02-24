@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PUZZMI - 결제하기</title>
   <link rel="stylesheet" href="payment_page.css">
-  <script src="https://cdn.portone.io/v2/browser-sdk.js"></script>
 </head>
 <body>
   <div class="container">
@@ -22,7 +21,7 @@
       </div>
       <div class="info-row">
         <span class="info-label">결제금액</span>
-        <span class="info-value" style="color: #667eea; font-size: 1.3rem;" id="price">-</span>
+        <span class="info-value" style="color: #4a90d9; font-size: 1.3rem;" id="price">-</span>
       </div>
     </div>
 
@@ -34,13 +33,221 @@
       ✅ 포트원 안전결제
     </div>
 
-    <div id="loading" style="display:none; text-align:center; margin-top:20px;">
+    <div id="loading" style="text-align:center; margin-top:20px;">
       <p>결제 정보를 불러오는 중...</p>
     </div>
 
     <div id="error-message" style="display:none; margin-top:20px; padding:20px; background:#fee; border-radius:12px; color:#c00; text-align:center;"></div>
   </div>
 
-  <script type="module" src="payment_page.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.portone.io/v2/browser-sdk.js"></script>
+  <script>
+    var SUPABASE_URL = 'https://eevvgbbokenpjnvtmztk.supabase.co';
+    var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4';
+    var STORE_ID = 'store-79c6a0c1-e7e2-486c-aa42-914242b9ff69';
+    var CHANNEL_KEY = 'channel-key-104b9122-a3c5-4206-bb92-1235cc021587';
+    var WEBHOOK_URL = 'https://eevvgbbokenpjnvtmztk.supabase.co/functions/v1/portone-webhook';
+
+    var db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    var bookingData = null;
+
+    function getPaymentToken() {
+      var params = new URLSearchParams(window.location.search);
+      return params.get('token');
+    }
+
+    function showError(message) {
+      var errorDiv = document.getElementById('error-message');
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('payBtn').disabled = true;
+    }
+
+    function loadPaymentInfo() {
+      var token = getPaymentToken();
+      if (!token) {
+        showError('결제 링크가 올바르지 않습니다.');
+        return;
+      }
+
+      db
+        .from('bookings')
+        .select('*')
+        .eq('payment_token', token)
+        .maybeSingle()
+        .then(function(result) {
+          var data = result.data;
+          var error = result.error;
+
+          if (error) {
+            showError('결제 정보를 불러오는데 실패했습니다.');
+            return;
+          }
+          if (!data) {
+            showError('결제 정보를 찾을 수 없습니다.');
+            return;
+          }
+
+          bookingData = data;
+
+          if (data.payment_status === 'paid') {
+            showError('이미 결제가 완료되었습니다.');
+            return;
+          }
+
+          var hours = data.duration_hours || 0;
+          var amount = data.total_amount || 0;
+          var amountStr = '¥' + amount.toLocaleString('ja-JP');
+          var orderName = 'PUZZMI メイト予約 (' + hours + '時間)';
+
+          document.getElementById('booking_id').textContent = '#' + data.id;
+          document.getElementById('goodname').textContent = orderName;
+          document.getElementById('price').textContent = amountStr;
+          document.getElementById('loading').style.display = 'none';
+          document.getElementById('payBtn').disabled = false;
+        });
+    }
+
+    document.getElementById('payBtn').addEventListener('click', function() {
+      if (!bookingData) {
+        alert('결제 정보를 불러오지 못했습니다.');
+        return;
+      }
+
+      var btn = document.getElementById('payBtn');
+      btn.disabled = true;
+      btn.textContent = '결제 처리 중...';
+
+      var timestamp = Date.now();
+      var random = Math.random().toString(36).substring(2, 9);
+      var paymentId = 'PUZZMI_' + timestamp + '_' + random;
+
+      var hours = bookingData.duration_hours || 0;
+      var orderName = 'PUZZMI メイト予約 (' + hours + '時間)';
+
+      var insertData = {
+        booking_id: bookingData.id,
+        user_id: null,
+        imp_uid: paymentId,
+        merchant_uid: paymentId,
+        amount: bookingData.total_amount,
+        currency: 'JPY',
+        status: 'ready',
+        pg_provider: 'portone_v2_inicis',
+        pay_method: 'CARD'
+      };
+
+      db
+        .from('portone_payments')
+        .insert(insertData)
+        .then(function(insertResult) {
+          if (insertResult.error) {
+            console.error('결제 정보 저장 실패:', insertResult.error);
+          }
+
+          var baseUrl = window.location.href.split('?')[0];
+          var redirectUrl = baseUrl.replace('payment_page.html', 'payment_complete.html');
+
+          var paymentParams = {
+            storeId: STORE_ID,
+            channelKey: CHANNEL_KEY,
+            paymentId: paymentId,
+            orderName: orderName,
+            totalAmount: bookingData.total_amount,
+            currency: 'CURRENCY_JPY',
+            payMethod: 'CARD',
+            customer: {
+              fullName: bookingData.customer_name || 'Guest',
+              firstNameKana: 'ゲスト',
+              lastNameKana: 'ゲスト',
+              phoneNumber: bookingData.customer_contact || '08000000000',
+              email: 'guest@puzzmi.com'
+            },
+            storeDetails: {
+              storeName: 'パズミ',
+              storeNameShort: 'パズミ',
+              storeNameEn: 'PUZZMI',
+              storeNameKana: 'パズミ',
+              contactName: 'PUZZMI Support',
+              email: 'puzzmi0721@gmail.com',
+              phoneNumber: '0312345678',
+              openingHours: {
+                open: '09:00',
+                close: '23:00'
+              }
+            },
+            customData: JSON.stringify({
+              booking_id: bookingData.id,
+              user_id: bookingData.customer_id,
+              mate_id: bookingData.mate_id
+            }),
+            redirectUrl: redirectUrl,
+            noticeUrls: [WEBHOOK_URL]
+          };
+
+          return PortOne.requestPayment(paymentParams);
+        })
+        .then(function(response) {
+          if (!response) return;
+
+          if (response.code != null) {
+            alert('결제 실패: ' + (response.message || '알 수 없는 오류'));
+            btn.disabled = false;
+            btn.textContent = '🔒 안전결제 실행';
+            return;
+          }
+
+          var paidPaymentId = response.paymentId;
+          var redirectTarget = window.location.href.split('?')[0].replace('payment_page.html', 'payment_complete.html');
+
+          db
+            .from('portone_payments')
+            .select('status')
+            .eq('imp_uid', paidPaymentId)
+            .maybeSingle()
+            .then(function(checkResult) {
+              if (checkResult.data && checkResult.data.status === 'paid') {
+                window.location.href = redirectTarget + '?booking_id=' + bookingData.id;
+                return;
+              }
+
+              var channel = db.channel('payment-status-' + paidPaymentId);
+              channel
+                .on('postgres_changes', {
+                  event: 'UPDATE',
+                  schema: 'public',
+                  table: 'portone_payments',
+                  filter: 'imp_uid=eq.' + paidPaymentId
+                }, function(payload) {
+                  if (payload.new.status === 'paid') {
+                    channel.unsubscribe();
+                    window.location.href = redirectTarget + '?booking_id=' + bookingData.id;
+                  } else if (payload.new.status === 'failed') {
+                    channel.unsubscribe();
+                    alert('결제에 실패했습니다.');
+                    btn.disabled = false;
+                    btn.textContent = '🔒 안전결제 실행';
+                  }
+                })
+                .subscribe();
+
+              setTimeout(function() {
+                channel.unsubscribe();
+                window.location.href = redirectTarget + '?booking_id=' + bookingData.id;
+              }, 30000);
+            });
+        })
+        .catch(function(error) {
+          console.error('Payment error:', error);
+          alert(error.message || '결제에 실패했습니다.');
+          btn.disabled = false;
+          btn.textContent = '🔒 안전결제 실행';
+        });
+    });
+
+    window.addEventListener('DOMContentLoaded', loadPaymentInfo);
+  </script>
 </body>
 </html>
