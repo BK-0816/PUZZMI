@@ -100,7 +100,7 @@ document.getElementById('payBtn').addEventListener('click', async function() {
       paymentId: paymentId,
       orderName: orderName,
       totalAmount: bookingData.total_amount,
-      currency: 'JPY',
+      currency: 'CURRENCY_JPY',
       payMethod: 'CARD',
       customer: {
         name: bookingData.customer_name || 'Guest',

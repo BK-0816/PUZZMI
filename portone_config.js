@@ -57,7 +57,7 @@ export function createPaymentParams(options) {
     },
     customData: typeof customData === 'string' ? customData : JSON.stringify(customData),
     storeDetails: { ...PORTONE_CONFIG.STORE_DETAILS },
-    redirectUrl: window.location.origin + '/payment_complete.html'
+    redirectUrl: window.location.href.split('?')[0].replace('payment_page.html', 'payment_complete.html')
   };
 
   if (products && products.length > 0) {
