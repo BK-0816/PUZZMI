@@ -130,7 +130,19 @@ document.getElementById('payBtn').addEventListener('click', async function() {
 
     if (insertError) {
       console.error('결제 정보 저장 실패:', insertError);
-      throw new Error('결제 정보 저장에 실패했습니다.');
+      console.error('에러 상세:', JSON.stringify(insertError, null, 2));
+      console.error('삽입 시도 데이터:', {
+        booking_id: bookingData.id,
+        user_id: bookingData.customer_id,
+        imp_uid: paymentId,
+        merchant_uid: paymentId,
+        amount: bookingData.total_amount,
+        currency: 'JPY',
+        status: 'ready',
+        pg_provider: 'portone_v2_inicis',
+        pay_method: 'CARD'
+      });
+      throw new Error('결제 정보 저장에 실패했습니다: ' + (insertError.message || insertError.code));
     }
 
     const paymentResult = await requestPayment(paymentParams);
