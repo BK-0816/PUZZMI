@@ -47,7 +47,8 @@ export function createPaymentParams(options) {
     },
     customData: typeof customData === 'string' ? customData : JSON.stringify(customData),
     storeDetails: {
-      storeName: 'PUZZMI'
+      storeName: 'PUZZMI',
+      storeNameEn: 'PUZZMI'
     },
     redirectUrl: window.location.origin + '/payment_complete.html'
   };
