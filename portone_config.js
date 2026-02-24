@@ -46,6 +46,19 @@ export function createPaymentParams(options) {
       email: customer.email || ''
     },
     customData: typeof customData === 'string' ? customData : JSON.stringify(customData),
+    storeDetails: {
+      storeName: 'PUZZMI',
+      storeNameShort: 'PUZZMI',
+      storeNameEn: 'PUZZMI',
+      storeNameKana: 'パズミ',
+      contactName: 'LINE: @puzzmi',
+      email: 'choi.seojun0721@gmail.com',
+      phoneNumber: '01094376167',
+      openingHours: {
+        open: '09:00',
+        close: '18:00'
+      }
+    },
     redirectUrl: window.location.origin + '/payment_complete.html'
   };
 
