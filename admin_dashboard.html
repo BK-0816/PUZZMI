@@ -245,6 +245,9 @@
       <button class="tab-button" data-tab="payments">
         <i class="fas fa-credit-card"></i> 결제 관리
       </button>
+      <button class="tab-button" data-tab="users">
+        <i class="fas fa-user-friends"></i> 유저 관리
+      </button>
     </div>
   </nav>
 
@@ -279,11 +282,12 @@
               <th>연락처</th>
               <th>메이트</th>
               <th>LINE</th>
+              <th>비고</th>
               <th>조치</th>
             </tr>
           </thead>
           <tbody id="bookingsTableBody">
-            <tr><td colspan="8" class="loading"><i class="fas fa-spinner"></i> 로딩 중...</td></tr>
+            <tr><td colspan="9" class="loading"><i class="fas fa-spinner"></i> 로딩 중...</td></tr>
           </tbody>
         </table>
       </div>
@@ -376,6 +380,39 @@
     </div>
   </div>
 
+  <!-- 유저 관리 탭 -->
+  <div class="tab-content" id="tab-users">
+    <div class="card">
+      <h2>유저 관리</h2>
+
+      <div class="toolbar">
+        <input id="searchUser" placeholder="이름, 이메일 검색..." style="flex: 1; max-width: 400px;"/>
+        <button class="btn btn-primary" id="refreshUsers">
+          <i class="fas fa-sync-alt"></i> 새로고침
+        </button>
+      </div>
+
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>이름</th>
+              <th>이메일</th>
+              <th>나이</th>
+              <th>성별</th>
+              <th>메이트 여부</th>
+              <th>조치</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody">
+            <tr><td colspan="7" class="loading"><i class="fas fa-spinner"></i> 로딩 중...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
     const SUPABASE_URL = "https://eevvgbbokenpjnvtmztk.supabase.co";
@@ -415,6 +452,7 @@
         else if (tabName === 'mates') loadMates();
         else if (tabName === 'identity') loadIdentity();
         else if (tabName === 'payments') loadPayments();
+        else if (tabName === 'users') loadUsers();
       });
     });
 
@@ -474,7 +512,7 @@
       });
 
       if (!filtered.length) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: #666;">검색 결과가 없습니다.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px; color: #666;">검색 결과가 없습니다.</td></tr>';
         return;
       }
 
@@ -482,6 +520,34 @@
         const mateName = matesMap.get(b.mate_id) || b.mate_id;
         const lineName = lineAccountsMap.get(b.customer_id);
         const lineStatus = lineName ? `<span style="color: #28a745;">✓ ${lineName}</span>` : '<span style="color: #999;">미연동</span>';
+
+        let remarksHtml = '-';
+        if (b.status === 'declined' && b.decline_reason) {
+          remarksHtml = `
+            <div style="max-width: 200px;">
+              <div style="color: #dc3545; font-weight: 600; margin-bottom: 4px;">
+                <i class="fas fa-ban"></i> 거절 사유
+              </div>
+              <div style="font-size: 0.85rem; color: #666; line-height: 1.4;">
+                ${b.decline_reason.replace(/</g,'&lt;')}
+              </div>
+              ${b.declined_at ? `<div style="font-size: 0.75rem; color: #999; margin-top: 4px;">${new Date(b.declined_at).toLocaleString('ko-KR')}</div>` : ''}
+            </div>
+          `;
+        } else if (b.status === 'cancelled' && (b.cancel_reason || b.canceled_reason)) {
+          const reason = b.cancel_reason || b.canceled_reason;
+          remarksHtml = `
+            <div style="max-width: 200px;">
+              <div style="color: #ffc107; font-weight: 600; margin-bottom: 4px;">
+                <i class="fas fa-times-circle"></i> 취소 사유
+              </div>
+              <div style="font-size: 0.85rem; color: #666; line-height: 1.4;">
+                ${reason.replace(/</g,'&lt;')}
+              </div>
+              ${b.canceled_at ? `<div style="font-size: 0.75rem; color: #999; margin-top: 4px;">${new Date(b.canceled_at).toLocaleString('ko-KR')}</div>` : ''}
+            </div>
+          `;
+        }
 
         return `
           <tr>
@@ -492,6 +558,7 @@
             <td>${b.customer_contact}</td>
             <td>${mateName}</td>
             <td>${lineStatus}</td>
+            <td>${remarksHtml}</td>
             <td>
               ${lineName ? `
                 <button class="btn btn-success" onclick="sendPassportRequest('${b.id}')" style="font-size: 0.8rem; padding: 6px 12px;">
@@ -1036,6 +1103,137 @@
     }
 
     document.getElementById('refreshPayments').addEventListener('click', loadPayments);
+
+    // ========== 유저 관리 ==========
+    let allUsers = [];
+
+    async function loadUsers() {
+      const tbody = document.getElementById('usersTableBody');
+      tbody.innerHTML = '<tr><td colspan="7" class="loading"><i class="fas fa-spinner"></i> 로딩 중...</td></tr>';
+
+      try {
+        const { data: profiles, error } = await supabase
+          .from('profiles')
+          .select('id, full_name, email, age, gender')
+          .order('created_at', { ascending: false })
+          .limit(200);
+
+        if (error) throw error;
+
+        const userIds = profiles.map(p => p.id);
+        const { data: mateProfiles } = await supabase
+          .from('mate_profiles')
+          .select('user_id')
+          .in('user_id', userIds);
+
+        const mateUserIds = new Set((mateProfiles || []).map(m => m.user_id));
+
+        allUsers = profiles.map(p => ({
+          ...p,
+          is_mate: mateUserIds.has(p.id)
+        }));
+
+        renderUsers();
+      } catch (error) {
+        console.error('유저 로드 실패:', error);
+        tbody.innerHTML = `<tr><td colspan="7" style="color: red; text-align: center; padding: 40px;">❌ 로드 실패: ${error.message}</td></tr>`;
+      }
+    }
+
+    function renderUsers() {
+      const tbody = document.getElementById('usersTableBody');
+      const search = document.getElementById('searchUser').value.toLowerCase();
+
+      let filtered = allUsers.filter(u => {
+        if (search && !u.full_name?.toLowerCase().includes(search) && !u.email?.toLowerCase().includes(search)) return false;
+        return true;
+      });
+
+      if (!filtered.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: #666;">검색 결과가 없습니다.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(u => `
+        <tr>
+          <td style="font-size: 0.85rem; color: #999;">${u.id.substring(0, 8)}...</td>
+          <td style="font-weight: 600;">${u.full_name || '-'}</td>
+          <td style="color: #666;">${u.email || '-'}</td>
+          <td>${u.age || '-'}</td>
+          <td>${u.gender || '-'}</td>
+          <td>
+            ${u.is_mate ? '<span class="badge badge-confirmed">✅ 메이트</span>' : '<span class="badge badge-pending">일반 유저</span>'}
+          </td>
+          <td>
+            ${!u.is_mate ? `
+              <button class="btn btn-success" onclick="convertToMate('${u.id}')" style="font-size: 0.85rem; padding: 8px 16px;">
+                <i class="fas fa-star"></i> 메이트로 전환
+              </button>
+            ` : `
+              <button class="btn btn-secondary" onclick="removeMate('${u.id}')" style="font-size: 0.85rem; padding: 8px 16px;">
+                <i class="fas fa-user-times"></i> 메이트 해제
+              </button>
+            `}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    window.convertToMate = async function(userId) {
+      const user = allUsers.find(u => u.id === userId);
+      if (!user) return alert('유저를 찾을 수 없습니다.');
+
+      if (!confirm(`${user.full_name || user.email}님을 메이트로 전환하시겠습니까?\n\n메이트는 자신의 프로필에서 소개와 정보를 직접 작성할 수 있습니다.`)) return;
+
+      try {
+        const { error } = await supabase
+          .from('mate_profiles')
+          .insert({
+            user_id: userId,
+            bio: '',
+            hourly_rate: 4000,
+            rating: 0,
+            is_verified: false,
+            tags: [],
+            areas: [],
+            hobbies: [],
+            photos: []
+          });
+
+        if (error) throw error;
+
+        alert('✅ 메이트로 전환되었습니다!\n\n해당 유저는 이제 메이트 편집 페이지에서 자신의 프로필을 작성할 수 있습니다.');
+        loadUsers();
+      } catch (error) {
+        console.error('메이트 전환 실패:', error);
+        alert('❌ 실패: ' + error.message);
+      }
+    };
+
+    window.removeMate = async function(userId) {
+      const user = allUsers.find(u => u.id === userId);
+      if (!user) return alert('유저를 찾을 수 없습니다.');
+
+      if (!confirm(`${user.full_name || user.email}님의 메이트 권한을 해제하시겠습니까?`)) return;
+
+      try {
+        const { error } = await supabase
+          .from('mate_profiles')
+          .delete()
+          .eq('user_id', userId);
+
+        if (error) throw error;
+
+        alert('✅ 메이트 권한이 해제되었습니다.');
+        loadUsers();
+      } catch (error) {
+        console.error('메이트 해제 실패:', error);
+        alert('❌ 실패: ' + error.message);
+      }
+    };
+
+    document.getElementById('searchUser').addEventListener('input', renderUsers);
+    document.getElementById('refreshUsers').addEventListener('click', loadUsers);
 
     // 초기 로드
     loadBookings();

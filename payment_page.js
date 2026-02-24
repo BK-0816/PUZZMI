@@ -1,4 +1,4 @@
-import { PORTONE_CONFIG, createPaymentParams, requestPayment } from './portone_config.js';
+import { PORTONE_CONFIG, requestPayment, createPaymentParams, generatePaymentId } from './portone_config.js?v=6';
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const SUPABASE_URL = 'https://eevvgbbokenpjnvtmztk.supabase.co';
@@ -8,15 +8,19 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let bookingData = null;
 
-function getPaymentToken() {
+function getPaymentParams() {
   const params = new URLSearchParams(window.location.search);
-  return params.get('token');
+  return {
+    token: params.get('token'),
+    bookingId: params.get('booking_id'),
+    amount: params.get('amount')
+  };
 }
 
 async function loadPaymentInfo() {
-  const token = getPaymentToken();
+  const { token, bookingId } = getPaymentParams();
 
-  if (!token) {
+  if (!token && !bookingId) {
     showError('결제 링크가 올바르지 않습니다.');
     return;
   }
@@ -25,11 +29,15 @@ async function loadPaymentInfo() {
   document.getElementById('payBtn').disabled = true;
 
   try {
-    const { data, error } = await supabase
-      .from('bookings')
-      .select('*')
-      .eq('payment_token', token)
-      .maybeSingle();
+    let query = supabase.from('bookings').select('*');
+
+    if (token) {
+      query = query.eq('payment_token', token);
+    } else if (bookingId) {
+      query = query.eq('id', bookingId);
+    }
+
+    const { data, error } = await query.maybeSingle();
 
     if (error) throw error;
     if (!data) throw new Error('결제 정보를 찾을 수 없습니다.');
@@ -71,34 +79,45 @@ function showError(message) {
 
 document.getElementById('payBtn').addEventListener('click', async function() {
   if (!bookingData) {
-    alert('결제 정보를 불러오지 못했습니다.');
+    alert('結済情報を読み込めませんでした。');
     return;
   }
 
   this.disabled = true;
-  this.innerHTML = '결제 처리 중...';
+  this.innerHTML = '決済処理中...';
 
   try {
-    const paymentId = `PUZZMI_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    const paymentId = generatePaymentId('PUZZMI');
 
     const paymentParams = createPaymentParams({
       paymentId: paymentId,
       orderName: `PUZZMI メイト予約 (${bookingData.duration_hours || 0}時間)`,
-      totalAmount: bookingData.total_amount,
+      totalAmount: Math.round(bookingData.total_amount || 0),
       currency: 'JPY',
       payMethod: 'CARD',
       customer: {
-        name: bookingData.customer_name || 'Guest',
-        tel: bookingData.customer_contact || '',
+        fullName: bookingData.customer_name || 'Guest Customer',
+        phoneNumber: bookingData.customer_contact || '000-0000-0000',
         email: 'guest@puzzmi.com'
       },
       customData: {
         booking_id: bookingData.id,
         user_id: bookingData.customer_id,
         mate_id: bookingData.mate_id
-      }
+      },
+      products: [{
+        id: `booking_${bookingData.id}`,
+        name: `メイトサービス予約`,
+        amount: Math.round(bookingData.total_amount || 0),
+        quantity: 1
+      }],
+      noticeUrls: [
+        `${SUPABASE_URL}/functions/v1/portone-webhook`
+      ],
+      locale: 'JA_JP'
     });
 
+    console.log('決済パラメータ:', paymentParams);
     const paymentResult = await requestPayment(paymentParams);
 
     const { error: insertError } = await supabase
@@ -122,16 +141,21 @@ document.getElementById('payBtn').addEventListener('click', async function() {
       console.error('결제 정보 저장 실패:', insertError);
     }
 
-    await supabase
+    const { error: updateError } = await supabase
       .from('bookings')
       .update({
         payment_status: 'paid',
-        payment_method: 'portone_inicis'
+        payment_method: 'portone_inicis',
+        payment_id: paymentResult.payment_id
       })
       .eq('id', bookingData.id);
 
-    alert('결제가 완료되었습니다!');
-    window.location.href = 'payment_complete.html';
+    if (updateError) {
+      console.error('예약 상태 업데이트 실패:', updateError);
+    }
+
+    alert('決済が完了しました!');
+    window.location.href = `payment_complete.html?payment_id=${paymentResult.payment_id}`;
 
   } catch (error) {
     console.error('Payment error:', error);
