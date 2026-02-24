@@ -147,25 +147,41 @@ document.getElementById('payBtn').addEventListener('click', async function() {
 
     const paymentResult = await requestPayment(paymentParams);
 
-    const verifyResponse = await fetch(`${SUPABASE_URL}/functions/v1/payment-complete`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-      },
-      body: JSON.stringify({
-        paymentId: paymentResult.payment_id
-      })
-    });
+    const { data: existingPayment } = await supabase
+      .from('portone_payments')
+      .select('status')
+      .eq('imp_uid', paymentResult.payment_id)
+      .maybeSingle();
 
-    const verifyResult = await verifyResponse.json();
-
-    if (!verifyResult.success) {
-      throw new Error(verifyResult.message || '결제 검증에 실패했습니다.');
+    if (existingPayment && existingPayment.status === 'paid') {
+      window.location.href = 'payment_complete.html?booking_id=' + bookingData.id;
+      return;
     }
 
-    alert('결제가 완료되었습니다!');
-    window.location.href = 'payment_complete.html';
+    const subscription = supabase
+      .channel('payment-status-' + paymentResult.payment_id)
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'portone_payments',
+        filter: `imp_uid=eq.${paymentResult.payment_id}`
+      }, (payload) => {
+        if (payload.new.status === 'paid') {
+          subscription.unsubscribe();
+          window.location.href = 'payment_complete.html?booking_id=' + bookingData.id;
+        } else if (payload.new.status === 'failed') {
+          subscription.unsubscribe();
+          alert('결제에 실패했습니다.');
+          this.disabled = false;
+          this.innerHTML = '\uD83D\uDD12 안전결제 실행';
+        }
+      })
+      .subscribe();
+
+    setTimeout(() => {
+      subscription.unsubscribe();
+      window.location.href = 'payment_complete.html?booking_id=' + bookingData.id;
+    }, 30000);
 
   } catch (error) {
     console.error('Payment error:', error);

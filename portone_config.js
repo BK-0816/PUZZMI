@@ -56,8 +56,8 @@ export function createPaymentParams(options) {
       email: customer.email || ''
     },
     customData: typeof customData === 'string' ? customData : JSON.stringify(customData),
-    storeDetails: { ...PORTONE_CONFIG.STORE_DETAILS },
-    redirectUrl: window.location.href.split('?')[0].replace('payment_page.html', 'payment_complete.html')
+    redirectUrl: window.location.href.split('?')[0].replace('payment_page.html', 'payment_complete.html'),
+    noticeUrls: ['https://eevvgbbokenpjnvtmztk.supabase.co/functions/v1/portone-webhook']
   };
 
   if (products && products.length > 0) {
