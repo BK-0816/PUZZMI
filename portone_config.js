@@ -4,18 +4,26 @@ export const PORTONE_CONFIG = {
 
   PAY_METHODS: {
     CARD: 'CARD',
-    VIRTUAL_ACCOUNT: 'VIRTUAL_ACCOUNT',
-    TRANSFER: 'TRANSFER',
-    MOBILE: 'MOBILE',
     CONVENIENCE_STORE: 'CONVENIENCE_STORE',
-    PAYPAY: 'PAYPAY',
-    LINEPAY: 'LINEPAY'
+    EASY_PAY: 'EASY_PAY'
   },
 
   CURRENCY: {
-    KRW: 'KRW',
-    JPY: 'JPY',
-    USD: 'USD'
+    JPY: 'CURRENCY_JPY'
+  },
+
+  STORE_DETAILS: {
+    storeName: 'パズルミ',
+    storeNameKana: 'パズルミ',
+    storeNameEn: 'PUZZMI',
+    storeNameShort: 'PUZZMI',
+    contactName: 'PUZZMI Support',
+    email: 'support@puzzmi.com',
+    phoneNumber: '0312345678',
+    openingHours: {
+      open: '09:00',
+      close: '18:00'
+    }
   }
 };
 
@@ -24,7 +32,7 @@ export function createPaymentParams(options) {
     paymentId,
     orderName,
     totalAmount,
-    currency = 'JPY',
+    currency = 'CURRENCY_JPY',
     payMethod = 'CARD',
     customer = {},
     customData = {},
@@ -42,14 +50,13 @@ export function createPaymentParams(options) {
     payMethod: payMethod,
     customer: {
       fullName: customer.fullName || customer.name || '',
+      firstNameKana: customer.firstNameKana || '',
+      lastNameKana: customer.lastNameKana || '',
       phoneNumber: customer.phoneNumber || customer.tel || '',
       email: customer.email || ''
     },
     customData: typeof customData === 'string' ? customData : JSON.stringify(customData),
-    storeDetails: {
-      storeName: 'PUZZMI',
-      storeNameEn: 'PUZZMI'
-    },
+    storeDetails: { ...PORTONE_CONFIG.STORE_DETAILS },
     redirectUrl: window.location.origin + '/payment_complete.html'
   };
 
