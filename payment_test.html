@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>결제 페이지 테스트</title>
+</head>
+<body>
+  <h1>결제 페이지 테스트</h1>
+  <div id="status">로딩 중...</div>
+  <div id="error" style="color: red;"></div>
+
+  <script type="module">
+    const statusDiv = document.getElementById('status');
+    const errorDiv = document.getElementById('error');
+
+    try {
+      statusDiv.textContent = '1. 모듈 로딩 시작...';
+
+      // portone_config.js 로드 테스트
+      const { PORTONE_CONFIG, createPaymentParams } = await import('./portone_config.js');
+      statusDiv.textContent = '2. portone_config.js 로드 성공!';
+
+      // Supabase 로드 테스트
+      const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2");
+      statusDiv.textContent = '3. Supabase 라이브러리 로드 성공!';
+
+      // payment_page.js 로드 테스트
+      await import('./payment_page.js');
+      statusDiv.textContent = '4. payment_page.js 로드 성공! 모든 모듈이 정상입니다.';
+
+    } catch (error) {
+      errorDiv.textContent = '오류 발생: ' + error.message;
+      console.error('Module load error:', error);
+    }
+  </script>
+</body>
+</html>

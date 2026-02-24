@@ -4,7 +4,12 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const SUPABASE_URL = 'https://eevvgbbokenpjnvtmztk.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4';
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let supabase;
+try {
+  supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+} catch (error) {
+  console.error('Supabase init error:', error);
+}
 
 let bookingData = null;
 
@@ -47,9 +52,14 @@ async function loadPaymentInfo() {
       maximumFractionDigits: 0
     });
 
-    document.getElementById('booking_id').textContent = `#${data.id}`;
-    document.getElementById('goodname').textContent = `PUZZMI メイト予約 (${data.duration_hours || 0}時間)`;
-    document.getElementById('price').textContent = yenFormatter.format(data.total_amount || 0);
+    const hours = data.duration_hours || 0;
+    const bookingId = '#' + data.id;
+    const orderName = 'PUZZMI \u30E1\u30A4\u30C8\u4E88\u7D04 (' + hours + '\u6642\u9593)';
+    const totalAmount = yenFormatter.format(data.total_amount || 0);
+
+    document.getElementById('booking_id').textContent = bookingId;
+    document.getElementById('goodname').textContent = orderName;
+    document.getElementById('price').textContent = totalAmount;
 
     document.getElementById('loading').style.display = 'none';
     document.getElementById('payBtn').disabled = false;
@@ -79,11 +89,16 @@ document.getElementById('payBtn').addEventListener('click', async function() {
   this.innerHTML = '결제 처리 중...';
 
   try {
-    const paymentId = `PUZZMI_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    const timestamp = Date.now();
+    const random = Math.random().toString(36).substring(2, 9);
+    const paymentId = 'PUZZMI_' + timestamp + '_' + random;
+
+    const hours = bookingData.duration_hours || 0;
+    const orderName = 'PUZZMI \u30E1\u30A4\u30C8\u4E88\u7D04 (' + hours + '\u6642\u9593)';
 
     const paymentParams = createPaymentParams({
       paymentId: paymentId,
-      orderName: `PUZZMI メイト予約 (${bookingData.duration_hours || 0}時間)`,
+      orderName: orderName,
       totalAmount: bookingData.total_amount,
       currency: 'JPY',
       payMethod: 'CARD',
@@ -137,7 +152,7 @@ document.getElementById('payBtn').addEventListener('click', async function() {
     console.error('Payment error:', error);
     alert(error.error_msg || error.message || '결제에 실패했습니다.');
     this.disabled = false;
-    this.innerHTML = '🔒 안전결제 실행';
+    this.innerHTML = '\u{1F512} 안전결제 실행';
   }
 });
 

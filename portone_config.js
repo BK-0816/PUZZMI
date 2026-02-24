@@ -62,7 +62,7 @@ export function createPaymentParams(options) {
       phoneNumber: customer.phoneNumber || customer.tel || '',
       email: customer.email || ''
     },
-    customData: JSON.stringify(customData),
+    customData: typeof customData === 'string' ? customData : JSON.stringify(customData),
     // 일본 결제를 위한 상점 정보 (필수)
     storeDetails: {
       storeName: 'PUZZMI',
