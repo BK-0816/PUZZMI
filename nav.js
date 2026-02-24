@@ -240,17 +240,17 @@ export async function renderNavbar(rootId = 'app-nav') {
     
     // 메이트 메뉴
     if (isMate) {
-      userMenu.appendChild(createElement('a', { class: 'dropdown-item', href: 'mate_edit.html' }, [
-        createElement('i', { class: 'fas fa-user-edit' }),
+      userMenu.appendChild(createElement('a', { class: 'dropdown-item', href: `mate_like.html?mate_id=${user.id}` }, [
+        createElement('i', { class: 'fas fa-id-card' }),
         createElement('span', {}, '내 프로필')
       ]));
       userMenu.appendChild(createElement('a', { class: 'dropdown-item', href: 'mate_dashboard.html' }, [
         createElement('i', { class: 'fas fa-chart-line' }),
         createElement('span', {}, '메이트 대시보드')
       ]));
-      userMenu.appendChild(createElement('a', { class: 'dropdown-item', href: `mate_like.html?mate_id=${user.id}` }, [
-        createElement('i', { class: 'fas fa-eye' }),
-        createElement('span', {}, '고객이 보는 내 프로필')
+      userMenu.appendChild(createElement('a', { class: 'dropdown-item', href: 'mate_edit.html' }, [
+        createElement('i', { class: 'fas fa-edit' }),
+        createElement('span', {}, '프로필 편집')
       ]));
     }
     

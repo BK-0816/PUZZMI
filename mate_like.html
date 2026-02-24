@@ -1253,14 +1253,6 @@
     const { data: { user } } = await supabase.auth.getUser();
     const isOwnProfile = user && user.id === mateId;
 
-    // 메이트 본인인 경우 예약/찜하기 버튼 숨기기
-    if (isOwnProfile) {
-      const actionButtons = document.querySelector('.action-buttons');
-      if (actionButtons) {
-        actionButtons.style.display = 'none';
-      }
-    }
-
     // 스토리지 키를 URL로 변환
     function keyToUrl(key) {
       if (!key) return 'https://picsum.photos/seed/puzzmi/400/300';
