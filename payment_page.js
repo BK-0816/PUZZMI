@@ -118,7 +118,7 @@ document.getElementById('payBtn').addEventListener('click', async function() {
       .from('portone_payments')
       .insert({
         booking_id: bookingData.id,
-        user_id: bookingData.customer_id,
+        user_id: null,
         imp_uid: paymentId,
         merchant_uid: paymentId,
         amount: bookingData.total_amount,
