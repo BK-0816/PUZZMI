@@ -74,7 +74,7 @@
 
       db
         .from('bookings')
-        .select('*')
+        .select('*, profiles!customer_id(email, phone_number)')
         .eq('payment_token', token)
         .maybeSingle()
         .then(function(result) {
@@ -89,6 +89,19 @@
             showError('결제 정보를 찾을 수 없습니다.');
             return;
           }
+
+          if (data.profiles) {
+            data._email = data.profiles.email || '';
+            data._phone = data.profiles.phone_number || '';
+          }
+          console.log('[PUZZMI] bookingData loaded:', {
+            id: data.id,
+            customer_name: data.customer_name,
+            customer_contact: data.customer_contact,
+            _email: data._email,
+            _phone: data._phone,
+            total_amount: data.total_amount
+          });
 
           bookingData = data;
 
@@ -162,8 +175,8 @@
               fullName: bookingData.customer_name || 'Guest',
               firstNameKana: 'ゲスト',
               lastNameKana: 'ゲスト',
-              phoneNumber: bookingData.customer_contact || '08000000000',
-              email: 'guest@puzzmi.com'
+              phoneNumber: bookingData.customer_contact || bookingData._phone || '08000000000',
+              email: bookingData._email || 'guest@puzzmi.com'
             },
             storeDetails: {
               storeName: 'パズミ',
@@ -172,7 +185,7 @@
               storeNameKana: 'パズミ',
               contactName: 'PUZZMI Support',
               email: 'puzzmi0721@gmail.com',
-              phoneNumber: '0312345678',
+              phoneNumber: '01094376167',
               openingHours: {
                 open: '09:00',
                 close: '23:00'
