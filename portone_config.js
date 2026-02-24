@@ -44,10 +44,12 @@ export function createPaymentParams(options) {
     payMethod = 'CARD', // 결제수단 (기본: 카드)
     customer = {},    // 구매자 정보
     customData = {},  // 추가 데이터
+    products = [],    // 상품 정보 배열
+    noticeUrls = [],  // 웹훅 URL 배열
     locale = 'ko'     // 언어 (한국어 기본)
   } = options;
 
-  return {
+  const params = {
     storeId: PORTONE_CONFIG.STORE_ID,
     channelKey: PORTONE_CONFIG.CHANNEL_KEY,
     paymentId: paymentId,
@@ -56,8 +58,8 @@ export function createPaymentParams(options) {
     currency: currency,
     payMethod: payMethod,
     customer: {
-      fullName: customer.name || '',
-      phoneNumber: customer.tel || '',
+      fullName: customer.fullName || customer.name || '',
+      phoneNumber: customer.phoneNumber || customer.tel || '',
       email: customer.email || ''
     },
     customData: JSON.stringify(customData),
@@ -79,6 +81,23 @@ export function createPaymentParams(options) {
     redirectUrl: `${window.location.origin}/payment_complete.html`,
     // 결제 창 닫기 시 호출될 콜백은 requestPayment에서 처리
   };
+
+  // 상품 정보가 있으면 추가
+  if (products && products.length > 0) {
+    params.products = products;
+  }
+
+  // 웹훅 URL이 있으면 추가
+  if (noticeUrls && noticeUrls.length > 0) {
+    params.noticeUrls = noticeUrls;
+  }
+
+  // 로케일 설정
+  if (locale) {
+    params.locale = locale;
+  }
+
+  return params;
 }
 
 /**
