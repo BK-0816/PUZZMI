@@ -13,13 +13,13 @@ export const PORTONE_CONFIG = {
   },
 
   STORE_DETAILS: {
-    storeName: 'パズルミ',
-    storeNameKana: 'パズルミ',
+    storeName: 'パズミ',
+    storeNameKana: 'パズミ',
     storeNameEn: 'PUZZMI',
     storeNameShort: 'PUZZMI',
     contactName: 'PUZZMI Support',
-    email: 'support@puzzmi.com',
-    phoneNumber: '0312345678',
+    email: 'puzzmi0721@gmail.com',
+    phoneNumber: '01094376167',
     openingHours: {
       open: '09:00',
       close: '18:00'
