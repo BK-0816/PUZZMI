@@ -142,8 +142,9 @@
   <div class="complete-container">
     <div class="complete-card" id="resultCard">
       <div class="loading-spinner"></div>
-      <div class="status-message">
-        お支払い結果を確認中...
+      <div class="status-message" id="loadingMessage">
+        お支払い結果を確認中...<br>
+        <small style="font-size:0.85rem; color:#999;">しばらくお待ちください</small>
       </div>
     </div>
   </div>
@@ -157,43 +158,91 @@
 
     async function checkPaymentStatus() {
       const urlParams = new URLSearchParams(window.location.search);
-      // V2는 paymentId와 code를 파라미터로 반환
       const paymentId = urlParams.get('paymentId');
       const code = urlParams.get('code');
       const message = urlParams.get('message');
-
-      const resultCard = document.getElementById('resultCard');
 
       if (!paymentId) {
         showError('決済情報が見つかりません。');
         return;
       }
 
-      // 결제 실패 (code가 있으면 에러)
       if (code) {
         const errorMsg = message || '決済に失敗しました。';
         showError(errorMsg);
         return;
       }
 
+      await waitForPaymentConfirmation(paymentId);
+    }
+
+    async function waitForPaymentConfirmation(paymentId, retries = 0) {
+      const MAX_RETRIES = 15;
+      const RETRY_INTERVAL = 2000;
+
       try {
-        // 포트원 결제 정보 조회 (V2는 payment_id로 조회)
         const { data: payment, error } = await supabase
           .from('portone_payments')
           .select('*, bookings(*)')
           .eq('imp_uid', paymentId)
           .maybeSingle();
 
-        if (error || !payment) {
+        if (error) {
           showError('決済情報の確認に失敗しました。');
           return;
         }
 
-        // 결제 성공
+        if (!payment) {
+          if (retries < MAX_RETRIES) {
+            setTimeout(() => waitForPaymentConfirmation(paymentId, retries + 1), RETRY_INTERVAL);
+            return;
+          }
+          showError('決済情報が見つかりません。');
+          return;
+        }
+
         if (payment.status === 'paid') {
           showSuccess(payment);
+          return;
+        }
+
+        if (payment.status === 'failed' || payment.status === 'cancelled') {
+          showError('決済に失敗しました。');
+          return;
+        }
+
+        if (retries < MAX_RETRIES) {
+          const channel = supabase
+            .channel('payment-complete-' + paymentId)
+            .on('postgres_changes', {
+              event: 'UPDATE',
+              schema: 'public',
+              table: 'portone_payments',
+              filter: 'imp_uid=eq.' + paymentId
+            }, (payload) => {
+              channel.unsubscribe();
+              if (payload.new.status === 'paid') {
+                supabase
+                  .from('portone_payments')
+                  .select('*, bookings(*)')
+                  .eq('imp_uid', paymentId)
+                  .maybeSingle()
+                  .then(({ data }) => {
+                    if (data) showSuccess(data);
+                    else showError('決済情報の確認に失敗しました。');
+                  });
+              } else {
+                showError('決済に失敗しました。');
+              }
+            })
+            .subscribe();
+
+          setTimeout(() => {
+            channel.unsubscribe();
+            waitForPaymentConfirmation(paymentId, retries + 1);
+          }, RETRY_INTERVAL);
         } else {
-          showError('決済が完了していません。');
+          showError('決済の確認がタイムアウトしました。しばらくしてから予約リストをご確認ください。');
         }
       } catch (error) {
         console.error('Error:', error);
