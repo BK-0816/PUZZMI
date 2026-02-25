@@ -81,7 +81,18 @@ Deno.serve(async (req: Request) => {
 
     const { type, data } = webhookData;
 
-    if (type !== "Transaction.StatusChanged") {
+    const PAYMENT_TYPES = [
+      "Transaction.Ready",
+      "Transaction.Paid",
+      "Transaction.VirtualAccountIssued",
+      "Transaction.PartialCancelled",
+      "Transaction.Cancelled",
+      "Transaction.Failed",
+      "Transaction.PayPending",
+      "Transaction.CancelPending",
+    ];
+
+    if (!PAYMENT_TYPES.includes(type)) {
       console.log("Ignoring webhook type:", type);
       return new Response(
         JSON.stringify({ message: "Webhook type ignored", type }),
@@ -94,7 +105,6 @@ Deno.serve(async (req: Request) => {
 
     const paymentId = data?.paymentId;
     const transactionId = data?.transactionId;
-    const status = data?.status;
 
     if (!paymentId) {
       console.error("Missing paymentId in webhook data");
@@ -107,7 +117,8 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    console.log(`Processing payment ${paymentId}, status: ${status}`);
+    const mappedStatus = mapWebhookType(type);
+    console.log(`Processing payment ${paymentId}, type: ${type}, mappedStatus: ${mappedStatus}`);
 
     const portoneApiSecret = Deno.env.get("PORTONE_API_SECRET");
 
@@ -139,7 +150,7 @@ Deno.serve(async (req: Request) => {
     }
 
     const updateData: any = {
-      status: mapV2Status(status),
+      status: mappedStatus,
       webhook_verified: true,
       updated_at: new Date().toISOString(),
     };
@@ -166,12 +177,12 @@ Deno.serve(async (req: Request) => {
         updateData.receipt_url = paymentData.receiptUrl;
       }
 
-      if (status === "PAID") {
+      if (type === "Transaction.Paid") {
         updateData.paid_at = paymentData.paidAt || new Date().toISOString();
-      } else if (status === "FAILED") {
-        updateData.fail_reason = paymentData.failureReason || data?.failureReason || "Payment failed";
+      } else if (type === "Transaction.Failed") {
+        updateData.fail_reason = paymentData.failureReason || "Payment failed";
         updateData.failed_at = new Date().toISOString();
-      } else if (status === "CANCELLED") {
+      } else if (type === "Transaction.Cancelled" || type === "Transaction.PartialCancelled") {
         updateData.cancelled_at = new Date().toISOString();
       }
     } else {
@@ -179,12 +190,12 @@ Deno.serve(async (req: Request) => {
         updateData.pg_tid = transactionId;
       }
 
-      if (status === "PAID") {
+      if (type === "Transaction.Paid") {
         updateData.paid_at = new Date().toISOString();
-      } else if (status === "FAILED") {
-        updateData.fail_reason = data?.failureReason || "Payment failed";
+      } else if (type === "Transaction.Failed") {
+        updateData.fail_reason = "Payment failed";
         updateData.failed_at = new Date().toISOString();
-      } else if (status === "CANCELLED") {
+      } else if (type === "Transaction.Cancelled" || type === "Transaction.PartialCancelled") {
         updateData.cancelled_at = new Date().toISOString();
       }
     }
@@ -230,13 +241,13 @@ Deno.serve(async (req: Request) => {
       let bookingStatus = "pending";
       let paymentStatus = "pending";
 
-      if (status === "PAID") {
+      if (type === "Transaction.Paid") {
         bookingStatus = "confirmed";
         paymentStatus = "paid";
-      } else if (status === "FAILED") {
+      } else if (type === "Transaction.Failed") {
         bookingStatus = "pending";
         paymentStatus = "failed";
-      } else if (status === "CANCELLED") {
+      } else if (type === "Transaction.Cancelled" || type === "Transaction.PartialCancelled") {
         bookingStatus = "canceled";
         paymentStatus = "cancelled";
       }
@@ -261,7 +272,7 @@ Deno.serve(async (req: Request) => {
     }
 
     return new Response(
-      JSON.stringify({ success: true, payment, paymentId, status }),
+      JSON.stringify({ success: true, payment, paymentId, type }),
       {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -279,14 +290,16 @@ Deno.serve(async (req: Request) => {
   }
 });
 
-// V2 상태를 내부 상태로 매핑
-function mapV2Status(v2Status: string): string {
-  const statusMap: { [key: string]: string } = {
-    "READY": "ready",
-    "PAID": "paid",
-    "FAILED": "failed",
-    "CANCELLED": "cancelled",
-    "PARTIAL_CANCELLED": "refunded",
+function mapWebhookType(type: string): string {
+  const typeMap: { [key: string]: string } = {
+    "Transaction.Ready": "ready",
+    "Transaction.Paid": "paid",
+    "Transaction.VirtualAccountIssued": "ready",
+    "Transaction.PartialCancelled": "refunded",
+    "Transaction.Cancelled": "cancelled",
+    "Transaction.Failed": "failed",
+    "Transaction.PayPending": "pending",
+    "Transaction.CancelPending": "pending",
   };
-  return statusMap[v2Status] || "ready";
+  return typeMap[type] || "ready";
 }
