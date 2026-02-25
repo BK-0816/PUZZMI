@@ -175,7 +175,9 @@
             currency: 'CURRENCY_JPY',
             payMethod: 'CARD',
             customer: {
-              fullName: bookingData.customer_name || 'guest',
+              fullName: 'ゲスト',
+              firstNameKana: 'ゲスト',
+              lastNameKana: 'ゲスト',
               phoneNumber: customerPhone,
               email: bookingData._email || 'guest@puzzmi.com'
             },
