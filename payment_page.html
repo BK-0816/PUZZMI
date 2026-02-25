@@ -1,40 +1,40 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ja">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PUZZMI - 결제하기</title>
+  <title>PUZZMI - お支払い</title>
   <link rel="stylesheet" href="payment_page.css">
 </head>
 <body>
   <div class="container">
-    <h1>💳 결제하기</h1>
+    <h1>お支払い</h1>
 
     <div class="info-box">
       <div class="info-row">
-        <span class="info-label">예약번호</span>
+        <span class="info-label">予約番号</span>
         <span class="info-value" id="booking_id">-</span>
       </div>
       <div class="info-row">
-        <span class="info-label">서비스명</span>
+        <span class="info-label">サービス内容</span>
         <span class="info-value" id="goodname">-</span>
       </div>
       <div class="info-row">
-        <span class="info-label">결제금액</span>
+        <span class="info-label">お支払い金額</span>
         <span class="info-value" style="color: #4a90d9; font-size: 1.3rem;" id="price">-</span>
       </div>
     </div>
 
     <button type="button" class="btn-pay" id="payBtn" disabled>
-      🔒 안전결제 실행
+      安全決済を実行
     </button>
 
     <div class="secure-badge">
-      ✅ 포트원 안전결제
+      PortOne 安全決済
     </div>
 
     <div id="loading" style="text-align:center; margin-top:20px;">
-      <p>결제 정보를 불러오는 중...</p>
+      <p>決済情報を読み込み中...</p>
     </div>
 
     <div id="error-message" style="display:none; margin-top:20px; padding:20px; background:#fee; border-radius:12px; color:#c00; text-align:center;"></div>
@@ -68,7 +68,7 @@
     function loadPaymentInfo() {
       var token = getPaymentToken();
       if (!token) {
-        showError('결제 링크가 올바르지 않습니다.');
+        showError('決済リンクが正しくありません。');
         return;
       }
 
@@ -82,15 +82,20 @@
           var error = result.error;
 
           if (error) {
-            showError('결제 정보를 불러오는데 실패했습니다.');
+            showError('決済情報の読み込みに失敗しました。');
             return;
           }
           if (!data) {
-            showError('결제 정보를 찾을 수 없습니다.');
+            showError('決済情報が見つかりません。');
             return;
           }
 
           bookingData = data;
+
+          if (data.payment_status === 'paid') {
+            showError('この予約はすでにお支払い済みです。');
+            return;
+          }
 
           if (data.customer_id) {
             db.from('profiles')
@@ -102,26 +107,13 @@
                   bookingData._email = profileResult.data.email || '';
                   bookingData._phone = profileResult.data.phone_number || '';
                 }
-                console.log('[PUZZMI] bookingData loaded:', {
-                  id: bookingData.id,
-                  customer_name: bookingData.customer_name,
-                  customer_contact: bookingData.customer_contact,
-                  _email: bookingData._email,
-                  _phone: bookingData._phone,
-                  total_amount: bookingData.total_amount
-                });
               });
-          }
-
-          if (data.payment_status === 'paid') {
-            showError('이미 결제가 완료되었습니다.');
-            return;
           }
 
           var hours = data.duration_hours || 0;
           var amount = data.total_amount || 0;
-          var amountStr = '¥' + amount.toLocaleString('ja-JP');
-          var orderName = 'PUZZMI メイト予約 (' + hours + '時間)';
+          var amountStr = new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY', maximumFractionDigits: 0 }).format(amount);
+          var orderName = 'PUZZMIメイト予約 (' + hours + '時間)';
 
           document.getElementById('booking_id').textContent = '#' + data.id;
           document.getElementById('goodname').textContent = orderName;
@@ -133,20 +125,20 @@
 
     document.getElementById('payBtn').addEventListener('click', function() {
       if (!bookingData) {
-        alert('결제 정보를 불러오지 못했습니다.');
+        alert('決済情報が読み込まれていません。');
         return;
       }
 
       var btn = document.getElementById('payBtn');
       btn.disabled = true;
-      btn.textContent = '결제 처리 중...';
+      btn.textContent = '決済処理中...';
 
       var timestamp = Date.now();
       var random = Math.random().toString(36).substring(2, 9);
       var paymentId = 'PUZZMI_' + timestamp + '_' + random;
 
       var hours = bookingData.duration_hours || 0;
-      var orderName = 'PUZZMI メイト予約 (' + hours + '時間)';
+      var orderName = 'PUZZMIメイト予約 (' + hours + '時間)';
 
       var insertData = {
         booking_id: bookingData.id,
@@ -165,7 +157,7 @@
         .insert(insertData)
         .then(function(insertResult) {
           if (insertResult.error) {
-            console.error('결제 정보 저장 실패:', insertResult.error);
+            console.error('決済情報の保存失敗:', insertResult.error);
           }
 
           var baseUrl = window.location.href.split('?')[0];
@@ -180,7 +172,7 @@
             currency: 'CURRENCY_JPY',
             payMethod: 'CARD',
             customer: {
-              fullName: bookingData.customer_name || 'Guest',
+              fullName: bookingData.customer_name || 'ゲスト',
               firstNameKana: 'ゲスト',
               lastNameKana: 'ゲスト',
               phoneNumber: bookingData.customer_contact || bookingData._phone || '08000000000',
@@ -193,11 +185,8 @@
               storeNameKana: 'パズミ',
               contactName: 'PUZZMI Support',
               email: 'puzzmi0721@gmail.com',
-              phoneNumber: '01094376167',
-              openingHours: {
-                open: '09:00',
-                close: '23:00'
-              }
+              phoneNumber: '0312345678',
+              openingHours: { open: '09:00', close: '23:00' }
             },
             customData: JSON.stringify({
               booking_id: bookingData.id,
@@ -214,9 +203,9 @@
           if (!response) return;
 
           if (response.code != null) {
-            alert('결제 실패: ' + (response.message || '알 수 없는 오류'));
+            alert('決済失敗: ' + (response.message || '不明なエラー'));
             btn.disabled = false;
-            btn.textContent = '🔒 안전결제 실행';
+            btn.textContent = '安全決済を実行';
             return;
           }
 
@@ -230,7 +219,7 @@
             .maybeSingle()
             .then(function(checkResult) {
               if (checkResult.data && checkResult.data.status === 'paid') {
-                window.location.href = redirectTarget + '?booking_id=' + bookingData.id;
+                window.location.href = redirectTarget + '?paymentId=' + paidPaymentId;
                 return;
               }
 
@@ -244,27 +233,27 @@
                 }, function(payload) {
                   if (payload.new.status === 'paid') {
                     channel.unsubscribe();
-                    window.location.href = redirectTarget + '?booking_id=' + bookingData.id;
+                    window.location.href = redirectTarget + '?paymentId=' + paidPaymentId;
                   } else if (payload.new.status === 'failed') {
                     channel.unsubscribe();
-                    alert('결제에 실패했습니다.');
+                    alert('決済に失敗しました。');
                     btn.disabled = false;
-                    btn.textContent = '🔒 안전결제 실행';
+                    btn.textContent = '安全決済を実行';
                   }
                 })
                 .subscribe();
 
               setTimeout(function() {
                 channel.unsubscribe();
-                window.location.href = redirectTarget + '?booking_id=' + bookingData.id;
+                window.location.href = redirectTarget + '?paymentId=' + paidPaymentId;
               }, 30000);
             });
         })
         .catch(function(error) {
           console.error('Payment error:', error);
-          alert(error.message || '결제에 실패했습니다.');
+          alert(error.message || '決済に失敗しました。');
           btn.disabled = false;
-          btn.textContent = '🔒 안전결제 실행';
+          btn.textContent = '安全決済を実行';
         });
     });
 
