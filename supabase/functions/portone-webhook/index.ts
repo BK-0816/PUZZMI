@@ -1,6 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { createHmac } from "node:crypto";
+import * as PortOne from "jsr:@portone/server-sdk";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -24,59 +24,32 @@ Deno.serve(async (req: Request) => {
     const webhookSecret = Deno.env.get("PORTONE_WEBHOOK_SECRET");
     const bodyText = await req.text();
 
+    let webhookData: any;
+
     if (webhookSecret) {
-      const webhookId = req.headers.get("webhook-id");
-      const webhookTimestamp = req.headers.get("webhook-timestamp");
-      const webhookSignature = req.headers.get("webhook-signature");
-
-      if (!webhookId || !webhookTimestamp || !webhookSignature) {
-        console.error("Missing webhook headers");
+      try {
+        const webhook = await PortOne.Webhook.verify(
+          webhookSecret,
+          bodyText,
+          req.headers,
+        );
+        webhookData = webhook;
+        console.log("Webhook signature verified successfully via PortOne SDK");
+      } catch (e) {
+        console.error("Webhook verification failed:", e);
         return new Response(
-          JSON.stringify({ error: "Missing webhook headers" }),
+          JSON.stringify({ error: "Invalid signature", detail: String(e) }),
           {
             status: 400,
             headers: { ...corsHeaders, "Content-Type": "application/json" },
           }
         );
       }
-
-      const secretBase64 = webhookSecret.startsWith("whsec_")
-        ? webhookSecret.slice(6)
-        : webhookSecret;
-      const secretBytes = Uint8Array.from(atob(secretBase64), (c) => c.charCodeAt(0));
-
-      const signedContent = `${webhookId}.${webhookTimestamp}.${bodyText}`;
-      const encoder = new TextEncoder();
-
-      const key = await crypto.subtle.importKey(
-        "raw",
-        secretBytes,
-        { name: "HMAC", hash: "SHA-256" },
-        false,
-        ["sign"]
-      );
-      const signatureBytes = await crypto.subtle.sign("HMAC", key, encoder.encode(signedContent));
-      const computedSignature = btoa(String.fromCharCode(...new Uint8Array(signatureBytes)));
-
-      const receivedSignatures = webhookSignature
-        .split(" ")
-        .map((s) => s.split(",")[1])
-        .filter(Boolean);
-
-      if (!receivedSignatures.includes(computedSignature)) {
-        console.error("Webhook signature verification failed");
-        return new Response(
-          JSON.stringify({ error: "Invalid signature" }),
-          {
-            status: 400,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          }
-        );
-      }
-      console.log("Webhook signature verified successfully");
+    } else {
+      webhookData = JSON.parse(bodyText);
+      console.warn("PORTONE_WEBHOOK_SECRET not configured, skipping signature verification");
     }
 
-    const webhookData = JSON.parse(bodyText);
     console.log("Received PortOne V2 webhook:", JSON.stringify(webhookData, null, 2));
 
     const { type, data } = webhookData;
