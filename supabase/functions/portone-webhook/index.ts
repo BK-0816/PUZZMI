@@ -25,24 +25,55 @@ Deno.serve(async (req: Request) => {
     const bodyText = await req.text();
 
     if (webhookSecret) {
-      const signature = req.headers.get("webhook-signature");
-      if (signature) {
-        const hmac = createHmac("sha256", webhookSecret);
-        hmac.update(bodyText);
-        const expectedSignature = hmac.digest("base64");
+      const webhookId = req.headers.get("webhook-id");
+      const webhookTimestamp = req.headers.get("webhook-timestamp");
+      const webhookSignature = req.headers.get("webhook-signature");
 
-        if (signature !== expectedSignature) {
-          console.error("Webhook signature verification failed");
-          return new Response(
-            JSON.stringify({ error: "Invalid signature" }),
-            {
-              status: 400,
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
-            }
-          );
-        }
-        console.log("Webhook signature verified successfully");
+      if (!webhookId || !webhookTimestamp || !webhookSignature) {
+        console.error("Missing webhook headers");
+        return new Response(
+          JSON.stringify({ error: "Missing webhook headers" }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
       }
+
+      const secretBase64 = webhookSecret.startsWith("whsec_")
+        ? webhookSecret.slice(6)
+        : webhookSecret;
+      const secretBytes = Uint8Array.from(atob(secretBase64), (c) => c.charCodeAt(0));
+
+      const signedContent = `${webhookId}.${webhookTimestamp}.${bodyText}`;
+      const encoder = new TextEncoder();
+
+      const key = await crypto.subtle.importKey(
+        "raw",
+        secretBytes,
+        { name: "HMAC", hash: "SHA-256" },
+        false,
+        ["sign"]
+      );
+      const signatureBytes = await crypto.subtle.sign("HMAC", key, encoder.encode(signedContent));
+      const computedSignature = btoa(String.fromCharCode(...new Uint8Array(signatureBytes)));
+
+      const receivedSignatures = webhookSignature
+        .split(" ")
+        .map((s) => s.split(",")[1])
+        .filter(Boolean);
+
+      if (!receivedSignatures.includes(computedSignature)) {
+        console.error("Webhook signature verification failed");
+        return new Response(
+          JSON.stringify({ error: "Invalid signature" }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
+      }
+      console.log("Webhook signature verified successfully");
     }
 
     const webhookData = JSON.parse(bodyText);
