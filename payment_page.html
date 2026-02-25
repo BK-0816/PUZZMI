@@ -163,6 +163,8 @@
           var baseUrl = window.location.href.split('?')[0];
           var redirectUrl = baseUrl.replace('payment_page.html', 'payment_complete.html');
 
+          var customerPhone = (bookingData.customer_contact || bookingData._phone || '08000000000').replace(/[^0-9]/g, '');
+
           var paymentParams = {
             storeId: STORE_ID,
             channelKey: CHANNEL_KEY,
@@ -172,10 +174,8 @@
             currency: 'CURRENCY_JPY',
             payMethod: 'CARD',
             customer: {
-              fullName: bookingData.customer_name || 'ゲスト',
-              firstNameKana: 'ゲスト',
-              lastNameKana: 'ゲスト',
-              phoneNumber: bookingData.customer_contact || bookingData._phone || '08000000000',
+              fullName: bookingData.customer_name || 'guest',
+              phoneNumber: customerPhone,
               email: bookingData._email || 'guest@puzzmi.com'
             },
             storeDetails: {
@@ -183,7 +183,7 @@
               storeNameShort: 'パズミ',
               storeNameEn: 'PUZZMI',
               storeNameKana: 'パズミ',
-              contactName: 'PUZZMI Support',
+              contactName: 'PUZZMI',
               email: 'puzzmi0721@gmail.com',
               phoneNumber: '0312345678',
               openingHours: { open: '09:00', close: '23:00' }
