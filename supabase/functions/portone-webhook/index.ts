@@ -80,11 +80,11 @@ Deno.serve(async (req: Request) => {
     const transactionId = data?.transactionId;
 
     if (!paymentId) {
-      console.error("Missing paymentId in webhook data");
+      console.warn("Missing paymentId in webhook data, acknowledging anyway");
       return new Response(
-        JSON.stringify({ error: "Missing paymentId" }),
+        JSON.stringify({ success: true, message: "Webhook acknowledged, no paymentId" }),
         {
-          status: 400,
+          status: 200,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         }
       );
