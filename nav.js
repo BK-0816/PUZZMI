@@ -226,7 +226,7 @@ export async function renderNavbar(rootId = 'app-nav') {
     if (!isAdmin && !isMate) {
       userMenu.appendChild(createElement('a', { class: 'dropdown-item', href: 'my_favorites.html' }, [
         createElement('i', { class: 'fas fa-heart' }),
-        createElement('span', {}, 'ネチムリスト')
+        createElement('span', {}, 'お気に入り')
       ]));
       userMenu.appendChild(createElement('a', { class: 'dropdown-item', href: 'my_bookings.html' }, [
         createElement('i', { class: 'fas fa-calendar-check' }),
@@ -355,7 +355,7 @@ function createMobileMenu(root, commonMenus, user, isAdmin, isMate) {
         onclick: closeMobileMenu
       }, [
         createElement('i', { class: 'fas fa-heart' }),
-        createElement('span', {}, 'ネチムリスト')
+        createElement('span', {}, 'お気に入り')
       ]));
       
       userSection.appendChild(createElement('a', { 
