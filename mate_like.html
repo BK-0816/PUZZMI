@@ -1039,7 +1039,7 @@
     <!-- 뒤로가기 버튼 -->
     <a href="index.html#friends" class="back-button">
       <i class="fas fa-arrow-left"></i>
-      메이트 목록으로
+      一覧に戻る
     </a>
 
     <!-- 메인 프로필 카드 -->
@@ -1101,7 +1101,7 @@
     <section class="info-section">
       <h3 class="info-title">
         <i class="fas fa-user"></i>
-        소개
+        紹介
       </h3>
       <div id="profileBio" class="info-content">
         소개를 불러오는 중...
@@ -1112,7 +1112,7 @@
     <section class="info-section">
       <h3 class="info-title">
         <i class="fas fa-tags"></i>
-        전문 분야
+        専門分野
       </h3>
       <div class="tags-container" id="profileTags">
         <!-- 태그들이 여기에 동적으로 추가됩니다 -->
@@ -1123,7 +1123,7 @@
     <section class="info-section">
       <h3 class="info-title">
         <i class="fas fa-map-marker-alt"></i>
-        활동 지역
+        活動エリア
       </h3>
       <div class="tags-container" id="profileAreas">
         <!-- 지역들이 여기에 동적으로 추가됩니다 -->
@@ -1134,7 +1134,7 @@
     <section class="info-section">
       <h3 class="info-title">
         <i class="fas fa-globe"></i>
-        사용 가능한 언어
+        利用可能な言語を選択
       </h3>
       <div class="tags-container" id="profileLanguages">
         <!-- 언어들이 여기에 동적으로 추가됩니다 -->
@@ -1145,12 +1145,12 @@
     <section class="reviews-section">
       <h3 class="reviews-title">
         <i class="fas fa-star"></i>
-        리뷰
+        レビュー
       </h3>
       
       <!-- 리뷰 통계 -->
       <div id="reviewsStats" class="reviews-stats" style="display: none;">
-        <span class="reviews-count">총 0개 리뷰</span>
+        <span class="reviews-count">レビュー0件</span>
         <div class="reviews-average">
           <i class="fas fa-star"></i>
           <span id="averageRating">0.0</span>
@@ -1236,7 +1236,7 @@
 
     // 이메일 마스킹 함수
     function maskEmail(email) {
-      if (!email || typeof email !== 'string') return '익명';
+      if (!email || typeof email !== 'string') return '匿名';
       
       const atIndex = email.indexOf('@');
       if (atIndex === -1) return email;
@@ -1402,7 +1402,7 @@
         profileName.textContent = mate.profiles.full_name || '메이트';
         
         const metaInfo = [];
-        if (mate.profiles.age) metaInfo.push(`${mate.profiles.age}세`);
+        if (mate.profiles.age) metaInfo.push(`${mate.profiles.age}才`);
         if (mate.profiles.gender) metaInfo.push(mate.profiles.gender);
         if (mate.location) metaInfo.push(mate.location);
         profileMeta.textContent = metaInfo.join(' • ');
@@ -1414,7 +1414,7 @@
         }
 
         // 소개
-        profileBio.textContent = mate.bio || '소개가 등록되지 않았습니다.';
+        profileBio.textContent = mate.bio || '自己紹介が登録されていません';
 
         // 사진 갤러리
         allPhotos = mate.photos || [];
