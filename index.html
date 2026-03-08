@@ -204,12 +204,18 @@
 
       // ===== 3) 인증 가드 & 찜하기 처리 =====
 
+      const favProcessing = new Set();
+
       // 찜하기 기능
       document.addEventListener('click', async (e) => {
         const btn = e.target.closest('[data-fav-mate]');
         if (!btn) return;
         e.preventDefault();
-        
+        e.stopPropagation();
+
+        const mateId = btn.getAttribute('data-fav-mate');
+        if (favProcessing.has(mateId)) return;
+
         // 로그인 체크
         const { data: { user }, error: authErr } = await supabase.auth.getUser();
         if (authErr || !user) {
@@ -218,56 +224,48 @@
           return;
         }
 
-        const mateId = btn.getAttribute('data-fav-mate');
+        favProcessing.add(mateId);
         const originalText = btn.textContent;
         btn.disabled = true;
         btn.textContent = '처리중...';
 
         try {
-          // 이미 찜했는지 확인
-          const { data: existing } = await supabase
-            .from('favorites')
-            .select('id')
-            .eq('user_id', user.id)
-            .eq('mate_id', mateId)
-            .maybeSingle();
+          const isFaved = btn.classList.contains('is-faved');
 
-          if (existing) {
-            // 이미 찜한 경우 - 찜 해제
+          if (isFaved) {
             const { error } = await supabase
               .from('favorites')
               .delete()
               .eq('user_id', user.id)
               .eq('mate_id', mateId);
-            
+
             if (error) throw error;
-            
-            btn.textContent = '찜하기';
+
+            btn.textContent = 'お気に入り';
             btn.classList.remove('is-faved');
             showToast('💔 찜 해제되었습니다');
           } else {
-            // 찜하기
             const { error } = await supabase
               .from('favorites')
-              .insert({ user_id: user.id, mate_id: mateId });
-            
+              .upsert({ user_id: user.id, mate_id: mateId }, { onConflict: 'user_id,mate_id', ignoreDuplicates: true });
+
             if (error) throw error;
-            
+
             btn.textContent = '찜 완료';
             btn.classList.add('is-faved');
             showToast('💖 찜 목록에 추가되었습니다!');
           }
 
-          // 하트 카운트 및 찜 상태 업데이트
           await refreshHeartCount();
           await refreshFavState();
-          
+
         } catch (error) {
           console.error('찜하기 오류:', error);
           btn.textContent = originalText;
           showToast('❌ 오류가 발생했습니다: ' + error.message);
         } finally {
           btn.disabled = false;
+          favProcessing.delete(mateId);
         }
       });
 
