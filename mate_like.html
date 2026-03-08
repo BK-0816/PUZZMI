@@ -1088,11 +1088,11 @@
       <div class="action-buttons">
         <a id="bookingBtn" class="action-btn btn-primary">
           <i class="fas fa-calendar-check"></i>
-          예약하기
+          予約する
         </a>
         <button id="favoriteBtn" class="action-btn btn-secondary">
           <i class="fas fa-heart"></i>
-          찜하기
+          お気に入り
         </button>
       </div>
     </section>
@@ -1737,7 +1737,7 @@
           .single();
 
         if (favorite) {
-          favoriteBtn.innerHTML = '<i class="fas fa-heart" style="color: #f5576c;"></i> 찜 해제';
+          favoriteBtn.innerHTML = '<i class="fas fa-heart" style="color: #f5576c;"></i> お気に入り解除';
           favoriteBtn.classList.add('favorited');
         }
       } catch (error) {
@@ -1748,7 +1748,7 @@
     // 찜하기/해제 토글
     async function toggleFavorite() {
       if (!user) {
-        alert('로그인이 필요합니다.');
+        alert('ログインしてください');
         return;
       }
 
@@ -1769,7 +1769,7 @@
 
           if (error) throw error;
 
-          favoriteBtn.innerHTML = '<i class="fas fa-heart"></i> 찜하기';
+          favoriteBtn.innerHTML = '<i class="fas fa-heart"></i> お気に入り';
           favoriteBtn.classList.remove('favorited');
         } else {
           // 찜하기
@@ -1782,7 +1782,7 @@
 
           if (error) throw error;
 
-          favoriteBtn.innerHTML = '<i class="fas fa-heart" style="color: #f5576c;"></i> 찜 해제';
+          favoriteBtn.innerHTML = '<i class="fas fa-heart" style="color: #f5576c;"></i> お気に入り解除';
           favoriteBtn.classList.add('favorited');
         }
       } catch (error) {
