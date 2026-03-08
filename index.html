@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PUZZMI - 서울 렌탈친구 서비스</title>
+    <title>PUZZMI - ソウル 友達レンタル サービス</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="nav.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -227,7 +227,7 @@
         favProcessing.add(mateId);
         const originalText = btn.textContent;
         btn.disabled = true;
-        btn.textContent = '처리중...';
+        btn.textContent = '処理中...';
 
         try {
           const isFaved = btn.classList.contains('is-faved');
@@ -243,7 +243,7 @@
 
             btn.textContent = 'お気に入り';
             btn.classList.remove('is-faved');
-            showToast('💔 찜 해제되었습니다');
+            showToast('💔「お気に入りを解除しました');
           } else {
             const { error } = await supabase
               .from('favorites')
@@ -251,9 +251,9 @@
 
             if (error) throw error;
 
-            btn.textContent = '찜 해제';
+            btn.textContent = 'お気に入り解除';
             btn.classList.add('is-faved');
-            showToast('💖 찜 목록에 추가되었습니다!');
+            showToast('💖 お気に入りリストに追加されました!');
           }
 
           await refreshHeartCount();
@@ -307,7 +307,7 @@
         btns.forEach(btn => {
           const mid = btn.getAttribute('data-fav-mate');
           if (favSet.has(mid)) {
-            btn.textContent = '찜 해제';
+            btn.textContent = 'お気に入り解除';
             btn.classList.add('is-faved');
           } else {
             btn.textContent = 'お気に入り';
