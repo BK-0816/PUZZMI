@@ -52,7 +52,7 @@ export function createPaymentParams(options) {
       storeNameKana: 'パズミ',
       contactName: 'PUZZMI Support',
       email: 'puzzmi0721@gmail.com',
-      phoneNumber: '0312345678',
+      phoneNumber: '01094376167',
       openingHours: {
         open: '09:00',
         close: '18:00'
