@@ -113,10 +113,12 @@
           var hours = data.duration_hours || 0;
           var amount = data.total_amount || 0;
           var amountStr = new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY', maximumFractionDigits: 0 }).format(amount);
-          var orderName = 'PUZZMIメイト予約 (' + hours + '時間)';
+          
+          // 화면 노출용 상품명 (이 부분은 일본어여도 상관없음)
+          var displayOrderName = 'PUZZMIメイト予約 (' + hours + '時間)';
 
           document.getElementById('booking_id').textContent = '#' + data.id;
-          document.getElementById('goodname').textContent = orderName;
+          document.getElementById('goodname').textContent = displayOrderName;
           document.getElementById('price').textContent = amountStr;
           document.getElementById('loading').style.display = 'none';
           document.getElementById('payBtn').disabled = false;
@@ -137,12 +139,13 @@
       var random = Math.random().toString(36).substring(2, 9);
       var paymentId = 'PUZZMI_' + timestamp + '_' + random;
 
+      // 🚨 중요: 이니시스 서버로 전송되는 상품명은 인코딩 해쉬 에러 방지를 위해 반드시 영문/숫자 조합 사용
       var hours = bookingData.duration_hours || 0;
-      var orderName = 'PUZZMIメイト予約 (' + hours + '時間)';
+      var pgOrderName = 'PUZZMI Booking ' + hours + 'h';
 
       var insertData = {
         booking_id: bookingData.id,
-        user_id: null,
+        user_id: bookingData.customer_id || null, // customer_id 명시
         imp_uid: paymentId,
         merchant_uid: paymentId,
         amount: bookingData.total_amount,
@@ -170,26 +173,21 @@
             storeId: STORE_ID,
             channelKey: CHANNEL_KEY,
             paymentId: paymentId,
-            orderName: orderName,
+            orderName: pgOrderName, // 영문 상품명 전달
             totalAmount: bookingData.total_amount,
             currency: 'CURRENCY_JPY',
             payMethod: 'CARD',
             customer: {
-              fullName: 'ゲスト',
-              firstNameKana: 'ゲスト',
-              lastNameKana: 'ゲスト',
+              // 이름 필드도 해쉬 충돌 방지를 위해 기본 영문 사용 (선택 사항)
+              fullName: 'Guest', 
               phoneNumber: customerPhone,
               email: bookingData._email || 'guest@puzzmi.com'
             },
+            // storeDetails가 문제를 일으킬 확률이 높으므로 이니시스 연동 시 안전한 영문으로만 전송하거나 최소화
             storeDetails: {
-              storeName: 'パズミ',
-              storeNameShort: 'パズミ',
-              storeNameEn: 'PUZZMI',
-              storeNameKana: 'パズミ',
-              contactName: 'PUZZMI',
+              storeName: 'PUZZMI',
               email: 'choi.seojun0721@gmail.com',
-              phoneNumber: '0312345678',
-              openingHours: { open: '09:00', close: '23:00' }
+              phoneNumber: '0312345678'
             },
             customData: JSON.stringify({
               booking_id: bookingData.id,
