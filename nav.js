@@ -234,7 +234,7 @@ export async function renderNavbar(rootId = 'app-nav') {
       ]));
       userMenu.appendChild(createElement('a', { class: 'dropdown-item', href: 'my_profile.html' }, [
         createElement('i', { class: 'fas fa-user-edit' }),
-        createElement('span', {}, '私の情報')
+        createElement('span', {}, 'マイページ')
       ]));
     }
     
@@ -373,7 +373,7 @@ function createMobileMenu(root, commonMenus, user, isAdmin, isMate) {
         onclick: closeMobileMenu
       }, [
         createElement('i', { class: 'fas fa-user-edit' }),
-        createElement('span', {}, '私の情報')
+        createElement('span', {}, 'マイページ')
       ]));
       
       userSection.appendChild(createElement('a', { 
