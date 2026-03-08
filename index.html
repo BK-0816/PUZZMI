@@ -258,8 +258,9 @@
             showToast('💖 찜 목록에 추가되었습니다!');
           }
 
-          // 하트 카운트 업데이트
+          // 하트 카운트 및 찜 상태 업데이트
           await refreshHeartCount();
+          await refreshFavState();
           
         } catch (error) {
           console.error('찜하기 오류:', error);
@@ -285,10 +286,43 @@
         setTimeout(() => toast.remove(), 3000);
       }
 
+      // 찜 상태 버튼 반영
+      async function refreshFavState() {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const btns = Array.from(document.querySelectorAll('[data-fav-mate]'));
+        if (!btns.length) return;
+
+        const ids = [...new Set(btns.map(b => b.getAttribute('data-fav-mate')).filter(Boolean))];
+
+        const { data, error } = await supabase
+          .from('favorites')
+          .select('mate_id')
+          .eq('user_id', user.id)
+          .in('mate_id', ids);
+
+        if (error) return;
+
+        const favSet = new Set((data || []).map(r => r.mate_id));
+
+        btns.forEach(btn => {
+          const mid = btn.getAttribute('data-fav-mate');
+          if (favSet.has(mid)) {
+            btn.textContent = '찜 완료';
+            btn.classList.add('is-faved');
+          } else {
+            btn.textContent = 'お気に入り';
+            btn.classList.remove('is-faved');
+          }
+        });
+      }
+
       // 초기 실행
       (async () => {
         await loadMates({ reset: true });
         await refreshHeartCount();
+        await refreshFavState();
         await loadHomepageReviews();
         
         // 자동 완료 체크 실행
