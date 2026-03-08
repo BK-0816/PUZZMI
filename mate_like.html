@@ -1287,7 +1287,7 @@
       const finalPhotos = orderedPhotos.filter(Boolean);
       
       if (!finalPhotos.length) {
-        photoSwiper.innerHTML = '<div class="no-photos">등록된 사진이 없습니다</div>';
+        photoSwiper.innerHTML = '<div class="no-photos">写真がまだ登録されていません</div>';
         photoCounter.style.display = 'none';
         photoPrev.style.display = 'none';
         photoNext.style.display = 'none';
@@ -1490,12 +1490,12 @@
         const averageRating = reviews.reduce((sum, review) => sum + review.rating, 0) / totalReviews;
         
         document.getElementById('reviewsStats').style.display = 'flex';
-        document.querySelector('.reviews-count').textContent = `총 ${totalReviews}개 리뷰`;
+        document.querySelector('.reviews-count').textContent = `レビュー ${totalReviews}件`;
         document.getElementById('averageRating').textContent = averageRating.toFixed(1);
 
         // 리뷰 목록 렌더링
         reviewsList.innerHTML = reviews.map(review => {
-          const reviewerName = maskEmail(review.author_name || '익명');
+          const reviewerName = maskEmail(review.author_name || '匿名');
           const stars = renderStars(review.rating);
           const date = new Date(review.created_at).toLocaleDateString('ko-KR');
           const content = review.content || '';
