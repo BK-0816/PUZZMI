@@ -1157,41 +1157,6 @@
         </div>
       </div>
 
-      <!-- 리뷰 작성 폼 (조건부 표시) -->
-      <div id="reviewForm" class="review-form" style="display: none;">
-        <h4 class="form-title">
-          <i class="fas fa-edit"></i>
-          리뷰 작성하기
-        </h4>
-        <form id="reviewFormElement">
-          <div class="rating-selector">
-            <label class="rating-label">별점을 선택해주세요</label>
-            <div class="rating-buttons">
-              <button type="button" class="rating-btn" data-rating="5">⭐ 5</button>
-              <button type="button" class="rating-btn" data-rating="4">⭐ 4</button>
-              <button type="button" class="rating-btn" data-rating="3">⭐ 3</button>
-              <button type="button" class="rating-btn" data-rating="2">⭐ 2</button>
-              <button type="button" class="rating-btn" data-rating="1">⭐ 1</button>
-            </div>
-            <input type="hidden" id="selectedRating" value="">
-          </div>
-          
-          <textarea 
-            id="reviewText" 
-            class="review-textarea" 
-            placeholder="메이트와 함께한 경험을 간단히 공유해주세요..."
-            required
-          ></textarea>
-          
-          <button type="submit" class="action-btn btn-primary">
-            <i class="fas fa-star"></i>
-            리뷰 등록하기
-          </button>
-          
-          <div id="reviewResult"></div>
-        </form>
-      </div>
-
       <!-- 리뷰 목록 -->
       <div class="reviews-container" id="reviewsContainer">
         <div id="reviewsList">
