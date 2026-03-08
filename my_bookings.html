@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>私の予約リスト - PUZZMI</title>
+  <title>予約リスト - PUZZMI</title>
   <link rel="stylesheet" href="styles.css"/>
   <link rel="stylesheet" href="pages.css"/>
   <link rel="stylesheet" href="nav.css"/>
@@ -359,8 +359,7 @@
   <div id="app-nav"></div>
   <main class="page">
     <section class="page-header">
-      <h2>私の予約リスト</h2>
-      <p class="page-subtitle">予約リストを確認してレビューを作成してください！</p>
+      <h2>予約リスト</h2>
     </section>
     <section>
       <div id="list" class="stack-16"></div>
@@ -376,9 +375,9 @@
       const canReview = bk.status === 'completed' && !bk.has_review;
       const dt = `${bk.date} ${bk.start_time} (${bk.duration_hours}h)`;
       const statusClass = `status-${bk.status}`;
-      const statusText = bk.status === 'pending' ? '⏳ 待機中' :
+      const statusText = bk.status === 'pending' ? '⏳ 支払い待ち' :
                         bk.status === 'confirmed' ? '✅ 予約確定' :
-                        bk.status === 'completed' ? '🎉 進行完了' :
+                        bk.status === 'completed' ? '🎉 完了' :
                         (bk.status === 'cancelled' || bk.status === 'canceled_by_mate') ? '❌ 予約キャンセル' : bk.status;
       
       return `
@@ -403,13 +402,7 @@
               <div class="status-badge ${statusClass}">${statusText}</div>
             </div>
           </div>
-          ${bk.payment_status === 'pending' && (bk.status === 'confirmed' || bk.status === 'pending') ? `
-            <div class="booking-actions">
-              <button class="btn-payment" onclick="goToPayment(${bk.id}, ${bk.total_amount || 0})" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 24px; border-radius: 12px; border: none; cursor: pointer; font-weight: 600; width: 100%; transition: all 0.3s ease;">
-                💳 決済する (¥${bk.total_amount || 0})
-              </button>
-            </div>
-          ` : ''}
+
           ${canReview ? `
             <div class="booking-actions">
               <button class="btn-review" data-act="review">✨ レビューを作成する</button>
