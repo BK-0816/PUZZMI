@@ -970,7 +970,12 @@ section:not(:first-child)::before {
 }
 
 .cta-btn.is-faved {
-  background: var(--gradient-secondary);
+  background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+  color: #fff;
+}
+
+.cta-btn.is-faved:hover {
+  background: linear-gradient(135deg, #c53030 0%, #9b2c2c 100%);
 }
 
 /* ===== 리뷰 카드 ===== */

@@ -251,7 +251,7 @@
 
             if (error) throw error;
 
-            btn.textContent = '찜 완료';
+            btn.textContent = '찜 해제';
             btn.classList.add('is-faved');
             showToast('💖 찜 목록에 추가되었습니다!');
           }
@@ -307,7 +307,7 @@
         btns.forEach(btn => {
           const mid = btn.getAttribute('data-fav-mate');
           if (favSet.has(mid)) {
-            btn.textContent = '찜 완료';
+            btn.textContent = '찜 해제';
             btn.classList.add('is-faved');
           } else {
             btn.textContent = 'お気に入り';
