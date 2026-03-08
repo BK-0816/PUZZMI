@@ -439,8 +439,8 @@
   <main class="favorites-wrap">
     <!-- 페이지 헤더 -->
     <section class="page-header">
-      <h2>💖 私のお気に入りのメイト</h2>
-      <p class="page-subtitle">お気に入りのメイトをチェックしてみてください！</p>
+      <h2>💖 お気に入りのメイト</h2>
+      <p class="page-subtitle">メイトをお気に入りに追加してみよう！</p>
     </section>
 
     <!-- 찜 목록 -->
@@ -584,7 +584,7 @@
                     </a>
                     <button class="btn btn-danger" data-unlike="${row.mate_id}">
                       <i class="fas fa-heart-broken"></i>
-                      蒸解剤
+                      お気に入りを解除
                     </button>
                   </div>
                 </div>
@@ -598,11 +598,11 @@
           btn.addEventListener('click', async () => {
             const mateId = btn.getAttribute('data-unlike');
             
-            if (!confirm('本当に蒸し物を解除しますか？')) return;
+            if (!confirm('本当にお気に入りを解除しますか？')) return;
             
             const originalText = btn.innerHTML;
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 처리중...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 処理中...';
             
             try {
               const { error } = await supabase
