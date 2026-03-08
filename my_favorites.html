@@ -526,11 +526,11 @@
           list.innerHTML = `
             <div class="empty-state">
               <div class="empty-icon">💔</div>
-              <div class="empty-text">気になるメイトがいません</div>
-              <div class="empty-subtext">お気に入りのメイトをチェックしてみてください！</div>
+              <div class="empty-text">気になるメイトがまだいません</div>
+              <div class="empty-subtext">お気に入りのメイトを追加しよう！</div>
               <a href="index.html#friends" class="empty-action">
                 <i class="fas fa-heart"></i>
-                メイト見学
+                メイトを見る
               </a>
             </div>
           `;
@@ -613,7 +613,7 @@
               
               if (error) throw error;
               
-              showToast('💔 蒸し物が解除されました');
+              showToast('💔 お気に入りが解除されました');
               await load(); // 목록 새로고침
               
             } catch (error) {
