@@ -1,14 +1,14 @@
 {
-  "name": "seoulddays",
+  "name": "PUZZMI",
   "version": "1.0.0",
-  "description": "SeoulDays - 서울 렌탈친구 서비스",
+  "description": "PUZZMI - 렌탈친구 서비스",
   "main": "index.html",
   "scripts": {
     "dev": "live-server --port=3000 --open=/",
     "start": "live-server --port=3000 --open=/"
   },
   "keywords": ["seoul", "rental-friend", "travel", "korea"],
-  "author": "SeoulDays",
+  "author": "PUZZMI",
   "license": "MIT",
   "devDependencies": {
     "live-server": "^1.2.2"

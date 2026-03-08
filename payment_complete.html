@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>お支払い完了 - PUZZMI</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="pages.css"/>
+  <link rel="stylesheet" href="pages-theme.css"/>
+  <style>
+    body {
+      background: var(--bg-cream, #faf9f7);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .complete-container {
+      max-width: 600px;
+      width: 100%;
+      margin: 40px auto;
+      padding: 20px;
+    }
+
+    .complete-card {
+      background: #fff;
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 28px;
+      padding: 60px 40px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+
+    .status-icon {
+      font-size: 4rem;
+      margin-bottom: 24px;
+    }
+
+    .status-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #1a1a1a;
+      margin-bottom: 16px;
+    }
+
+    .status-title.error {
+      color: #dc3545;
+    }
+
+    .status-message {
+      font-size: 1rem;
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+
+    .payment-info {
+      background: #f8f9fa;
+      border-radius: 16px;
+      padding: 24px;
+      margin: 30px 0;
+      text-align: left;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+    }
+
+    .info-label {
+      color: #666;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .info-value {
+      font-weight: 700;
+      color: #1a1a1a;
+      font-size: 0.9rem;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      padding: 16px 32px;
+      background: #1a1a1a;
+      color: white;
+      border: none;
+      border-radius: 16px;
+      font-size: 1rem;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      margin-top: 20px;
+    }
+
+    .btn-primary:hover {
+      background: #333;
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      border: 4px solid #e9ecef;
+      border-radius: 50%;
+      border-top-color: #1a1a1a;
+      animation: spin 1s ease-in-out infinite;
+      margin: 20px auto;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="complete-container">
+    <div class="complete-card" id="resultCard">
+      <div class="loading-spinner"></div>
+      <div class="status-message" id="loadingMessage">
+        お支払い結果を確認中...<br>
+        <small style="font-size:0.85rem; color:#999;">しばらくお待ちください</small>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+    var SUPABASE_URL = 'https://eevvgbbokenpjnvtmztk.supabase.co';
+    var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4';
+    var db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    function getParam(name) {
+      return new URLSearchParams(window.location.search).get(name);
+    }
+
+    function formatYen(amount) {
+      return new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY', maximumFractionDigits: 0 }).format(amount);
+    }
+
+    function getPayMethodName(method) {
+      var names = {
+        'CARD': 'クレジットカード',
+        'card': 'クレジットカード',
+        'VIRTUAL_ACCOUNT': '仮想口座',
+        'vbank': '仮想口座',
+        'CONVENIENCE_STORE': 'コンビニ決済',
+        'cvs': 'コンビニ決済',
+        'EASY_PAY': 'スマホ決済',
+        'paypay': 'PayPay',
+        'linepay': 'LINE Pay'
+      };
+      return names[method] || method || '-';
+    }
+
+    function showSuccess(payment) {
+      var resultCard = document.getElementById('resultCard');
+      resultCard.innerHTML =
+        '<div class="status-icon">&#x2705;</div>' +
+        '<div class="status-title">お支払いが完了しました</div>' +
+        '<div class="status-message">予約が確定されました。<br>ご利用ありがとうございます。</div>' +
+        '<div class="payment-info">' +
+          '<div class="info-row"><span class="info-label">決済番号</span><span class="info-value">' + payment.imp_uid + '</span></div>' +
+          '<div class="info-row"><span class="info-label">お支払い金額</span><span class="info-value">' + formatYen(payment.amount) + '</span></div>' +
+          '<div class="info-row"><span class="info-label">決済方法</span><span class="info-value">' + getPayMethodName(payment.pay_method) + '</span></div>' +
+          (payment.receipt_url ? '<div class="info-row"><span class="info-label">領収書</span><span class="info-value"><a href="' + payment.receipt_url + '" target="_blank" style="color:#1a1a1a;">表示する</a></span></div>' : '') +
+        '</div>' +
+        '<a href="my_bookings.html" class="btn-primary">予約リストを確認</a>';
+    }
+
+    function showError(message) {
+      var resultCard = document.getElementById('resultCard');
+      resultCard.innerHTML =
+        '<div class="status-icon">&#x274C;</div>' +
+        '<div class="status-title error">決済に失敗しました</div>' +
+        '<div class="status-message">' + message + '</div>' +
+        '<a href="my_bookings.html" class="btn-primary">予約リストに戻る</a>';
+    }
+
+    function waitForPayment(paymentId, retries) {
+      if (retries === undefined) retries = 0;
+      var MAX_RETRIES = 15;
+      var RETRY_INTERVAL = 2000;
+
+      db
+        .from('portone_payments')
+        .select('*')
+        .eq('imp_uid', paymentId)
+        .maybeSingle()
+        .then(function(result) {
+          var payment = result.data;
+          var error = result.error;
+
+          if (error) {
+            showError('決済情報の確認に失敗しました。');
+            return;
+          }
+
+          if (!payment) {
+            if (retries < MAX_RETRIES) {
+              setTimeout(function() { waitForPayment(paymentId, retries + 1); }, RETRY_INTERVAL);
+            } else {
+              showError('決済情報が見つかりません。');
+            }
+            return;
+          }
+
+          if (payment.status === 'paid') {
+            showSuccess(payment);
+            return;
+          }
+
+          if (payment.status === 'failed' || payment.status === 'cancelled') {
+            showError('決済に失敗しました。もう一度お試しください。');
+            return;
+          }
+
+          if (retries < MAX_RETRIES) {
+            var channel = db.channel('complete-' + paymentId);
+            channel
+              .on('postgres_changes', {
+                event: 'UPDATE',
+                schema: 'public',
+                table: 'portone_payments',
+                filter: 'imp_uid=eq.' + paymentId
+              }, function(payload) {
+                channel.unsubscribe();
+                if (payload.new.status === 'paid') {
+                  db.from('portone_payments').select('*').eq('imp_uid', paymentId).maybeSingle()
+                    .then(function(r) { if (r.data) showSuccess(r.data); else showError('決済情報の取得に失敗しました。'); });
+                } else {
+                  showError('決済に失敗しました。');
+                }
+              })
+              .subscribe();
+
+            setTimeout(function() {
+              channel.unsubscribe();
+              waitForPayment(paymentId, retries + 1);
+            }, RETRY_INTERVAL);
+          } else {
+            showError('決済の確認がタイムアウトしました。予約リストをご確認ください。');
+          }
+        });
+    }
+
+    function checkPaymentStatus() {
+      var paymentId = getParam('paymentId');
+      var code = getParam('code');
+      var message = getParam('message');
+
+      if (!paymentId) {
+        showError('決済情報が見つかりません。');
+        return;
+      }
+
+      if (code) {
+        showError(message || '決済に失敗しました。');
+        return;
+      }
+
+      waitForPayment(paymentId);
+    }
+
+    window.addEventListener('DOMContentLoaded', checkPaymentStatus);
+  </script>
+</body>
+</html>

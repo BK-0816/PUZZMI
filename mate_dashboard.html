@@ -757,6 +757,156 @@
       color: white;
       box-shadow: 0 2px 8px rgba(240, 147, 251, 0.3);
     }
+
+    /* 예약 액션 버튼 */
+    .booking-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(0,0,0,0.08);
+    }
+
+    .booking-actions .btn {
+      flex: 1;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-accept {
+      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    }
+
+    .btn-accept:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(40, 167, 69, 0.4);
+    }
+
+    .btn-decline {
+      background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+    }
+
+    .btn-decline:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(220, 53, 69, 0.4);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    /* 거절 사유 입력 모달 */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 20px;
+      padding: 32px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      animation: modalSlideIn 0.3s ease-out;
+    }
+
+    @keyframes modalSlideIn {
+      from {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .modal-content h3 {
+      margin: 0 0 20px 0;
+      font-size: 1.5rem;
+      color: #333;
+    }
+
+    .modal-content textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-family: inherit;
+      resize: vertical;
+      margin-bottom: 20px;
+      transition: border-color 0.3s;
+    }
+
+    .modal-content textarea:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .modal-actions .btn {
+      flex: 1;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-cancel-modal {
+      background: #e0e0e0;
+      color: #666;
+    }
+
+    .btn-cancel-modal:hover {
+      background: #d0d0d0;
+    }
+
+    .btn-submit-decline {
+      background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+      color: white;
+    }
+
+    .btn-submit-decline:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(220, 53, 69, 0.4);
+    }
     
     .booking-details {
       background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(240, 147, 251, 0.03) 100%);
@@ -919,7 +1069,19 @@
   </div>
 
   <div id="app-nav"></div>
-  
+
+  <!-- 거절 사유 모달 -->
+  <div id="declineModal" class="modal-overlay">
+    <div class="modal-content">
+      <h3>예약 거절 사유</h3>
+      <textarea id="declineReason" placeholder="거절 사유를 입력해주세요..."></textarea>
+      <div class="modal-actions">
+        <button class="btn btn-cancel-modal" onclick="closeDeclineModal()">취소</button>
+        <button class="btn btn-submit-decline" onclick="submitDecline()">거절하기</button>
+      </div>
+    </div>
+  </div>
+
   <main class="dashboard-wrap">
     <!-- 페이지 헤더 -->
     <section class="page-header">
@@ -1468,6 +1630,24 @@
               ${booking.notes.replace(/</g,'&lt;')}
             </div>
           ` : ''}
+
+          ${booking.status === 'pending' ? `
+            <div class="booking-actions">
+              <button class="btn btn-accept" onclick="acceptBooking(${booking.id})">
+                <i class="fas fa-check"></i> 예약 수락
+              </button>
+              <button class="btn btn-decline" onclick="openDeclineModal(${booking.id})">
+                <i class="fas fa-times"></i> 예약 거절
+              </button>
+            </div>
+          ` : ''}
+
+          ${booking.status === 'declined' && booking.decline_reason ? `
+            <div class="booking-notes" style="border-left: 3px solid #dc3545;">
+              <strong>🚫 거절 사유:</strong><br>
+              ${booking.decline_reason.replace(/</g,'&lt;')}
+            </div>
+          ` : ''}
         </div>
       `;
     }).join('');
@@ -1596,7 +1776,78 @@
     });
   });
 
-  // 8) 실시간 업데이트
+  // 8) 예약 수락/거절 함수들
+  let currentBookingId = null;
+
+  window.acceptBooking = async function(bookingId) {
+    if (!confirm('이 예약을 수락하시겠습니까?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('bookings')
+        .update({ status: 'confirmed' })
+        .eq('id', bookingId)
+        .eq('mate_id', user.id);
+
+      if (error) throw error;
+
+      alert('예약이 수락되었습니다!');
+      await load();
+    } catch (error) {
+      console.error('예약 수락 실패:', error);
+      alert('예약 수락에 실패했습니다: ' + error.message);
+    }
+  };
+
+  window.openDeclineModal = function(bookingId) {
+    currentBookingId = bookingId;
+    document.getElementById('declineModal').classList.add('active');
+    document.getElementById('declineReason').value = '';
+    document.getElementById('declineReason').focus();
+  };
+
+  window.closeDeclineModal = function() {
+    currentBookingId = null;
+    document.getElementById('declineModal').classList.remove('active');
+  };
+
+  window.submitDecline = async function() {
+    const reason = document.getElementById('declineReason').value.trim();
+
+    if (!reason) {
+      alert('거절 사유를 입력해주세요.');
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('bookings')
+        .update({
+          status: 'declined',
+          decline_reason: reason,
+          declined_at: new Date().toISOString()
+        })
+        .eq('id', currentBookingId)
+        .eq('mate_id', user.id);
+
+      if (error) throw error;
+
+      alert('예약이 거절되었습니다.');
+      closeDeclineModal();
+      await load();
+    } catch (error) {
+      console.error('예약 거절 실패:', error);
+      alert('예약 거절에 실패했습니다: ' + error.message);
+    }
+  };
+
+  document.getElementById('declineModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeDeclineModal();
+    }
+  });
+
+  // 9) 실시간 업데이트
   const channel = supabase
     .channel('mate-bookings')
     .on('postgres_changes', {
