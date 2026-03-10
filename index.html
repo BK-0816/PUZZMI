@@ -86,7 +86,6 @@
         const age    = row.profiles?.age ? `${row.profiles.age}才` : "";
         const gender = row.profiles?.gender ?? "";
         const langs  = Array.isArray(row.profiles?.languages) ? row.profiles.languages : [];
-        const gIcon  = genderIcon(gender);
 
         const keys   = Array.isArray(row.photos) ? row.photos : [];
         const cover  = row.primary_photo || keys[0] || row.profiles?.avatar_url || "https://picsum.photos/seed/puzzmi/400/300";
