@@ -83,7 +83,7 @@
       // 카드 렌더
       function renderCard(row) {
         const name   = row.profiles?.full_name ?? "이름 비공개";
-        const age    = row.profiles?.age ? `${row.profiles.age}세` : "";
+        const age    = row.profiles?.age ? `${row.profiles.age}才` : "";
         const gender = row.profiles?.gender ?? "";
         const langs  = Array.isArray(row.profiles?.languages) ? row.profiles.languages : [];
         const gIcon  = genderIcon(gender);
@@ -93,7 +93,6 @@
         const img    = cover.startsWith("http") ? cover : keyToUrl(cover);
 
         const priceJpy = new Intl.NumberFormat("ja-JP", { style: "currency", currency: "JPY", maximumFractionDigits: 0 }).format(4000);
-        const tagsTxt  = (row.tags ?? []).slice(0,3).join(", ") || "서울 투어";
         const subline  = [gIcon, age].filter(Boolean).join(" • ");
 
         const card = document.createElement("div");
