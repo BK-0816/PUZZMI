@@ -92,7 +92,7 @@
         const img    = cover.startsWith("http") ? cover : keyToUrl(cover);
 
         const priceJpy = new Intl.NumberFormat("ja-JP", { style: "currency", currency: "JPY", maximumFractionDigits: 0 }).format(4000);
-        const subline  = [gIcon, age].filter(Boolean).join(" • ");
+        const subline  = [gender, age].filter(Boolean).join(" • ");
 
         const tagsList = Array.isArray(row.tags) ? row.tags : [];
         const tagsTxt  = tagsList.length > 0 ? tagsList.map(t => `#${t}`).join(" ") : "";
