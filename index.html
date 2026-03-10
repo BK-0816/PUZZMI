@@ -71,7 +71,7 @@
         const pure = key.startsWith("mates/") ? key.replace(/^mates\//,"") : key;
         return supabase.storage.from("mates").getPublicUrl(pure).data.publicUrl;
       }
-
+/*
       // 성별 → 기호
       function genderIcon(gender) {
         const g = (gender || "").toString().trim().toLowerCase();
@@ -79,7 +79,7 @@
         if (["male","m","남","남자","man","남성"].includes(g))   return "♂";
         return "⚧";
       }
-
+*/
       // 카드 렌더
       function renderCard(row) {
         const name   = row.profiles?.full_name ?? "이름 비공개";
@@ -97,7 +97,7 @@
 
         const tagsList = Array.isArray(row.tags) ? row.tags : [];
         const tagsTxt  = tagsList.length > 0 ? tagsList.map(t => `#${t}`).join(" ") : "";
-        
+
         const card = document.createElement("div");
         card.className = "friend-card";
         card.innerHTML = `
