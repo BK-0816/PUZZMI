@@ -1083,7 +1083,7 @@
         avatarEl.src = coverPhoto;
         nameEl.textContent = p.full_name || '이름 비공개';
         
-        const age = p.age ? `${p.age}歳` : '';
+        const age = p.age ? `${p.age}才` : '';
         const gender = p.gender || '';
         const rating = data.rating ? `⭐ ${data.rating}` : '';
         const langs = Array.isArray(p.languages) ? p.languages.join(', ') : '';
