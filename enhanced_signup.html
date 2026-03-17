@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ja">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>PUZZMI - 회원가입</title>
+  <title>PUZZMI - 会員登録</title>
   <link rel="stylesheet" href="styles.css"/>
   <link rel="stylesheet" href="pages.css"/>
   <link rel="stylesheet" href="pages-theme.css"/>
@@ -20,49 +20,14 @@
     
     /* 배경 장식 요소 */
     .decorative-bg {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 0;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0;
     }
-    
     .decorative-element {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(60px);
-      opacity: 0.25;
-      animation: float 12s ease-in-out infinite;
+      position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.25; animation: float 12s ease-in-out infinite;
     }
-    
-    .decorative-element:nth-child(1) {
-      width: 300px;
-      height: 300px;
-      background: linear-gradient(45deg, #667eea, #764ba2);
-      top: 10%;
-      left: -5%;
-      animation-delay: 0s;
-    }
-    
-    .decorative-element:nth-child(2) {
-      width: 250px;
-      height: 250px;
-      background: linear-gradient(45deg, #f093fb, #f5576c);
-      top: 50%;
-      right: -8%;
-      animation-delay: 4s;
-    }
-    
-    .decorative-element:nth-child(3) {
-      width: 200px;
-      height: 200px;
-      background: linear-gradient(45deg, #4facfe, #00f2fe);
-      bottom: 15%;
-      left: 10%;
-      animation-delay: 8s;
-    }
+    .decorative-element:nth-child(1) { width: 300px; height: 300px; background: linear-gradient(45deg, #667eea, #764ba2); top: 10%; left: -5%; animation-delay: 0s; }
+    .decorative-element:nth-child(2) { width: 250px; height: 250px; background: linear-gradient(45deg, #f093fb, #f5576c); top: 50%; right: -8%; animation-delay: 4s; }
+    .decorative-element:nth-child(3) { width: 200px; height: 200px; background: linear-gradient(45deg, #4facfe, #00f2fe); bottom: 15%; left: 10%; animation-delay: 8s; }
     
     @keyframes float {
       0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
@@ -73,14 +38,9 @@
     
     /* 메인 컨테이너 */
     .signup-container {
-      max-width: 600px;
-      margin: 40px auto;
-      padding: 0 20px;
-      position: relative;
-      z-index: 1;
+      max-width: 650px; margin: 40px auto; padding: 0 20px; position: relative; z-index: 1;
     }
     
-    /* 메인 카드 */
     .signup-card {
       background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
       backdrop-filter: blur(25px);
@@ -88,17 +48,11 @@
       border-radius: 28px;
       padding: 50px;
       box-shadow: 0 30px 80px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.04);
-      position: relative;
-      overflow: hidden;
+      position: relative; overflow: hidden;
     }
     
     .signup-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 6px;
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px;
       background: linear-gradient(90deg, #667eea 0%, #764ba2 20%, #f093fb 40%, #f5576c 60%, #4facfe 80%, #00f2fe 100%);
       animation: shimmer 4s ease-in-out infinite;
     }
@@ -109,776 +63,120 @@
     }
     
     /* 헤더 */
-    .signup-header {
-      text-align: center;
-      margin-bottom: 40px;
-    }
-    
+    .signup-header { text-align: center; margin-bottom: 30px; }
     .signup-title {
-      font-size: 2.8rem;
-      font-weight: 900;
+      font-size: 2.5rem; font-weight: 900;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin: 0 0 16px 0;
-      letter-spacing: -0.03em;
-      position: relative;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin: 0 0 16px 0; letter-spacing: -0.03em; position: relative;
     }
+    .signup-subtitle { color: var(--text-secondary); font-size: 1.1rem; line-height: 1.6; margin: 0; font-weight: 500; }
     
-    .signup-title::after {
-      content: '';
-      position: absolute;
-      bottom: -12px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80px;
-      height: 4px;
-      background: linear-gradient(90deg, #667eea 0%, #f093fb 100%);
-      border-radius: 2px;
-    }
-    
-    .signup-subtitle {
-      color: var(--text-secondary);
-      font-size: 1.2rem;
-      line-height: 1.6;
-      margin: 0;
-      font-weight: 500;
-    }
-    
-    /* 단계 표시 */
+    /* 단계 표시 (4 Steps) */
     .step-indicator {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 16px;
-      margin: 32px 0;
-      padding: 20px;
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(240, 147, 251, 0.03) 100%);
-      border-radius: 16px;
-      border: 2px solid rgba(102, 126, 234, 0.2);
+      display: flex; justify-content: space-between; align-items: center; margin: 0 0 32px 0;
+      padding: 16px 24px; background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(240, 147, 251, 0.03) 100%);
+      border-radius: 16px; border: 2px solid rgba(102, 126, 234, 0.1);
     }
     
     .step {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-weight: 600;
-      font-size: 0.9rem;
-      transition: all 0.3s ease;
+      display: flex; flex-direction: column; align-items: center; gap: 6px; font-weight: 600; font-size: 0.8rem;
+      transition: all 0.3s ease; flex: 1; text-align: center; position: relative; color: var(--text-secondary); opacity: 0.6;
     }
+    .step i { font-size: 1.2rem; margin-bottom: 4px; }
     
-    .step.active {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    .step.active { color: #667eea; opacity: 1; transform: scale(1.05); }
+    .step.completed { color: #28a745; opacity: 1; }
+    
+    .step:not(:last-child)::after {
+      content: ''; position: absolute; right: -50%; top: 30%; width: 100%; height: 2px;
+      background: rgba(102, 126, 234, 0.2); z-index: -1;
     }
+    .step.completed:not(:last-child)::after { background: #28a745; }
     
-    .step.completed {
-      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-      color: white;
-      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
-    }
+    /* 폼 공통 */
+    .form-grid { display: grid; gap: 24px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .form-row.single { grid-template-columns: 1fr; }
     
-    .step.inactive {
-      background: rgba(255,255,255,0.6);
-      color: var(--text-secondary);
-    }
-    
-    .step-arrow {
-      color: var(--text-secondary);
-      font-size: 1.2rem;
-    }
-    
-    /* 폼 그리드 */
-    .form-grid {
-      display: grid;
-      gap: 24px;
-    }
-    
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-    
-    .form-row.single {
-      grid-template-columns: 1fr;
-    }
-    
-    .form-field {
-      position: relative;
-    }
-    
+    .form-field { position: relative; }
     .form-label {
-      display: block;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 8px;
-      font-size: 0.95rem;
-      letter-spacing: 0.3px;
-      text-transform: uppercase;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      display: block; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; font-size: 0.95rem;
+      text-transform: uppercase; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
     }
+    .form-label.required::after { content: ' *'; color: #f5576c; font-weight: 800; }
     
-    .form-label.required::after {
-      content: ' *';
-      color: #f5576c;
-      font-weight: 800;
-    }
-    
-    .form-input, .form-select, .form-textarea {
-      width: 100%;
-      padding: 16px 20px;
-      border: 2px solid rgba(102, 126, 234, 0.2);
-      border-radius: 12px;
+    .form-input, .form-select {
+      width: 100%; padding: 16px 20px; border: 2px solid rgba(102, 126, 234, 0.2); border-radius: 12px;
       background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
-      font-family: inherit;
-      font-size: 1rem;
-      transition: all 0.3s ease;
-      backdrop-filter: blur(8px);
-      box-shadow: inset 0 2px 8px rgba(0,0,0,0.04);
+      font-family: inherit; font-size: 1rem; transition: all 0.3s ease; box-shadow: inset 0 2px 8px rgba(0,0,0,0.04);
     }
-    
-    .form-input:focus, .form-select:focus, .form-textarea:focus {
-      outline: none;
-      border-color: rgba(102, 126, 234, 0.5);
-      background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.95) 100%);
-      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1), inset 0 2px 12px rgba(0,0,0,0.06);
-      transform: translateY(-1px);
-    }
-    
-    .form-input::placeholder, .form-textarea::placeholder {
-      color: rgba(102, 126, 234, 0.5);
-      font-style: italic;
-    }
-    
-    /* 이메일 인증 섹션 */
-    .email-verification-section {
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(240, 147, 251, 0.05) 100%);
-      border: 2px solid rgba(102, 126, 234, 0.2);
-      border-radius: 20px;
-      padding: 32px;
-      margin: 24px 0;
-      backdrop-filter: blur(8px);
-      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.1);
-      display: none;
-      animation: slideIn 0.5s ease;
-    }
-    
-    .email-verification-section.show {
-      display: block;
-    }
-    
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    .verification-header {
-      text-align: center;
-      margin-bottom: 24px;
-    }
-    
-    .verification-header h4 {
-      font-size: 1.4rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin: 0 0 12px 0;
-    }
-    
-    .verification-header p {
-      color: var(--text-secondary);
-      font-size: 1rem;
-      line-height: 1.6;
-      margin: 0;
-    }
-    
-    .verification-email-display {
-      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
-      border: 2px solid rgba(102, 126, 234, 0.3);
-      border-radius: 12px;
-      padding: 16px 20px;
-      margin: 20px 0;
-      text-align: center;
-      font-weight: 700;
-      color: #667eea;
-      font-size: 1.1rem;
-      word-break: break-all;
-      backdrop-filter: blur(6px);
-    }
-    
-    .verification-code-input {
-      text-align: center;
-      font-size: 1.5rem;
-      font-weight: 700;
-      letter-spacing: 4px;
-      font-family: 'Courier New', monospace;
-      background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 100%);
-      border: 3px solid rgba(102, 126, 234, 0.3);
-      border-radius: 16px;
-      padding: 20px;
-      margin: 20px 0;
-    }
-    
-    .verification-code-input:focus {
-      border-color: rgba(102, 126, 234, 0.6);
-      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
-    }
-    
-    .verification-actions {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin: 24px 0;
-    }
-    
-    /* 체크박스 그룹 */
-    .checkbox-group {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      padding: 16px;
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(240, 147, 251, 0.03) 100%);
-      border: 2px solid rgba(102, 126, 234, 0.2);
-      border-radius: 12px;
-    }
-    
-    .checkbox-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-      padding: 12px 16px;
-      background: linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.6) 100%);
-      border-radius: 8px;
-      transition: all 0.3s ease;
-    }
-    
-    .checkbox-item:hover {
-      background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 100%);
-      transform: translateY(-1px);
-    }
-    
-    .checkbox-item input[type="checkbox"] {
-      width: 20px;
-      height: 20px;
-      border: 2px solid rgba(102, 126, 234, 0.3);
-      border-radius: 4px;
-      background: white;
-      cursor: pointer;
-      position: relative;
-      appearance: none;
-    }
-    
-    .checkbox-item input[type="checkbox"]:checked {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border-color: transparent;
-    }
-    
-    .checkbox-item input[type="checkbox"]:checked::after {
-      content: '✓';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      color: white;
-      font-weight: 800;
-      font-size: 12px;
+    .form-input:focus, .form-select:focus {
+      outline: none; border-color: rgba(102, 126, 234, 0.5); background: #fff;
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1), inset 0 2px 12px rgba(0,0,0,0.06); transform: translateY(-1px);
     }
     
     /* 버튼 */
     .btn {
-      padding: 16px 32px;
-      border-radius: 12px;
-      font-weight: 700;
-      font-size: 1rem;
-      border: none;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-      letter-spacing: 0.3px;
+      padding: 16px 32px; border-radius: 12px; font-weight: 700; font-size: 1rem; border: none; cursor: pointer;
+      transition: all 0.3s ease; text-align: center; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;
     }
+    .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3); }
+    .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(102, 126, 234, 0.4); }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-secondary { background: rgba(102, 126, 234, 0.1); color: #667eea; border: 2px solid rgba(102, 126, 234, 0.2); }
+    .btn-secondary:hover { background: rgba(102, 126, 234, 0.2); transform: translateY(-2px); }
+    .btn-line { background: linear-gradient(135deg, #00C300 0%, #00B900 100%); color: white; box-shadow: 0 8px 20px rgba(0, 195, 0, 0.3); }
     
-    .btn::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-      transition: left 0.5s ease;
-    }
+    /* 섹션 전환 */
+    .step-section { display: none; animation: fadeIn 0.4s ease; }
+    .step-section.active { display: block; }
     
-    .btn:hover::before {
-      left: 100%;
-    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     
-    .btn-primary {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
-      width: 100%;
+    /* 약관 동의 */
+    .terms-box { background: rgba(102, 126, 234, 0.05); border: 1px solid rgba(102, 126, 234, 0.2); border-radius: 16px; padding: 24px; margin-top: 10px; }
+    .terms-item { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px; cursor: pointer; }
+    .terms-item:last-child { margin-bottom: 0; }
+    .terms-item.all-agree { border-bottom: 2px solid rgba(102, 126, 234, 0.2); padding-bottom: 16px; margin-bottom: 20px; font-weight: 800; font-size: 1.1rem; }
+    .terms-item input { display: none; }
+    .checkmark {
+      width: 22px; height: 22px; border: 2px solid rgba(102, 126, 234, 0.4); border-radius: 6px; background: #fff;
+      display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s ease;
     }
-    
-    .btn-primary:hover {
-      transform: translateY(-2px) scale(1.02);
-      box-shadow: 0 12px 28px rgba(102, 126, 234, 0.4);
+    .terms-item input:checked + .checkmark { background: #667eea; border-color: #667eea; }
+    .terms-item input:checked + .checkmark::after { content: '✓'; color: white; font-weight: bold; font-size: 14px; }
+    .terms-text { font-size: 0.95rem; color: var(--text-primary); line-height: 1.4; }
+    .terms-subtext { display: block; font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px; }
+    .terms-link { color: #667eea; text-decoration: underline; font-size: 0.85rem; margin-left: 8px; }
+
+    /* 이메일 인증 */
+    .verification-code-input {
+      text-align: center; font-size: 1.8rem; font-weight: 700; letter-spacing: 8px; padding: 20px;
+      font-family: 'Courier New', monospace; border: 3px solid rgba(102, 126, 234, 0.3); border-radius: 16px; margin: 20px 0;
     }
-    
-    .btn-primary:disabled {
-      opacity: 0.6;
-      transform: none;
-      cursor: not-allowed;
-    }
-    
-    .btn-secondary {
-      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
-      color: var(--text-primary);
-      border: 2px solid rgba(102, 126, 234, 0.2);
-      backdrop-filter: blur(8px);
-    }
-    
-    .btn-secondary:hover {
-      background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 100%);
-      transform: translateY(-2px) scale(1.02);
-      border-color: rgba(102, 126, 234, 0.4);
-    }
-    
-    .btn-line {
-      background: linear-gradient(135deg, #00C300 0%, #00B900 100%);
-      color: white;
-      box-shadow: 0 8px 20px rgba(0, 195, 0, 0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      font-size: 1.1rem;
-    }
-    
-    .btn-line:hover {
-      transform: translateY(-2px) scale(1.02);
-      box-shadow: 0 12px 28px rgba(0, 195, 0, 0.4);
-    }
-    
-    /* 메시지 */
-    .success {
-      background: linear-gradient(135deg, #d1f2eb 0%, #a3e4d7 100%);
-      color: #0e6b47;
-      padding: 16px 20px;
-      border-radius: 12px;
-      border: 2px solid rgba(25, 135, 84, 0.3);
-      font-weight: 600;
-      box-shadow: 0 4px 12px rgba(25, 135, 84, 0.2);
-      margin: 16px 0;
-    }
-    
-    .error {
-      background: linear-gradient(135deg, #fadbd8 0%, #f1948a 100%);
-      color: #922b21;
-      padding: 16px 20px;
-      border-radius: 12px;
-      border: 2px solid rgba(220, 53, 69, 0.3);
-      font-weight: 600;
-      box-shadow: 0 4px 12px rgba(220, 53, 69, 0.2);
-      margin: 16px 0;
-    }
-    
-    .help-text {
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.03) 100%);
-      border: 1px solid rgba(102, 126, 234, 0.2);
-      padding: 12px 16px;
-      border-radius: 8px;
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-      line-height: 1.5;
-      margin-top: 8px;
-    }
+    .edit-email-btn { background: none; border: none; color: #f5576c; text-decoration: underline; cursor: pointer; font-size: 0.9rem; margin-top: 10px; }
+
+    /* 로딩, 메시지 */
+    .loading { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .msg-box { padding: 12px 16px; border-radius: 12px; margin: 16px 0; font-weight: 600; font-size: 0.95rem; display: none; }
+    .msg-error { background: #fadbd8; color: #922b21; border: 1px solid #f1948a; display: block; }
+    .msg-success { background: #d1f2eb; color: #0e6b47; border: 1px solid #a3e4d7; display: block; }
+
+    /* 언어 선택 (프로필) */
+    .checkbox-group { display: flex; flex-direction: column; gap: 10px; padding: 16px; background: rgba(102,126,234,0.05); border-radius: 12px; border: 1px solid rgba(102,126,234,0.2); }
+    .lang-item { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+    .lang-item input { width: 18px; height: 18px; accent-color: #667eea; }
     
     /* 완료 섹션 */
-    .completion-section {
-      text-align: center;
-      padding: 40px 20px;
-      display: none;
-    }
-    
-    .completion-section.show {
-      display: block;
-      animation: slideIn 0.5s ease;
-    }
-    
-    .completion-icon {
-      font-size: 5rem;
-      margin-bottom: 24px;
-      animation: bounce 2s ease-in-out infinite;
-    }
-    
-    @keyframes bounce {
-      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-      40% { transform: translateY(-10px); }
-      60% { transform: translateY(-5px); }
-    }
-    
-    .completion-title {
-      font-size: 2.5rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, #28a745 0%, #20c997 50%, #667eea 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 16px;
-    }
-    
-    .completion-message {
-      font-size: 1.2rem;
-      color: var(--text-secondary);
-      line-height: 1.6;
-      margin-bottom: 32px;
-    }
-    
-    /* LINE 연동 섹션 */
-    .line-connect-section {
-      background: linear-gradient(135deg, rgba(0, 195, 0, 0.05) 0%, rgba(0, 185, 0, 0.03) 100%);
-      border: 2px solid rgba(0, 195, 0, 0.2);
-      border-radius: 16px;
-      padding: 32px;
-      text-align: center;
-      margin: 32px 0;
-    }
-    
-    .line-icon {
-      font-size: 4rem;
-      margin-bottom: 16px;
-      color: #00C300;
-    }
-    
-    .line-title {
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: var(--text-primary);
-      margin-bottom: 12px;
-    }
-    
-    .line-description {
-      color: var(--text-secondary);
-      font-size: 1rem;
-      line-height: 1.6;
-      margin-bottom: 24px;
-    }
-    
-    /* 반응형 디자인 */
-    @media (max-width: 768px) {
-      .signup-container {
-        margin: 20px auto;
-        padding: 0 16px;
-      }
-      
-      .signup-card {
-        padding: 32px 24px;
-        border-radius: 20px;
-      }
-      
-      .signup-title {
-        font-size: 2.2rem;
-      }
-      
-      .form-row {
-        grid-template-columns: 1fr;
-        gap: 16px;
-      }
-      
-      .verification-actions {
-        flex-direction: column;
-      }
-      
-      .btn {
-        width: 100%;
-        justify-content: center;
-      }
-      
-      .step-indicator {
-        flex-direction: column;
-        gap: 8px;
-      }
-      
-      .step-arrow {
-        transform: rotate(90deg);
-      }
-    }
-    
-    /* 로딩 애니메이션 */
-    .loading {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(255,255,255,0.3);
-      border-radius: 50%;
-      border-top-color: #fff;
-      animation: spin 1s ease-in-out infinite;
-    }
-    
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    
-    /* 숨김 상태 */
-    .hidden { display: none !important; }
-    
-    /* 약관 동의 섹션 */
-    .terms-agreement-section {
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(240, 147, 251, 0.05) 100%);
-      border: 2px solid rgba(102, 126, 234, 0.2);
-      border-radius: 20px;
-      padding: 32px;
-      margin: 32px 0;
-      backdrop-filter: blur(8px);
-      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.1);
-    }
-    
-    .terms-title {
-      font-size: 1.4rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin: 0 0 12px 0;
-      text-align: center;
-    }
-    
-    .terms-subtitle {
-      color: var(--text-secondary);
-      font-size: 1rem;
-      text-align: center;
-      margin: 0 0 24px 0;
-      line-height: 1.6;
-    }
-    
-    .terms-checkboxes {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-    
-    .terms-checkbox-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 16px;
-      cursor: pointer;
-      padding: 20px;
-      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
-      border: 2px solid rgba(255,255,255,0.4);
-      border-radius: 16px;
-      transition: all 0.3s ease;
-      backdrop-filter: blur(8px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .terms-checkbox-item::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
-      transition: left 0.5s ease;
-    }
-    
-    .terms-checkbox-item:hover::before {
-      left: 100%;
-    }
-    
-    .terms-checkbox-item:hover {
-      background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 100%);
-      border-color: rgba(102, 126, 234, 0.4);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-    }
-    
-    .terms-checkbox-item.required::after {
-      content: '*';
-      position: absolute;
-      top: 12px;
-      right: 16px;
-      color: #f5576c;
-      font-size: 1.5rem;
-      font-weight: 800;
-    }
-    
-    .terms-checkbox-item input[type="checkbox"] {
-      display: none;
-    }
-    
-    .checkmark {
-      width: 24px;
-      height: 24px;
-      border: 3px solid rgba(102, 126, 234, 0.3);
-      border-radius: 8px;
-      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
-      position: relative;
-      transition: all 0.3s ease;
-      flex-shrink: 0;
-      margin-top: 2px;
-      backdrop-filter: blur(6px);
-    }
-    
-    .terms-checkbox-item:hover .checkmark {
-      border-color: rgba(102, 126, 234, 0.5);
-      background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 100%);
-      transform: scale(1.05);
-    }
-    
-    .terms-checkbox-item input[type="checkbox"]:checked + .checkmark {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border-color: transparent;
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-    }
-    
-    .terms-checkbox-item input[type="checkbox"]:checked + .checkmark::after {
-      content: '✓';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      color: white;
-      font-weight: 800;
-      font-size: 16px;
-    }
-    
-    .checkbox-text {
-      flex: 1;
-      line-height: 1.6;
-    }
-    
-    .checkbox-text strong {
-      display: block;
-      color: var(--text-primary);
-      font-size: 1rem;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-    
-    .checkbox-subtext {
-      display: block;
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-      font-style: italic;
-      margin-bottom: 8px;
-    }
-    
-    .terms-link {
-      color: #667eea;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 0.9rem;
-      padding: 4px 8px;
-      border-radius: 8px;
-      background: rgba(102, 126, 234, 0.1);
-      transition: all 0.3s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-    
-    .terms-link:hover {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-    }
-    
-    .privacy-details {
-      background: rgba(255,255,255,0.8);
-      border: 1px solid rgba(102, 126, 234, 0.2);
-      border-radius: 8px;
-      padding: 12px;
-      margin-top: 8px;
-      font-size: 0.85rem;
-      line-height: 1.5;
-      color: var(--text-primary);
-    }
-    
-    .terms-notice {
-      background: linear-gradient(135deg, rgba(245, 87, 108, 0.1) 0%, rgba(240, 147, 251, 0.05) 100%);
-      border: 2px solid rgba(245, 87, 108, 0.2);
-      border-radius: 12px;
-      padding: 16px 20px;
-      margin-top: 24px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      color: #f5576c;
-      font-weight: 600;
-      font-size: 1rem;
-    }
-    
-    .terms-notice i {
-      font-size: 1.2rem;
-      flex-shrink: 0;
-    }
-    
-    /* 제출 버튼 비활성화 상태 */
-    .btn-primary:disabled {
-      background: linear-gradient(135deg, rgba(200, 200, 200, 0.8) 0%, rgba(180, 180, 180, 0.6) 100%);
-      color: rgba(255, 255, 255, 0.7);
-      cursor: not-allowed;
-      transform: none !important;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-    
-    .btn-primary:disabled:hover {
-      transform: none !important;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
-    }
-    
-    /* 반응형 디자인 */
-    @media (max-width: 768px) {
-      .terms-agreement-section {
-        padding: 24px;
-        border-radius: 16px;
-      }
-      
-      .terms-checkbox-item {
-        padding: 16px;
-        border-radius: 12px;
-      }
-      
-      .checkbox-text strong {
-        font-size: 0.95rem;
-      }
-      
-      .checkbox-subtext {
-        font-size: 0.85rem;
-      }
-      
-      .privacy-details {
-        font-size: 0.8rem;
-      }
-    }
+    .completion-icon { font-size: 5rem; margin-bottom: 24px; animation: bounce 2s ease-in-out infinite; text-align: center;}
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
   </style>
 </head>
 <body class="bg-cream">
-  <!-- 배경 장식 요소 -->
   <div class="decorative-bg">
     <div class="decorative-element"></div>
     <div class="decorative-element"></div>
@@ -887,299 +185,212 @@
 
   <main class="signup-container">
     <section class="signup-card">
-      <!-- 헤더 -->
+      
       <div class="signup-header">
         <h1 class="signup-title">PUZZMI 会員登録</h1>
         <p class="signup-subtitle">特別な旅行のための第一歩を始めてみてください！</p>
       </div>
 
-      <!-- 단계 표시 -->
       <div class="step-indicator">
-        <div class="step active" id="step1">
-          <i class="fas fa-user"></i>
-          <span>基本情報</span>
-        </div>
-        <div class="step-arrow">→</div>
-        <div class="step inactive" id="step2">
-          <i class="fas fa-envelope"></i>
-          <span>Eメール認証</span>
-        </div>
-        <div class="step-arrow">→</div>
-        <div class="step inactive" id="step3">
-          <i class="fas fa-check-circle"></i>
-          <span>登録完了</span>
+        <div class="step active" id="ind-1"><i class="fas fa-lock"></i><span>アカウント</span></div>
+        <div class="step inactive" id="ind-2"><i class="fas fa-envelope"></i><span>認証</span></div>
+        <div class="step inactive" id="ind-3"><i class="fas fa-user"></i><span>プロフィール</span></div>
+        <div class="step inactive" id="ind-4"><i class="fas fa-check-circle"></i><span>完了</span></div>
+      </div>
+
+      <div id="step1-section" class="step-section active">
+        <form id="formStep1" class="form-grid">
+          <div class="form-row single">
+            <div class="form-field">
+              <label class="form-label required">E-MAIL</label>
+              <input class="form-input" type="email" id="email" required placeholder="example@email.com"/>
+            </div>
+            <div class="form-field">
+              <label class="form-label required">パスワード (8文字以上)</label>
+              <input class="form-input" type="password" id="password" required minlength="8" placeholder="パスワードを入力してください"/>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label class="form-label required">利用規約の同意</label>
+            <div class="terms-box">
+              
+              <label class="terms-item all-agree">
+                <input type="checkbox" id="agreeAll">
+                <span class="checkmark"></span>
+                <span class="terms-text"><strong>すべての利用規約に同意する</strong><br><span style="font-size:0.85rem; color:#666; font-weight:normal;">(모든 필수 약관에 동의합니다)</span></span>
+              </label>
+
+              <label class="terms-item">
+                <input type="checkbox" class="term-check" id="ageConsent" required>
+                <span class="checkmark"></span>
+                <span class="terms-text">私は18歳以上です。<span class="terms-subtext">만 18세 이상입니다.</span></span>
+              </label>
+              
+              <label class="terms-item">
+                <input type="checkbox" class="term-check" id="passportConsent" required>
+                <span class="checkmark"></span>
+                <span class="terms-text">現地でのパスポート確認に同意します。<span class="terms-subtext">현장 여권 실물 확인에 동의합니다.</span></span>
+              </label>
+
+              <label class="terms-item">
+                <input type="checkbox" class="term-check" id="termsConsent" required>
+                <span class="checkmark"></span>
+                <span class="terms-text">利用規約に同意します。<a href="terms_of_service.html" target="_blank" class="terms-link">確認</a></span>
+              </label>
+
+              <label class="terms-item">
+                <input type="checkbox" class="term-check" id="refundConsent" required>
+                <span class="checkmark"></span>
+                <span class="terms-text">返金・キャンセルポリシーに同意します。<a href="refund_policy.html" target="_blank" class="terms-link">確認</a></span>
+              </label>
+
+              <label class="terms-item">
+                <input type="checkbox" class="term-check" id="coolingOffConsent" required>
+                <span class="checkmark"></span>
+                <span class="terms-text">クーリングオフ適用外事項に同意します。</span>
+              </label>
+
+              <label class="terms-item">
+                <input type="checkbox" class="term-check" id="privacyConsent" required>
+                <span class="checkmark"></span>
+                <span class="terms-text">個人情報の収集・利用に同意します。<a href="privacy_policy.html" target="_blank" class="terms-link">確認</a></span>
+              </label>
+
+              <label class="terms-item">
+                <input type="checkbox" class="term-check" id="transferConsent" required>
+                <span class="checkmark"></span>
+                <span class="terms-text">個人情報の国外移転・第三者提供に同意します。</span>
+              </label>
+
+              <label class="terms-item">
+                <input type="checkbox" class="term-check" id="lineNotificationConsent" required>
+                <span class="checkmark"></span>
+                <span class="terms-text">LINEでの通知受信に同意します。</span>
+              </label>
+            </div>
+          </div>
+
+          <div id="step1-msg" class="msg-box"></div>
+          <button type="submit" class="btn btn-primary" id="btnStep1" disabled>
+            📧 認証番号を受け取る (次へ)
+          </button>
+        </form>
+        
+        <div style="text-align: center; margin-top: 24px;">
+          <a href="auth_combo.html" style="color: #667eea; font-weight: 600; text-decoration: none;">すでにアカウントをお持ちですか？ ログインする →</a>
         </div>
       </div>
 
-      <!-- 회원가입 폼 -->
-      <div id="signupFormSection">
-        <form class="form-grid" id="signupForm">
-          <!-- 기본정보 -->
+      <div id="step2-section" class="step-section">
+        <div style="text-align: center; margin-bottom: 24px;">
+          <h3 style="color:#667eea; margin-bottom: 8px;">📧 Eメール認証</h3>
+          <p style="color:#666; font-size:0.95rem;">入力されたメールアドレスに6桁の認証番号を送信しました。</p>
+          <div style="background:#f8f9fa; padding:12px; border-radius:8px; margin-top:16px; font-weight:bold; color:#333;" id="displayEmail"></div>
+          <button type="button" class="edit-email-btn" id="btnEditEmail"><i class="fas fa-edit"></i> メールアドレスを修正する</button>
+        </div>
+
+        <form id="formStep2" class="form-grid">
+          <div class="form-field">
+            <input class="form-input verification-code-input" type="text" id="verificationCode" maxlength="6" placeholder="123456" autocomplete="off"/>
+          </div>
+
+          <div id="step2-msg" class="msg-box"></div>
+
+          <div class="form-row">
+            <button type="button" class="btn btn-secondary" id="btnResendCode">再送信</button>
+            <button type="submit" class="btn btn-primary" id="btnVerifyCode">✅ 認証する</button>
+          </div>
+        </form>
+      </div>
+
+      <div id="step3-section" class="step-section">
+        <div style="text-align: center; margin-bottom: 24px;">
+          <h3 style="color:#667eea; margin-bottom: 8px;">👤 プロフィール入力</h3>
+          <p style="color:#666; font-size:0.95rem;">メイトに公開される基本情報を入力してください。</p>
+        </div>
+
+        <form id="formStep3" class="form-grid">
           <div class="form-row">
             <div class="form-field">
-              <label class="form-label required" for="fullName">名前</label>
-              <input class="form-input" type="text" id="fullName" required placeholder="フリガナ"/>
+              <label class="form-label required">名前 (フリガナ)</label>
+              <input class="form-input" type="text" id="fullName" required placeholder="ヤマダ タロウ"/>
             </div>
             <div class="form-field">
-              <label class="form-label required" for="birthDate">生年月日</label>
+              <label class="form-label required">生年月日</label>
               <input class="form-input" type="date" id="birthDate" required/>
             </div>
           </div>
           
           <div class="form-row">
             <div class="form-field">
-              <label class="form-label required" for="gender">性別</label>
+              <label class="form-label required">性別</label>
               <select class="form-select" id="gender" required>
                 <option value="">選択してください</option>
-                <option value="女">女性</option>
-                <option value="男">男性</option>
+                <option value="女">女性 (Female)</option>
+                <option value="男">男性 (Male)</option>
               </select>
             </div>
             <div class="form-field">
-              <label class="form-label required" for="phoneNumber">電話番号</label>
-              <input class="form-input" type="tel" id="phoneNumber" required placeholder="010-1234-5678"/>
-            </div>
-          </div>
-          
-          <div class="form-row">
-            <div class="form-field">
-              <label class="form-label required" for="nationality">国籍</label>
+              <label class="form-label required">国籍</label>
               <select class="form-select" id="nationality" required>
                 <option value="">選択してください</option>
-                <option value="한국">🇰🇷 韓国</option>
                 <option value="일본">🇯🇵 日本</option>
+                <option value="한국">🇰🇷 韓国</option>
                 <option value="중국">🇨🇳 中国</option>
                 <option value="미국">🇺🇸 アメリカ</option>
               </select>
             </div>
-            <!--<div class="form-field">
-              <label class="form-label" for="residence">현재 거주지</label>
-              <input class="form-input" type="text" id="residence" placeholder="서울특별시 강남구"/>
-            </div>
-            -->
           </div>
-          
-          <!-- 언어 선택 -->
+
           <div class="form-row single">
             <div class="form-field">
-              <label class="form-label required">使用可能な言語</label>
+              <label class="form-label required">電話番号</label>
+              <input class="form-input" type="tel" id="phoneNumber" required placeholder="090-1234-5678"/>
+            </div>
+          </div>
+
+          <div class="form-row single">
+            <div class="form-field">
+              <label class="form-label required">使用可能な言語 (1つ以上)</label>
               <div class="checkbox-group" id="languageGroup">
-                <label class="checkbox-item">
-                  <input type="checkbox" value="韓国語"/>
-                  <span>🇰🇷 한국어</span>
-                </label>
-                <label class="checkbox-item">
-                  <input type="checkbox" value="日本語"/>
-                  <span>🇯🇵 日本語</span>
-                </label>
-                <label class="checkbox-item">
-                  <input type="checkbox" value="English"/>
-                  <span>🇺🇸 English</span>
-                </label>
-                <label class="checkbox-item">
-                  <input type="checkbox" value="中文"/>
-                  <span>🇨🇳 中文</span>
-                </label>
+                <label class="lang-item"><input type="checkbox" class="lang-check" value="日本語"/> 🇯🇵 日本語</label>
+                <label class="lang-item"><input type="checkbox" class="lang-check" value="韓国語"/> 🇰🇷 한국어</label>
+                <label class="lang-item"><input type="checkbox" class="lang-check" value="English"/> 🇺🇸 English</label>
+                <label class="lang-item"><input type="checkbox" class="lang-check" value="中文"/> 🇨🇳 中文</label>
               </div>
-              <div class="help-text">メイトとコミュニケーション可能な言語を選択してください(最低1つ)</div>
             </div>
           </div>
-          
-          <!-- 계정 정보 -->
-          <div class="form-row">
-            <div class="form-field">
-              <label class="form-label required" for="email">E-MAIL</label>
-              <input class="form-input" type="email" id="email" required placeholder="example@email.com"/>
-              <div class="help-text">ログイン時に使用するメールアドレスです</div>
-            </div>
-            <div class="form-field">
-              <label class="form-label required" for="password">パスワード</label>
-              <input class="form-input" type="password" id="password" required minlength="8" placeholder="8文字以上入力"/>
-              <div class="help-text">8文字以上の安全なパスワードを設定してください</div>
-            </div>
-          </div>
-          
-          <!-- 회원가입 버튼 -->
-          <button type="submit" class="btn btn-primary" id="signupBtn">
-            📧 アカウント作成とEメール認証
+
+          <div id="step3-msg" class="msg-box"></div>
+          <button type="submit" class="btn btn-primary" id="btnCompleteSignup">
+            ✨ 会員登録を完了する
           </button>
-          
-          <div id="signupResult"></div>
         </form>
-
-        <!-- 약관 동의 섹션 -->
-        <div class="terms-agreement-section">
-          <h4 class="terms-title">📋 利用規約および同意事項</h4>
-          <p class="terms-subtitle">サービスをご利用いただくにあたり､ 以下の項目をご確認のうえ､ 同意してください。</p>
-          
-          <div class="terms-checkboxes">
-            <!-- 필수 동의 항목들 -->
-            <label class="terms-checkbox-item required">
-              <input type="checkbox" id="ageConsent" required>
-              <span class="checkmark"></span>
-              <span class="checkbox-text">
-                <strong>私は18歳以上です。</strong>
-                <span class="checkbox-subtext">만 18세 이상입니다.</span>
-              </span>
-            </label>
-            
-            <label class="terms-checkbox-item required">
-              <input type="checkbox" id="passportConsent" required>
-              <span class="checkmark"></span>
-              <span class="checkbox-text">
-                <strong>現地でパスポートをその場で確認することに同意します｡ 撮影・複製・保管は行わず､ 成人確認・確認者・確認時刻のみを記録します｡</strong>
-                <span class="checkbox-subtext">현장에서 여권 실물 확인에 동의합니다. 사진 촬영·복사·보관은 하지 않습니다. (성인 여부/확인자/확인시각만 기록)</span>
-              </span>
-            </label>
-            
-            <label class="terms-checkbox-item required">
-              <input type="checkbox" id="termsConsent" required>
-              <span class="checkmark"></span>
-              <span class="checkbox-text">
-                <strong>利用規約に同意します。</strong>
-                <span class="checkbox-subtext">이용약관에 동의합니다.</span>
-                <a href="terms_of_service.html" target="_blank" class="terms-link">📋 利用規約を確認</a>
-              </span>
-            </label>
-            
-            <label class="terms-checkbox-item required">
-              <input type="checkbox" id="refundConsent" required>
-              <span class="checkmark"></span>
-              <span class="checkbox-text">
-                <strong>返金・キャンセルポリシー娔24時間前まで全額返金／24～4時間前は50％返金／4時間以内および無断キャンセルは返金不可娘に同意します。</strong>
-                <span class="checkbox-subtext">환불·취소 정책(24시간 전 전액 / 24~4시간 50% / 4시간 이내·노쇼 불가)에 동의합니다.</span>
-                <a href="refund_policy.html" target="_blank" class="terms-link">💰 返金ポリシーを確認</a>
-              </span>
-            </label>
-            
-            <label class="terms-checkbox-item required">
-              <input type="checkbox" id="coolingOffConsent" required>
-              <span class="checkmark"></span>
-              <span class="checkbox-text">
-                <strong>日時指定サービスの特性上､ 7日間のクーリングオフ 娔申込み撤回娘が適用されない場合があること 娔第11条娘に同意いたします。</strong>
-                <span class="checkbox-subtext">시간지정 서비스 특성상 '청약철회(7일)'가 제한됨(제11조)에 동의합니다.</span>
-              </span>
-            </label>
-            
-            <label class="terms-checkbox-item required">
-              <input type="checkbox" id="privacyConsent" required>
-              <span class="checkmark"></span>
-              <span class="checkbox-text">
-                <strong>個人情報の収集・利用に同意します。</strong>
-                <span class="checkbox-subtext">개인정보 수집·이용에 동의합니다.</span>
-                <div class="privacy-details">
-                  <strong>項目:</strong> 氏名・連絡先・LINE ID・予約情報・成人確認結果（可/否）・確認者/時刻<br>
-                  <strong>目的:</strong> 予約・本人/年齢確認・紛争対応<br>
-                  <strong>保管:</strong> 成人確認ログ［例：12か月］等
-                </div>
-              </span>
-            </label>
-            
-            <label class="terms-checkbox-item required">
-              <input type="checkbox" id="transferConsent" required>
-              <span class="checkmark"></span>
-              <span class="checkbox-text">
-                <strong>個人情報の国外移転および､ 決済・メッセージ配信のための第三者提供に同意します｡</strong>
-                <span class="checkbox-subtext">개인정보 국외이전 및 제3자 제공(결제·메시징)에 동의합니다.</span>
-                <div class="privacy-details">
-                  <strong>提供先:</strong> LINE Corporation（日本/他）、決済事業者等<br>
-                  <strong>目的:</strong> 決済処理・通知送信<br>
-                  <strong>項目:</strong> 氏名・連絡先・決済識別子・予約情報（必要最小限）
-                </div>
-              </span>
-            </label>
-            
-            <label class="terms-checkbox-item required">
-              <input type="checkbox" id="lineNotificationConsent" required>
-              <span class="checkmark"></span>
-              <span class="checkbox-text">
-                <strong>契約・決済に関する通知をLINEで受信することに同意します。</strong>
-                <span class="checkbox-subtext">계약·결제 관련 고지를 LINE 메시지로 받는 것에 동의합니다.</span>
-              </span>
-            </label>
-          </div>
-          
-          <div class="terms-notice">
-            <i class="fas fa-info-circle"></i>
-            <span>すべての必須項目に同意していただく必要があります。</span>
-          </div>
-        </div>
-        <!-- 이메일 인증 섹션 -->
-        <div class="email-verification-section" id="emailVerificationSection">
-          <div class="verification-header">
-            <h4>📧 Eメール認証番号入力</h4>
-            <p>入力されたメールアドレスに6桁の認証番号を送信しました。 認証番号を入力してください。</p>
-          </div>
-          
-          <div class="verification-email-display" id="verificationEmailDisplay"></div>
-          
-          <div class="form-field">
-            <label class="form-label required" for="verificationCode">認証番号 (6桁)</label>
-            <input class="form-input verification-code-input" type="text" id="verificationCode" maxlength="6" placeholder="123456"/>
-            <div class="help-text">メールで受け取った6桁の認証番号を入力してください。(10分有効)</div>
-          </div>
-          
-          <div class="verification-actions">
-            <button type="button" class="btn btn-primary" id="verifyCodeBtn">
-              ✅ 認証番号確認
-            </button>
-            <button type="button" class="btn btn-secondary" id="resendCodeBtn">
-              📧 認証番号再送信
-            </button>
-          </div>
-          
-          <div id="verificationResult"></div>
-        </div>
       </div>
 
-      <!-- 완료 섹션 -->
-      <div class="completion-section" id="completionSection">
+      <div id="step4-section" class="step-section text-center">
         <div class="completion-icon">🎉</div>
-        <h2 class="completion-title">会員登録完了！</h2>
-        <p class="completion-message">
-          PUZZMIへようこそ！<br>
-          それではメイトたちを見回して特別な旅行を計画してみてください。
+        <h2 style="font-size:2rem; font-weight:800; color:#28a745; margin-bottom:16px;">会員登録完了！</h2>
+        <p style="color:#666; font-size:1.1rem; line-height:1.6; margin-bottom:32px;">
+          PUZZMIへようこそ！<br>素敵な旅行を計画してみてください。
         </p>
-        
-        <!-- LINE 연동 안내 (선택사항) -->
-        <div class="line-connect-section">
-          <div class="line-icon">💬</div>
-          <h3 class="line-title">LINEアカウント連動(オプション)</h3>
-          <p class="line-description">
-            予約確定および決済案内を受けるには、LINEアカウントの連動が必要です。<br>
-            今連動するか、後で予約時に連動できます！
-          </p>
+
+        <div style="background: rgba(0, 195, 0, 0.05); border: 2px solid rgba(0, 195, 0, 0.2); border-radius: 16px; padding: 30px; margin-bottom:30px;">
+          <i class="fab fa-line" style="font-size: 3rem; color: #00C300; margin-bottom: 12px;"></i>
+          <h3 style="font-size:1.2rem; font-weight:800; margin-bottom:8px;">LINE連携 (推奨)</h3>
+          <p style="color:#666; font-size:0.95rem; margin-bottom:20px;">予約確定や決済通知をLINEで受け取れます。</p>
           
-          <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 24px;">
-            <button class="btn btn-line" id="lineConnectBtn">
-              <i class="fab fa-line"></i>
-              今LINE連動する
-            </button>
-            <button class="btn btn-secondary" onclick="skipLineConnection()">
-              後で連動する
-            </button>
-          </div>
-          
-          <div id="lineStatus" class="help-text" style="display: none; margin-top: 16px;"></div>
-        </div>
-        
-        <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 32px;">
-          <a href="index.html" class="btn btn-primary">
-            🏠 ホームに行く
-          </a>
-          <a href="index.html#friends" class="btn btn-secondary">
-            👥 メイト見学
-          </a>
+          <button class="btn btn-line" id="lineConnectBtn" style="margin-bottom: 12px;">
+            <i class="fab fa-line"></i> 今すぐLINE連携する
+          </button>
+          <button class="btn btn-secondary" onclick="window.location.href='index.html'">
+            後で連携する (ホームへ)
+          </button>
+          <div id="lineStatus" class="msg-box" style="margin-top: 16px;"></div>
         </div>
       </div>
 
-      <!-- 로그인 링크 -->
-      <div style="text-align: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(102, 126, 234, 0.2);">
-        <p style="color: var(--text-secondary); margin-bottom: 16px;">すでにアカウントをお持ちですか？</p>
-        <a href="auth_combo.html" style="color: #667eea; text-decoration: none; font-weight: 600; padding: 8px 16px; border-radius: 8px; background: rgba(102, 126, 234, 0.1); transition: all 0.3s ease;">
-          ログインする →
-        </a>
-      </div>
     </section>
   </main>
 
@@ -1190,614 +401,251 @@
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4";
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    let userData = {};
-    let currentStep = 1;
+    // 전역 유저 데이터 저장소
+    let signupData = {
+      email: '', password: '', fullName: '', birthDate: '', gender: '', phoneNumber: '', nationality: '', languages: []
+    };
 
-    // DOM 요소들
-    const signupForm = document.getElementById('signupForm');
-    const emailVerificationSection = document.getElementById('emailVerificationSection');
-    const completionSection = document.getElementById('completionSection');
-    const signupFormSection = document.getElementById('signupFormSection');
-    const signupBtn = document.getElementById('signupBtn');
-    
-    const step1 = document.getElementById('step1');
-    const step2 = document.getElementById('step2');
-    const step3 = document.getElementById('step3');
-    
-    const verificationEmailDisplay = document.getElementById('verificationEmailDisplay');
-    const verifyCodeBtn = document.getElementById('verifyCodeBtn');
-    const resendCodeBtn = document.getElementById('resendCodeBtn');
-    const signupResult = document.getElementById('signupResult');
-    const verificationResult = document.getElementById('verificationResult');
+    // UI 컨트롤
+    function showSection(stepNum) {
+      document.querySelectorAll('.step-section').forEach(el => el.classList.remove('active'));
+      document.getElementById(`step${stepNum}-section`).classList.add('active');
 
-    // 단계 업데이트 함수
-    function updateSteps(activeStep) {
-      currentStep = activeStep;
-      
-      [step1, step2, step3].forEach((step, index) => {
-        step.classList.remove('active', 'completed', 'inactive');
-        
-        if (index + 1 < activeStep) {
-          step.classList.add('completed');
-        } else if (index + 1 === activeStep) {
-          step.classList.add('active');
-        } else {
-          step.classList.add('inactive');
-        }
+      // 인디케이터 업데이트
+      for(let i=1; i<=4; i++) {
+        const ind = document.getElementById(`ind-${i}`);
+        ind.className = 'step';
+        if (i < stepNum) ind.classList.add('completed');
+        else if (i === stepNum) ind.classList.add('active');
+        else ind.classList.add('inactive');
+      }
+    }
+
+    function showMsg(id, msg, isError = true) {
+      const box = document.getElementById(id);
+      box.className = `msg-box ${isError ? 'msg-error' : 'msg-success'}`;
+      box.innerHTML = msg;
+    }
+
+    // ==========================================
+    // STEP 1: 전체 동의 제어 및 이메일 발송
+    // ==========================================
+    const agreeAllBtn = document.getElementById('agreeAll');
+    const termChecks = document.querySelectorAll('.term-check');
+    const btnStep1 = document.getElementById('btnStep1');
+
+    agreeAllBtn.addEventListener('change', (e) => {
+      const isChecked = e.target.checked;
+      termChecks.forEach(cb => cb.checked = isChecked);
+      btnStep1.disabled = !isChecked;
+    });
+
+    termChecks.forEach(cb => {
+      cb.addEventListener('change', () => {
+        const allChecked = Array.from(termChecks).every(c => c.checked);
+        agreeAllBtn.checked = allChecked;
+        btnStep1.disabled = !allChecked;
       });
-    }
+    });
 
-    // 약관 동의 상태 확인 및 버튼 활성화
-    function checkTermsAgreement() {
-      const requiredCheckboxes = [
-        'ageConsent', 'passportConsent', 'termsConsent', 'refundConsent', 
-        'coolingOffConsent', 'privacyConsent', 'transferConsent', 'lineNotificationConsent'
-      ];
-      
-      const allChecked = requiredCheckboxes.every(id => document.getElementById(id).checked);
-      signupBtn.disabled = !allChecked;
-    }
-    
-    // 체크박스 이벤트 리스너 추가
-    document.addEventListener('change', (e) => {
-      if (e.target.type === 'checkbox' && e.target.closest('.terms-checkboxes')) {
-        checkTermsAgreement();
+    document.getElementById('formStep1').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      if(password.length < 8) return showMsg('step1-msg', '❌ パスワードは8文字以上必要です。');
+
+      btnStep1.disabled = true;
+      btnStep1.innerHTML = '<div class="loading"></div> 確認中...';
+
+      try {
+        // 이메일 중복 확인
+        const { data: existingUser } = await supabase.from('profiles').select('email').eq('email', email).maybeSingle();
+        if (existingUser) {
+          throw new Error('このメールアドレスは既に登録されています。ログインしてください。');
+        }
+
+        // OTP 발송 (Edge Function)
+        const res = await fetch(`${SUPABASE_URL}/functions/v1/email-verification`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
+          body: JSON.stringify({ email: email, action: 'send' })
+        });
+
+        if (!res.ok) throw new Error('認証番号の送信に失敗しました。');
+        const resData = await res.json();
+        if(!resData.success) throw new Error(resData.error || '送信失敗');
+
+        // 성공: 데이터 임시 저장 및 Step 2 이동
+        signupData.email = email;
+        signupData.password = password;
+        document.getElementById('displayEmail').textContent = email;
+        showSection(2);
+
+      } catch (err) {
+        showMsg('step1-msg', `❌ ${err.message}`);
+      } finally {
+        btnStep1.disabled = false;
+        btnStep1.innerHTML = '📧 認証番号を受け取る (次へ)';
       }
     });
 
-    // 회원가입 폼 제출 (1단계 → 2단계)
-    signupForm.addEventListener('submit', async (e) => {
+    // ==========================================
+    // STEP 2: 이메일 인증 확인
+    // ==========================================
+    document.getElementById('btnEditEmail').addEventListener('click', () => {
+      showSection(1); // 이메일 수정하러 뒤로 가기 (데이터 보존됨)
+    });
+
+    document.getElementById('btnResendCode').addEventListener('click', async () => {
+      const btn = document.getElementById('btnResendCode');
+      btn.disabled = true; btn.textContent = '送信中...';
+      try {
+        await fetch(`${SUPABASE_URL}/functions/v1/email-verification`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
+          body: JSON.stringify({ email: signupData.email, action: 'send' })
+        });
+        showMsg('step2-msg', '✅ 新しい認証番号を送信しました。', false);
+      } catch (err) {
+        showMsg('step2-msg', '❌ 送信に失敗しました。');
+      } finally {
+        btn.disabled = false; btn.textContent = '再送信';
+      }
+    });
+
+    document.getElementById('formStep2').addEventListener('submit', async (e) => {
       e.preventDefault();
-      
-      // 폼 유효성 검사
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
+      const code = document.getElementById('verificationCode').value.trim();
+      if(code.length !== 6) return showMsg('step2-msg', '❌ 6桁の番号を入力してください。');
+
+      const btn = document.getElementById('btnVerifyCode');
+      btn.disabled = true; btn.innerHTML = '<div class="loading"></div> 認証中...';
+
+      try {
+        const res = await fetch(`${SUPABASE_URL}/functions/v1/email-verification`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
+          body: JSON.stringify({ email: signupData.email, action: 'verify', code: code })
+        });
+        
+        const resData = await res.json();
+        if(!resData.success) throw new Error('認証番号が正しくありません。');
+
+        // 인증 성공 시 Step 3 이동
+        showSection(3);
+
+      } catch (err) {
+        showMsg('step2-msg', `❌ ${err.message}`);
+      } finally {
+        btn.disabled = false; btn.innerHTML = '✅ 認証する';
+      }
+    });
+
+    // ==========================================
+    // STEP 3: 프로필 작성 및 최종 회원가입
+    // ==========================================
+    // 생년월일 max 설정
+    document.getElementById('birthDate').max = new Date().toISOString().split('T')[0];
+
+    document.getElementById('formStep3').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
       const fullName = document.getElementById('fullName').value.trim();
       const birthDate = document.getElementById('birthDate').value;
       const gender = document.getElementById('gender').value;
-      const phoneNumber = document.getElementById('phoneNumber').value.trim();
       const nationality = document.getElementById('nationality').value;
+      const phoneNumber = document.getElementById('phoneNumber').value.trim();
       
-      // 언어 선택 확인
-      const selectedLanguages = Array.from(document.querySelectorAll('#languageGroup input:checked'))
-        .map(cb => cb.value);
-      
-      // 유효성 검사
-      if (!email || !password || !fullName || !birthDate || !gender || !phoneNumber || !nationality) {
-        signupResult.innerHTML = '<div class="error">❌ すべての必須項目を入力してください。</div>';
-        return;
-      }
-      
-      if (selectedLanguages.length === 0) {
-        signupResult.innerHTML = '<div class="error">❌少なくとも 1 つの言語を選択してください。</div>';
-        return;
-      }
-      
-      // 약관 동의 확인
-      const requiredCheckboxes = [
-        'ageConsent', 'passportConsent', 'termsConsent', 'refundConsent', 
-        'coolingOffConsent', 'privacyConsent', 'transferConsent', 'lineNotificationConsent'
-      ];
-      
-      const uncheckedItems = requiredCheckboxes.filter(id => !document.getElementById(id).checked);
-      if (uncheckedItems.length > 0) {
-        signupResult.innerHTML = '<div class="error">❌ すべての必須同意項目にチェックしてください。</div>';
-        return;
-      }
-      
-      if (password.length < 8) {
-        signupResult.innerHTML = '<div class="error">❌ パスワードは 8 文字以上である必要があります。</div>';
-        return;
-      }
-      
-      // 이메일 형식 검증
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        signupResult.innerHTML = '<div class="error">❌ 有効なメール形式を入力してください。</div>';
-        return;
-      }
-      
-      // 나이 계산
-      const today = new Date();
+      const langs = Array.from(document.querySelectorAll('.lang-check:checked')).map(cb => cb.value);
+      if(langs.length === 0) return showMsg('step3-msg', '❌ 少なくとも1つの言語を選択してください。');
+
+      // 나이 검증 (16세 이상)
       const birth = new Date(birthDate);
-      let age = today.getFullYear() - birth.getFullYear();
-      const monthDiff = today.getMonth() - birth.getMonth();
-      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-        age--;
-      }
-      
-      if (age < 16) {
-        signupResult.innerHTML = '<div class="error">❌ 16歳以上のみ加入可能です。</div>';
-        return;
-      }
-      
-      // 사용자 데이터 저장
-      userData = {
-        email,
-        password,
-        fullName,
-        birthDate,
-        age,
-        gender,
-        phoneNumber,
-        nationality,
-        residence: document.getElementById('residence').value.trim() || null,
-        languages: selectedLanguages
-      };
+      let age = new Date().getFullYear() - birth.getFullYear();
+      if(new Date().getMonth() < birth.getMonth()) age--;
+      if(age < 16) return showMsg('step3-msg', '❌ 16歳以上のみ加入可能です。');
 
-      const submitBtn = document.getElementById('signupBtn');
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = '<div class="loading"></div> 重複確認中...';
+      const btn = document.getElementById('btnCompleteSignup');
+      btn.disabled = true; btn.innerHTML = '<div class="loading"></div> 登録処理中...';
 
       try {
-        const { data: existingEmail } = await supabase
-          .from('profiles')
-          .select('email')
-          .eq('email', email)
-          .maybeSingle();
+        // 전화번호 중복 확인
+        const { data: existPhone } = await supabase.from('profiles').select('phone_number').eq('phone_number', phoneNumber).maybeSingle();
+        if(existPhone) throw new Error('この電話番号は既に登録されています。');
 
-        if (existingEmail) {
-          signupResult.innerHTML = '<div class="error">❌ このメールアドレスは既に登録されています。</div>';
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = '✉️ Eメール認証番号受信';
-          return;
-        }
-
-        const { data: existingPhone } = await supabase
-          .from('profiles')
-          .select('phone_number')
-          .eq('phone_number', phoneNumber)
-          .maybeSingle();
-
-        if (existingPhone) {
-          signupResult.innerHTML = '<div class="error">❌ この電話番号は既に登録されています。</div>';
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = '✉️ Eメール認証番号受信';
-          return;
-        }
-
-        submitBtn.innerHTML = '<div class="loading"></div> Eメール認証番号送信中...';
-
-        // 서버에서 6자리 OTP 생성 및 이메일 발송
-        const response = await fetch(`${SUPABASE_URL}/functions/v1/email-verification`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-          },
-          body: JSON.stringify({
-            email: email,
-            action: 'send'
-          })
+        // 1. Supabase Auth 계정 생성 (실제 가입)
+        const { data: authData, error: authErr } = await supabase.auth.signUp({
+          email: signupData.email,
+          password: signupData.password,
+          options: { data: { full_name: fullName } }
         });
-        
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`이메일 발송 실패: ${response.status} - ${errorText}`);
-        }
-        
-        const result = await response.json();
-        if (!result.success) {
-          // 디버그 정보가 있으면 표시 (개발용)
-          if (result.debug && result.debug.otpGenerated) {
-            signupResult.innerHTML = `
-              <div class="error">
-                ❌ SMTP 설정 오류: ${result.error}<br>
-                <div style="margin-top: 12px; padding: 12px; background: rgba(255,255,255,0.8); border-radius: 8px; font-size: 0.9rem;">
-                  <strong>해결방법:</strong><br>
-                  1. <a href="gmail_smtp_setup_guide.html" target="_blank" style="color: #667eea;">Gmail SMTP 설정 가이드</a> 확인<br>
-                  2. Gmail 앱 비밀번호 생성 및 설정<br>
-                  3. Supabase Dashboard에서 SMTP 설정 완료
-                </div>
-              </div>
-            `;
-            return;
-          }
-          
-          throw new Error(result.error || '이메일 발송 실패');
-        }
-        
-        // 2단계로 이동
-        updateSteps(2);
-        showEmailVerificationSection(email);
-        signupResult.innerHTML = '<div class="success">✅ 認証番号がメールで送信されました！ メールボックスを確認してください。</div>';
-        
-      } catch (error) {
-        console.error('인증번호 발송 실패:', error);
-        signupResult.innerHTML = `<div class="error">❌ 認証番号の送信に失敗: ${error.message}</div>`;
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '📧 アカウント作成とEメール認証';
-      }
-    });
+        if(authErr) throw authErr;
+        if(!authData.user) throw new Error('アカウント生成失敗');
 
-    // 이메일 인증 섹션 표시
-    function showEmailVerificationSection(email) {
-      verificationEmailDisplay.textContent = email;
-      emailVerificationSection.classList.add('show');
-      
-      // 인증번호 입력 필드에 포커스
-      setTimeout(() => {
-        document.getElementById('verificationCode').focus();
-      }, 500);
-    }
-
-    // 인증번호 확인 (2단계 → 3단계)
-    verifyCodeBtn.addEventListener('click', async () => {
-      const code = document.getElementById('verificationCode').value.trim();
-      
-      if (!code || code.length !== 6) {
-        verificationResult.innerHTML = '<div class="error">❌ 6桁の認証番号を入力してください。</div>';
-        return;
-      }
-      
-      verifyCodeBtn.disabled = true;
-      verifyCodeBtn.innerHTML = '<div class="loading"></div> 認証中...';
-      
-      try {
-        // 서버에서 인증번호 검증
-        const response = await fetch(`${SUPABASE_URL}/functions/v1/email-verification`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-          },
-          body: JSON.stringify({
-            email: userData.email,
-            action: 'verify',
-            code: code
-          })
-        });
-        
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`認証失敗: ${response.status} - ${errorText}`);
-        }
-        
-        const result = await response.json();
-        if (!result.success) {
-          throw new Error(result.error || '認証番号が正しくありません。');
-        }
-        
-        // 인증 성공 - 즉시 회원가입 완료 처리
-        await completeSignup();
-        
-      } catch (error) {
-        console.error('인증 실패:', error);
-        verificationResult.innerHTML = `<div class="error">❌ 認証失敗: ${error.message}</div>`;
-      } finally {
-        verifyCodeBtn.disabled = false;
-        verifyCodeBtn.innerHTML = '✅ 認証番号確認';
-      }
-    });
-
-    // 인증번호 재발송
-    resendCodeBtn.addEventListener('click', async () => {
-      resendCodeBtn.disabled = true;
-      resendCodeBtn.innerHTML = '<div class="loading"></div> 再送中...';
-
-      try {
-        console.log('📧 인증번호 재발송 요청:', userData.email);
-
-        const response = await fetch(`${SUPABASE_URL}/functions/v1/email-verification`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-          },
-          body: JSON.stringify({
-            email: userData.email,
-            action: 'send'
-          })
-        });
-        
-        console.log('📧 재발송 응답 상태:', response.status);
-        
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error('📧 재발송 실패:', errorText);
-          throw new Error(`재발송 실패: ${response.status} - ${errorText}`);
-        }
-        
-        const result = await response.json();
-        console.log('📧 재발송 결과:', result);
-        
-        if (!result.success) {
-          throw new Error(result.error || '再送失敗');
-        }
-        
-        verificationResult.innerHTML = '<div class="success">✅ 新しい認証番号がメールで送信されました！</div>';
-        
-      } catch (error) {
-        console.error('📧 재발송 오류:', error);
-        verificationResult.innerHTML = `<div class="error">❌ 재발송 실패: ${error.message}</div>`;
-      } finally {
-        resendCodeBtn.disabled = false;
-        resendCodeBtn.innerHTML = '📧 認証番号再送信';
-      }
-    });
-
-    // 회원가입 완료 처리
-    async function completeSignup() {
-      try {
-        console.log('🔐 Starting signup process...', { email: userData.email });
-
-        // 1. Supabase 계정 생성
-        let { data, error } = await supabase.auth.signUp({
-          email: userData.email,
-          password: userData.password,
-          options: {
-            data: {
-              full_name: userData.fullName
-            }
-          }
-        });
-
-        console.log('📝 SignUp response:', { data, error });
-
-        if (error) {
-          console.error('❌ SignUp error:', error);
-
-          if (error.message.includes('User already registered') || error.message.includes('already been registered')) {
-            console.log('⚠️ User already exists, attempting sign in...');
-            try {
-              const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-                email: userData.email,
-                password: userData.password
-              });
-
-              console.log('🔐 SignIn response:', { signInData, signInError });
-
-              if (signInError) {
-                throw new Error('このメールアドレスは既に登録されています。パスワードが正しくありません。ログインページに移動してください。');
-              }
-
-              if (!signInData.user) {
-                throw new Error('ログインに失敗しました。');
-              }
-
-              const { data: existingProfile } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', signInData.user.id)
-                .maybeSingle();
-
-              console.log('👤 Existing profile:', existingProfile);
-
-              if (existingProfile) {
-                verificationResult.innerHTML = '<div class="success">✅ 既に登録済みです。ログインしました。</div>';
-                setTimeout(() => {
-                  window.location.href = '/my_profile.html';
-                }, 1500);
-                return;
-              }
-
-              data = { user: signInData.user, session: signInData.session };
-            } catch (loginError) {
-              throw loginError;
-            }
-          } else {
-            throw error;
-          }
-        }
-
-        if (!data || !data.user) {
-          console.error('❌ No user data received');
-          throw new Error('アカウント作成に失敗しました。Supabaseの設定でメール確認が有効になっている可能性があります。');
-        }
-
-        console.log('✅ User created/authenticated:', data.user.id);
-        
-        // 2. 프로필 생성
-        const profileData = {
-          id: data.user.id,
-          email: userData.email,
-          full_name: userData.fullName,
-          birth_date: userData.birthDate,
-          gender: userData.gender,
-          languages: userData.languages,
-          phone_number: userData.phoneNumber,
-          nationality: userData.nationality,
-          residence: userData.residence,
-          profile_completion: 85,
+        // 2. Profiles DB 저장
+        const profilePayload = {
+          id: authData.user.id,
+          email: signupData.email,
+          full_name: fullName,
+          birth_date: birthDate,
+          gender: gender,
+          nationality: nationality,
+          phone_number: phoneNumber,
+          languages: langs,
           account_status: 'active'
         };
-        
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .upsert(profileData, { 
-            onConflict: 'id',
-            ignoreDuplicates: false 
-          });
-        
-        if (profileError) {
-          console.error('프로필 저장 오류:', profileError);
-          throw new Error(`프로필 저장 실패: ${profileError.message}`);
-        }
-        
-        userData.userId = data.user.id;
-        
-        // 3. 3단계로 이동 (완료)
-        updateSteps(3);
-        signupFormSection.style.display = 'none';
-        completionSection.classList.add('show');
-        
-        verificationResult.innerHTML = '<div class="success">✅会員登録が完了しました！</div>';
-        
-        // 성공 후 잠시 대기하여 사용자가 메시지를 볼 수 있도록 함
-        setTimeout(() => {
-          updateSteps(3);
-          signupFormSection.style.display = 'none';
-          completionSection.classList.add('show');
-        }, 1500);
-        
-      } catch (error) {
-        console.error('❌ 회원가입 완료 실패:', error);
-        verificationResult.innerHTML = `<div class="error">❌ 会員登録失敗: ${error.message}</div>`;
 
-        completionSection.classList.remove('show');
-        emailVerificationSection.style.display = 'block';
+        const { error: profileErr } = await supabase.from('profiles').upsert(profilePayload);
+        if(profileErr) throw profileErr;
+
+        // 가입 완료 -> Step 4
+        showSection(4);
+
+      } catch (err) {
+        showMsg('step3-msg', `❌ 登録エラー: ${err.message}`);
+      } finally {
+        btn.disabled = false; btn.innerHTML = '✨ 会員登録を完了する';
       }
-    }
+    });
 
-    // LINE 연동 (선택사항)
+    // ==========================================
+    // STEP 4: LINE 연동 로직 (기존 로직 유지)
+    // ==========================================
     document.getElementById('lineConnectBtn').addEventListener('click', async () => {
       const btn = document.getElementById('lineConnectBtn');
-      const statusEl = document.getElementById('lineStatus');
-      
-      // 사용자 클릭과 동시에 즉시 팝업 열기 (브라우저 차단 방지)
-      const popup = window.open('about:blank', 'lineLogin', 'width=500,height=600,scrollbars=yes,resizable=yes');
-      
-      if (!popup) {
-        statusEl.innerHTML = '<div class="error">❌ ポップアップがブロックされました。 ポップアップブロックを解除して、もう一度お試しください。</div>';
-        statusEl.style.display = 'block';
-        return;
-      }
-      
-      btn.disabled = true;
-      btn.innerHTML = '<div class="loading"></div> LINE連動中...';
+      const popup = window.open('about:blank', 'lineLogin', 'width=500,height=600,scrollbars=yes');
+      btn.innerHTML = '<div class="loading"></div> 連携準備中...';
       
       try {
-        // 실제 LINE OAuth URL 생성 (Edge Function 사용)
         const { data: { session } } = await supabase.auth.getSession();
-        if (!session) {
-          throw new Error('ログインセッションがありません。 再度ログインしてください。');
-        }
-
         const response = await fetch(`${SUPABASE_URL}/functions/v1/line-auth/generate-url`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session.access_token}`,
-            'Origin': window.location.origin,
-            'Referer': window.location.href
-          },
-          body: JSON.stringify({
-            requestOrigin: window.location.origin
-          })
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+          body: JSON.stringify({ requestOrigin: window.location.origin })
         });
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error('Edge Function 호출 실패:', {
-            status: response.status,
-            error: errorText
-          });
-          throw new Error(`Edge Function 호출 실패: ${response.status} - ${errorText}`);
-        }
-
         const result = await response.json();
-
-        if (!result.success) {
-          throw new Error(result.error || 'LINE URL 生成失敗');
-        }
-
-        const lineUrl = result.loginUrl;
-        console.log('✅ 실제 LINE URL 생성 성공:', lineUrl);
-
-        // 팝업을 실제 LINE OAuth URL로 리다이렉트
-        popup.location.href = lineUrl;
         
-        // 팝업 완료 대기
+        if (!result.success) throw new Error('LINE URL生成失敗');
+        popup.location.href = result.loginUrl;
+
+        // 연동 상태 폴링 대기
         const checkAuth = setInterval(async () => {
           if (popup && popup.closed) {
             clearInterval(checkAuth);
-            console.log('ポップアップが閉じました。 連動状態確認中...');
-            // 잠시 대기 후 상태 확인
-            setTimeout(async () => {
-              await checkLineConnectionStatus();
-              btn.disabled = false;
-              btn.innerHTML = '<i class="fab fa-line"></i> LINEアカウントを連動させる';
-            }, 1000);
+            btn.innerHTML = '<i class="fab fa-line"></i> 連携を確認しました (ホームへ)';
+            btn.onclick = () => window.location.href = 'index.html';
+            showMsg('lineStatus', '✅ LINE連携が完了したか、ウィンドウが閉じられました。', false);
           }
         }, 1000);
-        
-        // 메시지 리스너 추가 (콜백에서 오는 메시지 처리)
-        const messageHandler = async (event) => {
-          const data = event.data;
-          if (!data || typeof data !== 'object') return;
 
-          if (data.type === 'LINE_AUTH_SUCCESS') {
-            console.log('LINE 연동 성공 메시지 받음:', data);
-            statusEl.innerHTML = '<div class="success">✅ LINEアカウントが正常に連動されました！</div>';
-            statusEl.style.display = 'block';
-            btn.innerHTML = '<i class="fab fa-line"></i> 연동 완료';
-            btn.disabled = true;
-            btn.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
-            if (popup && !popup.closed) popup.close();
-            window.removeEventListener('message', messageHandler);
-            return;
-          }
-          
-          if (data.type === 'LINE_AUTH_ERROR') {
-            console.error('LINE 연동 실패 메시지 받음:', data);
-            statusEl.innerHTML = `<div class="error">❌ LINE連動失敗: ${data.error}</div>`;
-            statusEl.style.display = 'block';
-            if (popup && !popup.closed) popup.close();
-            window.removeEventListener('message', messageHandler);
-            return;
-          }
-        };
-        
-        window.addEventListener('message', messageHandler);
-        
-      } catch (error) {
-        console.error('LINE 연동 오류:', error);
-        if (popup && !popup.closed) {
-          popup.close();
-        }
-        statusEl.innerHTML = `<div class="error">❌ LINE LINE連動エラー: ${error.message}</div>`;
-        statusEl.style.display = 'block';
-        
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fab fa-line"></i> LINEアカウントを連動させる';
+      } catch (err) {
+        if(popup && !popup.closed) popup.close();
+        showMsg('lineStatus', `❌ エラー: ${err.message}`);
+        btn.innerHTML = '<i class="fab fa-line"></i> 再試行';
       }
     });
 
-    // LINE 연동 상태 확인
-    async function checkLineConnectionStatus() {
-      try {
-        const { data: lineAccount, error } = await supabase
-          .from('user_line_accounts')
-          .select('is_verified, line_display_name')
-          .eq('user_id', userData.userId)
-          .eq('is_verified', true)
-          .maybeSingle();
-        
-        if (!error && lineAccount) {
-          const statusEl = document.getElementById('lineStatus');
-          statusEl.innerHTML = `<div class="success">✅ LINEアカウント連動完了: ${lineAccount.line_display_name}</div>`;
-          statusEl.style.display = 'block';
-        }
-      } catch (error) {
-        console.error('LINE 연동 상태 확인 실패:', error);
-      }
-    }
-
-    // LINE 연동 건너뛰기
-    window.skipLineConnection = function() {
-      if (confirm('LINE連動をスキップしますか？\n\n予約時に決済案内を受けるためには後で連動が必要です。')) {
-        location.href = 'index.html';
-      }
-    };
-
-    // 페이지 로드 시 설정
-    window.addEventListener('load', () => {
-      // 생년월일 입력 필드 설정
-      const today = new Date().toISOString().split('T')[0];
-      const minDate = new Date();
-      minDate.setFullYear(minDate.getFullYear() - 100);
-      const minDateStr = minDate.toISOString().split('T')[0];
-      
-      const birthDateInput = document.getElementById('birthDate');
-      if (birthDateInput) {
-        birthDateInput.setAttribute('max', today);
-        birthDateInput.setAttribute('min', minDateStr);
-      }
-      
-      // 초기 버튼 상태 설정
-      checkTermsAgreement();
-    });
   </script>
 </body>
 </html>
