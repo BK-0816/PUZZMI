@@ -162,34 +162,57 @@
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
     const SUPABASE_URL = "https://eevvgbbokenpjnvtmztk.supabase.co";
+    // 🚨 기존에 복사해두셨던 본인의 진짜 ANON_KEY 로 꼭 바꿔주세요!
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4";
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let currentUser = null;
 
-    // 페이지 로드 시 로그인(세션) 확인
-    window.addEventListener('DOMContentLoaded', async () => {
-      document.getElementById('birthDate').max = new Date().toISOString().split('T')[0];
+    // 1. Supabase가 세션을 해독하고 로그인을 완료할 때까지 기다리는 "리스너"
+    supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth Event:', event); // 디버깅용
+      
+      // 로그인이 완료되었거나 이미 세션이 있는 경우
+      if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+        if (session && session.user) {
+          currentUser = session.user;
+          console.log('✅ 세션 획득 성공:', currentUser.email);
 
-      const { data: { user }, error } = await supabase.auth.getUser();
-      if (!user || error) {
-        alert("セッションが有効ではありません。再度ログインしてください。");
-        window.location.href = 'auth_combo.html';
-        return;
+          // 이미 프로필을 작성했는지 확인 (중복 작성 방지)
+          const { data: profile } = await supabase.from('profiles').select('id').eq('id', currentUser.id).maybeSingle();
+          if (profile) {
+            alert("すでにプロフィール設定が完了しています。メインページに移動します。");
+            window.location.href = 'index.html';
+            return;
+          }
+
+          // 폼 완료 버튼 활성화 (로딩 끝!)
+          const completeBtn = document.getElementById('completeBtn');
+          completeBtn.disabled = false;
+          completeBtn.innerHTML = '✨ 会員登録を完了する';
+        }
       }
-
-      // 이미 프로필이 있는지 확인 (중복 접근 방지)
-      const { data: profile } = await supabase.from('profiles').select('id').eq('id', user.id).maybeSingle();
-      if (profile) {
-        alert("すでにプロフィール設定が完了しています。メインページに移動します。");
-        window.location.href = 'index.html';
-        return;
-      }
-
-      currentUser = user;
     });
 
-    // 폼 제출 (프로필 생성)
+    // 2. 페이지 로드 초기 설정
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('birthDate').max = new Date().toISOString().split('T')[0];
+      
+      // 초기에는 버튼을 막아두고 "인증 확인 중" 표시
+      const completeBtn = document.getElementById('completeBtn');
+      completeBtn.disabled = true;
+      completeBtn.innerHTML = '<div class="loading"></div> 認証を確認中...';
+
+      // 🚨 만약 3초가 지났는데도 currentUser가 없다면 진짜 비정상 접근임 (쫓아내기)
+      setTimeout(() => {
+        if (!currentUser) {
+          alert("セッションが有効ではありません。再度ログインしてください。");
+          window.location.href = 'auth_combo.html';
+        }
+      }, 3000);
+    });
+
+    // 3. 폼 제출 (프로필 생성)
     document.getElementById('profileForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       
@@ -259,7 +282,7 @@
       }
     });
 
-    // LINE 연동 로직 (기존과 동일)
+    // 4. LINE 연동 로직 (기존과 동일)
     document.getElementById('lineConnectBtn').addEventListener('click', async () => {
       const btn = document.getElementById('lineConnectBtn');
       const statusEl = document.getElementById('lineStatus');
@@ -311,5 +334,3 @@
       }
     });
   </script>
-</body>
-</html>
