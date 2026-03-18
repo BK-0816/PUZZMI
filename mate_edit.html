@@ -633,35 +633,60 @@
       }
     }
     
+    /* 모바일 반응형 최적화 (768px 이하) */
     @media (max-width: 768px) {
-      .page-header h2 {
-        font-size: 2rem;
-      }
+      .wrap { margin: 20px auto; padding: 0 12px; }
+
+      /* 1. 페이지 헤더 콤팩트화 */
+      .page-header { padding: 32px 20px; border-radius: 24px; margin-bottom: 24px; }
+      .page-header h2 { font-size: 1.8rem; margin-bottom: 12px; }
+      .page-subtitle { font-size: 0.95rem; line-height: 1.5; }
+
+      /* 2. 섹션 카드 패딩 및 제목 축소 */
+      .section-card { padding: 24px 16px; border-radius: 20px; margin-bottom: 24px; }
+      .section-title { font-size: 1.4rem; gap: 10px; margin-bottom: 20px; }
+      .section-title::before { height: 28px; width: 5px; }
+
+      /* 3. 사진 업로드 영역 슬림화 */
+      .upload-zone { padding: 24px 16px; }
+      .upload-icon { font-size: 2.2rem; margin-bottom: 10px; }
+      .upload-text { font-size: 1rem; }
+      .upload-subtext { font-size: 0.85rem; }
+
+      /* 4. 썸네일 그리드 2열로 고정 및 버튼 크기 최적화 */
+      .thumbs-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 24px 0; }
+      .thumb-card { padding: 12px; border-radius: 16px; }
+      .thumb-card img { height: 110px; border-radius: 10px; margin-bottom: 12px; }
+      .thumb-actions { gap: 8px; }
+      .btn-secondary, .btn-danger { padding: 10px 8px; font-size: 0.8rem; border-radius: 10px; }
+      .primary-badge, .normal-badge { padding: 6px; font-size: 0.75rem; }
+
+      /* 5. 캐러셀 미리보기 크기 축소 */
+      .carousel { margin: 24px 0; border-radius: 16px; }
+      .carousel .track { padding: 12px; gap: 12px; }
+      .carousel .track > img { width: 220px; height: 160px; border-radius: 12px; border-width: 2px; }
+      .carousel .nav { width: 40px; height: 40px; font-size: 16px; }
+      .carousel .prev { left: 8px; }
+      .carousel .next { right: 8px; }
+
+      /* 6. 폼 필드 정렬 및 간격 */
+      .form-grid { gap: 24px; }
+      .form-row { grid-template-columns: 1fr; gap: 20px; } /* 무조건 한 줄에 하나 */
+      .label { font-size: 0.9rem; margin-bottom: 8px; }
+      .input, .select, .textarea { padding: 16px 20px; font-size: 1rem; border-radius: 12px; }
+      .textarea { min-height: 120px; }
+
+      /* 7. 언어 체크박스 촘촘하게 */
+      .language-checkboxes { padding: 12px; gap: 10px; }
+      .checkbox-item { padding: 12px 16px; border-radius: 12px; }
+      .checkbox-label { font-size: 0.95rem; }
+      .checkbox-item input[type="checkbox"] { width: 20px; height: 20px; }
+
+      /* 8. 저장 버튼 하단 고정 느낌으로 강조 */
+      .action-group { margin-top: 16px; }
+      .btn-primary { width: 100%; padding: 18px; font-size: 1.1rem; border-radius: 16px; }
       
-      .form-row {
-        grid-template-columns: 1fr;
-        gap: 20px;
-      }
-      
-      .thumbs-grid {
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-        gap: 16px;
-      }
-      
-      .carousel .track > img {
-        width: 280px;
-        height: 200px;
-      }
-      
-      .action-group {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      
-      .btn {
-        width: 100%;
-        justify-content: center;
-      }
+      .help-text { font-size: 0.85rem; padding: 12px; }
     }
     
     /* 로딩 애니메이션 */
