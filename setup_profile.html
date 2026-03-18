@@ -303,8 +303,17 @@
           account_status: 'active'
         };
         
-        const { error: profileError } = await supabase.from('profiles').upsert(profileData);
+const { error: profileError } = await supabase.from('profiles').upsert(profileData);
         if (profileError) throw profileError;
+
+        // 2. ✅ 추가된 부분: Supabase Auth 메타데이터에도 이름 저장 (대시보드 표시용)
+        const { error: authError } = await supabase.auth.updateUser({
+          data: { 
+            name: fullName,       // Display Name으로 주로 쓰임
+            full_name: fullName   // 예비용
+          }
+        });
+        if (authError) console.error('Auth 메타데이터 업데이트 실패:', authError);
 
         // 화면 전환
         document.getElementById('profileSection').style.display = 'none';
