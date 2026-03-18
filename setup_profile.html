@@ -170,15 +170,17 @@
     let currentUser = null;
 
     // 프로필 초기화 함수
+// 프로필 초기화 함수
     async function initProfile(user) {
       if (currentUser) return; // 중복 실행 방지
       currentUser = user;
       
       try {
-        // ✅ 해결: 이름(full_name)이나 활성 상태(active)가 진짜로 입력되어 있을 때만 튕겨냄
-        const { data: profile } = await supabase.from('profiles').select('id, account_status, full_name').eq('id', currentUser.id).maybeSingle();
+        // ✅ 수정 1: id와 full_name만 가져오도록 변경
+        const { data: profile } = await supabase.from('profiles').select('id, full_name').eq('id', currentUser.id).maybeSingle();
         
-        if (profile && (profile.account_status === 'active' || profile.full_name)) {
+        // ✅ 수정 2: 데이터가 존재하고, "이름(full_name)"이 실제로 채워져 있을 때만 튕겨냄!
+        if (profile && profile.full_name) {
           alert("すでにプロフィール設定が完了しています。メインページに移動します。");
           window.location.href = 'index.html';
           return;
