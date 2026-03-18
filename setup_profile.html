@@ -176,8 +176,8 @@
       
       try {
         // 이미 프로필을 작성했는지 확인 (중복 작성 방지)
-        const { data: profile } = await supabase.from('profiles').select('id').eq('id', currentUser.id).maybeSingle();
-        if (profile) {
+        const { data: profile } = await supabase.from('profiles').select('id, account_status, full_name').eq('id', currentUser.id).maybeSingle();
+        if (profile && (profile.account_status === 'active' || profile.full_name)) {
           alert("すでにプロフィール設定が完了しています。メインページに移動します。");
           window.location.href = 'index.html';
           return;
