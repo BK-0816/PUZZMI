@@ -138,10 +138,21 @@
         font-size: 0.8rem;
       }
 
-      /* 완료 섹션 아이콘 크기 조절 */
-      #successSection div, #completionSection div {
-        font-size: 3.5rem !important;
-      }
+/* 성공 메시지 안내 박스 최적화 */
+  #successSection div[style*="background: rgba(102,126,234,0.1)"] {
+    font-size: 0.8rem !important; /* 폰트 크기를 작게 고정 */
+    line-height: 1.5 !important;
+    padding: 12px !important;
+    text-align: left !important; /* 모바일에서는 왼쪽 정렬이 더 깔끔함 */
+    word-break: keep-all; /* 줄바꿈 자연스럽게 */
+    -webkit-text-size-adjust: none; /* 브라우저 임의 확장을 방지 */
+  }
+
+  /* 성공 섹션의 전체적인 텍스트 조정 */
+  #successSection p {
+    font-size: 0.9rem !important;
+    margin-bottom: 20px !important;
+  }
 
       /* 하단 버튼 고정 느낌으로 강조 */
       .btn {
