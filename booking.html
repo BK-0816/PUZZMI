@@ -69,7 +69,47 @@
     .result-error { background: linear-gradient(135deg, #fadbd8 0%, #f1948a 100%); color: #922b21; border: 2px solid rgba(220, 53, 69, 0.3); box-shadow: 0 8px 24px rgba(220, 53, 69, 0.2); }
     
     @media (max-width: 1024px) { .booking-container { grid-template-columns: 1fr; gap: 32px; } .mate-avatar { width: 200px; height: 200px; } }
-    @media (max-width: 768px) { .page { padding: 20px 16px; gap: 24px; } .mate-profile-card, .booking-form-card { padding: 24px; border-radius: 20px; } .form-row { grid-template-columns: 1fr; gap: 20px; } .mate-info h2 { font-size: 1.6rem; } .form-title { font-size: 1.8rem; } .form-input, .form-select, .form-textarea { padding: 16px 20px; font-size: 1rem; } .mate-avatar { width: 180px; height: 180px; } .policy-highlight { grid-template-columns: 1fr; gap: 12px; } .highlight-item { flex-direction: row; text-align: left; padding: 16px; } .highlight-icon { font-size: 2rem; margin-bottom: 0; margin-right: 16px; } }
+    /* 모바일 반응형 최적화 (768px 이하) */
+    @media (max-width: 768px) {
+      .page { padding: 20px 12px; gap: 20px; }
+      
+      /* 1. 뒤로가기 버튼 축소 */
+      .back-btn { padding: 10px 16px; font-size: 0.9rem; border-radius: 12px; }
+
+      /* 2. 레이아웃 1열 정렬 및 카드 패딩 축소 */
+      .booking-container { grid-template-columns: 1fr; gap: 20px; }
+      .mate-profile-card, .booking-form-card { padding: 24px 20px; border-radius: 24px; }
+
+      /* 3. 메이트 프로필 요약 정보 최적화 */
+      .mate-avatar { width: 140px; height: 140px; border-radius: 20px; }
+      .mate-info h2 { font-size: 1.5rem; }
+      .mate-meta { font-size: 0.9rem; }
+
+      /* 4. 폼 타이틀 및 필드 최적화 */
+      .form-title { font-size: 1.8rem; margin-bottom: 24px; }
+      .form-grid { gap: 20px; }
+      .form-row { grid-template-columns: 1fr !important; gap: 16px; } /* 무조건 한줄에 하나 */
+      
+      .form-label { font-size: 0.85rem; margin-bottom: 8px; }
+      .form-input, .form-select, .form-textarea { padding: 14px 16px; font-size: 1rem; border-radius: 12px; }
+      
+      /* 5. 금액 표시 영역 강조 */
+      .payment-amount { padding: 16px; margin: 16px 0; border-radius: 12px; }
+      .payment-amount div:nth-child(2) { font-size: 1.6rem !important; }
+
+      /* 6. 환불 정책 및 동의 영역 축소 */
+      .policy-header { padding: 14px 16px; }
+      .policy-title { font-size: 1rem; }
+      .policy-highlight { grid-template-columns: 1fr; }
+      .highlight-item { flex-direction: row; text-align: left; padding: 12px; }
+      .highlight-icon { margin-bottom: 0; margin-right: 12px; font-size: 1.5rem; }
+
+      .agreement-section { padding: 16px; margin: 20px 0; }
+      .agreement-checkbox { font-size: 0.95rem; }
+      
+      /* 7. 제출 버튼 */
+      .submit-btn { padding: 16px; font-size: 1.1rem; border-radius: 14px; }
+    }
     
     .loading { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }

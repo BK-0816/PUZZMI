@@ -825,111 +825,53 @@
     }
     
     /* 모바일 최적화 */
+/* 모바일 반응형 최적화 (768px 이하) */
     @media (max-width: 768px) {
-      .profile-container {
-        padding: 0 10px;
-        margin: 12px auto;
-      }
+      .profile-container { padding: 0 8px; margin: 10px auto; }
       
-      .profile-header {
-        padding: 2px 6px 2px 6px;
-      }
+      /* 1. 뒤로가기 버튼 슬림화 */
+      .back-button { padding: 8px 14px; font-size: 0.85rem; border-radius: 10px; margin-bottom: 12px; }
+
+      /* 2. 사진 갤러리 높이 및 카운터 조정 */
+      .photo-gallery { height: 350px; border-radius: 0; }
+      .photo-counter { top: 10px; right: 10px; padding: 4px 10px; font-size: 0.75rem; }
+      .photo-nav { width: 32px; height: 32px; font-size: 0.9rem; }
+
+      /* 3. 상단 이름 및 별점 영역 (인스타그램 스타일) */
+      .profile-header { padding: 12px 16px; }
+      .profile-name { font-size: 1.25rem; }
+      .profile-meta { font-size: 0.85rem; }
+      .profile-rating { padding: 4px 8px; font-size: 0.8rem; border-radius: 10px; }
+
+      /* 4. 액션 버튼 (예약/찜) - 하단 고정 느낌으로 강조 */
+      .action-buttons { padding: 12px; gap: 8px; position: sticky; bottom: 0; z-index: 100; border-top: 1px solid rgba(0,0,0,0.05); }
+      .action-btn { min-height: 48px; font-size: 0.9rem; border-radius: 12px; }
+      .btn-primary { flex: 2; } /* 예약 버튼을 더 크게 */
+      .btn-secondary { flex: 1; }
+
+      /* 5. 정보 섹션 가독성 향상 */
+      .info-section { padding: 20px 16px; border-radius: 16px; margin-bottom: 8px; }
+      .info-title { font-size: 1.1rem; margin-bottom: 12px; }
+      .info-content { font-size: 0.95rem; line-height: 1.6; }
       
-      .profile-info-row {
-        margin: 0;
-      }
+      /* 태그 크기 조절 */
+      .tag, .language-tag { padding: 5px 10px; font-size: 0.8rem; }
+
+      /* 6. 리뷰 섹션 최적화 */
+      .reviews-section { padding: 16px; }
+      .review-item { padding: 12px; border-radius: 12px; }
+      .review-author { font-size: 0.85rem; }
+      .review-content { font-size: 0.85rem; -webkit-line-clamp: 4; }
       
-      .profile-info-row {
-        gap: 8px;
-      }
-      
-      .profile-name-section {
-        gap: 2px;
-      }
-      
-      .profile-name {
-        font-size: 1.3rem;
-      }
-      
-      .profile-meta {
-        font-size: 0.85rem;
-      }
-      
-      .profile-rating {
-        padding: 4px 10px;
-        font-size: 0.85rem;
-      }
-      
-      .photo-nav {
-        width: 36px;
-        height: 36px;
-        font-size: 1rem;
-      }
-      
-      .photo-nav-prev {
-        left: 12px;
-      }
-      
-      .photo-nav-next {
-        right: 12px;
-      }
-      
-      .photo-counter {
-        top: 12px;
-        right: 12px;
-        font-size: 0.8rem;
-        padding: 4px 8px;
-      }
-      
-      .action-buttons {
-        padding: 12px 16px;
-        gap: 8px;
-      }
-      
-      .action-btn {
-        padding: 12px 16px;
-        font-size: 0.9rem;
-        min-height: 44px;
-      }
-      
-      .info-section {
-        padding: 14px 16px;
-        border-radius: 14px;
-        margin-bottom: 8px;
-      }
-      
-      .info-title {
-        font-size: 1.05rem;
-        margin-bottom: 8px;
-      }
-      
-      .reviews-section {
-        padding: 12px;
-        border-radius: 14px;
-        margin-bottom: 8px;
-      }
-      
-      .reviews-title {
-        font-size: 1rem;
-        margin-bottom: 8px;
-      }
-      
-      .review-item {
-        padding: 10px;
-        margin-bottom: 6px;
-      }
-      
-      .rating-buttons {
-        gap: 3px;
-      }
-      
-      .rating-btn {
-        padding: 5px 8px;
-        font-size: 0.7rem;
-        min-width: 50px;
-      }
+      .reviews-stats { padding: 10px; font-size: 0.85rem; }
     }
-    
+
+    /* 초소형 기기(iPhone SE 등) 대응 */
+    @media (max-width: 380px) {
+      .photo-gallery { height: 280px; }
+      .profile-name { font-size: 1.1rem; }
+      .action-btn { font-size: 0.8rem; padding: 8px; }
+    }
     @media (max-width: 480px) {
       .profile-container {
         padding: 0 8px;
