@@ -362,19 +362,25 @@
         window.mateHourlyRate = data.hourly_rate || 4000;
 
         // 🌟 2. 해당 메이트의 휴무일 데이터 가져오기
-        const { data: unavailData } = await supabase
+        const { data: unavailData, error: unavailError } = await supabase
           .from('mate_unavailabilities')
           .select('date')
           .eq('mate_id', mateId);
 
-        const blockedDates = unavailData ? unavailData.map(item => item.date) : [];
+        if (unavailError) {
+          console.error("휴무일 로드 에러:", unavailError);
+        }
 
-        // 🌟 3. Flatpickr 달력 초기화 (휴무일 선택 불가 처리)
+        // DB에서 가져온 날짜에 혹시 모를 시간(Time) 문자열이 껴있다면 제거하고 깔끔한 배열로 만듦
+        const blockedDates = unavailData ? unavailData.map(item => item.date.split('T')[0]) : [];
+        console.log("차단된 날짜들:", blockedDates); // 개발자 도구 확인용
+
+        // 🌟 3. Flatpickr 달력 초기화
         flatpickr("#date", {
-          locale: "ja",             // 일본어 달력 표시
-          minDate: "today",         // 오늘 이전 날짜 선택 불가
-          disable: blockedDates,    // 메이트가 지정한 휴무일 배열 전달 (클릭 방지)
-          dateFormat: "Y-m-d",      // DB 저장 규격
+          locale: "ja",             // 일본어
+          minDate: "today",         // 오늘 이전 선택 불가
+          disable: blockedDates,    // DB에서 가져온 휴무일 배열 넣어주기!
+          dateFormat: "Y-m-d",
         });
 
       } catch (error) {
