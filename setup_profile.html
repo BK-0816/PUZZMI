@@ -50,6 +50,95 @@
     .msg-success { background: #d1f2eb; color: #0e6b47; border: 2px solid rgba(25, 135, 84, 0.3); display:block; }
     .loading { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s infinite linear; margin-right:8px;}
     @keyframes spin { to { transform: rotate(360deg); } }
+    /* 모바일 반응형 최적화 패치 */
+    @media (max-width: 768px) {
+      .signup-container {
+        margin: 20px auto;
+        padding: 0 12px; /* 모바일 양옆 여백 최소화 */
+      }
+
+      .signup-card {
+        padding: 32px 20px; /* 내부 패딩 축소 */
+        border-radius: 24px;
+      }
+
+      .signup-title {
+        font-size: 1.8rem; /* 타이틀 크기 축소 */
+        margin-bottom: 12px;
+      }
+
+      .signup-subtitle {
+        font-size: 0.95rem;
+      }
+
+      /* 단계 표시기 축소 */
+      .step-indicator {
+        gap: 8px;
+        padding: 12px;
+        margin: 24px 0;
+      }
+
+      .step {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        gap: 6px;
+      }
+
+      .step-arrow {
+        font-size: 0.9rem;
+      }
+
+      /* 폼 입력창 최적화 */
+      .form-grid {
+        gap: 16px;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr; /* 무조건 세로로 한 줄씩 */
+        gap: 16px;
+      }
+
+      .form-input, .form-select {
+        padding: 14px 16px; /* 터치하기 적당한 높이 유지 */
+        font-size: 1rem; /* 폰트가 너무 작으면 아이폰에서 자동 줌인되므로 16px(1rem) 유지 */
+      }
+
+      /* 약관 동의 영역 */
+      .terms-agreement-section {
+        padding: 20px 16px;
+        margin: 24px 0;
+      }
+
+      .terms-checkbox-item {
+        padding: 14px;
+        gap: 12px;
+      }
+
+      .checkmark {
+        width: 20px;
+        height: 20px;
+      }
+
+      .checkbox-text strong {
+        font-size: 0.9rem;
+      }
+
+      .checkbox-subtext {
+        font-size: 0.8rem;
+      }
+
+      /* 완료 섹션 아이콘 크기 조절 */
+      #successSection div, #completionSection div {
+        font-size: 3.5rem !important;
+      }
+
+      /* 하단 버튼 고정 느낌으로 강조 */
+      .btn {
+        padding: 14px 24px;
+        font-size: 0.95rem;
+        border-radius: 10px;
+      }
+    }
   </style>
 </head>
 <body class="bg-cream">
