@@ -222,11 +222,14 @@
       
       // 🌟 Flatpickr 일본어 설정 초기화
       flatpickr("#birthDate", {
-        locale: "ja",
+        locale: "ja", 
         dateFormat: "Y-m-d",
         maxDate: "today",
-        monthSelectorType: "static",
-        showMonths: 1
+        monthSelectorType: "dropdown", // 월을 드롭다운으로 선택
+        yearSelectorType: "static",    // 연도 선택 활성화
+        clickOpens: true,
+        allowInput: false,             // 직접 타이핑 방지
+        disableMobile: "true"          // 폰에서도 기기 달력 대신 Flatpickr 사용 강제
       });
 
       const completeBtn = document.getElementById('completeBtn');
