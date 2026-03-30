@@ -45,50 +45,53 @@
         word-break: keep-all;
     }
 
-    /* 3. ABOUT & SAFETY 그리드 최적화 (2열 배치) */
-.about-grid, .safety-grid {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important; /* 1열에서 2열로 변경 */
-    gap: 12px !important;
-    padding: 0 15px;
-}
+   /* 3. ABOUT & SAFETY 가로 스와이프 최적화 */
+@media (max-width: 768px) {
+    .about-grid, .safety-grid {
+        display: flex !important; /* 그리드 대신 플렉스 박스 사용 */
+        flex-direction: row !important;
+        overflow-x: auto !important; /* 가로 스크롤 활성화 */
+        scroll-snap-type: x mandatory; /* 카드 단위로 딱딱 걸리게 설정 */
+        gap: 16px !important;
+        padding: 0 20px 20px 20px !important; /* 하단 여백은 스크롤바 공간 */
+        -webkit-overflow-scrolling: touch; /* iOS 부드러운 스크롤 */
+    }
 
-.about-card, .safety-card {
-    width: 100% !important;
-    margin: 0 !important;
-    background: #fff;
-    border-radius: 12px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-}
+    /* 스크롤바 숨기기 (디자인 깔끔하게) */
+    .about-grid::-webkit-scrollbar, 
+    .safety-grid::-webkit-scrollbar {
+        display: none;
+    }
 
-/* 카드 내 이미지 및 텍스트 크기 조정 */
-.about-card-image img {
-    height: 120px !important; /* 이미지 높이 제한 */
-    object-fit: cover;
-}
+    .about-card, .safety-card {
+        flex: 0 0 85%; /* 화면 너비의 85%만 차지하여 다음 카드가 살짝 보이게 함 */
+        max-width: 300px !important;
+        scroll-snap-align: center; /* 스크롤 시 카드가 중앙에 위치 */
+        margin: 0 !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08); /* 입체감 추가 */
+    }
 
-.about-card-content, .safety-card-content {
-    padding: 12px !important;
-}
+    .about-card-image img {
+        height: 180px !important;
+        object-fit: cover;
+    }
 
-.about-card-content h3, .safety-card-content h3 {
-    font-size: 0.95rem !important; /* 제목 크기 축소 */
-    line-height: 1.3;
-    margin-bottom: 6px;
-    word-break: keep-all;
-}
+    .about-card-content, .safety-card-content {
+        padding: 20px !important;
+        background: #fff;
+        height: 100%;
+    }
 
-.about-card-content p, .safety-card-content p {
-    font-size: 0.8rem !important; /* 본문 크기 축소 */
-    line-height: 1.4;
-    color: #666;
-}
+    .about-card-content h3, .safety-card-content h3 {
+        font-size: 1.1rem !important;
+        margin-bottom: 10px;
+    }
 
-.safety-icon {
-    font-size: 1.5rem !important; /* 아이콘 크기 조정 */
-    margin-bottom: 8px;
+    .about-card-content p, .safety-card-content p {
+        font-size: 0.9rem !important;
+        line-height: 1.5;
+        color: #555;
+    }
 }
 
     /* 4. 메이트 카드(Friends Grid) 최적화 */
