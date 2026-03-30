@@ -45,18 +45,51 @@
         word-break: keep-all;
     }
 
-    /* 3. ABOUT & SAFETY 그리드 1열 전환 */
-    .about-grid, .safety-grid {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 20px !important;
-        padding: 0 20px;
-    }
-    
-    .about-card, .safety-card {
-        width: 100% !important;
-        margin: 0 !important;
-    }
+    /* 3. ABOUT & SAFETY 그리드 최적화 (2열 배치) */
+.about-grid, .safety-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important; /* 1열에서 2열로 변경 */
+    gap: 12px !important;
+    padding: 0 15px;
+}
+
+.about-card, .safety-card {
+    width: 100% !important;
+    margin: 0 !important;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 카드 내 이미지 및 텍스트 크기 조정 */
+.about-card-image img {
+    height: 120px !important; /* 이미지 높이 제한 */
+    object-fit: cover;
+}
+
+.about-card-content, .safety-card-content {
+    padding: 12px !important;
+}
+
+.about-card-content h3, .safety-card-content h3 {
+    font-size: 0.95rem !important; /* 제목 크기 축소 */
+    line-height: 1.3;
+    margin-bottom: 6px;
+    word-break: keep-all;
+}
+
+.about-card-content p, .safety-card-content p {
+    font-size: 0.8rem !important; /* 본문 크기 축소 */
+    line-height: 1.4;
+    color: #666;
+}
+
+.safety-icon {
+    font-size: 1.5rem !important; /* 아이콘 크기 조정 */
+    margin-bottom: 8px;
+}
 
     /* 4. 메이트 카드(Friends Grid) 최적화 */
     .friends-grid {
