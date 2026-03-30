@@ -15,13 +15,13 @@
     .admin-header {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
-      padding: 20px;
+      padding: 24px 20px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.1);
     }
     .admin-header h1 {
       max-width: 1400px;
       margin: 0 auto;
-      font-size: 1.5rem;
+      font-size: 1.8rem;
       font-weight: 800;
       display: flex;
       align-items: center;
@@ -41,18 +41,18 @@
       margin: 0 auto;
       display: flex;
       padding: 0 10px;
-      overflow-x: auto; /* 모바일에서 탭 가로 스크롤 허용 */
-      scrollbar-width: none; /* 파이어폭스 스크롤바 숨김 */
+      overflow-x: auto; /* 모바일 가로 스크롤 */
+      scrollbar-width: none;
     }
-    .tab-nav-inner::-webkit-scrollbar { display: none; } /* 크롬 스크롤바 숨김 */
+    .tab-nav-inner::-webkit-scrollbar { display: none; }
     
     .tab-button {
-      padding: 15px 20px;
+      padding: 18px 24px;
       border: none;
       background: none;
       cursor: pointer;
       font-weight: 600;
-      font-size: 0.95rem;
+      font-size: 1rem;
       color: #666;
       border-bottom: 3px solid transparent;
       transition: all 0.3s;
@@ -71,7 +71,7 @@
     .tab-content {
       display: none;
       max-width: 1400px;
-      margin: 20px auto;
+      margin: 24px auto;
       padding: 0 15px;
     }
     .tab-content.active { display: block; }
@@ -80,112 +80,91 @@
     .card {
       background: white;
       border-radius: 16px;
-      padding: 20px;
+      padding: 24px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.08);
       margin-bottom: 24px;
     }
-    .card h2 { margin: 0 0 20px 0; font-size: 1.3rem; font-weight: 800; color: #333; }
+    .card h2 { margin: 0 0 20px 0; font-size: 1.4rem; font-weight: 800; color: #333; }
 
     /* 툴바 반응형 */
     .toolbar {
       display: flex;
       gap: 10px;
       margin-bottom: 20px;
-      flex-wrap: wrap; /* 모바일에서 자동 줄바꿈 */
+      flex-wrap: wrap;
     }
     .toolbar input, .toolbar select {
-      padding: 10px;
+      padding: 12px;
       border: 2px solid #e9ecef;
       border-radius: 8px;
-      font-size: 0.9rem;
-      flex: 1; /* 가급적 넓게 차지 */
-      min-width: 150px;
+      font-size: 0.95rem;
+      flex: 1;
+      min-width: 200px;
     }
-    .toolbar button { width: auto; flex-shrink: 0; }
 
-    /* 테이블 반응형 핵심 */
-    .table-responsive { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; }
+    /* 테이블 반응형 핵심 처리 */
+    .table-container { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; background: white; }
     th {
       background: #f8f9fa;
-      padding: 12px;
+      padding: 14px 12px;
       text-align: left;
       font-weight: 700;
       color: #666;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       border-bottom: 2px solid #e9ecef;
     }
-    td { padding: 12px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; font-size: 0.9rem; }
+    td { padding: 14px 12px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
 
-    /* 버튼 모바일 최적화 */
-    .btn {
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 0.85rem;
-      white-space: nowrap;
-    }
-    .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; }
-    .btn-success { background: #28a745; color: white; border: none; }
-    .btn-secondary { background: #6c757d; color: white; border: none; }
-
-    /* 배지 */
-    .badge { padding: 4px 8px; border-radius: 8px; font-size: 0.75rem; font-weight: 600; }
-    .badge-pending { background: #fff3cd; color: #856404; }
-    .badge-confirmed { background: #d1e7dd; color: #0f5132; }
+    /* 버튼 및 배지 */
+    .btn { padding: 10px 18px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; transition: 0.3s; white-space: nowrap; }
+    .badge { padding: 6px 12px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; display: inline-block; }
 
     /* 📱 모바일 전용 스타일 (768px 이하) */
     @media (max-width: 768px) {
-      .admin-header h1 { font-size: 1.2rem; }
-      .card { padding: 15px; }
+      .admin-header h1 { font-size: 1.4rem; }
+      .card { padding: 16px; }
       
-      /* 테이블을 카드로 변환하는 테크닉 */
+      /* 테이블 행을 카드로 변환 */
       table, thead, tbody, th, td, tr { display: block; }
-      thead { display: none; } /* 헤더 숨김 */
+      thead { display: none; }
       tr {
         border: 1px solid #eee;
         border-radius: 12px;
-        margin-bottom: 15px;
-        padding: 10px;
+        margin-bottom: 16px;
+        padding: 12px;
         background: #fff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
       }
       td {
         border: none;
-        position: relative;
-        padding-left: 40% !important; /* 라벨 공간 확보 */
-        text-align: right;
-        min-height: 35px;
         display: flex;
+        justify-content: space-between;
         align-items: center;
-        justify-content: flex-end;
+        padding: 8px 0;
+        text-align: right;
+        font-size: 0.9rem;
       }
       td::before {
-        content: attr(data-label); /* data-label 속성 사용 */
-        position: absolute;
-        left: 10px;
-        width: 35%;
-        text-align: left;
+        content: attr(data-label);
         font-weight: 700;
         color: #888;
         font-size: 0.8rem;
+        flex-shrink: 0;
+        margin-right: 15px;
       }
-      td:last-child { 
-        border-top: 1px solid #f0f0f0; 
-        margin-top: 10px; 
-        padding-top: 15px !important;
-        padding-left: 10px !important;
+      td:last-child {
+        border-top: 1px solid #f5f5f5;
+        margin-top: 8px;
+        padding-top: 15px;
         justify-content: center;
-        gap: 5px;
+        gap: 8px;
       }
+      .btn { flex: 1; padding: 12px 10px; text-align: center; }
       
-      /* 메이트 그리드 조정 */
+      /* 메이트 그리드 1열 고정 */
       #matesGrid { grid-template-columns: 1fr !important; }
     }
-
-    /* 로딩 애니메이션 */
-    .loading i { animation: spin 1s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
@@ -217,15 +196,15 @@
           <option value="all">전체</option>
         </select>
         <input id="searchBooking" placeholder="고객명, 연락처 검색..."/>
-        <button class="btn btn-primary" id="refreshBookings"><i class="fas fa-sync-alt"></i></button>
+        <button class="btn btn-primary" id="refreshBookings"><i class="fas fa-sync-alt"></i> 새로고침</button>
       </div>
-      <div class="table-responsive">
+      <div class="table-container">
         <table>
           <thead>
-            <tr><th>상태</th><th>일시</th><th>고객</th><th>연락처</th><th>메이트</th><th>LINE</th><th>비고</th><th>조치</th></tr>
+            <tr><th>ID</th><th>상태</th><th>일시</th><th>고객</th><th>연락처</th><th>메이트</th><th>LINE</th><th>비고</th><th>조치</th></tr>
           </thead>
           <tbody id="bookingsTableBody">
-            <tr><td colspan="8" class="loading" style="text-align:center;"><i class="fas fa-spinner"></i> 로딩 중...</td></tr>
+            <tr><td colspan="9" class="loading"><i class="fas fa-spinner"></i> 로딩 중...</td></tr>
           </tbody>
         </table>
       </div>
@@ -242,10 +221,10 @@
           <option value="false">미검증만</option>
         </select>
         <input id="searchMate" placeholder="이름, 태그 검색..."/>
-        <button class="btn btn-primary" id="refreshMates"><i class="fas fa-sync-alt"></i></button>
+        <button class="btn btn-primary" id="refreshMates"><i class="fas fa-sync-alt"></i> 새로고침</button>
       </div>
-      <div id="matesGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
-        <div class="loading" style="grid-column: 1/-1; text-align:center;"><i class="fas fa-spinner"></i> 로딩 중...</div>
+      <div id="matesGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;">
+        <div class="loading"><i class="fas fa-spinner"></i> 로딩 중...</div>
       </div>
     </div>
   </div>
@@ -264,7 +243,7 @@
         <button class="btn btn-primary" id="refreshIdentity"><i class="fas fa-sync-alt"></i> 새로고침</button>
       </div>
       <div id="identityRequests">
-        <div class="loading" style="text-align:center;"><i class="fas fa-spinner"></i> 로딩 중...</div>
+        <div class="loading"><i class="fas fa-spinner"></i> 로딩 중...</div>
       </div>
     </div>
   </div>
@@ -281,11 +260,13 @@
         </select>
         <button class="btn btn-primary" id="refreshPayments"><i class="fas fa-sync-alt"></i> 새로고침</button>
       </div>
-      <div class="table-responsive">
+      <div class="table-container">
         <table>
-          <thead><tr><th>ID</th><th>고객</th><th>금액</th><th>상태</th><th>날짜</th></tr></thead>
+          <thead>
+            <tr><th>ID</th><th>예약 ID</th><th>고객</th><th>금액</th><th>상태</th><th>생성일</th></tr>
+          </thead>
           <tbody id="paymentsTableBody">
-            <tr><td colspan="5" class="loading" style="text-align:center;"><i class="fas fa-spinner"></i> 로딩 중...</td></tr>
+            <tr><td colspan="6" class="loading"><i class="fas fa-spinner"></i> 로딩 중...</td></tr>
           </tbody>
         </table>
       </div>
@@ -297,13 +278,15 @@
       <h2>유저 관리</h2>
       <div class="toolbar">
         <input id="searchUser" placeholder="이름, 이메일 검색..."/>
-        <button class="btn btn-primary" id="refreshUsers"><i class="fas fa-sync-alt"></i></button>
+        <button class="btn btn-primary" id="refreshUsers"><i class="fas fa-sync-alt"></i> 새로고침</button>
       </div>
-      <div class="table-responsive">
+      <div class="table-container">
         <table>
-          <thead><tr><th>이름</th><th>이메일</th><th>나이/성별</th><th>메이트</th><th>조치</th></tr></thead>
+          <thead>
+            <tr><th>ID</th><th>이름</th><th>이메일</th><th>나이</th><th>성별</th><th>메이트</th><th>조치</th></tr>
+          </thead>
           <tbody id="usersTableBody">
-            <tr><td colspan="5" class="loading" style="text-align:center;"><i class="fas fa-spinner"></i> 로딩 중...</td></tr>
+            <tr><td colspan="7" class="loading"><i class="fas fa-spinner"></i> 로딩 중...</td></tr>
           </tbody>
         </table>
       </div>
@@ -316,17 +299,14 @@
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVldnZnYmJva2VucGpudnRtenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NjI2OTgsImV4cCI6MjA3MzEzODY5OH0.aLoqYYeDW_0ZEwkr8c8IPFvXnEwQPZah1mQzwiyG2Y4";
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // 🔐 관리자 인증 확인 (기존 로직 유지)
-    async function checkAdmin() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) location.replace('auth_combo.html?redirect=admin_dashboard.html');
-      const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).maybeSingle();
-      if (!profile?.is_admin) { alert('관리자 권한이 필요합니다.'); location.replace('index.html'); }
-      return user;
-    }
-    const adminUser = await checkAdmin();
+    // 🔐 관리자 인증 확인
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) location.replace('auth_combo.html?redirect=admin_dashboard.html');
 
-    // 📑 탭 전환 로직
+    const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).maybeSingle();
+    if (!profile?.is_admin) { alert('관리자 권한이 필요합니다.'); location.replace('index.html'); }
+
+    // 📑 탭 전환
     document.querySelectorAll('.tab-button').forEach(btn => {
       btn.addEventListener('click', () => {
         const tabName = btn.dataset.tab;
@@ -342,21 +322,20 @@
       });
     });
 
-    // 📅 예약 관리 (기능 유지 및 반응형 속성 data-label 추가)
+    // 📅 예약 관리
     let allBookings = [];
     let matesMap = new Map();
     let lineAccountsMap = new Map();
 
     async function loadBookings() {
       const tbody = document.getElementById('bookingsTableBody');
+      tbody.innerHTML = '<tr><td colspan="9" class="loading"><i class="fas fa-spinner"></i> 로딩 중...</td></tr>';
       try {
-        const [{data: mates}, {data: lineAcc}, {data: bookings}] = await Promise.all([
-          supabase.from('mate_profiles').select('user_id, profiles(full_name)'),
-          supabase.from('user_line_accounts').select('user_id, line_display_name').eq('is_verified', true),
-          supabase.from('bookings').select('*').order('created_at', { ascending: false }).limit(100)
-        ]);
-        matesMap = new Map(mates?.map(m => [m.user_id, m.profiles?.full_name || '이름없음']));
+        const { data: mates } = await supabase.from('mate_profiles').select('user_id, profiles(full_name)');
+        matesMap = new Map(mates?.map(m => [m.user_id, m.profiles?.full_name || m.user_id]));
+        const { data: lineAcc } = await supabase.from('user_line_accounts').select('user_id, line_display_name').eq('is_verified', true);
         lineAccountsMap = new Map(lineAcc?.map(l => [l.user_id, l.line_display_name]));
+        const { data: bookings } = await supabase.from('bookings').select('*').order('created_at', { ascending: false }).limit(200);
         allBookings = bookings || [];
         renderBookings();
       } catch (e) { console.error(e); }
@@ -366,34 +345,40 @@
       const tbody = document.getElementById('bookingsTableBody');
       const statusFilter = document.getElementById('statusFilter').value;
       const search = document.getElementById('searchBooking').value.toLowerCase();
-
       const filtered = allBookings.filter(b => {
         if (statusFilter !== 'all' && b.status !== statusFilter) return false;
-        if (search && !b.customer_name?.toLowerCase().includes(search)) return false;
+        if (search && !b.customer_name?.toLowerCase().includes(search) && !b.customer_contact?.toLowerCase().includes(search)) return false;
         return true;
       });
-
-      tbody.innerHTML = filtered.map(b => `
-        <tr>
-          <td data-label="상태"><span class="badge badge-${b.status}">${b.status}</span></td>
-          <td data-label="일시">${b.date} ${b.start_time}</td>
-          <td data-label="고객">${b.customer_name}</td>
-          <td data-label="연락처">${b.customer_contact || '-'}</td>
-          <td data-label="메이트">${matesMap.get(b.mate_id) || '미정'}</td>
-          <td data-label="LINE">${lineAccountsMap.get(b.customer_id) || '미연동'}</td>
-          <td data-label="비고">${b.cancel_reason || b.decline_reason || '-'}</td>
-          <td>
-            <button class="btn btn-success" onclick="sendPassportRequest('${b.id}')">🛂 여권</button>
-            <button class="btn btn-success" onclick="sendPaymentRequest('${b.id}')">💳 결제</button>
-          </td>
-        </tr>
-      `).join('') || '<tr><td colspan="8" style="text-align:center;">데이터가 없습니다.</td></tr>';
+      tbody.innerHTML = filtered.map(b => {
+        const mateName = matesMap.get(b.mate_id) || b.mate_id;
+        const lineName = lineAccountsMap.get(b.customer_id);
+        const reason = b.cancel_reason || b.decline_reason || '-';
+        return `
+          <tr>
+            <td data-label="ID">#${b.id}</td>
+            <td data-label="상태"><span class="badge badge-${b.status}">${b.status}</span></td>
+            <td data-label="일시">${b.date} ${b.start_time}</td>
+            <td data-label="고객">${b.customer_name}</td>
+            <td data-label="연락처">${b.customer_contact}</td>
+            <td data-label="메이트">${mateName}</td>
+            <td data-label="LINE">${lineName ? '✓ '+lineName : '미연동'}</td>
+            <td data-label="비고">${reason}</td>
+            <td>
+              ${lineName ? `
+                <button class="btn btn-success" onclick="sendPassportRequest('${b.id}')">🛂 여권</button>
+                <button class="btn btn-success" onclick="sendPaymentRequest('${b.id}')">💳 결제</button>
+              ` : '-'}
+            </td>
+          </tr>
+        `;
+      }).join('') || '<tr><td colspan="9" style="text-align:center;">결과가 없습니다.</td></tr>';
     }
 
-    // 🛂 여권/결제 요청 로직 (기존 코드 그대로 유지)
+    // 🛂 여권/결제 요청 로직
     window.sendPassportRequest = async function(bookingId) {
       const booking = allBookings.find(b => b.id == bookingId);
-      if(!confirm('여권 인증 링크를 LINE으로 발송하시겠습니까?')) return;
+      if (!confirm('여권 인증 링크를 LINE으로 발송하시겠습니까?')) return;
       try {
         const token = crypto.randomUUID();
         await supabase.from('identity_verification_requests').insert({ user_id: booking.customer_id, status: 'pending', verification_token: token });
@@ -404,7 +389,7 @@
           body: JSON.stringify({ userId: booking.customer_id, type: 'identity_verification_request', uploadUrl: `${location.origin}/passport_upload_token.html?token=${token}` })
         });
         const result = await res.json();
-        alert(result.success ? '✓ 발송 완료!' : '실패: ' + result.error);
+        alert(result.success ? '✓ 발송 성공!' : '실패: ' + result.error);
       } catch (e) { alert(e.message); }
     };
 
@@ -416,22 +401,110 @@
         const token = crypto.randomUUID();
         await supabase.from('bookings').update({ payment_token: token, payment_status: 'pending' }).eq('id', bookingId);
         const {data:{session}} = await supabase.auth.getSession();
-        const res = await fetch(`${SUPABASE_URL}/functions/v1/send-line-notification`, {
+        await fetch(`${SUPABASE_URL}/functions/v1/send-line-notification`, {
           method: 'POST',
           headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}`},
           body: JSON.stringify({ userId: booking.customer_id, bookingId, type: 'payment_request', paymentUrl: `${location.origin}/payment_page.html?token=${token}`, amount: parseInt(amount) })
         });
-        const result = await res.json();
-        if(result.success) alert('✓ 결제 링크 발송 완료!');
+        alert('✓ 결제 요청 성공!');
       } catch (e) { alert(e.message); }
     };
 
-    // 👥 유저 관리 (반응형 data-label 추가)
+    // ⭐ 메이트 관리
+    async function loadMates() {
+      const grid = document.getElementById('matesGrid');
+      grid.innerHTML = '<div class="loading" style="grid-column:1/-1;"><i class="fas fa-spinner"></i> 로딩 중...</div>';
+      try {
+        const { data: mates } = await supabase.from('mate_profiles').select('user_id, is_verified, rating, profiles(full_name, avatar_url)').order('rating', { ascending: false });
+        grid.innerHTML = mates?.map(mate => `
+          <div class="card" style="margin-bottom:0; display:flex; flex-direction:column; gap:15px; border:1px solid #eee;">
+            <div style="display:flex; gap:15px; align-items:center;">
+              <img src="${mate.profiles?.avatar_url || 'https://picsum.photos/80'}" style="width:70px; height:70px; border-radius:12px; object-fit:cover;">
+              <div>
+                <div style="font-weight:700; font-size:1.1rem;">${mate.profiles?.full_name || '이름없음'}</div>
+                <div style="color:#666; font-size:0.9rem;">⭐ ${(mate.rating || 0).toFixed(1)}</div>
+                <span class="badge ${mate.is_verified ? 'badge-confirmed' : 'badge-pending'}">${mate.is_verified ? '✅ 검증됨' : '⏳ 미검증'}</span>
+              </div>
+            </div>
+            <div style="display:flex; gap:10px;">
+              <a href="mate_like.html?mate_id=${mate.user_id}" target="_blank" class="btn btn-secondary" style="flex:1; text-decoration:none; text-align:center;">프로필</a>
+              <button class="btn btn-primary" style="flex:1;" onclick="toggleVerify('${mate.user_id}', ${mate.is_verified})">${mate.is_verified ? '검증해제' : '검증처리'}</button>
+            </div>
+          </div>
+        `).join('') || '<div style="grid-column:1/-1; text-align:center;">메이트가 없습니다.</div>';
+      } catch (e) { console.error(e); }
+    }
+
+    window.toggleVerify = async (id, status) => {
+      if(!confirm('상태를 변경하시겠습니까?')) return;
+      await supabase.from('mate_profiles').update({ is_verified: !status }).eq('user_id', id);
+      loadMates();
+    };
+
+    // 🛂 본인인증 심사
+    async function loadIdentity() {
+      const container = document.getElementById('identityRequests');
+      container.innerHTML = '<div class="loading"><i class="fas fa-spinner"></i> 로딩 중...</div>';
+      try {
+        const filter = document.getElementById('identityFilter').value;
+        let query = supabase.from('identity_verification_requests').select('*').order('created_at', { ascending: false });
+        if (filter !== 'all') query = query.eq('status', filter);
+        const { data: requests } = await query;
+        if (requests?.length) {
+          const userIds = requests.map(r => r.user_id);
+          const { data: profiles } = await supabase.from('profiles').select('id, full_name, email, phone_number').in('id', userIds);
+          container.innerHTML = requests.map(req => {
+            const p = profiles?.find(u => u.id === req.user_id);
+            return `
+              <div class="card" style="border: 1px solid #eee;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+                  <strong>${p?.full_name || 'Unknown'} (${req.status})</strong>
+                  <small>${new Date(req.created_at).toLocaleDateString()}</small>
+                </div>
+                ${req.passport_image_url ? `<img src="${req.passport_image_url}" style="max-width:100%; border-radius:8px; margin-bottom:15px; cursor:pointer;" onclick="window.open(this.src)">` : '<p>이미지 없음</p>'}
+                <div style="display:flex; gap:10px;">
+                  <button class="btn btn-success" onclick="approveIdentity('${req.id}')">승인</button>
+                  <button class="btn btn-secondary" onclick="rejectIdentity('${req.id}')">거부</button>
+                </div>
+              </div>
+            `;
+          }).join('');
+        } else { container.innerHTML = '<p style="text-align:center; padding:20px;">요청이 없습니다.</p>'; }
+      } catch (e) { console.error(e); }
+    }
+
+    window.approveIdentity = async (id) => {
+      const name = prompt('확인된 실명:');
+      const birth = prompt('생년월일(YYYY-MM-DD):');
+      if(!name || !birth) return;
+      await supabase.from('identity_verification_requests').update({ status:'approved', verified_name:name, verified_birth_date:birth }).eq('id', id);
+      alert('승인 완료'); loadIdentity();
+    };
+
+    // 💳 결제 내역
+    async function loadPayments() {
+      const tbody = document.getElementById('paymentsTableBody');
+      tbody.innerHTML = '<tr><td colspan="6" class="loading"><i class="fas fa-spinner"></i> 로딩 중...</td></tr>';
+      const { data } = await supabase.from('kg_inicis_payments').select('*').order('created_at', { ascending: false });
+      tbody.innerHTML = data?.map(p => `
+        <tr>
+          <td data-label="ID">#${p.id}</td>
+          <td data-label="예약ID">#${p.booking_id}</td>
+          <td data-label="고객">${p.buyer_name}</td>
+          <td data-label="금액">₩${p.amount?.toLocaleString()}</td>
+          <td data-label="상태">${p.payment_status}</td>
+          <td data-label="날짜">${new Date(p.created_at).toLocaleDateString()}</td>
+        </tr>
+      `).join('') || '<tr><td colspan="6" style="text-align:center;">내역이 없습니다.</td></tr>';
+    }
+
+    // 👥 유저 관리
     let allUsers = [];
     async function loadUsers() {
       const tbody = document.getElementById('usersTableBody');
-      const {data: profiles} = await supabase.from('profiles').select('id, full_name, email, age, gender').order('created_at', { ascending: false });
-      const {data: mates} = await supabase.from('mate_profiles').select('user_id');
+      tbody.innerHTML = '<tr><td colspan="7" class="loading"><i class="fas fa-spinner"></i> 로딩 중...</td></tr>';
+      const { data: profiles } = await supabase.from('profiles').select('id, full_name, email, age, gender').order('created_at', { ascending: false });
+      const { data: mates } = await supabase.from('mate_profiles').select('user_id');
       const mateSet = new Set(mates?.map(m => m.user_id));
       allUsers = profiles.map(p => ({ ...p, is_mate: mateSet.has(p.id) }));
       renderUsers();
@@ -443,9 +516,11 @@
       const filtered = allUsers.filter(u => u.full_name?.toLowerCase().includes(search) || u.email?.toLowerCase().includes(search));
       tbody.innerHTML = filtered.map(u => `
         <tr>
+          <td data-label="ID">${u.id.substring(0,8)}</td>
           <td data-label="이름">${u.full_name || '-'}</td>
           <td data-label="이메일">${u.email}</td>
-          <td data-label="나이/성별">${u.age || '-'}/${u.gender || '-'}</td>
+          <td data-label="나이">${u.age || '-'}</td>
+          <td data-label="성별">${u.gender || '-'}</td>
           <td data-label="메이트">${u.is_mate ? '✅' : '일반'}</td>
           <td>
             ${!u.is_mate ? `<button class="btn btn-success" onclick="convertToMate('${u.id}')">전환</button>` : `<button class="btn btn-secondary" onclick="removeMate('${u.id}')">해제</button>`}
@@ -454,45 +529,28 @@
       `).join('');
     }
 
-    // 메이트 전환/해제 (기존 로직 유지)
-    window.convertToMate = async (userId) => {
+    window.convertToMate = async (id) => {
       if(!confirm('메이트로 전환하시겠습니까?')) return;
-      await supabase.from('mate_profiles').insert({ user_id: userId, hourly_rate: 4000, bio: '', is_verified: false });
-      alert('완료'); loadUsers();
+      await supabase.from('mate_profiles').insert({ user_id: id, hourly_rate: 4000 });
+      loadUsers();
     };
-    window.removeMate = async (userId) => {
+    window.removeMate = async (id) => {
       if(!confirm('해제하시겠습니까?')) return;
-      await supabase.from('mate_profiles').delete().eq('user_id', userId);
-      alert('완료'); loadUsers();
+      await supabase.from('mate_profiles').delete().eq('user_id', id);
+      loadUsers();
     };
 
-    // 초기 이벤트 리스너
+    // 초기 이벤트 바인딩
     document.getElementById('statusFilter').onchange = renderBookings;
     document.getElementById('searchBooking').oninput = renderBookings;
     document.getElementById('refreshBookings').onclick = loadBookings;
-    document.getElementById('searchUser').oninput = renderUsers;
+    document.getElementById('refreshMates').onclick = loadMates;
+    document.getElementById('refreshIdentity').onclick = loadIdentity;
+    document.getElementById('refreshPayments').onclick = loadPayments;
     document.getElementById('refreshUsers').onclick = loadUsers;
+    document.getElementById('searchUser').oninput = renderUsers;
 
-    // 본인인증 심사 로드 (기존 UI 로직 유지)
-    async function loadIdentity() {
-      const container = document.getElementById('identityRequests');
-      const {data: requests} = await supabase.from('identity_verification_requests').select('*, profiles(full_name, email, phone_number, birth_date)').order('created_at', { ascending: false });
-      container.innerHTML = requests?.map(req => `
-        <div class="card" style="border: 1px solid #eee;">
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
-            <div><strong>${req.profiles?.full_name}</strong><br><small>${req.profiles?.email}</small></div>
-            <span class="badge badge-pending">${req.status}</span>
-          </div>
-          ${req.passport_image_url ? `<img src="${req.passport_image_url}" style="width:100%; border-radius:8px; margin-bottom:10px; cursor:pointer;" onclick="window.open(this.src)">` : '<p>이미지 미업로드</p>'}
-          <div style="display:flex; gap:5px;">
-            <button class="btn btn-success" style="flex:1" onclick="approveIdentity('${req.id}')">승인</button>
-            <button class="btn btn-secondary" style="flex:1" onclick="rejectIdentity('${req.id}')">거부</button>
-          </div>
-        </div>
-      `).join('') || '내역이 없습니다.';
-    }
-
-    // 초기 데이터 로드
+    // 첫 화면 로드
     loadBookings();
   </script>
 </body>
