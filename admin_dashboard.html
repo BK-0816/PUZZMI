@@ -443,35 +443,78 @@
 
     // 🛂 본인인증 심사
     async function loadIdentity() {
-      const container = document.getElementById('identityRequests');
-      container.innerHTML = '<div class="loading"><i class="fas fa-spinner"></i> 로딩 중...</div>';
-      try {
-        const filter = document.getElementById('identityFilter').value;
-        let query = supabase.from('identity_verification_requests').select('*').order('created_at', { ascending: false });
-        if (filter !== 'all') query = query.eq('status', filter);
-        const { data: requests } = await query;
-        if (requests?.length) {
-          const userIds = requests.map(r => r.user_id);
-          const { data: profiles } = await supabase.from('profiles').select('id, full_name, email, phone_number').in('id', userIds);
-          container.innerHTML = requests.map(req => {
-            const p = profiles?.find(u => u.id === req.user_id);
-            return `
-              <div class="card" style="border: 1px solid #eee;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
-                  <strong>${p?.full_name || 'Unknown'} (${req.status})</strong>
-                  <small>${new Date(req.created_at).toLocaleDateString()}</small>
+  const container = document.getElementById('identityRequests');
+  container.innerHTML = '<div class="loading"><i class="fas fa-spinner"></i> 로딩 중...</div>';
+
+  try {
+    const filter = document.getElementById('identityFilter').value;
+    let query = supabase.from('identity_verification_requests').select('*').order('created_at', { ascending: false });
+    if (filter !== 'all') query = query.eq('status', filter);
+    
+    const { data: requests } = await query;
+
+    if (requests?.length) {
+      const userIds = requests.map(r => r.user_id);
+      const { data: profiles } = await supabase.from('profiles').select('id, full_name, email, phone_number').in('id', userIds);
+      
+      container.innerHTML = requests.map(req => {
+        const p = profiles?.find(u => u.id === req.user_id);
+        const uniqueId = `details_${req.id}`; // 고유 ID 생성
+        
+        return `
+          <div class="card" style="border: 1px solid #eee; padding: 15px; margin-bottom: 10px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <strong>${p?.full_name || 'Unknown'}</strong> 
+                <span class="badge badge-pending" style="margin-left:8px;">${req.status}</span>
+                <div style="font-size:0.8rem; color:#888;">${new Date(req.created_at).toLocaleString()}</div>
+              </div>
+              <button class="btn btn-secondary" onclick="toggleElement('${uniqueId}')">
+                <i class="fas fa-search"></i> 심사하기
+              </button>
+            </div>
+
+            <div id="${uniqueId}" style="display:none; margin-top:15px; padding-top:15px; border-top:1px dashed #eee;">
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                <div>
+                  <p><strong>이메일:</strong> ${p?.email || '-'}</p>
+                  <p><strong>연락처:</strong> ${p?.phone_number || '-'}</p>
+                  ${req.passport_image_url ? `
+                    <button class="btn btn-primary" onclick="window.open('${req.passport_image_url}', '_blank')" style="width:100%; margin-top:10px;">
+                      <i class="fas fa-passport"></i> 여권 원본 새창보기
+                    </button>
+                  ` : ''}
                 </div>
-                ${req.passport_image_url ? `<img src="${req.passport_image_url}" style="max-width:100%; border-radius:8px; margin-bottom:15px; cursor:pointer;" onclick="window.open(this.src)">` : '<p>이미지 없음</p>'}
-                <div style="display:flex; gap:10px;">
-                  <button class="btn btn-success" onclick="approveIdentity('${req.id}')">승인</button>
-                  <button class="btn btn-secondary" onclick="rejectIdentity('${req.id}')">거부</button>
+                <div style="text-align:center;">
+                  ${req.passport_image_url ? `
+                    <img src="${req.passport_image_url}" style="max-width:100%; max-height:200px; border-radius:8px; cursor:pointer; border:1px solid #ddd;" 
+                         onclick="window.open(this.src)" title="클릭하면 크게 봅니다">
+                  ` : '<p style="color:#ccc;">이미지 없음</p>'}
                 </div>
               </div>
-            `;
-          }).join('');
-        } else { container.innerHTML = '<p style="text-align:center; padding:20px;">요청이 없습니다.</p>'; }
-      } catch (e) { console.error(e); }
+              
+              <div style="display:flex; gap:10px; margin-top:15px;">
+                <button class="btn btn-success" style="flex:1" onclick="approveIdentity('${req.id}')">승인 처리</button>
+                <button class="btn btn-secondary" style="flex:1; background:#fee; color:#c33;" onclick="rejectIdentity('${req.id}')">거부 처리</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    } else {
+      container.innerHTML = '<p style="text-align:center; padding:40px; color:#999;">심사 대기 중인 내역이 없습니다.</p>';
     }
+  } catch (e) {
+    console.error(e);
+    container.innerHTML = '<p style="text-align:center; color:red;">데이터를 불러오는 중 오류가 발생했습니다.</p>';
+  }
+}
+
+// 토글 함수 추가
+window.toggleElement = function(id) {
+  const el = document.getElementById(id);
+  el.style.display = (el.style.display === 'none') ? 'block' : 'none';
+}
 
     window.approveIdentity = async (id) => {
       const name = prompt('확인된 실명:');
