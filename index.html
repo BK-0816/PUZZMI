@@ -18,81 +18,103 @@
     <link rel="stylesheet" href="styles_hero_zoom_tune.css">
     <link rel="stylesheet" href="styles_hero_desktop_fit.css">
     <style>
-  @media (max-width: 768px) {
-    /* 1. 공통 섹션 패딩 축소 */
-    section { padding: 40px 0 !important; }
-    .section-title { font-size: 1.6rem !important; text-align: center; }
-
-    /* 2. 모든 그리드(About, Safety, Friends, Reviews)에 스와이프 적용 */
-    .about-grid, .safety-grid, .friends-grid, .reviews-grid {
-      display: flex !important;
-      flex-wrap: nowrap !important;
-      overflow-x: auto !important;
-      scroll-snap-type: x mandatory; /* 자석처럼 착착 감기는 스크롤 */
-      gap: 16px !important;
-      padding: 0 20px 20px 20px !important; /* 좌우 여백 유지 */
-      margin: 0 -20px !important; /* 컨테이너 밖으로 확장 */
-      -webkit-overflow-scrolling: touch;
+  /* 📱 모바일 반응형 최적화 패치 (max-width: 768px) */
+@media (max-width: 768px) {
+    /* 1. 네비게이션 바 최적화 */
+    #app-nav {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+    }
+    
+    /* 2. 섹션 간격 조정 */
+    section {
+        padding: 40px 0 !important;
+    }
+    
+    .section-header {
+        margin-bottom: 30px !important;
+        padding: 0 20px;
+    }
+    
+    .section-title {
+        font-size: 1.8rem !important;
+        word-break: keep-all;
     }
 
-    /* 스크롤바 숨기기 */
-    .about-grid::-webkit-scrollbar, .safety-grid::-webkit-scrollbar, 
-    .friends-grid::-webkit-scrollbar, .reviews-grid::-webkit-scrollbar {
-      display: none;
+    /* 3. ABOUT & SAFETY 그리드 1열 전환 */
+    .about-grid, .safety-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 20px !important;
+        padding: 0 20px;
+    }
+    
+    .about-card, .safety-card {
+        width: 100% !important;
+        margin: 0 !important;
     }
 
-    /* 3. 카드 크기 최적화 (화면의 80~85%만 차지하게 해서 다음 카드가 보이게 함) */
-    .about-card, .safety-card, .review-card {
-      flex: 0 0 85% !important;
-      scroll-snap-align: center;
+    /* 4. 메이트 카드(Friends Grid) 최적화 */
+    .friends-grid {
+        display: grid !important;
+        grid-template-columns: 1fr !important; /* 모바일은 1열 */
+        gap: 24px !important;
+        padding: 0 20px;
     }
-
-    /* 메이트 카드는 조금 더 작게 해서 더 많이 넘겨보게 유도 */
+    
     .friend-card {
-      flex: 0 0 75% !important; 
-      scroll-snap-align: center;
-      margin-bottom: 0 !important;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* 4. 메이트 카드 내부 요소 압축 */
-    .friend-image img {
-      height: 220px !important; /* 세로형 카드로 강조 */
-      border-radius: 20px 20px 0 0 !important;
+        max-width: 100% !important;
     }
     
-    .friend-info {
-      padding: 16px !important;
-      flex-grow: 1;
+    .friend-info .cta-btn {
+        padding: 10px 5px !important; /* 버튼 텍스트가 넘치지 않게 조절 */
+        font-size: 0.85rem !important;
     }
 
-    .friend-description {
-      display: -webkit-box !important;
-      -webkit-line-clamp: 2; /* 두 줄만 보여주고 생략 */
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      font-size: 0.85rem !important;
+    /* 5. 리뷰 그리드 최적화 */
+    .reviews-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 16px !important;
+        padding: 0 20px;
+    }
+    
+    .review-card {
+        width: 100% !important;
     }
 
-    /* 버튼 가로 정렬로 변경 (스와이프 시 터치 방해 최소화) */
-    .friend-info > div:last-child {
-      display: grid !important;
-      grid-template-columns: 1fr 1fr; /* 버튼 두 개를 나란히 */
-      gap: 8px !important;
+    /* 6. 푸터 최적화 */
+    .footer-content {
+        flex-direction: column !important;
+        text-align: center !important;
+        gap: 20px;
     }
     
-    .cta-btn {
-      padding: 10px 5px !important;
-      font-size: 0.75rem !important;
-      white-space: nowrap;
+    .footer-legal {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+    }
+
+    /* 7. 플로팅 액션 버튼 크기 조절 */
+    .floating-actions {
+        bottom: 20px !important;
+        right: 15px !important;
     }
     
-    /* '어카운트(찜)' 버튼은 작은 아이콘 버튼으로 변경하는 효과 */
-    [data-fav-mate] {
-      grid-column: span 2; /* 찜 버튼은 가로로 길게 밑에 배치 */
+    .floating-btn span {
+        display: none; /* 모바일에서는 텍스트 숨기고 아이콘만 표시 */
     }
-  }
+    
+    .floating-btn {
+        width: 50px !important;
+        height: 50px !important;
+    }
+}
 </style>
 </head>
 
