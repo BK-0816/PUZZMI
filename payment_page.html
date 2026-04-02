@@ -40,6 +40,18 @@
     <div id="error-message" style="display:none; margin-top:20px; padding:20px; background:#fee; border-radius:12px; color:#c00; text-align:center;"></div>
   </div>
 
-  <script type="module" src="payment_page.js"></script>
+  <script type="module" src="payment_page.js">
+
+    const { data: { user } } = await supabase.auth.getUser();
+
+if (!user) {
+    alert("로그인 세션이 만료되었거나 정보가 없습니다. 다시 로그인해 주세요.");
+    // 로그인 완료 후 다시 결제 페이지로 돌아오도록 설정
+    const currentUrl = encodeURIComponent(window.location.href);
+    window.location.href = `auth_combo.html?redirect=${currentUrl}`;
+    return;
+}
+
+  </script>
 </body>
 </html>
