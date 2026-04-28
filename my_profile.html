@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>マイページ - PUZZMI</title>
+  <title>私の情報 - PUZZMI</title>
   <link rel="stylesheet" href="styles.css"/>
   <link rel="stylesheet" href="pages.css"/>
   <link rel="stylesheet" href="pages-theme.css"/>
@@ -708,8 +708,8 @@
   <main class="profile-wrap">
     <!-- 페이지 헤더 -->
     <section class="page-header">
-      <h2>マイページ</h2>
-      <p class="page-subtitle">プロフィール編集／アカウント設定</p>
+      <h2>私の情報</h2>
+      <p class="page-subtitle">プロフィール情報を修正してアカウントを管理してください</p>
     </section>
 
     <!-- 프로필 완성도 -->
@@ -718,7 +718,7 @@
       <div class="progress-bar">
         <div class="progress-fill" id="progressFill" style="width: 0%"></div>
       </div>
-      <div class="progress-text" id="progressText">0% </div>
+      <div class="progress-text" id="progressText">0% 完成</div>
     </section>
 
     <!-- 계정 상태 -->
@@ -729,7 +729,7 @@
 
     <!-- 기본 정보 섹션 -->
     <section class="section-card">
-      <h3 class="section-title">👤 会員情報</h3>
+      <h3 class="section-title">👤 基本情報</h3>
       
       <form id="basicInfoForm" class="form-grid">
         <div class="form-row">
@@ -747,8 +747,8 @@
           <div class="form-field">
             <label class="form-label" for="gender">性別</label>
             <select class="form-select" id="gender">
-              <option value="女性">女性</option>
-              <option value="男性">男性</option>
+              <option value="여성">女性</option>
+              <option value="남성">男性</option>
             </select>
           </div>
           <div class="form-field">
@@ -758,7 +758,7 @@
         </div>
         
         <div class="action-group">
-          <button class="btn btn-primary" type="submit">💾 保存</button>
+          <button class="btn btn-primary" type="submit">💾 基本情報保存</button>
           <div id="basicInfoResult"></div>
         </div>
       </form>
@@ -766,7 +766,7 @@
 
     <!-- 상세 정보 섹션 -->
     <section class="section-card">
-      <h3 class="section-title">🌍 保存</h3>
+      <h3 class="section-title">🌍 詳細情報</h3>
       <form id="detailInfoForm" class="form-grid">
         <div class="form-row">
           <div class="form-field">
@@ -780,12 +780,10 @@
 
             </select>
           </div>
-        <!--
           <div class="form-field">
             <label class="form-label" for="residence">현재 거주지</label>
             <input class="form-input" type="text" id="residence" placeholder="서울특별시 강남구"/>
           </div>
-        -->
         </div>
         
         <div class="form-row">
@@ -798,17 +796,17 @@
         <div class="form-row single">
           <div class="form-field">
             <label class="form-label" for="selfIntroduction">自己紹介</label>
-            <textarea class="form-textarea" id="selfIntroduction" placeholder="→簡単な自己紹介をご記入ください..."></textarea>
+            <textarea class="form-textarea" id="selfIntroduction" placeholder="簡単な自己紹介をお書きください..."></textarea>
           </div>
         </div>
         
         <div class="form-row single">
           <div class="form-field">
-            <label class="form-label">利用可能な言語を選択</label>
+            <label class="form-label">사용 가능한 언어</label>
             <div class="checkbox-group" id="languageGroup">
               <label class="checkbox-item">
-                <input type="checkbox" value="韓国語"/>
-                <span class="checkbox-label">🇰🇷 韓国語</span>
+                <input type="checkbox" value="한국어"/>
+                <span class="checkbox-label">🇰🇷 한국어</span>
               </label>
               <label class="checkbox-item">
                 <input type="checkbox" value="日本語"/>
@@ -829,15 +827,15 @@
         
         <div class="form-row single">
           <div class="form-field">
-            <label class="form-label">好きなこと</label>
+            <label class="form-label">関心事</label>
             <div class="checkbox-group" id="interestsGroup">
               <label class="checkbox-item">
                 <input type="checkbox" value="맛집 탐방"/>
-                <span class="checkbox-label">🍽️ グルメ巡り</span>
+                <span class="checkbox-label">🍽️ グルメ探訪</span>
               </label>
               <label class="checkbox-item">
                 <input type="checkbox" value="카페 투어"/>
-                <span class="checkbox-label">☕ カフェ巡り</span>
+                <span class="checkbox-label">☕ カフェツアー</span>
               </label>
               <label class="checkbox-item">
                 <input type="checkbox" value="쇼핑"/>
@@ -856,7 +854,7 @@
                 <span class="checkbox-label">🎵 K-POP</span>
               </label>
             </div>
-            <div class="help-text">興味のあることを選択してください</div>
+            <div class="help-text">関心のある活動を選択してください</div>
           </div>
         </div>
         
@@ -892,7 +890,7 @@
       <div class="identity-verification-section" style="margin-bottom: 32px; padding: 24px; background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); border-radius: 16px; border: 2px solid rgba(102, 126, 234, 0.1);">
         <h4 style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
           <i class="fas fa-id-card" style="color: #667eea;"></i>
-          本人確認
+          本人認証
         </h4>
 
         <div id="identityVerificationStatus" class="help-text" style="margin-bottom: 16px;">
@@ -908,7 +906,7 @@
       <form id="emailForm" class="form-grid">
         <div class="form-row single">
           <div class="form-field">
-            <label class="form-label" for="currentEmail">Eメール</label>
+            <label class="form-label" for="currentEmail">現在のEメール</label>
             <input class="form-input" type="email" id="currentEmail" readonly style="background: rgba(0,0,0,0.05); cursor: not-allowed;"/>
           </div>
         </div>
@@ -942,9 +940,9 @@
 
     <!-- 계정 삭제 섹션 -->
     <section class="section-card">
-      <h3 class="section-title">⚠️ 退会</h3>
+      <h3 class="section-title">⚠️ 会員脱退</h3>
       <div class="help-text" style="margin-bottom: 20px;">
-        削除すると､ アカウントおよびすべてのデータは復元できません｡
+        アカウントを削除すると、すべてのデータが永久に削除され、回復できません。
       </div>
       
       <div class="action-group">
@@ -1051,17 +1049,17 @@
           statusEl.innerHTML = `
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
               <i class="fas fa-exclamation-triangle" style="color: #ffc107;"></i>
-              <strong>LINEアカウントが連携されていません</strong>
+              <strong>LINE 계정이 연동되지 않았습니다</strong>
             </div>
             <div style="font-size: 0.9rem;">
-              予約確定および決済案内を受け取るにはLINE連携が必要です。
+              예약 확정 및 결제 안내를 받으려면 LINE 연동이 필요합니다.
             </div>
           `;
           
           actionsEl.innerHTML = `
             <button class="btn btn-line" id="connectLineBtn">
               <i class="fab fa-line"></i>
-              LINEアカウントを連携する
+              LINE 계정 연동하기
             </button>
           `;
           
@@ -1249,7 +1247,7 @@
         genderEl.value = profile.gender || '';
         phoneNumberEl.value = profile.phone_number || '';
         nationalityEl.value = profile.nationality || '';
-        //residenceEl.value = profile.residence || '';
+        residenceEl.value = profile.residence || '';
         occupationEl.value = profile.occupation || '';
         currentEmailEl.value = user.email || '';
 
@@ -1268,7 +1266,7 @@
         // 프로필 완성도 업데이트
         const completion = calculateCompletion(profile);
         progressFill.style.width = completion + '%';
-        progressText.textContent = completion + '%';
+        progressText.textContent = completion + '% 完成';
 
         // 계정 상태 업데이트
         const statusIcon = accountStatus.querySelector('.status-icon');
@@ -1335,7 +1333,7 @@
         basicInfoResult.innerHTML = `<div class="error">❌ 貯蔵失敗: ${error.message}</div>`;
       } finally {
         submitBtn.disabled = false;
-        submitBtn.innerHTML = '💾 保存';
+        submitBtn.innerHTML = '💾 基本情報保存';
       }
     });
 
@@ -1618,7 +1616,7 @@
             <div style="padding: 16px; background: white; border-radius: 12px; border: 2px dashed #ddd;">
               <div style="color: #666; font-size: 0.95rem; margin-bottom: 12px;">
                 予約サービスをご利用いただくには、本人認証が必要です。<br>
-                <strong style="color: #667eea;">予約申請後､ LINEにて本人確認用のリンクをお送りします｡</strong>
+                <strong style="color: #667eea;">予約を申請すると、管理者がLINEでパスポートアップロードリンクを送信します。</strong>
               </div>
             </div>
           `;
