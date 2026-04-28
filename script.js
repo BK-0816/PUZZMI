@@ -596,12 +596,15 @@ function switchLanguage(lang) {
     });
 }
 
-// 로고 변경을 위한 코드
-const navBrand = document.querySelector('.nav-brand');
-navBrand.innerHTML = `<img src="puzzmi_original.png" alt="PUZZMI 로고" class="logo"><span>PUZZMI</span>`;
-//navBrand.querySelector('.logo').style.height = '40px';
-//navBrand.querySelector('.logo').style.marginRight = '10px';
-navBrand.querySelector('.logo').style.verticalAlign = 'middle';
+// 로고 변경을 위한 코드 (nav.js injects nav after this script runs — guard for null)
+document.addEventListener('DOMContentLoaded', () => {
+  const navBrand = document.querySelector('.nav-brand');
+  if (navBrand && !navBrand.querySelector('img')) {
+    navBrand.innerHTML = `<img src="puzzmi_original.png" alt="PUZZMI ロゴ" class="logo"><span>PUZZMI</span>`;
+    const logo = navBrand.querySelector('.logo');
+    if (logo) logo.style.verticalAlign = 'middle';
+  }
+});
 
 // 히어로 배경 이미지 순환 로직
 let currentBgIndex = 0;
@@ -683,7 +686,7 @@ function initializeSmoothScrolling() {
             const targetElement = document.querySelector(targetId);
             
             if (targetElement) {
-                const headerHeight = document.querySelector('.header').offsetHeight;
+                const headerHeight = (document.querySelector('.app-nav') || document.querySelector('.header'))?.offsetHeight || 72;
                 const targetPosition = targetElement.offsetTop - headerHeight;
                 
                 window.scrollTo({
@@ -867,7 +870,7 @@ window.addEventListener('resize', debounce(() => {
 // 키보드 네비게이션 지원
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-        navMenu.classList.remove('active');
+        navMenu?.classList.remove('active');
     }
 });
 
