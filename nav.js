@@ -248,10 +248,7 @@ export async function renderNavbar(rootId = 'app-nav') {
         createElement('i', { class: 'fas fa-chart-line' }),
         createElement('span', {}, '메이트 대시보드')
       ]));
-      userMenu.appendChild(createElement('a', { class: 'dropdown-item', href: `mate_like.html?mate_id=${user.id}` }, [
-        createElement('i', { class: 'fas fa-eye' }),
-        createElement('span', {}, '고객이 보는 내 프로필')
-      ]));
+      
     }
     
     // 관리자 메뉴
