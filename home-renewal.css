@@ -414,46 +414,46 @@ section{ padding: 88px 0; }
   background-size: cover;
   background-position: center;
 }
-.photo-hero::after{ content: none; }
+.photo-hero::after, .photo-hero i{ content: none; display: none; }
 
 .photo-gourmet{
   background-image: url('activity-gourmet.jpg');
   background-size: cover;
   background-position: center;
 }
-.photo-gourmet::after{ content: none; }
+.photo-gourmet::after, .photo-gourmet i{ content: none; display: none; }
 
 .photo-cafe{
   background-image: url('activity-cafe.jpg');
   background-size: cover;
   background-position: center;
 }
-.photo-cafe::after{ content: none; }
+.photo-cafe::after, .photo-cafe i{ content: none; display: none; }
 
 .photo-shoot{
   background-image: url('activity-shoot.jpg');
   background-size: cover;
   background-position: center;
 }
-.photo-shoot::after{ content: none; }
+.photo-shoot::after, .photo-shoot i{ content: none; display: none; }
 
 .photo-shopping{
   background-image: url('activity-shopping.jpg');
   background-size: cover;
   background-position: center;
 }
-.photo-shopping::after{ content: none; }
+.photo-shopping::after, .photo-shopping i{ content: none; display: none; }
 
 .photo-hotspot{
   background-image: url('activity-hotspot.jpg');
   background-size: cover;
   background-position: center;
 }
-.photo-hotspot::after{ content: none; }
+.photo-hotspot::after, .photo-hotspot i{ content: none; display: none; }
 
 .photo-cta{
   background-image: url('cta-banner.jpg');
   background-size: cover;
   background-position: center;
 }
-.photo-cta::after{ content: none; }
+.photo-cta::after, .photo-cta i{ content: none; display: none; }
