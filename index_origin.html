@@ -1,14 +1,155 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PUZZMI - ソウルで出会う、友達みたいな特別な時間</title>
+    <title>PUZZMI - ソウル 友達レンタル サービス</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;800&family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="nav.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <!-- 메인페이지 전용 리뉴얼 디자인 시스템 (2026) -->
-    <link rel="stylesheet" href="home-renewal.css">
+    <link rel="stylesheet" href="styles_hero_patch_2b.css">
+    <link rel="stylesheet" href="styles_swipe_patch.css">
+    <link rel="stylesheet" href="styles_hero_zoom_tune.css">
+    <link rel="stylesheet" href="styles_hero_desktop_fit.css">
+    <style>
+  /* 📱 모바일 반응형 최적화 패치 (max-width: 768px) */
+@media (max-width: 768px) {
+    /* 1. 네비게이션 바 최적화 */
+    #app-nav {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+    }
+    
+    /* 2. 섹션 간격 조정 */
+    section {
+        padding: 40px 0 !important;
+    }
+    
+    .section-header {
+        margin-bottom: 30px !important;
+        padding: 0 20px;
+    }
+    
+    .section-title {
+        font-size: 1.8rem !important;
+        word-break: keep-all;
+    }
+
+    /* 3. ABOUT & SAFETY 그리드 최적화 (2열 배치) */
+.about-grid, .safety-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important; /* 1열에서 2열로 변경 */
+    gap: 12px !important;
+    padding: 0 15px;
+}
+
+.about-card, .safety-card {
+    width: 100% !important;
+    margin: 0 !important;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 카드 내 이미지 및 텍스트 크기 조정 */
+.about-card-image img {
+    height: 120px !important; /* 이미지 높이 제한 */
+    object-fit: cover;
+}
+
+.about-card-content, .safety-card-content {
+    padding: 12px !important;
+}
+
+.about-card-content h3, .safety-card-content h3 {
+    font-size: 0.95rem !important; /* 제목 크기 축소 */
+    line-height: 1.3;
+    margin-bottom: 6px;
+    word-break: keep-all;
+}
+
+.about-card-content p, .safety-card-content p {
+    font-size: 0.8rem !important; /* 본문 크기 축소 */
+    line-height: 1.4;
+    color: #666;
+}
+
+.safety-icon {
+    font-size: 1.5rem !important; /* 아이콘 크기 조정 */
+    margin-bottom: 8px;
+}
+
+    /* 4. 메이트 카드(Friends Grid) 최적화 */
+    .friends-grid {
+        display: grid !important;
+        grid-template-columns: 1fr !important; /* 모바일은 1열 */
+        gap: 24px !important;
+        padding: 0 20px;
+    }
+    
+    .friend-card {
+        max-width: 100% !important;
+    }
+    
+    .friend-info .cta-btn {
+        padding: 10px 5px !important; /* 버튼 텍스트가 넘치지 않게 조절 */
+        font-size: 0.85rem !important;
+    }
+
+    /* 5. 리뷰 그리드 최적화 */
+    .reviews-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 16px !important;
+        padding: 0 20px;
+    }
+    
+    .review-card {
+        width: 100% !important;
+    }
+
+    /* 6. 푸터 최적화 */
+    .footer-content {
+        flex-direction: column !important;
+        text-align: center !important;
+        gap: 20px;
+    }
+    
+    .footer-legal {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+    }
+
+    /* 7. 플로팅 액션 버튼 크기 조절 */
+    .floating-actions {
+        bottom: 20px !important;
+        right: 15px !important;
+    }
+    
+    .floating-btn span {
+        display: none; /* 모바일에서는 텍스트 숨기고 아이콘만 표시 */
+    }
+    
+    .floating-btn {
+        width: 50px !important;
+        height: 50px !important;
+    }
+}
+</style>
 </head>
 
 <body class="bg-cream">
@@ -94,7 +235,7 @@
         card.innerHTML = `
           <div class="friend-image">
             <img src="${img}" alt="${name}">
-            <div class="heart-badge" data-heart="${row.user_id}">
+            <div class="heart-badge" data-heart="${row.user_id}" style="position:absolute;right:8px;top:8px;background:#e0245e;color:#fff;border-radius:16px;padding:4px 8px;font-size:12px;display:flex;gap:6px;align-items:center;">
               <i class="fas fa-heart"></i><span class="count">0</span>
             </div>
           </div>
@@ -176,8 +317,8 @@
                     <p style="font-size:0.9em; color:#666; margin-top:8px;">
                       네트워크 연결을 확인하고 페이지를 새로고침해주세요.
                     </p>
-                    <button onclick="location.reload()" class="retry-btn">
-                      再読み込み
+                    <button onclick="location.reload()" style="margin-top:12px; padding:8px 16px; background:#667eea; color:white; border:none; border-radius:4px; cursor:pointer;">
+                      새로고침
                     </button>
                   </div>
                 `;
@@ -267,9 +408,9 @@
         const toast = document.createElement('div');
         toast.style.cssText = `
           position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-          background: linear-gradient(135deg, var(--rose-500, #da7290) 0%, var(--violet-500, #b46aaf) 100%);
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           color: white; padding: 12px 24px; border-radius: 12px;
-          z-index: 9999; font-weight: 600; box-shadow: 0 8px 24px rgba(180,106,175,0.35);
+          z-index: 9999; font-weight: 600; box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
           animation: slideDown 0.3s ease;
         `;
         toast.textContent = message;
@@ -464,7 +605,7 @@
                   ${renderStars(review.rating)}
                 </div>
                 <p class="review-date">${reviewDate}</p>
-                <div class="review-mate">
+                <div class="review-mate" style="margin-top: 12px; padding: 8px 12px; background: rgba(102, 126, 234, 0.1); border-radius: 8px; font-size: 0.9rem; color: var(--text-secondary);">
                   メイト <strong>${mateName}</strong> さんとの旅
                 </div>
               </div>
@@ -486,111 +627,91 @@
     <script type="module" src="nav.js"></script>
     
     <section id="home" class="hero">
-        <div class="hero-photo ph-photo" data-ph="PHOTO: カフェで笑うメイトと旅行者"><i class="fas fa-image"></i></div>
-        <div class="hero-content">
-            <p class="hero-eyebrow">ひとり旅でも、<strong>ひとりじゃない<i class="fas fa-heart"></i></strong></p>
-            <h1>ソウルで出会う、<br>友達みたいな<br>特別な時間。</h1>
-            <p class="hero-sub">現地の友達「メイト」と一緒に、グルメも、カフェも、ショッピングも、あなただけのソウルを楽しもう！</p>
-        </div>
-        <aside class="hero-highlight-card">
-            <h3>一緒にできること <i class="fas fa-heart" style="color:var(--rose-500);font-size:0.75em;"></i></h3>
-            <ul>
-                <li><i class="fas fa-check"></i>韓国グルメ巡り</li>
-                <li><i class="fas fa-check"></i>カフェ・スイーツ</li>
-                <li><i class="fas fa-check"></i>ショッピング同行</li>
-                <li><i class="fas fa-check"></i>写真を撮ってくれる</li>
-                <li><i class="fas fa-check"></i>韓国人しか知らないスポット案内 など</li>
-            </ul>
-        </aside>
+        <div class="hero-bg"></div>
+        <div class="hero-overlay"></div>
     </section>
 
-    <div class="hero-search">
-        <div class="search-bar">
-            <div class="search-field">
-                <i class="fas fa-map-marker-alt"></i>
-                <div>
-                    <span class="label">エリアを選択</span>
-                    <span class="value">エリアを選択してください</span>
-                </div>
-            </div>
-            <div class="search-field">
-                <i class="fas fa-calendar-alt"></i>
-                <div>
-                    <span class="label">日付を選択</span>
-                    <span class="value">日付を選択してください</span>
-                </div>
-            </div>
-            <div class="search-field">
-                <i class="fas fa-clock"></i>
-                <div>
-                    <span class="label">時間を選択</span>
-                    <span class="value">時間を選択してください</span>
-                </div>
-            </div>
-            <a href="#friends" class="search-submit"><i class="fas fa-search"></i> メイトを探す</a>
-        </div>
+<section id="about" class="about">
+  <div class="container">
+    <div class="section-header" data-eyebrow="ABOUT">
+      <h2 class="section-title">'PUZZMI'ってどんなサービス？'</h2>
+      <p class="section-subtitle">あなたの"⼀緒に⾏きたい"という気持ちを叶えるサービス！</p>
     </div>
 
-<section id="safety" class="trust">
-  <div class="container">
-    <div class="section-header">
-      <h2>PUZZMIのメイトはここが安心！<i class="fas fa-heart heart"></i></h2>
-    </div>
-    <div class="trust-grid">
-      <div class="trust-card">
-        <div class="trust-icon"><i class="fas fa-id-card"></i></div>
-        <p>本人確認済みの<br>メイトのみ</p>
+    <!-- 반응형 그리드 컨테이너 -->
+    <div class="about-grid">
+      <div class="about-card">
+        <div class="about-card-image">
+          <img src="about1.png" alt="PUZZMI 소개 사진 1" />
+        </div>
+        <div class="about-card-content">
+          <h3>一人では行けない、お店、グルメやカフェを楽しもう！</h3>
+          <p>現地の友達と一緒なら、ローカルグルメも安心！言葉の壁を気にせず、韓国を思いっきり楽しもう！</p>
+        </div>
       </div>
-      <div class="trust-card">
-        <div class="trust-icon"><i class="fas fa-comment-dots"></i></div>
-        <p>日本語OK！<br>日本人スタッフがサポート</p>
+      
+      <div class="about-card">
+        <div class="about-card-image">
+          <img src="about2.png" alt="PUZZMI 소개 사진 2" />
+        </div>
+        <div class="about-card-content">
+          <h3>ガイドブックに載っていない、あなただけの韓国を見つけよう！</h3>
+          <p>ガイドブックには載っていない、地元の人だけが知っている隠れた名店もご紹介します。人気観光地とあわせて、韓国の魅力を存分にお楽しみください。</p>
+        </div>
       </div>
-      <div class="trust-card">
-        <div class="trust-icon"><i class="fas fa-shield-alt"></i></div>
-        <p>安心・安全の<br>運営体制</p>
-      </div>
-      <div class="trust-card">
-        <div class="trust-icon"><i class="fas fa-phone-volume"></i></div>
-        <p>トラブル時も<br>24時間サポート</p>
-      </div>
-      <div class="trust-card">
-        <div class="trust-icon"><i class="fas fa-calendar-check"></i></div>
-        <p>予約確定後にお支払い<br>キャンセルも安心</p>
+      
+      <div class="about-card">
+        <div class="about-card-image">
+          <img src="about3.png" alt="PUZZMI 소개 사진 3" />
+        </div>
+        <div class="about-card-content">
+          <h3>周りと差がつく韓国旅行を！</h3>
+          <p>現地韓国女子と、韓国の最新トレンドをリアルに体験できます！ファッションやコスメ、話題のカフェや最新スポットまで韓国の「今」を満喫しよう！</p>
+        </div>
       </div>
     </div>
   </div>
 </section>
+      
+</section>
 
-<section id="about" class="activities">
+<section id="safety" class="safety">
   <div class="container">
-    <div class="section-header">
-      <h2>一緒にできること <i class="fas fa-heart heart"></i></h2>
+    <div class="section-header" data-eyebrow="SAFETY">
+      <h2 class="section-title">PUZZMIの安全・安心の仕組み</h2>
+      <p class="section-subtitle">はじめてでも安心の3つのポイント</p>
     </div>
-    <div class="activity-grid">
-      <div class="activity-card">
-        <div class="activity-photo ph-photo" data-ph="グルメ"><i class="fas fa-image"></i></div>
-        <h4>ローカルグルメ巡り</h4>
-        <p>韓国人しか知らない<br>本当に美味しいお店へ！</p>
+
+    <!-- 반응형 그리드 컨테이너 -->
+    <div class="safety-grid">
+      <div class="safety-card">
+        <div class="safety-icon">
+          <i class="fas fa-user-shield"></i>
+        </div>
+        <div class="safety-card-content">
+          <h3>メイト全員の本人確認</h3>
+          <p>メイト全員が身分証による本人確認に加え、<strong>面接</strong>で対応力やマナーをチェックしております。信頼できるメイトと、安全で楽しい時間を提供いたします。</p>
+        </div>
       </div>
-      <div class="activity-card">
-        <div class="activity-photo ph-photo" data-ph="カフェ"><i class="fas fa-image"></i></div>
-        <h4>おしゃれカフェで<br>ゆっくりおしゃべり</h4>
-        <p>お気に入りのカフェに<br>一緒に行こう<i class="fas fa-heart" style="color:var(--rose-300);"></i></p>
+      
+      <div class="safety-card">
+        <div class="safety-icon">
+          <i class="fas fa-headset"></i>
+        </div>
+        <div class="safety-card-content">
+          <h3>日本人スタッフの常駐</h3>
+          <p>日本人スタッフが常駐しているため、<strong>言語·文化</strong>の壁を気にせず、初めての方も安心してご利用いただけます。</p>
+        </div>
       </div>
-      <div class="activity-card">
-        <div class="activity-photo ph-photo" data-ph="撮影"><i class="fas fa-image"></i></div>
-        <h4>写真を撮ってくれる</h4>
-        <p>旅の思い出を<br>自然な笑顔で残そう！</p>
-      </div>
-      <div class="activity-card">
-        <div class="activity-photo ph-photo" data-ph="ショッピング"><i class="fas fa-image"></i></div>
-        <h4>ショッピング同行</h4>
-        <p>トレンドのお店や<br>かわいい雑貨も案内！</p>
-      </div>
-      <div class="activity-card">
-        <div class="activity-photo ph-photo" data-ph="ホットスポット"><i class="fas fa-image"></i></div>
-        <h4>韓国のホットスポットへ</h4>
-        <p>インスタで話題の場所や<br>夜景スポットも一緒に！</p>
+      
+      <div class="safety-card">
+        <div class="safety-icon">
+          <i class="fas fa-shield-alt"></i>
+        </div>
+        <div class="safety-card-content">
+          <h3>安全・安心のサポート・相談体制</h3>
+          <p>万が一ご利用中に問題が起きても、<strong>迅速な対応</strong>でサポートいたします。いつでもお気軽にご相談くださいませ。</p>
+        </div>
       </div>
     </div>
   </div>
@@ -598,20 +719,23 @@
 
     <section id="friends" class="friends">
       <div class="container">
-        <div class="section-top-row">
-          <h2 data-key="friends-title">人気のメイト <i class="fas fa-heart heart"></i></h2>
-          <a href="#friends" class="section-link" data-key="friends-subtitle">すべてのメイトを見る <i class="fas fa-chevron-right"></i></a>
+        <div class="section-header" data-eyebrow="FRIENDS">
+          <h2 class="section-title" data-key="friends-title">メイトに会ってみよう</h2>
+          <p class="section-subtitle" data-key="friends-subtitle">趣味も、グルメも、最新トレンドも、一緒に楽しめる友達と！</p>
         </div>
 
-        <!-- JS가 카드를 채워 넣을 컨테이너 (.friend-card 구조는 위 인라인 스크립트가 생성) -->
-        <div class="friends-grid"></div>
-        <div class="dots-row"><span class="active"></span><span></span><span></span></div>
+        <div class="friend-filters">
+          <button class="quick-filter active" data-filter="all" data-key="filter-all">すべて見る</button>
+        </div>
 
+        <!-- JS가 카드를 채워 넣을 컨테이너 -->
+        <div class="friends-grid"></div>
+        
         <!-- 더 보기 버튼 -->
         <div class="friends-actions text-center">
           <button id="loadMore" class="btn btn-primary btn-lg" style="display:none">
             <i class="fas fa-plus"></i>
-            もっと見る
+            더 보기
           </button>
         </div>
       </div>
@@ -619,31 +743,15 @@
 
     <section id="reviews" class="reviews">
         <div class="container">
-            <div class="section-top-row">
-                <h2 data-key="reviews-title">利用者のリアルな声 <i class="fas fa-heart heart"></i></h2>
-                <a href="#reviews" class="section-link" data-key="reviews-subtitle">すべての口コミを見る <i class="fas fa-chevron-right"></i></a>
+            <div class="section-header" data-eyebrow="REVIEWS">
+                <h2 class="section-title" data-key="reviews-title">思い出のパズルを完成させよう</h2>
+                <p class="section-subtitle" data-key="reviews-subtitle"> PUZZMIと一緒に旅したお客様の貴重な声</p>
             </div>
-
+            
             <div class="reviews-grid" id="reviewsGrid">
-                <!-- 실제 리뷰 데이터가 여기에 로드됩니다 (.review-card 구조는 위 인라인 스크립트가 생성) -->
+                <!-- 실제 리뷰 데이터가 여기에 로드됩니다 -->
             </div>
         </div>
-    </section>
-
-    <section class="contact-cta">
-      <div class="container">
-        <div class="contact-banner">
-          <div class="ph-photo" data-ph="PHOTO"><i class="fas fa-image"></i></div>
-          <div class="contact-banner-text">
-            <p>何をするか迷っても大丈夫！</p>
-            <p>メイトがあなたの「やりたい」をサポートします<i class="fas fa-face-smile"></i></p>
-          </div>
-          <div class="contact-banner-actions">
-            <a href="https://lin.ee/NbNPSUz" target="_blank" class="btn-line"><i class="fab fa-line"></i> LINEで相談する</a>
-            <a href="mailto:jp@puzzmi.com" class="btn-mail"><i class="fas fa-envelope"></i> メールで相談する</a>
-          </div>
-        </div>
-      </div>
     </section>
 
     <footer class="footer">
@@ -651,63 +759,33 @@
 
             <div class="footer-content">
                 <div class="footer-brand">
-                    <a class="nav-brand" href="index.html">
+                    <div class="nav-brand">
                         <img src="puzzmi_original.png" alt="PUZZMI 로고">
                         <span>PUZZMI</span>
-                    </a>
-                    <p class="footer-description" data-key="footer-desc">ソウルであなた専用の韓国人メイトと特別な時間を一緒に作るサービスです。</p>
+                    </div>
+                    <p class="footer-description" data-key="footer-desc">一生忘れないとっておきの瞬間をあなたに！</p>
                 </div>
-
-                <div class="footer-col">
-                    <h5>サービス</h5>
-                    <a href="index.html#friends">メイトを探す</a>
-                    <a href="service_intro.html">サービスの紹介</a>
-                    <a href="service_intro.html">ご利用の流れ</a>
-                    <a href="service_intro.html">料金について</a>
-                </div>
-
-                <div class="footer-col">
-                    <h5>サポート</h5>
-                    <a href="qna.html">よくある質問</a>
-                    <a href="qna.html">お問い合わせ</a>
-                    <a href="terms_of_service.html" data-key="footer-terms">利用規約</a>
-                    <a href="privacy_policy.html" data-key="footer-privacy">プライバシーポリシー</a>
-                </div>
-
-                <div class="footer-col">
-                    <h5>運営会社</h5>
-                    <a href="tokusho.html">会社概要</a>
-                    <a href="tokusho.html">特定商取引法に基づく表記</a>
-                    <a href="refund_policy.html" data-key="footer-refund">返金・キャンセルポリシー</a>
-                </div>
-
-                <div class="footer-col">
-                    <h5>日本語サポート</h5>
-                    <p>対応時間：10:00 - 19:00 (KST)</p>
-                    <p>LINE：@puzzmi</p>
-                    <p>Email：jp@puzzmi.com</p>
-                </div>
+                
             </div>
-
+            
             <div class="footer-bottom">
+               <!-- <p>&copy; 2025 PUZZMI. <span data-key="footer-rights">All rights reserved.</span></p>
+                <div class="business-info">
+                    <p>PUZZMI | 서울특별시 영등포구 디지털로 48길 23-1</p>
+                    <p>사업자번호 716-10-02780 | 대표 최서준</p>
+                </div> --> 
                 <div class="footer-legal">
-                    <a href="terms_of_service.html">ご利用規約</a>
-                    <a href="privacy_policy.html">プライバシーポリシー</a>
-                    <a href="refund_policy.html">払戻·取消約款</a>
+                    <a href="terms_of_service.html" data-key="footer-terms">ご利用規約</a>
+                    <a href="privacy_policy.html" data-key="footer-privacy">プライバシーポリシー</a>
+                    <a href="refund_policy.html" data-key="footer-refund">払戻·取消約款</a>
                     <a href="tokusho.html">特定商取引法に基づく表記</a>
-                </div>
-                <div class="footer-social">
-                    <a href="https://instagram.com/puzzmi_official" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                    <a href="https://x.com/puzzmi19889" target="_blank" aria-label="X"><i class="fa-brands fa-x-twitter"></i></a>
-                    <a href="#" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
-                    <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
                 </div>
             </div>
         </div>
     </footer>
 
-    <!-- swipe-hero.js는 존재하지 않는 파일이라 로드 제거함 (기존에도 404였음) -->
     <script src="script.js"></script>
+    <script src="swipe-hero.js"></script>
    
 
     <div class="floating-actions" aria-label="빠른 실행 버튼">

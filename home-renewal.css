@@ -1,0 +1,406 @@
+/* ==========================================================================
+   PUZZMI 메인페이지 리뉴얼 (2026)
+   레퍼런스 목업 기반 디자인 시스템 — 로즈핑크 x 크림 x 폴라로이드 무드
+   이 파일은 index.html에서만 로드되며, styles.css / nav.css 뒤에 로드되어
+   해당 파일들의 색상 규칙을 이 페이지에 한해 덮어씁니다.
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Klee+One:wght@400;600&display=swap');
+
+/* ---------- 1. 디자인 토큰 ---------- */
+:root{
+  /* Brand — 레퍼런스 사진에서 추출한 실제 색상 */
+  --rose-50:  #fdf1f0;
+  --rose-100: #fbe3e8;
+  --rose-300: #f0a8bb;
+  --rose-500: #da7290;   /* 그라디언트 시작 */
+  --rose-600: #c85f82;
+  --rose-700: #b0496d;
+
+  --violet-300: #d9b7e0;
+  --violet-500: #b46aaf; /* 그라디언트 끝 */
+  --violet-600: #9d5896;
+  --violet-700: #86477f;
+
+  --gradient-brand: linear-gradient(120deg, var(--rose-500) 0%, var(--violet-500) 100%);
+  --gradient-brand-soft: linear-gradient(120deg, var(--rose-100) 0%, var(--violet-300) 100%);
+
+  --cream:      #fdfaf9;  /* 페이지 배경 */
+  --cream-alt:  #fbf2f4;  /* 섹션 교차 배경 */
+  --pink-tint:  #faeff2;  /* 뱃지/필 배경 */
+  --white:      #ffffff;
+
+  --ink-900: #221c1f;
+  --ink-700: #4a4145;
+  --ink-500: #8a7f83;
+  --line:    #f0dfe4;
+
+  --radius-sm:  12px;
+  --radius-md:  20px;
+  --radius-lg:  28px;
+  --radius-full: 999px;
+
+  --shadow-card: 0 8px 24px rgba(180,106,175,0.08);
+  --shadow-soft: 0 20px 50px rgba(180,106,175,0.14);
+  --shadow-btn:  0 10px 24px rgba(218,114,144,0.35);
+
+  --font-display: 'Zen Maru Gothic', 'Noto Sans JP', sans-serif;
+  --font-accent:  'Klee One', 'Zen Maru Gothic', cursive;
+
+  --container: 1180px;
+}
+
+/* ---------- 2. 베이스 ---------- */
+body{
+  background: var(--cream);
+  font-family: var(--font-display);
+  color: var(--ink-900);
+  -webkit-font-smoothing: antialiased;
+}
+
+.container{ max-width: var(--container); margin: 0 auto; padding: 0 24px; }
+
+section{ padding: 88px 0; }
+@media (max-width: 768px){ section{ padding: 56px 0; } }
+
+.section-header{ text-align: center; margin-bottom: 48px; }
+.section-header h2{
+  font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2rem);
+  font-weight: 900;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.section-header .heart{ color: var(--rose-500); font-size: 0.8em; }
+.section-link{
+  display: inline-flex; align-items: center; gap: 4px;
+  color: var(--rose-600); font-weight: 700; text-decoration: none; font-size: 0.9rem;
+}
+.section-top-row{
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;
+}
+.section-top-row h2{ font-size: clamp(1.3rem, 1.05rem + 1vw, 1.6rem); font-weight: 900; }
+
+/* PLACEHOLDER 이미지 블록 — 실제 사진 준비되면 background-image로 교체 */
+.ph-photo{
+  background: var(--gradient-brand-soft);
+  display:flex; align-items:center; justify-content:center;
+  color: var(--violet-700); font-size: 1.4rem;
+  position: relative; overflow: hidden;
+}
+.ph-photo::after{
+  content: attr(data-ph); position:absolute; bottom:8px; right:10px;
+  font-family: var(--font-display); font-size: 0.62rem; font-weight:700;
+  color: rgba(255,255,255,0.85); background: rgba(34,28,31,0.35);
+  padding: 3px 8px; border-radius: var(--radius-full);
+}
+
+/* ---------- 3. 네비게이션 (nav.js가 만드는 .app-nav 구조 재스타일) ---------- */
+.app-nav{
+  position: sticky; top:0; z-index: 1000;
+  background: rgba(253,250,249,0.9);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line);
+}
+.app-nav .nav-container{
+  max-width: var(--container); margin:0 auto; padding: 14px 24px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.app-nav .nav-brand{
+  display:flex; align-items:center; gap:8px; text-decoration:none;
+  font-weight:900; font-size:1.2rem; color: var(--violet-700);
+}
+.app-nav .nav-brand img{ height:28px; width:auto; }
+.app-nav .nav-left{ display:flex; align-items:center; gap:28px; }
+.app-nav .nav-link{
+  color: var(--ink-700); text-decoration:none; font-weight:700; font-size:0.92rem;
+  transition: color .2s ease;
+}
+.app-nav .nav-link:hover{ color: var(--rose-600); }
+.app-nav .nav-right{ display:flex; align-items:center; gap:14px; }
+.app-nav .nav-right .nav-link{
+  border: 1.5px solid var(--line); padding: 8px 18px; border-radius: var(--radius-full);
+}
+.app-nav .nav-cta{
+  background: var(--gradient-brand); color:#fff !important; border:none !important;
+  padding: 10px 22px; border-radius: var(--radius-full); font-weight:800 !important;
+  box-shadow: var(--shadow-btn); text-decoration:none;
+}
+.app-nav .dropdown-menu{
+  border-radius: var(--radius-md); box-shadow: var(--shadow-soft); border:1px solid var(--line);
+}
+.app-nav .dropdown-item:hover{ background: var(--pink-tint); }
+.app-nav .logout-btn{ color: var(--ink-500); }
+.app-nav .mobile-menu-btn .hamburger span{ background: var(--ink-900); }
+
+/* ---------- 4. 히어로 ---------- */
+.hero{
+  position: relative;
+  min-height: 62svh;
+  display:flex; align-items:center;
+  overflow:hidden;
+  background: var(--cream);
+}
+.hero-photo{
+  position:absolute; inset:0; z-index:0;
+}
+.hero-photo::before{
+  /* 왼쪽에서 오른쪽으로: 텍스트 가독성용 크림 그라디언트 오버레이 */
+  content:''; position:absolute; inset:0; z-index:1;
+  background: linear-gradient(100deg, var(--cream) 0%, rgba(253,250,249,0.85) 32%, rgba(253,250,249,0.25) 55%, transparent 72%);
+}
+.hero-content{
+  position: relative; z-index: 2;
+  max-width: var(--container); margin: 0 auto; padding: 40px 24px;
+  width: 100%;
+}
+.hero-eyebrow{
+  font-family: var(--font-accent);
+  color: var(--ink-900); font-size: 1.15rem; line-height: 1.5; margin-bottom: 2px;
+}
+.hero-eyebrow strong{
+  display:block; color: var(--rose-600); font-size: 1.5rem; font-weight: 700;
+}
+.hero h1{
+  font-size: clamp(1.9rem, 1.3rem + 2.6vw, 3rem);
+  font-weight: 900; line-height: 1.3; margin: 12px 0 18px;
+}
+.hero-sub{ color: var(--ink-700); line-height:1.8; font-size: 0.98rem; max-width: 34ch; margin-bottom: 28px;}
+
+.hero-highlight-card{
+  position:absolute; top: 12%; right: 4%; z-index: 2;
+  background: rgba(255,255,255,0.92); backdrop-filter: blur(8px);
+  border-radius: var(--radius-md); box-shadow: var(--shadow-soft);
+  padding: 18px 22px; width: 232px;
+  border: 1px solid rgba(255,255,255,0.6);
+}
+.hero-highlight-card h3{ font-size:0.92rem; font-weight:800; margin-bottom:10px; display:flex; align-items:center; gap:6px;}
+.hero-highlight-card ul{ list-style:none; display:flex; flex-direction:column; gap:6px; }
+.hero-highlight-card li{ font-size:0.78rem; color: var(--ink-700); display:flex; gap:6px; align-items:flex-start;}
+.hero-highlight-card li i{ color: var(--rose-500); margin-top:2px; }
+
+/* 검색 바 */
+.hero-search{
+  position: relative; z-index: 3;
+  max-width: var(--container); margin: -34px auto 0; padding: 0 24px;
+}
+.search-bar{
+  background:#fff; border-radius: var(--radius-lg); box-shadow: var(--shadow-soft);
+  display:flex; align-items:stretch; padding: 8px; gap: 4px;
+}
+.search-field{
+  flex:1; display:flex; align-items:center; gap:10px; padding: 12px 18px;
+  border-right: 1px solid var(--line);
+}
+.search-field:last-of-type{ border-right:none; }
+.search-field i{ color: var(--rose-500); font-size:1.05rem; }
+.search-field .label{ display:block; font-size:0.7rem; color: var(--ink-500); font-weight:700; }
+.search-field .value{ display:block; font-size:0.86rem; color: var(--ink-900); font-weight:700; }
+.search-submit{
+  background: var(--gradient-brand); color:#fff; border:none; border-radius: var(--radius-md);
+  padding: 0 30px; font-weight:800; font-size:0.92rem; display:flex; align-items:center; gap:8px;
+  cursor:pointer; box-shadow: var(--shadow-btn); white-space:nowrap;
+}
+
+@media (max-width: 900px){
+  .hero-highlight-card{ display:none; }
+  .hero{ min-height: auto; padding-top: 24px; }
+  .hero-photo{ position:relative; inset:auto; height: 46vh; margin: 0 -24px; }
+  .hero-content{ padding-top: 20px; }
+  .search-bar{ flex-direction:column; padding: 14px; gap:10px; }
+  .search-field{ border-right:none; border-bottom:1px solid var(--line); padding: 4px 4px 12px; }
+  .search-submit{ padding: 14px; justify-content:center; }
+}
+
+/* ---------- 5. 신뢰 아이콘 섹션 (안심 포인트) ---------- */
+.trust{ padding-top: 72px; }
+.trust-grid{
+  display:grid; grid-template-columns: repeat(5, 1fr); gap: 22px;
+}
+.trust-card{ text-align:center; }
+.trust-icon{
+  width: 68px; height:68px; margin: 0 auto 14px; border-radius:50%;
+  background: var(--pink-tint); display:flex; align-items:center; justify-content:center;
+  color: var(--rose-600); font-size: 1.4rem; box-shadow: var(--shadow-card);
+}
+.trust-card p{ font-size: 0.84rem; color: var(--ink-700); line-height:1.6; font-weight:700; }
+
+@media (max-width: 900px){
+  .trust-grid{ grid-template-columns: repeat(3,1fr); row-gap: 28px; }
+}
+@media (max-width: 560px){
+  .trust-grid{ grid-template-columns: repeat(2,1fr); }
+}
+
+/* ---------- 6. 一緒にできること — 폴라로이드 카드 ---------- */
+.activities{ background: var(--cream-alt); }
+.activity-grid{
+  display:grid; grid-template-columns: repeat(5, 1fr); gap: 20px;
+}
+.activity-card{
+  background:#fff; padding: 10px 10px 16px; border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card); position:relative;
+}
+.activity-card:nth-child(even){ transform: rotate(-1.4deg); }
+.activity-card:nth-child(odd){ transform: rotate(1.2deg); }
+.activity-card::before{
+  /* 마스킹테이프 */
+  content:''; position:absolute; top:-10px; left:50%; transform:translateX(-50%) rotate(-3deg);
+  width: 54px; height:20px; background: rgba(218,114,144,0.35); border-radius:2px;
+}
+.activity-photo{
+  aspect-ratio: 4/5; border-radius: calc(var(--radius-md) - 8px); margin-bottom: 12px;
+}
+.activity-card h4{ font-size:0.9rem; font-weight:800; padding: 0 4px 4px; }
+.activity-card p{ font-size:0.76rem; color: var(--ink-500); padding: 0 4px; line-height:1.5; }
+
+@media (max-width: 900px){
+  .activity-grid{ grid-template-columns: repeat(3,1fr); }
+}
+@media (max-width: 560px){
+  .activity-grid{ grid-template-columns: repeat(2,1fr); }
+  .activity-card:nth-child(even), .activity-card:nth-child(odd){ transform:none; }
+}
+
+/* ---------- 7. 人気のメイト ----------
+   .friend-card 이하 구조는 index.html 인라인 스크립트(renderCard)가 실제로
+   생성하는 DOM입니다. 클래스명은 절대 바꾸지 말고 스타일만 이 파일에서 관리하세요. */
+.friends-grid{
+  display:grid; grid-template-columns: repeat(5, 1fr); gap: 18px;
+}
+.friend-card{
+  background:#fff; border-radius: var(--radius-md); overflow:hidden;
+  box-shadow: var(--shadow-card); opacity: 0; transform: translateY(16px);
+  transition: opacity .5s ease, transform .5s ease;
+}
+.friend-card.fade-in{ opacity:1; transform:none; }
+
+.friend-image{ position:relative; aspect-ratio: 3/4; background: var(--pink-tint); }
+.friend-image img{ width:100%; height:100%; object-fit:cover; display:block; }
+.heart-badge{
+  position:absolute; right:8px; top:8px; z-index:2;
+  background: rgba(34,28,31,0.55); backdrop-filter: blur(4px);
+  color:#fff; border-radius: var(--radius-full); padding:5px 10px;
+  font-size:11px; display:flex; gap:5px; align-items:center;
+}
+.heart-badge i{ color: var(--rose-300); }
+.heart-badge:hover{ background: var(--rose-600); cursor:pointer; }
+
+.friend-info{ padding: 14px 14px 16px; }
+.friend-name{ font-size: 0.98rem; font-weight:900; margin-bottom:2px; }
+.friend-age{ font-size:0.74rem; color: var(--ink-500); margin-bottom:6px; }
+.friend-specialties{
+  font-size:0.7rem; font-weight:700; color: var(--rose-700);
+  background: var(--pink-tint); display:inline-block; padding: 3px 10px;
+  border-radius: var(--radius-full); margin-bottom:8px;
+}
+.friend-description{
+  font-size:0.76rem; color: var(--ink-500); line-height:1.5; margin-bottom:8px;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+}
+.friend-languages{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+.friend-languages .language{
+  font-size:0.66rem; font-weight:700; color: var(--violet-700);
+  border: 1px solid var(--line); padding: 3px 9px; border-radius: var(--radius-full);
+}
+.friend-price{ margin-bottom:10px; }
+.friend-price .price{ font-size:0.95rem; font-weight:900; color: var(--ink-900); }
+.friend-price .duration{ font-size:0.72rem; color: var(--ink-500); margin-left:3px; }
+
+.friend-info .cta-btn{
+  flex:1; text-align:center; font-size:0.72rem; font-weight:800;
+  padding: 9px 4px; border-radius: var(--radius-full); text-decoration:none;
+  border: 1.5px solid var(--line); color: var(--ink-700); white-space:nowrap;
+}
+.friend-info .cta-btn[href*="booking"]{
+  background: var(--gradient-brand); color:#fff; border:none;
+}
+.friend-info .cta-btn.is-faved{ color: var(--rose-600); border-color: var(--rose-300); }
+
+.dots-row{ display:flex; justify-content:center; gap:8px; margin-top: 28px; }
+.dots-row span{ width:7px; height:7px; border-radius:50%; background: var(--line); }
+.dots-row span.active{ background: var(--rose-500); width:20px; border-radius:4px; }
+
+.retry-btn{
+  margin-top:12px; padding: 10px 20px; background: var(--gradient-brand);
+  color:#fff; border:none; border-radius: var(--radius-full); font-weight:800; cursor:pointer;
+}
+
+@media (max-width: 900px){ .friends-grid{ grid-template-columns: repeat(2,1fr); } }
+@media (max-width: 560px){
+  .friend-info{ padding: 12px; }
+  .friend-info > div[style]{ flex-wrap:wrap; }
+}
+
+/* ---------- 8. 리뷰 ----------
+   .review-card 이하 구조는 index.html 인라인 스크립트(loadHomepageReviews)가
+   실제로 생성하는 DOM입니다. 클래스명은 유지하고 스타일만 관리하세요. */
+.reviews{ background: var(--cream-alt); }
+.reviews-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+.review-card{
+  background:#fff; border-radius: var(--radius-md); box-shadow: var(--shadow-card);
+  padding: 22px; opacity:0; transform: translateY(16px); transition: opacity .5s ease, transform .5s ease;
+}
+.review-card.fade-in{ opacity:1; transform:none; }
+.review-header{ margin-bottom:12px; }
+.reviewer-info{ display:flex; align-items:center; gap:10px; }
+.reviewer-avatar{ width:38px; height:38px; border-radius:50%; flex-shrink:0; object-fit:cover; }
+.reviewer-name{ font-size:0.85rem; font-weight:800; }
+.review-text{ font-size:0.84rem; color: var(--ink-700); line-height:1.7; margin-bottom:12px; }
+.review-rating{ color:#f5b73f; font-size:0.78rem; margin-bottom:6px; }
+.review-date{ font-size:0.7rem; color: var(--ink-500); }
+.review-mate{
+  margin-top:12px; padding: 8px 12px; background: var(--pink-tint);
+  border-radius: var(--radius-sm); font-size:0.82rem; color: var(--rose-700);
+}
+
+@media (max-width: 900px){ .reviews-grid{ grid-template-columns:1fr; } }
+
+/* ---------- 9. CTA 배너 (LINE 상담) ---------- */
+.contact-banner{
+  background: var(--gradient-brand); border-radius: var(--radius-lg);
+  display:flex; align-items:center; gap: 28px; padding: 20px;
+  margin: 0 24px; max-width: calc(var(--container) - 48px);
+  margin-left:auto; margin-right:auto;
+}
+.contact-banner .ph-photo{ width: 130px; height:130px; border-radius: var(--radius-md); flex-shrink:0; }
+.contact-banner-text{ flex:1; color:#fff; }
+.contact-banner-text p:first-child{ font-weight:900; font-size:1.05rem; margin-bottom:4px; }
+.contact-banner-text p:last-child{ font-size:0.88rem; opacity:0.92; }
+.contact-banner-actions{ display:flex; gap:10px; flex-shrink:0; }
+.btn-line, .btn-mail{
+  display:flex; align-items:center; gap:8px; padding: 12px 20px; border-radius: var(--radius-full);
+  font-weight:800; font-size:0.86rem; text-decoration:none; white-space:nowrap;
+}
+.btn-line{ background:#fff; color:#06c755; }
+.btn-mail{ background:transparent; color:#fff; border: 1.5px solid rgba(255,255,255,0.7); }
+
+@media (max-width: 768px){
+  .contact-banner{ flex-direction:column; text-align:center; padding: 28px 20px; }
+  .contact-banner-actions{ flex-direction:column; width:100%; }
+  .btn-line, .btn-mail{ justify-content:center; }
+}
+
+/* ---------- 10. 푸터 ---------- */
+.footer{ background: var(--white); border-top: 1px solid var(--line); padding: 64px 0 32px; margin-top: 40px;}
+.footer-content{
+  display:grid; grid-template-columns: 1.4fr repeat(4, 1fr); gap: 24px; margin-bottom: 40px;
+}
+.footer-brand .nav-brand{ display:flex; align-items:center; gap:8px; font-weight:900; color:var(--violet-700); margin-bottom:10px; text-decoration:none;}
+.footer-brand .nav-brand img{ height:26px; }
+.footer-description{ font-size:0.82rem; color: var(--ink-500); line-height:1.6; max-width: 26ch; }
+.footer-col h5{ font-size:0.82rem; font-weight:900; margin-bottom:14px; color: var(--ink-900); }
+.footer-col a, .footer-col p{
+  display:block; font-size:0.8rem; color: var(--ink-500); text-decoration:none; margin-bottom:10px; line-height:1.5;
+}
+.footer-col a:hover{ color: var(--rose-600); }
+.footer-bottom{
+  border-top: 1px solid var(--line); padding-top: 24px;
+  display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;
+}
+.footer-legal{ display:flex; gap:18px; flex-wrap:wrap; }
+.footer-legal a{ font-size:0.78rem; color: var(--ink-500); text-decoration:none; }
+.footer-social{ display:flex; gap:14px; }
+.footer-social a{ color: var(--ink-500); font-size:1.05rem; }
+
+@media (max-width: 900px){
+  .footer-content{ grid-template-columns: repeat(2,1fr); }
+}

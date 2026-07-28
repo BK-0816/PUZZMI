@@ -185,12 +185,6 @@ export async function renderNavbar(rootId = 'app-nav') {
   
   // 오른쪽 액션 영역
   const navRight = createElement('div', { class: 'nav-right' });
-
-  // 예약 CTA 버튼 (디자인 리뉴얼: home-renewal.css의 .nav-cta로 스타일링됨)
-  navRight.appendChild(createElement('a', {
-    class: 'nav-link nav-cta',
-    href: 'index.html#friends'
-  }, 'メイトを予約する'));
   
   const { user, isAdmin, isMate } = await getUserRoles();
   
