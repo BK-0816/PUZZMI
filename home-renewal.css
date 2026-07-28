@@ -410,7 +410,7 @@ section{ padding: 88px 0; }
    ========================================================================== */
 
 .photo-hero{
-  background-image: url('hero.jpg');
+  background-image: url('hero.png');
   background-size: cover;
   background-position: center;
 }
