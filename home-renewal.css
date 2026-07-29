@@ -422,7 +422,7 @@ section{ padding: 88px 0; }
 .photo-hero::after, .photo-hero i{ content: none; display: none; }
 
 .photo-gourmet{
-  background-image: url('activity-gourmet.jpg');
+  background-image: url('activity-gourmet.png');
   background-size: cover;
   background-position: center;
 }
