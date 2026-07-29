@@ -429,21 +429,21 @@ section{ padding: 88px 0; }
 .photo-gourmet::after, .photo-gourmet i{ content: none; display: none; }
 
 .photo-cafe{
-  background-image: url('activity-cafe.jpg');
+  background-image: url('activity-cafe.png');
   background-size: cover;
   background-position: center;
 }
 .photo-cafe::after, .photo-cafe i{ content: none; display: none; }
 
 .photo-shoot{
-  background-image: url('activity-shoot.jpg');
+  background-image: url('activity-shoot.png');
   background-size: cover;
   background-position: center;
 }
 .photo-shoot::after, .photo-shoot i{ content: none; display: none; }
 
 .photo-shopping{
-  background-image: url('activity-shopping.jpg');
+  background-image: url('activity-shopping.png');
   background-size: cover;
   background-position: center;
 }
