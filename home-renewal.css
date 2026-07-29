@@ -457,7 +457,7 @@ section{ padding: 88px 0; }
 .photo-hotspot::after, .photo-hotspot i{ content: none; display: none; }
 
 .photo-cta{
-  background-image: url('cta-banner.jpg');
+  background-image: url('cta-banner.png');
   background-size: cover;
   background-position: center;
 }
