@@ -468,3 +468,88 @@ section{ padding: 88px 0; }
 }
 .photo-cta::after, .photo-cta i{ content: none; display: none; }
  
+.mobile-menu{
+  background: rgba(34,28,31,0.45);
+  backdrop-filter: blur(10px);
+}
+
+.mobile-menu-content{
+  background: var(--cream);
+  border: none;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+}
+
+.mobile-menu-header{
+  border-bottom: 1px solid var(--line);
+  padding: 20px 0 24px;
+}
+.mobile-menu-header::after{
+  background: var(--gradient-brand);
+}
+.mobile-menu-header .nav-brand{
+  font-family: var(--font-display);
+  font-weight: 900;
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.mobile-menu-section{
+  background: var(--pink-tint);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  box-shadow: none;
+}
+.mobile-menu-section::before{
+  background: var(--gradient-brand);
+  height: 3px;
+}
+
+.mobile-menu-section-title{
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.95rem;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--ink-700);
+  background: none;
+  -webkit-text-fill-color: initial;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+.mobile-menu-section-title::after{ content: none; }
+
+.mobile-menu-link{
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--ink-900);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  box-shadow: none;
+  min-height: 56px;
+}
+.mobile-menu-link::before{ background: var(--gradient-brand); }
+.mobile-menu-link:hover,
+.mobile-menu-link:active{
+  background: #fff;
+  color: var(--rose-600);
+  border-color: var(--rose-300);
+  transform: none;
+  box-shadow: var(--shadow-card);
+}
+.mobile-menu-link i{
+  font-size: 1.1rem;
+  color: var(--rose-600);
+  background: var(--pink-tint);
+  border: none;
+}
+.mobile-menu-link:hover i{
+  background: var(--gradient-brand);
+  color: #fff;
+  border-color: transparent;
+  transform: none;
+}
