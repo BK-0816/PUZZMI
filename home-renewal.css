@@ -4,9 +4,9 @@
    이 파일은 index.html에서만 로드되며, styles.css / nav.css 뒤에 로드되어
    해당 파일들의 색상 규칙을 이 페이지에 한해 덮어씁니다.
    ========================================================================== */
-
+ 
 @import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Klee+One:wght@400;600&display=swap');
-
+ 
 /* ---------- 1. 디자인 토큰 ---------- */
 :root{
   /* Brand — 레퍼런스 사진에서 추출한 실제 색상 */
@@ -16,40 +16,40 @@
   --rose-500: #da7290;   /* 그라디언트 시작 */
   --rose-600: #c85f82;
   --rose-700: #b0496d;
-
+ 
   --violet-300: #d9b7e0;
   --violet-500: #b46aaf; /* 그라디언트 끝 */
   --violet-600: #9d5896;
   --violet-700: #86477f;
-
+ 
   --gradient-brand: linear-gradient(120deg, var(--rose-500) 0%, var(--violet-500) 100%);
   --gradient-brand-soft: linear-gradient(120deg, var(--rose-100) 0%, var(--violet-300) 100%);
-
+ 
   --cream:      #fdfaf9;  /* 페이지 배경 */
   --cream-alt:  #fbf2f4;  /* 섹션 교차 배경 */
   --pink-tint:  #faeff2;  /* 뱃지/필 배경 */
   --white:      #ffffff;
-
+ 
   --ink-900: #221c1f;
   --ink-700: #4a4145;
   --ink-500: #8a7f83;
   --line:    #f0dfe4;
-
+ 
   --radius-sm:  12px;
   --radius-md:  20px;
   --radius-lg:  28px;
   --radius-full: 999px;
-
+ 
   --shadow-card: 0 8px 24px rgba(180,106,175,0.08);
   --shadow-soft: 0 20px 50px rgba(180,106,175,0.14);
   --shadow-btn:  0 10px 24px rgba(218,114,144,0.35);
-
+ 
   --font-display: 'Zen Maru Gothic', 'Noto Sans JP', sans-serif;
   --font-accent:  'Klee One', 'Zen Maru Gothic', cursive;
-
+ 
   --container: 1180px;
 }
-
+ 
 /* ---------- 2. 베이스 ---------- */
 html{ max-width: 100vw; overflow-x: hidden; }
 body{
@@ -61,13 +61,13 @@ body{
   overflow-x: hidden;
 }
 *, *::before, *::after{ box-sizing: border-box; }
-
+ 
 .container{ max-width: var(--container); width: 100%; margin: 0 auto; padding: 0 24px; box-sizing: border-box; }
 section{ width: 100%; }
-
+ 
 section{ padding: 88px 0; }
 @media (max-width: 768px){ section{ padding: 56px 0; } }
-
+ 
 .section-header{ text-align: center; margin-bottom: 48px; }
 .section-header h2{
   font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2rem);
@@ -83,7 +83,7 @@ section{ padding: 88px 0; }
   display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;
 }
 .section-top-row h2{ font-size: clamp(1.3rem, 1.05rem + 1vw, 1.6rem); font-weight: 900; }
-
+ 
 /* PLACEHOLDER 이미지 블록 — 실제 사진 준비되면 background-image로 교체 */
 .ph-photo{
   background: var(--gradient-brand-soft);
@@ -97,7 +97,7 @@ section{ padding: 88px 0; }
   color: rgba(255,255,255,0.85); background: rgba(34,28,31,0.35);
   padding: 3px 8px; border-radius: var(--radius-full);
 }
-
+ 
 /* ---------- 3. 네비게이션 (nav.js가 만드는 .app-nav 구조 재스타일) ---------- */
 .app-nav{
   position: sticky; top:0; z-index: 1000;
@@ -131,13 +131,16 @@ section{ padding: 88px 0; }
   padding: 10px 22px; border-radius: var(--radius-full); font-weight:800 !important;
   box-shadow: var(--shadow-btn); text-decoration:none;
 }
+@media (max-width: 640px){
+  .app-nav .nav-cta{ display:none; }
+}
 .app-nav .dropdown-menu{
   border-radius: var(--radius-md); box-shadow: var(--shadow-soft); border:1px solid var(--line);
 }
 .app-nav .dropdown-item:hover{ background: var(--pink-tint); }
 .app-nav .logout-btn{ color: var(--ink-500); }
 .app-nav .mobile-menu-btn .hamburger span{ background: var(--ink-900); }
-
+ 
 /* ---------- 4. 히어로 ---------- */
 .hero{
   position: relative;
@@ -171,7 +174,7 @@ section{ padding: 88px 0; }
   font-weight: 900; line-height: 1.3; margin: 12px 0 18px;
 }
 .hero-sub{ color: var(--ink-700); line-height:1.8; font-size: 0.98rem; max-width: 34ch; margin-bottom: 28px;}
-
+ 
 .hero-highlight-card{
   position:absolute; top: 12%; right: 4%; z-index: 2;
   background: rgba(255,255,255,0.92); backdrop-filter: blur(8px);
@@ -183,7 +186,7 @@ section{ padding: 88px 0; }
 .hero-highlight-card ul{ list-style:none; display:flex; flex-direction:column; gap:6px; }
 .hero-highlight-card li{ font-size:0.78rem; color: var(--ink-700); display:flex; gap:6px; align-items:flex-start;}
 .hero-highlight-card li i{ color: var(--rose-500); margin-top:2px; }
-
+ 
 /* 검색 바 */
 .hero-search{
   position: relative; z-index: 3;
@@ -206,7 +209,7 @@ section{ padding: 88px 0; }
   padding: 0 30px; font-weight:800; font-size:0.92rem; display:flex; align-items:center; gap:8px;
   cursor:pointer; box-shadow: var(--shadow-btn); white-space:nowrap;
 }
-
+ 
 @media (max-width: 900px){
   .hero-highlight-card{ display:none; }
   .hero{ min-height: auto; padding-top: 24px; flex-direction: column; align-items: stretch; }
@@ -216,7 +219,7 @@ section{ padding: 88px 0; }
   .search-field{ border-right:none; border-bottom:1px solid var(--line); padding: 4px 4px 12px; }
   .search-submit{ padding: 14px; justify-content:center; }
 }
-
+ 
 /* ---------- 5. 신뢰 아이콘 섹션 (안심 포인트) ---------- */
 .trust{ padding-top: 72px; }
 .trust-grid{
@@ -229,14 +232,14 @@ section{ padding: 88px 0; }
   color: var(--rose-600); font-size: 1.4rem; box-shadow: var(--shadow-card);
 }
 .trust-card p{ font-size: 0.84rem; color: var(--ink-700); line-height:1.6; font-weight:700; }
-
+ 
 @media (max-width: 900px){
   .trust-grid{ grid-template-columns: repeat(3,1fr); row-gap: 28px; }
 }
 @media (max-width: 560px){
   .trust-grid{ grid-template-columns: repeat(2,1fr); }
 }
-
+ 
 /* ---------- 6. 一緒にできること — 폴라로이드 카드 ---------- */
 .activities{ background: var(--cream-alt); }
 .activity-grid{
@@ -258,7 +261,7 @@ section{ padding: 88px 0; }
 }
 .activity-card h4{ font-size:0.9rem; font-weight:800; padding: 0 4px 4px; }
 .activity-card p{ font-size:0.76rem; color: var(--ink-500); padding: 0 4px; line-height:1.5; }
-
+ 
 @media (max-width: 900px){
   .activity-grid{ grid-template-columns: repeat(3,1fr); }
 }
@@ -266,7 +269,7 @@ section{ padding: 88px 0; }
   .activity-grid{ grid-template-columns: repeat(2,1fr); }
   .activity-card:nth-child(even), .activity-card:nth-child(odd){ transform:none; }
 }
-
+ 
 /* ---------- 7. 人気のメイト ----------
    .friend-card 이하 구조는 index.html 인라인 스크립트(renderCard)가 실제로
    생성하는 DOM입니다. 클래스명은 절대 바꾸지 말고 스타일만 이 파일에서 관리하세요. */
@@ -277,7 +280,7 @@ section{ padding: 88px 0; }
   background:#fff; border-radius: var(--radius-md); overflow:hidden;
   box-shadow: var(--shadow-card);
 }
-
+ 
 .friend-image{ position:relative; aspect-ratio: 3/4; background: var(--pink-tint); }
 .friend-image img{ width:100%; height:100%; object-fit:cover; display:block; }
 .heart-badge{
@@ -288,7 +291,7 @@ section{ padding: 88px 0; }
 }
 .heart-badge i{ color: var(--rose-300); }
 .heart-badge:hover{ background: var(--rose-600); cursor:pointer; }
-
+ 
 .friend-info{ padding: 14px 14px 16px; }
 .friend-name{ font-size: 0.98rem; font-weight:900; margin-bottom:2px; }
 .friend-age{ font-size:0.74rem; color: var(--ink-500); margin-bottom:6px; }
@@ -309,7 +312,7 @@ section{ padding: 88px 0; }
 .friend-price{ margin-bottom:10px; }
 .friend-price .price{ font-size:0.95rem; font-weight:900; color: var(--ink-900); }
 .friend-price .duration{ font-size:0.72rem; color: var(--ink-500); margin-left:3px; }
-
+ 
 .friend-info .cta-btn{
   flex:1; text-align:center; font-size:0.72rem; font-weight:800;
   padding: 9px 4px; border-radius: var(--radius-full); text-decoration:none;
@@ -319,22 +322,22 @@ section{ padding: 88px 0; }
   background: var(--gradient-brand); color:#fff; border:none;
 }
 .friend-info .cta-btn.is-faved{ color: var(--rose-600); border-color: var(--rose-300); }
-
+ 
 .dots-row{ display:flex; justify-content:center; gap:8px; margin-top: 28px; }
 .dots-row span{ width:7px; height:7px; border-radius:50%; background: var(--line); }
 .dots-row span.active{ background: var(--rose-500); width:20px; border-radius:4px; }
-
+ 
 .retry-btn{
   margin-top:12px; padding: 10px 20px; background: var(--gradient-brand);
   color:#fff; border:none; border-radius: var(--radius-full); font-weight:800; cursor:pointer;
 }
-
+ 
 @media (max-width: 900px){ .friends-grid{ grid-template-columns: repeat(2,1fr); } }
 @media (max-width: 560px){
   .friend-info{ padding: 12px; }
   .friend-info > div[style]{ flex-wrap:wrap; }
 }
-
+ 
 /* ---------- 8. 리뷰 ----------
    .review-card 이하 구조는 index.html 인라인 스크립트(loadHomepageReviews)가
    실제로 생성하는 DOM입니다. 클래스명은 유지하고 스타일만 관리하세요. */
@@ -355,9 +358,9 @@ section{ padding: 88px 0; }
   margin-top:12px; padding: 8px 12px; background: var(--pink-tint);
   border-radius: var(--radius-sm); font-size:0.82rem; color: var(--rose-700);
 }
-
+ 
 @media (max-width: 900px){ .reviews-grid{ grid-template-columns:1fr; } }
-
+ 
 /* ---------- 9. CTA 배너 (LINE 상담) ---------- */
 .contact-banner{
   background: var(--gradient-brand); border-radius: var(--radius-lg);
@@ -376,13 +379,13 @@ section{ padding: 88px 0; }
 }
 .btn-line{ background:#fff; color:#06c755; }
 .btn-mail{ background:transparent; color:#fff; border: 1.5px solid rgba(255,255,255,0.7); }
-
+ 
 @media (max-width: 768px){
   .contact-banner{ flex-direction:column; text-align:center; padding: 28px 20px; }
   .contact-banner-actions{ flex-direction:column; width:100%; }
   .btn-line, .btn-mail{ justify-content:center; }
 }
-
+ 
 /* ---------- 10. 푸터 ---------- */
 .footer{ background: var(--white); border-top: 1px solid var(--line); padding: 64px 0 32px; margin-top: 40px;}
 .footer-content{
@@ -404,63 +407,64 @@ section{ padding: 88px 0; }
 .footer-legal a{ font-size:0.78rem; color: var(--ink-500); text-decoration:none; }
 .footer-social{ display:flex; gap:14px; }
 .footer-social a{ color: var(--ink-500); font-size:1.05rem; }
-
+ 
 @media (max-width: 900px){
   .footer-content{ grid-template-columns: repeat(2,1fr); }
 }
-
+ 
 /* ==========================================================================
    11. 실제 사진 연결
    url('파일명') 부분만 실제 이미지 파일명으로 바꿔주세요.
    사진 파일은 index.html과 같은 폴더에 두면 됩니다.
    ph-photo::after (PHOTO 라벨)는 사진이 채워지면 아래에서 자동으로 사라집니다.
    ========================================================================== */
-
+ 
 .photo-hero{
-  background-image: url('hero.png');
+  background-image: url('hero.');
   background-size: cover;
   background-position: center;
 }
 .photo-hero::after, .photo-hero i{ content: none; display: none; }
-
+ 
 .photo-gourmet{
-  background-image: url('activity-gourmet.png');
+  background-image: url('activity-gourmet.');
   background-size: cover;
   background-position: center;
 }
 .photo-gourmet::after, .photo-gourmet i{ content: none; display: none; }
-
+ 
 .photo-cafe{
   background-image: url('activity-cafe.png');
   background-size: cover;
   background-position: center;
 }
 .photo-cafe::after, .photo-cafe i{ content: none; display: none; }
-
+ 
 .photo-shoot{
   background-image: url('activity-shoot.png');
   background-size: cover;
   background-position: center;
 }
 .photo-shoot::after, .photo-shoot i{ content: none; display: none; }
-
+ 
 .photo-shopping{
   background-image: url('activity-shopping.png');
   background-size: cover;
   background-position: center;
 }
 .photo-shopping::after, .photo-shopping i{ content: none; display: none; }
-
+ 
 .photo-hotspot{
   background-image: url('activity-hotspot.png');
   background-size: cover;
   background-position: center;
 }
 .photo-hotspot::after, .photo-hotspot i{ content: none; display: none; }
-
+ 
 .photo-cta{
   background-image: url('cta-banner.png');
   background-size: cover;
   background-position: center;
 }
 .photo-cta::after, .photo-cta i{ content: none; display: none; }
+ 
