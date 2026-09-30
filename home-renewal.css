@@ -309,10 +309,14 @@ section{ padding: 88px 0; }
   font-size:0.66rem; font-weight:700; color: var(--violet-700);
   border: 1px solid var(--line); padding: 3px 9px; border-radius: var(--radius-full);
 }
-.friend-price{ margin-bottom:10px; }
-.friend-price .price{ font-size:0.95rem; font-weight:900; color: var(--ink-900); }
-.friend-price .duration{ font-size:0.72rem; color: var(--ink-500); margin-left:3px; }
- 
+.friend-price{ margin-bottom:10px; display:flex; align-items:baseline; gap:6px; flex-wrap:wrap; }
+.friend-price .price-original{
+  font-size:0.74rem; color: var(--ink-500); text-decoration: line-through;
+  text-decoration-color: var(--rose-300);
+}
+.friend-price .price{ font-size:0.95rem; font-weight:900; color: var(--rose-700); }
+.friend-price .duration{ font-size:0.72rem; color: var(--ink-500); margin-left:1px; }
+
 .friend-info .cta-btn{
   flex:1; text-align:center; font-size:0.72rem; font-weight:800;
   padding: 9px 4px; border-radius: var(--radius-full); text-decoration:none;
@@ -420,7 +424,7 @@ section{ padding: 88px 0; }
    ========================================================================== */
  
 .photo-hero{
-  background-image: url('hero.');
+  background-image: url('hero.png');
   background-size: cover;
   background-position: center;
 }

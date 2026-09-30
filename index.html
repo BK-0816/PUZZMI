@@ -83,8 +83,9 @@
         const cover  = row.primary_photo || keys[0] || row.profiles?.avatar_url || "https://picsum.photos/seed/puzzmi/400/300";
         const img    = cover.startsWith("http") ? cover : keyToUrl(cover);
 
-        const priceJpy = new Intl.NumberFormat("ja-JP", { style: "currency", currency: "JPY", maximumFractionDigits: 0 }).format(4000);
-        const subline  = [gender, age].filter(Boolean).join(" • ");
+       const priceOriginal2h = new Intl.NumberFormat("ja-JP", { style: "currency", currency: "JPY", maximumFractionDigits: 0 }).format(8000);
+       const priceDiscount2h = new Intl.NumberFormat("ja-JP", { style: "currency", currency: "JPY", maximumFractionDigits: 0 }).format(7000);
+       const subline  = [gender, age].filter(Boolean).join(" • ");
 
         const tagsList = Array.isArray(row.tags) ? row.tags : [];
         const tagsTxt  = tagsList.length > 0 ? tagsList.map(t => `#${t}`).join(" ") : "";
@@ -107,8 +108,9 @@
               ${langs.map(l => `<span class="language">${l}</span>`).join("")}
             </div>
             <div class="friend-price">
-              <span class="price">${priceJpy}</span><span class="duration">/時間</span>
-            </div>
+              <span class="price-original">${priceOriginal2h}</span>
+              <span class="price">${priceDiscount2h}</span><span class="duration">/2時間</span>
+              </div>
             <div style="margin-top:10px; display:flex; gap:8px;">
               <a class="cta-btn" data-requires-auth="true" href="mate_like.html?mate_id=${row.user_id}">プロフィールを見る</a>
             </div>
