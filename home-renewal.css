@@ -450,7 +450,7 @@ section{ padding: 88px 0; }
 .photo-shopping::after, .photo-shopping i{ content: none; display: none; }
 
 .photo-hotspot{
-  background-image: url('activity-hotspot.jpg');
+  background-image: url('activity-hotspot.png');
   background-size: cover;
   background-position: center;
 }
